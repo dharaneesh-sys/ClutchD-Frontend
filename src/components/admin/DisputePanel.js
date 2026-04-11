@@ -3,6 +3,7 @@ import { GlassCard } from "../ui/GlassCard";
 import { Badge } from "../ui/Badge";
 import { Button } from "../ui/Button";
 import { AlertCircle, FileText, CheckCircle2 } from "lucide-react";
+import { useThemeStore } from "../../store/themeStore";
 
 const MOCK_DISPUTES = [
   {
@@ -32,6 +33,8 @@ const MOCK_DISPUTES = [
 export function DisputePanel() {
   const [disputes, setDisputes] = useState(MOCK_DISPUTES);
   const [selectedDispute, setSelectedDispute] = useState(null);
+  const { theme } = useThemeStore();
+  const isLight = theme === "light";
 
   const resolveDispute = (id) => {
     setDisputes(disputes.filter(d => d.id !== id));
@@ -41,13 +44,13 @@ export function DisputePanel() {
   return (
     <div className="flex flex-col lg:flex-row h-full gap-6">
       <GlassCard className="flex-1 flex flex-col overflow-hidden max-h-full">
-         <div className="p-4 border-b border-white/5 flex justify-between items-center bg-white/[0.02]">
-            <h3 className="font-semibold text-white">Active Disputes</h3>
+         <div className={`p-4 border-b flex justify-between items-center ${isLight ? "border-stone-200 bg-stone-50/50" : "border-white/5 bg-white/[0.02]"}`}>
+            <h3 className={`font-semibold ${isLight ? "text-stone-900" : "text-white"}`}>Active Disputes</h3>
             <Badge variant="danger">{disputes.length} Open</Badge>
          </div>
          <div className="flex-1 overflow-y-auto custom-scrollbar p-3 space-y-3">
            {disputes.length === 0 ? (
-             <div className="text-center py-12 text-white/40">No active disputes 🎉</div>
+             <div className={`text-center py-12 ${isLight ? "text-stone-400" : "text-white/40"}`}>No active disputes 🎉</div>
            ) : (
              disputes.map(d => (
                <div 
@@ -55,16 +58,16 @@ export function DisputePanel() {
                  onClick={() => setSelectedDispute(d)}
                  className={`p-4 rounded-xl border transition-all cursor-pointer ${
                    selectedDispute?.id === d.id 
-                     ? 'bg-red-500/10 border-red-500/30 shadow-[0_0_10px_rgba(239,68,68,0.1)]' 
-                     : 'bg-white/5 border-white/10 hover:bg-white/10'
+                     ? (isLight ? 'bg-red-50 border-red-200 shadow-sm' : 'bg-red-500/10 border-red-500/30 shadow-[0_0_10px_rgba(239,68,68,0.1)]')
+                     : (isLight ? 'bg-white border-stone-200 hover:bg-stone-50' : 'bg-white/5 border-white/10 hover:bg-white/10')
                  }`}
                >
                  <div className="flex justify-between items-start mb-2">
                    <Badge variant={d.status === 'Open' ? 'danger' : 'warning'} className="mb-2">{d.status}</Badge>
-                   <span className="text-xs text-white/40">{d.date}</span>
+                   <span className={`text-xs ${isLight ? "text-stone-400" : "text-white/40"}`}>{d.date}</span>
                  </div>
-                 <h4 className="font-medium text-white mb-1"><AlertCircle size={14} className="inline mr-1 text-red-400 mb-0.5" />{d.reason}</h4>
-                 <p className="text-sm text-white/50">{d.customer} vs {d.provider}</p>
+                 <h4 className={`font-medium mb-1 ${isLight ? "text-stone-900" : "text-white"}`}><AlertCircle size={14} className="inline mr-1 text-red-500 mb-0.5" />{d.reason}</h4>
+                 <p className={`text-sm ${isLight ? "text-stone-500" : "text-white/50"}`}>{d.customer} vs {d.provider}</p>
                </div>
              ))
            )}
@@ -72,13 +75,13 @@ export function DisputePanel() {
       </GlassCard>
 
       {/* Resolution Panel */}
-      <GlassCard className="flex-[1.5] flex flex-col overflow-hidden bg-black/40">
+      <GlassCard className={`flex-[1.5] flex flex-col overflow-hidden ${isLight ? "bg-stone-50/50" : "bg-black/40"}`}>
         {selectedDispute ? (
-          <div className="p-6 flex flex-col h-full">
+          <div className="p-4 sm:p-6 flex flex-col h-full">
             <div className="flex justify-between items-start mb-6">
               <div>
-                <h3 className="text-xl font-bold text-white mb-1">Dispute {selectedDispute.id}</h3>
-                <p className="text-sm text-emerald-100/60">Related Job: {selectedDispute.jobId}</p>
+                <h3 className={`text-xl font-bold mb-1 ${isLight ? "text-stone-900" : "text-white"}`}>Dispute {selectedDispute.id}</h3>
+                <p className={`text-sm ${isLight ? "text-stone-500" : "text-emerald-100/60"}`}>Related Job: {selectedDispute.jobId}</p>
               </div>
               <Badge variant="danger" className="text-lg">
                 Amount: {selectedDispute.amount}
@@ -86,38 +89,38 @@ export function DisputePanel() {
             </div>
             
             <div className="grid grid-cols-2 gap-4 mb-6">
-              <div className="p-4 rounded-xl bg-white/5 border border-white/10">
-                <p className="text-[10px] text-white/40 uppercase mb-1">Customer</p>
-                <p className="font-medium text-white">{selectedDispute.customer}</p>
+              <div className={`p-4 rounded-xl border ${isLight ? "bg-white border-stone-200" : "bg-white/5 border-white/10"}`}>
+                <p className={`text-[10px] uppercase mb-1 ${isLight ? "text-stone-400" : "text-white/40"}`}>Customer</p>
+                <p className={`font-medium ${isLight ? "text-stone-900" : "text-white"}`}>{selectedDispute.customer}</p>
               </div>
-              <div className="p-4 rounded-xl bg-white/5 border border-white/10">
-                <p className="text-[10px] text-white/40 uppercase mb-1">Provider</p>
-                <p className="font-medium text-white">{selectedDispute.provider}</p>
+              <div className={`p-4 rounded-xl border ${isLight ? "bg-white border-stone-200" : "bg-white/5 border-white/10"}`}>
+                <p className={`text-[10px] uppercase mb-1 ${isLight ? "text-stone-400" : "text-white/40"}`}>Provider</p>
+                <p className={`font-medium ${isLight ? "text-stone-900" : "text-white"}`}>{selectedDispute.provider}</p>
               </div>
             </div>
             
             <div className="mb-6">
-              <p className="font-medium text-white mb-2">Customer Complaint</p>
-              <div className="p-4 rounded-xl bg-red-500/5 border border-red-500/20 text-sm text-red-100/80 leading-relaxed relative">
-                <AlertCircle className="absolute -left-2 -top-2 text-red-500 bg-black rounded-full" size={20} />
+              <p className={`font-medium mb-2 ${isLight ? "text-stone-900" : "text-white"}`}>Customer Complaint</p>
+              <div className={`p-4 rounded-xl border text-sm leading-relaxed relative ${isLight ? "bg-red-50 border-red-200 text-red-800" : "bg-red-500/5 border-red-500/20 text-red-100/80"}`}>
+                <AlertCircle className={`absolute -left-2 -top-2 rounded-full ${isLight ? "text-red-500 bg-white" : "text-red-500 bg-black"}`} size={20} />
                 &quot;{selectedDispute.desc}&quot;
               </div>
             </div>
             
-            <div className="mt-auto space-y-4 pt-6 border-t border-white/5">
-              <h4 className="text-sm font-medium text-white">Resolution Actions</h4>
+            <div className={`mt-auto space-y-4 pt-6 border-t ${isLight ? "border-stone-200" : "border-white/5"}`}>
+              <h4 className={`text-sm font-medium ${isLight ? "text-stone-900" : "text-white"}`}>Resolution Actions</h4>
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                <Button variant="outline" className="border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/10">Refund Customer</Button>
-                <Button variant="outline" className="border-red-500/30 text-red-400 hover:bg-red-500/10">Penalize Provider</Button>
-                <Button variant="outline" className="border-white/20 text-white/70 hover:bg-white/10">Message Both</Button>
-                <Button className="bg-emerald-500 text-black hover:bg-emerald-400" onClick={() => resolveDispute(selectedDispute.id)}>
+                <Button variant="outline" className={isLight ? "border-green-200 text-green-700 hover:bg-green-50" : "border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/10"}>Refund Customer</Button>
+                <Button variant="outline" className={isLight ? "border-red-200 text-red-600 hover:bg-red-50" : "border-red-500/30 text-red-400 hover:bg-red-500/10"}>Penalize Provider</Button>
+                <Button variant="outline" className={isLight ? "border-stone-200 text-stone-600 hover:bg-stone-50" : "border-white/20 text-white/70 hover:bg-white/10"}>Message Both</Button>
+                <Button onClick={() => resolveDispute(selectedDispute.id)}>
                    <CheckCircle2 size={16} className="mr-1.5" /> Close Dispute
                 </Button>
               </div>
             </div>
           </div>
         ) : (
-          <div className="flex flex-col items-center justify-center h-full text-white/30">
+          <div className={`flex flex-col items-center justify-center h-full ${isLight ? "text-stone-400" : "text-white/30"}`}>
             <FileText size={64} className="mb-4 opacity-20" />
             <p className="text-lg font-medium">Select a dispute to view details</p>
             <p className="text-sm">Choose from the list on the left</p>

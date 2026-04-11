@@ -95,7 +95,7 @@ export function ServiceStatusTracker({ request, onComplete, onCancel }) {
   };
 
   return (
-    <GlassCard variant="strong" className="w-full h-full p-6 flex flex-col">
+    <GlassCard variant="strong" className="w-full p-6 flex flex-col flex-shrink-0">
       <div className="mb-8">
         <h2 className={`text-2xl font-bold mb-1 ${isLight ? "text-slate-900" : "text-white"}`}>Service Status</h2>
         <p className={`text-sm ${isLight ? "text-slate-500" : "text-emerald-100/70"}`}>Track your request in real-time</p>

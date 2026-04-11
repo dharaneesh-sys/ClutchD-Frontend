@@ -5,6 +5,7 @@ import { MAP_DEFAULT_CENTER } from "../lib/constants";
 export const useTrackingStore = create((set, get) => ({
   userLocation: MAP_DEFAULT_CENTER,
   mechanicLocation: null,
+  navigationTarget: null,
   nearbyMechanics: [],
   nearbyGarages: [],
   isLoading: false,
@@ -16,6 +17,7 @@ export const useTrackingStore = create((set, get) => ({
     get().fetchNearbyProviders();
   },
   setMechanicLocation: (coords) => set({ mechanicLocation: coords }),
+  setNavigationTarget: (coords) => set({ navigationTarget: coords }),
   
   fetchNearbyProviders: async () => {
     const center = get().userLocation;

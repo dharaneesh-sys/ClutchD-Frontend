@@ -16,7 +16,7 @@ const NavigationMap = dynamic(
   () => import("../../../components/dashboard/MapView"),
   { 
     ssr: false,
-    loading: () => <div className="w-full h-full bg-[#0a2a1a] rounded-2xl animate-pulse" />
+    loading: () => <div className="w-full h-full bg-stone-100 dark:bg-zinc-900 rounded-2xl animate-pulse" />
   }
 );
 

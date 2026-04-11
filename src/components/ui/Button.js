@@ -31,18 +31,18 @@ export const Button = forwardRef(
 
     const lightVariants = {
       primary:
-        "bg-gradient-to-b from-yellow-400 via-yellow-500 to-yellow-600 text-white " +
-        "shadow-[0_10px_26px_rgba(234,179,8,0.3)] " +
-        "ring-1 ring-yellow-300/30 hover:ring-yellow-200/50 " +
-        "hover:shadow-[0_16px_40px_rgba(234,179,8,0.25)] hover:-translate-y-[1px]",
+        "bg-gradient-to-b from-amber-500 via-amber-500 to-amber-600 text-white " +
+        "shadow-[0_4px_14px_rgba(212,160,17,0.3)] " +
+        "ring-1 ring-amber-400/30 hover:ring-amber-300/50 " +
+        "hover:shadow-[0_8px_24px_rgba(212,160,17,0.25)] hover:-translate-y-[1px]",
       secondary:
-        "bg-gradient-to-b from-slate-100 to-slate-50 text-slate-700 " +
-        "border border-slate-200 ring-1 ring-slate-200/50 hover:bg-slate-100 hover:border-slate-300",
+        "bg-gradient-to-b from-stone-100 to-stone-50 text-stone-700 " +
+        "border border-stone-200 ring-1 ring-stone-200/50 hover:bg-stone-100 hover:border-stone-300",
       outline:
-        "border-2 border-yellow-500/70 text-yellow-700 " +
-        "bg-transparent hover:bg-yellow-500/10 hover:border-yellow-500 " +
-        "shadow-[0_0_0_1px_rgba(234,179,8,0.18)]",
-      ghost: "hover:bg-yellow-50 text-slate-700 border border-transparent hover:border-yellow-200",
+        "border-2 border-amber-500/60 text-amber-700 " +
+        "bg-transparent hover:bg-amber-500/10 hover:border-amber-500 " +
+        "shadow-[0_0_0_1px_rgba(212,160,17,0.1)]",
+      ghost: "hover:bg-amber-50 text-stone-700 border border-transparent hover:border-amber-200",
       danger:
         "bg-gradient-to-b from-red-500 via-red-500 to-red-600 text-white " +
         "shadow-[0_10px_26px_rgba(239,68,68,0.22)] ring-1 ring-red-300/20 " +

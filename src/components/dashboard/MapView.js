@@ -1,10 +1,11 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
+import { MapContainer, TileLayer, Marker, Popup, useMap, Polyline } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
 import { useTrackingStore } from "../../store/trackingStore";
+import { useThemeStore } from "../../store/themeStore";
 
 // Fix for default Leaflet icon in Next.js
 const customMarkerIcon = (color) => new L.Icon({
@@ -26,7 +27,9 @@ function MapUpdater({ center }) {
 }
 
 export default function MapView() {
-  const { userLocation, mechanicLocation, nearbyMechanics, nearbyGarages, fetchNearbyProviders } = useTrackingStore();
+  const { userLocation, mechanicLocation, navigationTarget, nearbyMechanics, nearbyGarages, fetchNearbyProviders } = useTrackingStore();
+  const { theme } = useThemeStore();
+  const isLight = theme === "light";
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
@@ -37,8 +40,30 @@ export default function MapView() {
     return () => clearTimeout(timer);
   }, [fetchNearbyProviders]);
 
+  const [routePath, setRoutePath] = useState(null);
+
+  useEffect(() => {
+    if (navigationTarget && userLocation) {
+      const getRoute = async () => {
+        try {
+          const res = await fetch(`https://router.project-osrm.org/route/v1/driving/${userLocation[1]},${userLocation[0]};${navigationTarget.lng},${navigationTarget.lat}?overview=full&geometries=geojson`);
+          const data = await res.json();
+          if (data.routes && data.routes.length > 0) {
+            const coords = data.routes[0].geometry.coordinates.map(coord => [coord[1], coord[0]]);
+            setRoutePath(coords);
+          }
+        } catch (err) {
+          console.error("Failed to fetch route:", err);
+        }
+      };
+      getRoute();
+    } else {
+      setRoutePath(null);
+    }
+  }, [navigationTarget, userLocation]);
+
   if (!mounted) {
-    return <div className="w-full h-full bg-[#0a2a1a] rounded-2xl animate-pulse" />;
+    return <div className={`w-full h-full rounded-2xl animate-pulse ${isLight ? "bg-stone-100" : "bg-[#0a2a1a]"}`} />;
   }
 
   return (
@@ -67,6 +92,18 @@ export default function MapView() {
           <Marker position={mechanicLocation} icon={customMarkerIcon("red")}>
             <Popup>
               <div className="font-semibold text-white">Mechanic En Route</div>
+            </Popup>
+          </Marker>
+        )}
+
+        {/* Navigation Info */}
+        {routePath && (
+          <Polyline positions={routePath} color="#10b981" weight={5} opacity={0.7} />
+        )}
+        {navigationTarget && (
+          <Marker position={[navigationTarget.lat, navigationTarget.lng]} icon={customMarkerIcon("orange")}>
+            <Popup>
+              <div className="font-semibold text-amber-900">Customer Location</div>
             </Popup>
           </Marker>
         )}

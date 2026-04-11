@@ -22,22 +22,20 @@
 }
 
 .light {
-  --background: #f8fafc;
-  --foreground: #0f172a;
-  --primary: #eab308;
-  --primary-dark: #ca8a04;
-  --primary-light: #fde047;
-  --accent: #eab308;
-  --glass-bg: rgba(255, 255, 255, 0.6); 
-  --glass-border: rgba(0, 0, 0, 0.1);
-  --glass-hover: rgba(240, 240, 240, 0.8);
+  --background: #faf8f3;
+  --foreground: #1c1917;
+  --primary: #d4a011;
+  --primary-dark: #b8860b;
+  --primary-light: #f0c644;
+  --accent: #d4a011;
+  --glass-bg: rgba(255, 255, 255, 0.72); 
+  --glass-border: rgba(28, 25, 23, 0.06);
+  --glass-hover: rgba(255, 255, 255, 0.88);
   
-  --color-primary-rgb: 234, 179, 8;
-  --color-white-rgb: 255, 255, 255; /* Keep true white for light mode explicitly styled items */
+  --color-primary-rgb: 212, 160, 17;
+  --color-white-rgb: 255, 255, 255;
   --color-black-rgb: 0, 0, 0;
 
-  /* We no longer invert white/black here since we added explicit isLight classes to components. */
-  
   --color-emerald-50: #451a03; 
   --color-emerald-100: #713f12;
   --color-emerald-200: #854d0e;
@@ -71,7 +69,6 @@ body {
   font-family: 'Inter', sans-serif;
   background-color: var(--background);
   background-attachment: fixed;
-  /* Subtle mesh gradient over dark background, not overwhelmingly green */
   background-image: 
     radial-gradient(ellipse at top left, rgba(var(--color-primary-rgb), 0.08) 0%, transparent 40%),
     radial-gradient(ellipse at bottom right, rgba(var(--color-primary-rgb), 0.05) 0%, transparent 40%);
@@ -268,114 +265,153 @@ h1, h2, h3, h4 {
 .light .leaflet-tile-pane { filter: none; }
 .light .leaflet-popup-content-wrapper {
   background: rgba(255, 255, 255, 0.95) !important;
-  color: #0f172a !important;
+  color: #1c1917 !important;
+  border: 1px solid rgba(0,0,0,0.08) !important;
+  box-shadow: 0 8px 30px rgba(0,0,0,0.08) !important;
 }
 .light .leaflet-popup-tip {
   background: rgba(255, 255, 255, 0.95) !important;
 }
 
 /* ============================================================
-   LIGHT MODE — Mustard Yellow + White Theme 
+   LIGHT MODE — Warm Mustard + Clean White — Production Quality
+   Inspired by Bumble, Rappi, Urban Company warm palettes
    ============================================================ */
 
-/* Body background — warm cream with mustard radial accents */
-.light body {
-  background-color: #fffdf5;
+/* Body — warm parchment base with very subtle golden radial wash */
+.light body,
+body.light {
+  background-color: #faf8f3;
   background-image:
-    radial-gradient(ellipse at top left, rgba(234, 179, 8, 0.12) 0%, transparent 40%),
-    radial-gradient(ellipse at bottom right, rgba(234, 179, 8, 0.08) 0%, transparent 40%);
-  color: #0f172a;
+    radial-gradient(ellipse at 0% 0%, rgba(212,160,17,0.06) 0%, transparent 50%),
+    radial-gradient(ellipse at 100% 100%, rgba(212,160,17,0.04) 0%, transparent 50%);
+  color: #1c1917;
 }
 
 /* Background mesh for light mode */
 .light .bg-mesh,
 .light.bg-mesh {
   background-image:
-    radial-gradient(ellipse at 20% 50%, rgba(234, 179, 8, 0.12) 0%, transparent 45%),
-    radial-gradient(ellipse at 80% 20%, rgba(234, 179, 8, 0.07) 0%, transparent 45%),
-    linear-gradient(to bottom right, #fffdf5, #fefce8) !important;
+    radial-gradient(ellipse at 20% 50%, rgba(212,160,17,0.07) 0%, transparent 45%),
+    radial-gradient(ellipse at 80% 20%, rgba(212,160,17,0.04) 0%, transparent 45%),
+    linear-gradient(175deg, #faf8f3, #fff9eb) !important;
 }
 
 /* Selection */
 .light ::selection {
-  background: rgba(234, 179, 8, 0.3);
+  background: rgba(212,160,17,0.2);
   color: #422006;
 }
 
-/* Glass cards — white frosted glass */
+/* --- Glass cards — solid white with soft layered shadows (no frosted glass look) --- */
 .light .glass {
-  background: rgba(255, 255, 255, 0.65);
-  border: 1px solid rgba(0, 0, 0, 0.08);
+  background: rgba(255,255,255,0.82);
+  border: 1px solid rgba(28,25,23,0.06);
+  box-shadow:
+    0 1px 2px rgba(0,0,0,0.04),
+    0 4px 16px rgba(0,0,0,0.04);
 }
 
 .light .glass-strong {
-  background: rgba(255, 255, 255, 0.75);
-  border: 1px solid rgba(0, 0, 0, 0.1);
+  background: rgba(255,255,255,0.92);
+  border: 1px solid rgba(28,25,23,0.07);
+  box-shadow:
+    0 1px 3px rgba(0,0,0,0.03),
+    0 8px 32px rgba(0,0,0,0.06);
 }
 
 .light .glass-hover:hover {
-  background: rgba(255, 255, 255, 0.85);
-  border-color: rgba(234, 179, 8, 0.3);
-  box-shadow: 0 12px 30px rgba(234, 179, 8, 0.15);
+  background: #fff;
+  border-color: rgba(212,160,17,0.2);
+  box-shadow:
+    0 1px 3px rgba(0,0,0,0.03),
+    0 12px 40px rgba(212,160,17,0.08);
 }
 
-/* Gradient text — mustard yellow gradient */
+/* Gradient text — richer warm mustard */
 .light .gradient-text {
-  background: linear-gradient(135deg, #eab308 0%, #ca8a04 50%, #a16207 100%);
+  background: linear-gradient(135deg, #d4a011 0%, #b8860b 50%, #996515 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
 
-/* Glow button — mustard */
+/* Glow button — deep warm mustard, text stays dark for readability */
 .light .btn-glow {
-  background: linear-gradient(135deg, #eab308 0%, #ca8a04 100%);
-  box-shadow: 0 4px 15px rgba(234, 179, 8, 0.3);
+  background: linear-gradient(135deg, #d4a011 0%, #b8860b 100%);
+  box-shadow: 0 4px 14px rgba(212,160,17,0.25);
+  color: #fff;
 }
 .light .btn-glow:hover {
-  box-shadow: 0 6px 25px rgba(234, 179, 8, 0.45);
+  box-shadow: 0 6px 24px rgba(212,160,17,0.35);
 }
 
-/* Inputs */
+/* --- Inputs — clean white, warm focus ring --- */
 .light .input-glass {
-  background: rgba(255, 255, 255, 0.7);
-  border: 1px solid rgba(0, 0, 0, 0.12);
-  color: #0f172a;
+  background: #fff;
+  border: 1px solid rgba(28,25,23,0.1);
+  color: #1c1917;
 }
 .light .input-glass::placeholder {
-  color: rgba(15, 23, 42, 0.4);
+  color: rgba(28,25,23,0.35);
 }
 .light .input-glass:focus {
-  border-color: #eab308;
-  box-shadow: 0 0 0 3px rgba(234, 179, 8, 0.2);
-  background: #ffffff;
+  border-color: #d4a011;
+  box-shadow: 0 0 0 3px rgba(212,160,17,0.12);
+  background: #fff;
 }
 
 /* Scrollbar light mode */
 .light ::-webkit-scrollbar-track {
-  background: rgba(0, 0, 0, 0.03);
+  background: rgba(0, 0, 0, 0.02);
 }
 .light ::-webkit-scrollbar-thumb {
-  background: rgba(234, 179, 8, 0.4);
+  background: rgba(28,25,23,0.12);
 }
 .light ::-webkit-scrollbar-thumb:hover {
-  background: rgba(234, 179, 8, 0.6);
+  background: rgba(28,25,23,0.22);
 }
 .light .custom-scrollbar::-webkit-scrollbar-thumb {
-  background: rgba(0, 0, 0, 0.12);
+  background: rgba(28,25,23,0.08);
 }
 
 /* Focus ring light mode */
 .light .focus-lux:focus-visible {
-  box-shadow: 0 0 0 4px rgba(234, 179, 8, 0.25);
-  border-color: rgba(234, 179, 8, 0.6) !important;
+  box-shadow: 0 0 0 4px rgba(212,160,17,0.18);
+  border-color: rgba(212,160,17,0.5) !important;
 }
 
-/* Pulse animation — mustard for light */
-.light .pulse-online {
+/* Pulse animation — warm mustard for light */
+.light .pulse-online,
+.light .pulse-online-light {
   animation: pulse-mustard 2s infinite;
 }
 @keyframes pulse-mustard {
-  0%, 100% { box-shadow: 0 0 0 0 rgba(234, 179, 8, 0.6); }
-  50% { box-shadow: 0 0 0 8px rgba(234, 179, 8, 0); }
+  0%, 100% { box-shadow: 0 0 0 0 rgba(212,160,17,0.5); }
+  50% { box-shadow: 0 0 0 8px rgba(212,160,17,0); }
+}
+
+/* ============================================================
+   MOBILE-FIRST ENHANCEMENTS
+   ============================================================ */
+@media (max-width: 640px) {
+  /* Bigger touch targets on mobile */
+  button, a, [role="button"] {
+    min-height: 44px;
+  }
+  
+  /* Reduce padding density on small screens */
+  .glass, .glass-strong {
+    border-radius: 0.875rem;
+  }
+}
+
+/* Safe-area insets for notch devices */
+@supports (padding: env(safe-area-inset-top)) {
+  body {
+    padding-top: env(safe-area-inset-top);
+    padding-bottom: env(safe-area-inset-bottom);
+    padding-left: env(safe-area-inset-left);
+    padding-right: env(safe-area-inset-right);
+  }
 }

@@ -52,8 +52,8 @@ export function Modal({ isOpen, onClose, title, children, className, maxWidth = 
                 "relative w-full rounded-2xl border",
                 "p-6 backdrop-blur-3xl pointer-events-auto",
                 isLight
-                  ? "border-slate-200 bg-white shadow-[0_30px_80px_rgba(0,0,0,0.1)] ring-1 ring-yellow-400/10"
-                  : "border-white/15 bg-gradient-to-b from-emerald-900/35 to-black/65 shadow-[0_30px_80px_rgba(0,0,0,0.65)] ring-1 ring-emerald-400/10",
+                  ? "border-stone-200 bg-white shadow-[0_30px_80px_rgba(0,0,0,0.08)] ring-1 ring-amber-400/10"
+                  : "border-white/15 bg-gradient-to-b from-zinc-900/90 to-zinc-950/95 shadow-[0_30px_80px_rgba(0,0,0,0.65)] ring-1 ring-emerald-400/10",
                 maxWidth,
                 className
               )}

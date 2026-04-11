@@ -22,7 +22,7 @@ const MapView = dynamic(
   {
     ssr: false,
     loading: () => (
-      <div className="w-full h-full bg-[#0a2a1a] rounded-2xl animate-pulse" />
+      <div className="w-full h-full bg-stone-100 dark:bg-zinc-900 rounded-2xl animate-pulse" />
     ),
   }
 );
@@ -30,7 +30,7 @@ const MapView = dynamic(
 // Lazy-loaded history component (Phase 6)
 const ServiceHistory = dynamic(
   () => import("../../../components/dashboard/ServiceHistory").then(m => ({ default: m.ServiceHistory })),
-  { ssr: false, loading: () => <div className="flex-1 flex items-center justify-center"><div className="w-8 h-8 border-2 border-t-transparent rounded-full animate-spin border-emerald-500" /></div> }
+  { ssr: false, loading: () => <div className="flex-1 flex items-center justify-center"><div className="w-8 h-8 border-2 border-t-transparent rounded-full animate-spin border-amber-500 dark:border-emerald-500" /></div> }
 );
 
 export default function CustomerDashboard() {
@@ -131,7 +131,7 @@ export default function CustomerDashboard() {
 
   return (
     <div className="h-screen w-full flex flex-col p-4 sm:p-6 pb-0 overflow-hidden relative z-10 gap-6">
-      <header className={`flex justify-between items-center px-6 py-4 backdrop-blur-xl rounded-2xl flex-shrink-0 ${isLight ? "bg-white/70 border border-slate-200" : "bg-white/5 border border-white/10"}`}>
+      <header className={`flex justify-between items-center px-6 py-4 backdrop-blur-xl rounded-2xl flex-shrink-0 relative z-50 ${isLight ? "bg-white/70 border border-slate-200" : "bg-white/5 border border-white/10"}`}>
         <div className="flex items-center gap-2">
           <div className={`w-8 h-8 rounded-lg flex items-center justify-center text-white font-bold tracking-tighter ${isLight ? "bg-gradient-to-br from-yellow-400 to-yellow-600" : "bg-gradient-to-br from-emerald-400 to-emerald-600"}`}>
             M
@@ -191,7 +191,7 @@ export default function CustomerDashboard() {
 
       {activeTab === "request" ? (
         <div className="flex-1 grid grid-cols-1 lg:grid-cols-12 gap-6 min-h-0 pb-6">
-          <div className="lg:col-span-7 xl:col-span-8 rounded-2xl overflow-hidden relative shadow-2xl h-full min-h-[400px]">
+          <div className="lg:col-span-7 xl:col-span-8 rounded-2xl overflow-hidden relative shadow-2xl h-[300px] sm:h-[400px] lg:h-full lg:min-h-[400px]">
             <MapView />
 
             <div className={`absolute top-4 left-4 z-[400] backdrop-blur-md px-3 py-1.5 rounded-full border text-xs font-semibold flex items-center gap-2 ${isLight ? "bg-white/80 border-slate-200 text-slate-700" : "bg-black/60 border-white/10 text-white"}`}>

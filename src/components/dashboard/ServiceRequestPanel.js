@@ -89,13 +89,13 @@ export function ServiceRequestPanel({ onSubmit, isLoading }) {
   }
 
   return (
-    <GlassCard variant="strong" className="w-full h-full p-6 flex flex-col relative">
+    <GlassCard variant="strong" className="w-full p-6 flex flex-col relative flex-shrink-0">
       <div className="mb-6">
         <h2 className={`text-2xl font-bold mb-1 ${isLight ? "text-slate-900" : "text-white"}`}>Request Service</h2>
         <p className={`text-sm ${isLight ? "text-slate-500" : "text-emerald-100/70"}`}>Tell us what&apos;s wrong with your vehicle</p>
       </div>
 
-      <form onSubmit={handleSubmit(submitHandler)} className="space-y-5 flex-grow flex flex-col">
+      <form onSubmit={handleSubmit(submitHandler)} className="space-y-5 flex-col">
         <div className="space-y-4">
           
           {/* Vehicle Selection */}

@@ -6,10 +6,13 @@ import { MultiSelect } from "../ui/MultiSelect";
 import { EXPERTISE_OPTIONS } from "../../lib/constants";
 import { Building2, MapPin, Phone, Clock, Users, Loader2 } from "lucide-react";
 import { useAuthStore } from "../../store/authStore";
+import { useThemeStore } from "../../store/themeStore";
 import api from "../../lib/api";
 
 export function GarageProfile() {
   const { user, updateUserData } = useAuthStore();
+  const { theme } = useThemeStore();
+  const isLight = theme === "light";
   const [isEditing, setIsEditing] = useState(false);
   const [services, setServices] = useState(user?.services || []);
   const [saving, setSaving] = useState(false);
@@ -46,30 +49,30 @@ export function GarageProfile() {
   };
 
   return (
-    <GlassCard variant="strong" className="p-6 h-full flex flex-col">
+    <GlassCard variant="strong" className="p-4 sm:p-6 h-full flex flex-col">
       <div className="flex justify-between items-center mb-6">
-        <h2 className="text-xl font-bold text-white tracking-tight">Garage Profile</h2>
+        <h2 className={`text-xl font-bold tracking-tight ${isLight ? "text-stone-900" : "text-white"}`}>Garage Profile</h2>
         <Button variant="ghost" size="sm" onClick={() => setIsEditing(!isEditing)} disabled={saving}>
           {isEditing ? "Cancel" : "Edit Details"}
         </Button>
       </div>
 
-      <div className="flex items-center gap-4 mb-8 pb-6 border-b border-white/5">
-        <div className="w-20 h-20 rounded-2xl bg-emerald-500/20 border-2 border-emerald-500/30 overflow-hidden flex items-center justify-center">
+      <div className={`flex items-center gap-4 mb-8 pb-6 border-b ${isLight ? "border-stone-200" : "border-white/5"}`}>
+        <div className={`w-20 h-20 rounded-2xl overflow-hidden flex items-center justify-center border-2 ${isLight ? "bg-amber-50 border-amber-200" : "bg-emerald-500/20 border-emerald-500/30"}`}>
           {user?.image ? (
              <img src={user.image} alt="Garage" className="w-full h-full object-cover" />
           ) : (
-            <Building2 size={32} className="text-emerald-400" />
+            <Building2 size={32} className={isLight ? "text-amber-600" : "text-emerald-400"} />
           )}
         </div>
         <div>
-          <h3 className="text-xl font-semibold text-white">{user?.name || user?.garageName || "Your Garage"}</h3>
-          <p className="text-emerald-100/60 text-sm">Managed by {user?.ownerName || "Owner"}</p>
+          <h3 className={`text-xl font-semibold ${isLight ? "text-stone-900" : "text-white"}`}>{user?.name || user?.garageName || "Your Garage"}</h3>
+          <p className={`text-sm ${isLight ? "text-stone-500" : "text-emerald-100/60"}`}>Managed by {user?.ownerName || "Owner"}</p>
           <div className="flex items-center gap-3 mt-2">
-             <div className="flex items-center text-xs text-amber-400">
-               ⭐ {user?.rating ?? "—"} <span className="text-emerald-100/40 ml-1">Rating</span>
+             <div className="flex items-center text-xs text-amber-500">
+               ⭐ {user?.rating ?? "—"} <span className={`ml-1 ${isLight ? "text-stone-400" : "text-emerald-100/40"}`}>Rating</span>
              </div>
-             <span className="px-2 py-0.5 rounded text-[10px] bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+             <span className={`px-2 py-0.5 rounded text-[10px] font-medium ${isLight ? "bg-green-50 text-green-700 border border-green-200" : "bg-emerald-500/20 text-emerald-300 border border-emerald-500/30"}`}>
                Verified Partner
              </span>
           </div>
@@ -134,17 +137,17 @@ export function GarageProfile() {
           />
         ) : (
           <div>
-            <label className="mb-2 block text-sm font-medium text-emerald-100/80">Services Offered</label>
+            <label className={`mb-2 block text-sm font-medium ${isLight ? "text-stone-600" : "text-emerald-100/80"}`}>Services Offered</label>
             <div className="flex flex-wrap gap-2">
                {user?.services?.length > 0 ? user.services.map(exp => {
                  const label = EXPERTISE_OPTIONS.find(o => o.value === exp)?.label || exp;
                  return (
-                   <span key={exp} className="px-2.5 py-1 bg-white/5 border border-white/10 rounded-md text-xs text-emerald-100">
+                   <span key={exp} className={`px-2.5 py-1 rounded-md text-xs font-medium ${isLight ? "bg-stone-100 border border-stone-200 text-stone-700" : "bg-white/5 border border-white/10 text-emerald-100"}`}>
                      {label}
                    </span>
                  )
                }) : (
-                 <span className="text-xs text-white/30">No services set</span>
+                 <span className={`text-xs ${isLight ? "text-stone-400" : "text-white/30"}`}>No services set</span>
                )}
             </div>
           </div>
@@ -152,7 +155,7 @@ export function GarageProfile() {
       </div>
 
       {isEditing && (
-        <div className="mt-6 pt-6 border-t border-white/5 flex justify-end">
+        <div className={`mt-6 pt-6 border-t flex justify-end ${isLight ? "border-stone-200" : "border-white/5"}`}>
           <Button onClick={handleSave} disabled={saving}>
             {saving ? <><Loader2 size={16} className="animate-spin mr-2" /> Saving...</> : "Save Details"}
           </Button>

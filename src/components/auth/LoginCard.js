@@ -8,6 +8,7 @@ import { Mail, Lock, LogIn, UserCircle, Wrench, Building2 } from "lucide-react";
 import { GlassCard } from "../ui/GlassCard";
 import { Button } from "../ui/Button";
 import { Input } from "../ui/Input";
+import api from "../../lib/api";
 
 import { useRouter } from "next/navigation";
 
@@ -113,6 +114,136 @@ export function LoginCard() {
     return () => {};
   }, [googleClientId, loginWithGoogle, router, selectedRole]);
 
+  const [view, setView] = useState("login");
+  const [resetEmail, setResetEmail] = useState("");
+  const [resetCode, setResetCode] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [resetError, setResetError] = useState("");
+  const [resetLoading, setResetLoading] = useState(false);
+
+  const handleForgotRequest = async (e) => {
+    e.preventDefault();
+    if (!resetEmail) {
+      setResetError("Email is required");
+      return;
+    }
+    setResetLoading(true);
+    setResetError("");
+    try {
+      await api.post("/auth/forgot-password/request", { email: resetEmail });
+      setView("forgot_code");
+    } catch (err) {
+      setResetError(err.response?.data?.detail || err.message || "Request failed");
+    } finally {
+      setResetLoading(false);
+    }
+  };
+
+  const handleForgotReset = async (e) => {
+    e.preventDefault();
+    if (!resetCode || !newPassword) {
+      setResetError("Code and new password are required");
+      return;
+    }
+    setResetLoading(true);
+    setResetError("");
+    try {
+      await api.post("/auth/forgot-password/reset", { 
+        email: resetEmail, 
+        code: resetCode, 
+        newPassword: newPassword 
+      });
+      setView("login");
+      setResetEmail("");
+      setResetCode("");
+      setNewPassword("");
+    } catch (err) {
+      setResetError(err.response?.data?.detail || err.message || "Reset failed");
+    } finally {
+      setResetLoading(false);
+    }
+  };
+
+  if (view === "forgot_email") {
+    return (
+      <GlassCard variant="strong" className="w-full max-w-md p-8 pt-10">
+        <div className="mb-8 text-center">
+          <h2 className={`text-2xl font-bold mb-2 tracking-tight ${isLight ? "text-slate-900" : "text-white"}`}>Reset Password</h2>
+          <p className={isLight ? "text-slate-500" : "text-emerald-100/70"}>Enter your email to receive a recovery code.</p>
+        </div>
+        <form onSubmit={handleForgotRequest} className="space-y-4">
+          <Input 
+            label="Email Address" 
+            type="email" 
+            icon={Mail} 
+            value={resetEmail} 
+            onChange={(e) => setResetEmail(e.target.value)} 
+            placeholder="name@example.com" 
+          />
+          {resetError && (
+             <div className="p-3 rounded-lg bg-red-500/10 border border-red-500/20 text-red-400 text-sm">
+               {resetError}
+             </div>
+          )}
+          <Button type="submit" className="w-full mt-2" size="lg" isLoading={resetLoading}>
+             Send Reset Code
+          </Button>
+          <button 
+             type="button" 
+             onClick={() => setView("login")} 
+             className={`w-full text-sm mt-4 text-center hover:underline ${isLight ? "text-slate-500" : "text-white/60"}`}
+          >
+             Back to Login
+          </button>
+        </form>
+      </GlassCard>
+    );
+  }
+
+  if (view === "forgot_code") {
+    return (
+      <GlassCard variant="strong" className="w-full max-w-md p-8 pt-10">
+        <div className="mb-8 text-center">
+          <h2 className={`text-2xl font-bold mb-2 tracking-tight ${isLight ? "text-slate-900" : "text-white"}`}>Enter Code</h2>
+          <p className={isLight ? "text-slate-500" : "text-emerald-100/70"}>Check your terminal logs for the 6-digit code.</p>
+        </div>
+        <form onSubmit={handleForgotReset} className="space-y-4">
+          <Input 
+            label="6-Digit Reset Code" 
+            type="text" 
+            value={resetCode} 
+            onChange={(e) => setResetCode(e.target.value)} 
+            placeholder="000000" 
+            maxLength={6}
+          />
+          <Input 
+            label="New Password" 
+            type="password" 
+            icon={Lock} 
+            value={newPassword} 
+            onChange={(e) => setNewPassword(e.target.value)} 
+            placeholder="••••••••" 
+          />
+          {resetError && (
+             <div className="p-3 rounded-lg bg-red-500/10 border border-red-500/20 text-red-400 text-sm">
+               {resetError}
+             </div>
+          )}
+          <Button type="submit" className="w-full mt-2" size="lg" isLoading={resetLoading}>
+             Reset Password
+          </Button>
+          <button 
+             type="button" 
+             onClick={() => setView("login")} 
+             className={`w-full text-sm mt-4 text-center hover:underline ${isLight ? "text-slate-500" : "text-white/60"}`}
+          >
+             Back to Login
+          </button>
+        </form>
+      </GlassCard>
+    );
+  }
+
   return (
     <GlassCard variant="strong" className="w-full max-w-md p-8 pt-10">
       <div className="mb-8 text-center">
@@ -174,12 +305,13 @@ export function LoginCard() {
             error={errors.password?.message}
           />
           <div className="flex justify-end">
-            <a
-              href="#"
+            <button
+              type="button"
+              onClick={() => setView("forgot_email")}
               className={`text-sm font-medium transition-colors ${isLight ? "text-yellow-600 hover:text-yellow-700" : "text-emerald-400 hover:text-emerald-300"}`}
             >
               Forgot password?
-            </a>
+            </button>
           </div>
         </div>
 
@@ -199,7 +331,7 @@ export function LoginCard() {
             <div className={`w-full border-t ${isLight ? "border-slate-200" : "border-white/10"}`}></div>
           </div>
           <div className="relative flex justify-center text-sm">
-            <span className={`px-2 ${isLight ? "bg-white text-slate-400" : "bg-[#0d3f2d] text-emerald-100/50"}`}>Or continue with</span>
+            <span className={`px-2 ${isLight ? "bg-white text-stone-400" : "bg-zinc-900 text-emerald-100/50"}`}>Or continue with</span>
           </div>
         </div>
 

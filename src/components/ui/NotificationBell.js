@@ -114,7 +114,7 @@ export function NotificationBell() {
                 You have no notifications.
               </div>
             ) : (
-              <div className="divide-y divide-white/5">
+              <div className={`divide-y ${isLight ? "divide-stone-100" : "divide-white/5"}`}>
                 {notifications.map(n => (
                   <div 
                     key={n.id} 
