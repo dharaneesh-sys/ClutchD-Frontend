@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { serviceRequestSchema } from "../../lib/validators";
@@ -10,13 +10,18 @@ import { GlassCard } from "../ui/GlassCard";
 import { Button } from "../ui/Button";
 import { Select } from "../ui/Select";
 import { FileUpload } from "../ui/FileUpload";
-import { Wrench, Navigation, CheckCircle2 } from "lucide-react";
+import { Navigation, CheckCircle2, CarFront, PlusCircle } from "lucide-react";
 import { useThemeStore } from "../../store/themeStore";
 import { cn } from "../../lib/utils";
+import api from "../../lib/api";
+import { VehicleManagerModal } from "./VehicleManagerModal";
 
 export function ServiceRequestPanel({ onSubmit, isLoading }) {
   const [estimatedPrice, setEstimatedPrice] = useState({ min: 500, max: 2000 });
   const [isSuccess, setIsSuccess] = useState(false);
+  const [vehicles, setVehicles] = useState([]);
+  const [isVehicleModalOpen, setIsVehicleModalOpen] = useState(false);
+
   const { theme } = useThemeStore();
   const isLight = theme === "light";
 
@@ -35,6 +40,23 @@ export function ServiceRequestPanel({ onSubmit, isLoading }) {
 
   const issueTag = watch("issueTag");
   const requestType = watch("requestType");
+  const selectedVehicleId = watch("vehicleId");
+
+  const fetchVehicles = async () => {
+    try {
+      const res = await api.get("/vehicles");
+      setVehicles(res.data);
+      if (res.data.length > 0 && !selectedVehicleId) {
+        setValue("vehicleId", res.data[0].id, { shouldValidate: true });
+      }
+    } catch(e) {
+      // best effort
+    }
+  };
+
+  useEffect(() => {
+    fetchVehicles();
+  }, []);
 
   const handleIssueChange = (e) => {
     const value = e.target.value;
@@ -67,7 +89,7 @@ export function ServiceRequestPanel({ onSubmit, isLoading }) {
   }
 
   return (
-    <GlassCard variant="strong" className="w-full h-full p-6 flex flex-col">
+    <GlassCard variant="strong" className="w-full h-full p-6 flex flex-col relative">
       <div className="mb-6">
         <h2 className={`text-2xl font-bold mb-1 ${isLight ? "text-slate-900" : "text-white"}`}>Request Service</h2>
         <p className={`text-sm ${isLight ? "text-slate-500" : "text-emerald-100/70"}`}>Tell us what&apos;s wrong with your vehicle</p>
@@ -75,6 +97,49 @@ export function ServiceRequestPanel({ onSubmit, isLoading }) {
 
       <form onSubmit={handleSubmit(submitHandler)} className="space-y-5 flex-grow flex flex-col">
         <div className="space-y-4">
+          
+          {/* Vehicle Selection */}
+          <div className="w-full">
+             <div className="flex justify-between items-center mb-2">
+               <label className={`text-sm font-medium ${isLight ? "text-slate-700" : "text-emerald-100/80"}`}>
+                 Select Vehicle
+               </label>
+               <button 
+                 type="button" 
+                 onClick={() => setIsVehicleModalOpen(true)}
+                 className={`text-xs flex items-center hover:underline ${isLight ? "text-yellow-600" : "text-emerald-400"}`}
+               >
+                 <PlusCircle size={12} className="mr-1" /> Manage
+               </button>
+             </div>
+             
+             {vehicles.length === 0 ? (
+               <div className={`p-4 rounded-xl border flex items-center justify-between ${isLight ? "bg-yellow-50 border-yellow-200" : "bg-emerald-500/10 border-emerald-500/30"}`}>
+                 <span className={`text-sm font-medium ${isLight ? "text-yellow-700" : "text-emerald-300"}`}>No vehicles added</span>
+                 <Button type="button" size="sm" onClick={() => setIsVehicleModalOpen(true)}>Add Vehicle</Button>
+               </div>
+             ) : (
+               <div className="grid grid-cols-1 gap-2">
+                 {vehicles.map(v => (
+                   <label 
+                     key={v.id}
+                     className={cn(
+                       "flex items-center gap-3 p-3 rounded-xl border cursor-pointer transition-all",
+                       selectedVehicleId === v.id 
+                         ? (isLight ? "bg-yellow-500/15 border-yellow-500 text-yellow-700 shadow-[0_0_10px_rgba(234,179,8,0.15)]" : "bg-emerald-500/20 border-emerald-400 text-white")
+                         : (isLight ? "bg-white border-slate-200 text-slate-500 hover:bg-slate-50" : "bg-white/5 border-white/10 text-white/50 hover:bg-white/10")
+                     )}
+                   >
+                     <input type="radio" value={v.id} {...register("vehicleId")} className="sr-only" />
+                     <CarFront size={18} className={selectedVehicleId === v.id ? (isLight ? "text-yellow-600" : "text-emerald-400") : "opacity-50"} />
+                     <span className="font-medium text-sm">{v.year} {v.make} {v.model}</span>
+                     {v.license_plate && <span className="text-xs opacity-60 ml-auto">{v.license_plate}</span>}
+                   </label>
+                 ))}
+               </div>
+             )}
+          </div>
+
           <Select
             label="What seems to be the issue?"
             placeholder="Select a category..."
@@ -152,12 +217,19 @@ export function ServiceRequestPanel({ onSubmit, isLoading }) {
             size="lg" 
             isLoading={isLoading} 
             className="w-full sm:w-auto"
+            disabled={vehicles.length > 0 && !selectedVehicleId}
           >
             <Navigation size={18} className="mr-2" />
             Find Help Now
           </Button>
         </div>
       </form>
+      
+      <VehicleManagerModal 
+        isOpen={isVehicleModalOpen} 
+        onClose={() => setIsVehicleModalOpen(false)} 
+        onVehiclesChanged={fetchVehicles}
+      />
     </GlassCard>
   );
 }

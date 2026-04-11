@@ -8,10 +8,14 @@ import { useTrackingStore } from "../../../store/trackingStore";
 import { useThemeStore } from "../../../store/themeStore";
 import { ServiceRequestPanel } from "../../../components/dashboard/ServiceRequestPanel";
 import { ServiceStatusTracker } from "../../../components/dashboard/ServiceStatusTracker";
+import { ProviderList } from "../../../components/dashboard/ProviderList";
 import { PaymentModal } from "../../../components/dashboard/PaymentModal";
 import { ReviewModal } from "../../../components/dashboard/ReviewModal";
-import { LogOut, User } from "lucide-react";
+import { NotificationBell } from "../../../components/ui/NotificationBell";
+import { SOSButton } from "../../../components/ui/SOSButton";
+import { LogOut, User, History, Wrench, Wifi, WifiOff } from "lucide-react";
 import { SERVICE_STATUS } from "../../../lib/constants";
+import api from "../../../lib/api";
 
 const MapView = dynamic(
   () => import("../../../components/dashboard/MapView"),
@@ -23,9 +27,15 @@ const MapView = dynamic(
   }
 );
 
+// Lazy-loaded history component (Phase 6)
+const ServiceHistory = dynamic(
+  () => import("../../../components/dashboard/ServiceHistory").then(m => ({ default: m.ServiceHistory })),
+  { ssr: false, loading: () => <div className="flex-1 flex items-center justify-center"><div className="w-8 h-8 border-2 border-t-transparent rounded-full animate-spin border-emerald-500" /></div> }
+);
+
 export default function CustomerDashboard() {
   const { user, logout, isAuthenticated } = useAuthStore();
-  const { activeRequest, createRequest, cancelRequest } = useServiceStore();
+  const { activeRequest, createRequest, cancelRequest, restoreActiveRequest } = useServiceStore();
   const { theme } = useThemeStore();
   const isLight = theme === "light";
   const updateRequestStatus = useCallback(
@@ -41,6 +51,7 @@ export default function CustomerDashboard() {
   const [isReviewOpen, setIsReviewOpen] = useState(false);
   const [reviewProviderName, setReviewProviderName] = useState("the professional");
   const [paymentAmount, setPaymentAmount] = useState(1200);
+  const [activeTab, setActiveTab] = useState("request"); // "request" | "history"
 
   useEffect(() => {
     if (!isAuthenticated) {
@@ -48,35 +59,32 @@ export default function CustomerDashboard() {
     }
   }, [isAuthenticated]);
 
+  // Restore active request on mount (handles page refresh)
   useEffect(() => {
-    if (!activeRequest) return;
-
-    let timer;
-    if (activeRequest.status === SERVICE_STATUS.SEARCHING) {
-      timer = setTimeout(() => {
-        updateRequestStatus(SERVICE_STATUS.ASSIGNED, {
-          id: "m1",
-          name: "Vijay Kumar",
-          rating: 4.8,
-          distance: "2.4 km",
-        });
-      }, 1500);
-    } else if (activeRequest.status === SERVICE_STATUS.ASSIGNED) {
-      timer = setTimeout(() => {
-        updateRequestStatus(SERVICE_STATUS.EN_ROUTE);
-      }, 1500);
-    } else if (activeRequest.status === SERVICE_STATUS.EN_ROUTE) {
-      timer = setTimeout(() => {
-        updateRequestStatus(SERVICE_STATUS.IN_PROGRESS);
-      }, 2000);
-    } else if (activeRequest.status === SERVICE_STATUS.IN_PROGRESS) {
-      timer = setTimeout(() => {
-        updateRequestStatus(SERVICE_STATUS.COMPLETED);
-      }, 2000);
+    if (isAuthenticated && !activeRequest) {
+      restoreActiveRequest();
     }
+  }, [isAuthenticated]); // eslint-disable-line react-hooks/exhaustive-deps
 
-    return () => clearTimeout(timer);
-  }, [activeRequest, updateRequestStatus]);
+  // Polling fallback: if WebSocket is unavailable, poll job status every 15s
+  useEffect(() => {
+    if (!activeRequest || !activeRequest.id) return;
+    if (activeRequest.status === SERVICE_STATUS.COMPLETED) return;
+
+    const interval = setInterval(async () => {
+      try {
+        const res = await api.get(`/jobs/status/${activeRequest.id}`);
+        const serverStatus = res.data?.status;
+        if (serverStatus && serverStatus !== activeRequest.status) {
+          updateRequestStatus(serverStatus, res.data?.mechanic, true);
+        }
+      } catch {
+        // Silently ignore — WebSocket is the primary channel
+      }
+    }, 15000);
+
+    return () => clearInterval(interval);
+  }, [activeRequest?.id, activeRequest?.status, updateRequestStatus]);
 
   if (!isAuthenticated) {
     return (
@@ -133,6 +141,32 @@ export default function CustomerDashboard() {
           </h1>
         </div>
 
+        {/* Tab Navigation */}
+        <div className={`flex items-center gap-1 p-1 rounded-xl ${isLight ? "bg-slate-100" : "bg-white/5"}`}>
+          <button
+            onClick={() => setActiveTab("request")}
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
+              activeTab === "request"
+                ? (isLight ? "bg-white text-yellow-700 shadow-sm" : "bg-white/10 text-emerald-300")
+                : (isLight ? "text-slate-500 hover:text-slate-700" : "text-white/40 hover:text-white/60")
+            }`}
+          >
+            <Wrench size={14} />
+            Service
+          </button>
+          <button
+            onClick={() => setActiveTab("history")}
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
+              activeTab === "history"
+                ? (isLight ? "bg-white text-yellow-700 shadow-sm" : "bg-white/10 text-emerald-300")
+                : (isLight ? "text-slate-500 hover:text-slate-700" : "text-white/40 hover:text-white/60")
+            }`}
+          >
+            <History size={14} />
+            History
+          </button>
+        </div>
+
         <div className="flex items-center gap-4">
           <div className="hidden sm:flex flex-col items-end mr-2">
             <span className={`text-sm font-semibold ${isLight ? "text-slate-900" : "text-white"}`}>
@@ -142,6 +176,7 @@ export default function CustomerDashboard() {
               Customer Mode
             </span>
           </div>
+          <NotificationBell />
           <div className={`w-10 h-10 rounded-full flex items-center justify-center ${isLight ? "bg-yellow-500/15 border border-yellow-500/30 text-yellow-600" : "bg-emerald-500/20 border border-emerald-500/30 text-emerald-300"}`}>
             <User size={18} />
           </div>
@@ -154,33 +189,43 @@ export default function CustomerDashboard() {
         </div>
       </header>
 
-      <div className="flex-1 grid grid-cols-1 lg:grid-cols-12 gap-6 min-h-0 pb-6">
-        <div className="lg:col-span-7 xl:col-span-8 rounded-2xl overflow-hidden relative shadow-2xl h-full min-h-[400px]">
-          <MapView />
+      {activeTab === "request" ? (
+        <div className="flex-1 grid grid-cols-1 lg:grid-cols-12 gap-6 min-h-0 pb-6">
+          <div className="lg:col-span-7 xl:col-span-8 rounded-2xl overflow-hidden relative shadow-2xl h-full min-h-[400px]">
+            <MapView />
 
-          <div className={`absolute top-4 left-4 z-[400] backdrop-blur-md px-3 py-1.5 rounded-full border text-xs font-semibold flex items-center gap-2 ${isLight ? "bg-white/80 border-slate-200 text-slate-700" : "bg-black/60 border-white/10 text-white"}`}>
-            <span className={`w-2 h-2 rounded-full animate-pulse ${isLight ? "bg-yellow-500" : "bg-emerald-400"}`} />
-            Live Area Map
+            <div className={`absolute top-4 left-4 z-[400] backdrop-blur-md px-3 py-1.5 rounded-full border text-xs font-semibold flex items-center gap-2 ${isLight ? "bg-white/80 border-slate-200 text-slate-700" : "bg-black/60 border-white/10 text-white"}`}>
+              <span className={`w-2 h-2 rounded-full animate-pulse ${isLight ? "bg-yellow-500" : "bg-emerald-400"}`} />
+              Live Area Map
+            </div>
+          </div>
+
+          <div className="lg:col-span-5 xl:col-span-4 h-full flex flex-col min-h-[500px] lg:min-h-0 overflow-y-auto custom-scrollbar pr-1 lg:pr-0 gap-6">
+            {!activeRequest ? (
+              <>
+                <ServiceRequestPanel onSubmit={handleRequestSubmit} />
+                <ProviderList />
+              </>
+            ) : (
+              <ServiceStatusTracker
+                request={activeRequest}
+                onComplete={handlePaymentInitiate}
+                onCancel={handleCancelRequest}
+              />
+            )}
           </div>
         </div>
-
-        <div className="lg:col-span-5 xl:col-span-4 h-full flex flex-col min-h-[500px] lg:min-h-0 overflow-y-auto custom-scrollbar pr-1 lg:pr-0">
-          {!activeRequest ? (
-            <ServiceRequestPanel onSubmit={handleRequestSubmit} />
-          ) : (
-            <ServiceStatusTracker
-              request={activeRequest}
-              onComplete={handlePaymentInitiate}
-              onCancel={handleCancelRequest}
-            />
-          )}
+      ) : (
+        <div className="flex-1 overflow-y-auto custom-scrollbar pb-6">
+          <ServiceHistory />
         </div>
-      </div>
+      )}
 
       <PaymentModal
         isOpen={isPaymentOpen}
         onClose={() => setIsPaymentOpen(false)}
         amount={paymentAmount}
+        jobId={activeRequest?.id}
         onSuccess={handlePaymentSuccess}
       />
 
@@ -190,6 +235,7 @@ export default function CustomerDashboard() {
         providerName={reviewProviderName}
         onSubmit={handleReviewSubmit}
       />
+      <SOSButton />
     </div>
   );
 }

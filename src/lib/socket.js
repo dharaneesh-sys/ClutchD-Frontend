@@ -56,11 +56,24 @@ export const connectWebSocket = (token) => {
         useTrackingStore.getState().setMechanicLocation(data.payload.coords);
       }
       
-      // Handle general service status triggers
+      // Handle service status updates from server — pass fromServer=true to avoid duplicate PATCH
       if (data.type === "STATUS_UPDATE") {
         import("../store/serviceStore").then((m) => {
-          m.useServiceStore.getState().updateRequestStatus(data.payload.status, data.payload.mechanic);
+          m.useServiceStore.getState().updateRequestStatus(
+            data.payload.status,
+            data.payload.mechanic,
+            true // fromServer — skip backend PATCH
+          );
         });
+      }
+
+      // Handle notification count updates
+      if (data.type === "NOTIFICATION_UPDATE") {
+        import("../store/notificationStore").then((m) => {
+          if (m.useNotificationStore) {
+            m.useNotificationStore.getState().setUnreadCount(data.payload.unreadCount);
+          }
+        }).catch(() => {});
       }
     } catch (err) {
       console.warn("[WebSocket] Failed to parse message", err);
@@ -113,5 +126,35 @@ export const disconnectWebSocket = () => {
   if (wsInstance) {
     wsInstance.close(1000, "Client disconnect");
     wsInstance = null;
+  }
+};
+
+/**
+ * Send mechanic GPS location to the server for real-time tracking.
+ */
+export const sendMechanicLocation = (lat, lon) => {
+  if (wsInstance && wsInstance.readyState === WebSocket.OPEN) {
+    wsInstance.send(JSON.stringify({ type: "MECHANIC_LOCATION", lat, lon }));
+  }
+};
+
+/**
+ * Check if the WebSocket is currently connected.
+ */
+export const isConnected = () => {
+  return wsInstance !== null && wsInstance.readyState === WebSocket.OPEN;
+};
+
+/**
+ * Get current connection state for UI indicators.
+ */
+export const getConnectionState = () => {
+  if (!wsInstance) return "disconnected";
+  switch (wsInstance.readyState) {
+    case WebSocket.CONNECTING: return "connecting";
+    case WebSocket.OPEN: return "connected";
+    case WebSocket.CLOSING: return "closing";
+    case WebSocket.CLOSED: return "disconnected";
+    default: return "disconnected";
   }
 };

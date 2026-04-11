@@ -6,9 +6,10 @@ export const useServiceStore = create((set, get) => ({
   activeRequest: null,
   history: [],
   isLoading: false,
+  error: null,
   
   createRequest: async (data) => {
-    set({ isLoading: true });
+    set({ isLoading: true, error: null });
     
     try {
       let mediaUrl = data.mediaUrl;
@@ -31,6 +32,7 @@ export const useServiceStore = create((set, get) => ({
         customerLat: data.customerLat,
         customerLng: data.customerLng,
         mediaUrl: mediaUrl,
+        vehicleId: data.vehicleId,
       };
 
       const response = await api.post("/service/request", payload);
@@ -40,48 +42,34 @@ export const useServiceStore = create((set, get) => ({
       return newRequest;
       
     } catch (error) {
-      if (error.response) {
-        console.warn("Backend createRequest failed, using fallback mock data.", error.message);
-      }
-
-      // If it's a real server error (not network), show the error
-      if (error.response?.status >= 400) {
-        set({ isLoading: false });
-        throw error;
-      }
-
-      // Fallback
-      await new Promise(r => setTimeout(r, 1000));
-      
-      const newRequest = {
-        id: "req_" + Date.now(),
-        ...data,
-        status: SERVICE_STATUS.SEARCHING,
-        createdAt: new Date().toISOString(),
-        mechanic: null,
-        priceEstimate: data.priceEstimate,
-      };
-      
-      set({ 
-        activeRequest: newRequest,
-        isLoading: false 
-      });
-      
-      return newRequest;
+      const msg =
+        error.response?.data?.detail ||
+        (error.response ? "Request failed." : "Server unreachable. Please try again later.");
+      set({ isLoading: false, error: msg });
+      throw error;
     }
   },
   
-  updateRequestStatus: async (status, mechanicData = null) => {
+  /**
+   * Update request status. 
+   * @param {string} status - New status
+   * @param {object|null} mechanicData - Mechanic info if assigned
+   * @param {boolean} fromServer - If true, skip the backend PATCH (already from server)
+   */
+  updateRequestStatus: async (status, mechanicData = null, fromServer = false) => {
     const currentReq = get().activeRequest;
     if (!currentReq) return;
 
-    try {
-      await api.patch(`/service/request/${currentReq.id}/status`, { status, mechanicId: mechanicData?.id });
-    } catch (error) {
-      console.warn("Backend updateRequestStatus failed.", error.message);
+    // Don't send PATCH if this update came from the server (WebSocket or poll)
+    if (!fromServer) {
+      try {
+        await api.patch(`/service/request/${currentReq.id}/status`, { status, mechanicId: mechanicData?.id });
+      } catch (error) {
+        console.warn("Backend updateRequestStatus failed.", error.message);
+      }
     }
     
-    // Update local state anyway
+    // Update local state
     set(state => {
       if (!state.activeRequest) return state;
       return {
@@ -101,9 +89,8 @@ export const useServiceStore = create((set, get) => ({
     try {
       await api.post(`/service/request/${currentReq.id}/complete`, paymentDetails);
     } catch (error) {
-      if (error.response) {
-        console.warn("Backend completeRequest failed.", error.message);
-      }
+      const msg = error.response?.data?.detail || "Completion failed.";
+      console.warn("Backend completeRequest failed:", msg);
     }
 
     set(state => {
@@ -127,9 +114,28 @@ export const useServiceStore = create((set, get) => ({
       try {
         await api.post(`/service/request/${currentReq.id}/cancel`);
       } catch(e) {
-        // console.warn(e);
+        // best-effort
       }
     }
-    set({ activeRequest: null });
-  }
+    set({ activeRequest: null, error: null });
+  },
+
+  /**
+   * Restore active request from the server after page refresh.
+   * Calls GET /jobs/incoming to find any active job for the current user.
+   */
+  restoreActiveRequest: async () => {
+    try {
+      const res = await api.get("/jobs/incoming");
+      const jobs = res.data?.jobs || [];
+      if (jobs.length > 0) {
+        // Take the most recent active job
+        set({ activeRequest: jobs[0] });
+      }
+    } catch {
+      // Not critical — user can create a new request
+    }
+  },
+
+  clearError: () => set({ error: null }),
 }));

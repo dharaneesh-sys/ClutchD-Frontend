@@ -51,8 +51,8 @@ export const PAYMENT_METHODS = [
   { value: "card", label: "Credit/Debit Card", icon: "CreditCard" },
 ];
 
-export const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api";
-export const WS_URL = process.env.NEXT_PUBLIC_WS_URL || "ws://localhost:8000/ws";
+export const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000/api";
+export const WS_URL = process.env.NEXT_PUBLIC_WS_URL || "ws://127.0.0.1:8000/ws";
 
 export const MAP_DEFAULT_CENTER = [11.0168, 76.9558]; // Coimbatore
 export const MAP_DEFAULT_ZOOM = 13;
