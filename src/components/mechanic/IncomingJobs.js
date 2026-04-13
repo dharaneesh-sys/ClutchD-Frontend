@@ -4,7 +4,9 @@ import { useState, useEffect, useCallback } from "react";
 import { GlassCard } from "../ui/GlassCard";
 import { Button } from "../ui/Button";
 import { Badge } from "../ui/Badge";
-import { Navigation, CheckCircle2, AlertTriangle, MapPin, Clock } from "lucide-react";
+import { Modal } from "../ui/Modal";
+import { Input } from "../ui/Input";
+import { Navigation, CheckCircle2, AlertTriangle, MapPin, Clock, IndianRupee, Loader2 } from "lucide-react";
 import { useThemeStore } from "../../store/themeStore";
 import { useTrackingStore } from "../../store/trackingStore";
 import api from "../../lib/api";
@@ -17,6 +19,13 @@ export function IncomingJobs() {
   const { theme } = useThemeStore();
   const { setNavigationTarget } = useTrackingStore();
   const isLight = theme === "light";
+
+  // --- Job Completion Modal State ---
+  const [completionModal, setCompletionModal] = useState(false);
+  const [completionJobId, setCompletionJobId] = useState(null);
+  const [serviceAmount, setServiceAmount] = useState("");
+  const [submittingPrice, setSubmittingPrice] = useState(false);
+  const [priceError, setPriceError] = useState("");
 
   const showToast = (message) => {
     setToast(message);
@@ -59,13 +68,38 @@ export function IncomingJobs() {
     setJobs(jobs.filter(j => j.id !== id));
   };
   
-  const finishJob = async (id) => {
+  // Opens the completion modal instead of directly completing the job
+  const openCompletionModal = (id) => {
+    setCompletionJobId(id);
+    setServiceAmount("");
+    setPriceError("");
+    setCompletionModal(true);
+  };
+
+  // Submits the service fee to backend, triggering price calculation
+  const handleFinalizePrice = async () => {
+    const amount = parseFloat(serviceAmount);
+    if (isNaN(amount) || amount <= 0) {
+      setPriceError("Please enter a valid service amount.");
+      return;
+    }
+    if (amount > 500000) {
+      setPriceError("Amount cannot exceed ₹5,00,000.");
+      return;
+    }
+    setPriceError("");
+    setSubmittingPrice(true);
     try {
-      await api.patch(`/service/request/${id}/status`, { status: "completed" });
-      setJobs(jobs.filter(j => j.id !== id));
-      showToast("Job marked as completed. Earnings added to your wallet.");
+      await api.post(`/service/request/${completionJobId}/finalize-price`, {
+        serviceAmount: amount,
+      });
+      setJobs(jobs.filter(j => j.id !== completionJobId));
+      setCompletionModal(false);
+      showToast(`Invoice of ₹${amount} sent to customer. Awaiting payment.`);
     } catch (err) {
-      showToast("Failed to complete job. Please try again.");
+      setPriceError(err.response?.data?.detail || "Failed to submit price. Please try again.");
+    } finally {
+      setSubmittingPrice(false);
     }
   };
 
@@ -161,7 +195,9 @@ export function IncomingJobs() {
                       }}>
                         <Navigation size={14} className="mr-1.5" /> Navigate
                       </Button>
-                      <Button size="sm" onClick={() => finishJob(job.id)}>Complete</Button>
+                      <Button size="sm" onClick={() => openCompletionModal(job.id)}>
+                        <IndianRupee size={14} className="mr-1" /> Bill Customer
+                      </Button>
                     </>
                   )}
                 </div>
@@ -170,6 +206,77 @@ export function IncomingJobs() {
           ))
         )}
       </div>
+
+      {/* ── Job Completion Modal ── */}
+      <Modal isOpen={completionModal} onClose={() => setCompletionModal(false)} title="Submit Service Bill">
+        <div className="text-center mb-6">
+          <div className={`w-16 h-16 mx-auto rounded-full flex items-center justify-center mb-4 ${isLight ? "bg-yellow-500/15" : "bg-emerald-500/20"}`}>
+            <IndianRupee size={32} className={isLight ? "text-yellow-600" : "text-emerald-400"} />
+          </div>
+          <p className={`text-sm ${isLight ? "text-slate-500" : "text-emerald-100/60"}`}>
+            Enter the service charge for the work you completed. Additional fees (convenience, distance, GST) will be automatically calculated and added to the customer&apos;s bill.
+          </p>
+        </div>
+
+        <Input
+          label="Your Service Fee (₹)"
+          type="number"
+          placeholder="e.g. 150"
+          value={serviceAmount}
+          onChange={(e) => setServiceAmount(e.target.value)}
+          icon={IndianRupee}
+        />
+
+        {priceError && (
+          <div className={`mt-3 flex items-center gap-2 p-3 rounded-xl text-sm ${isLight ? "bg-red-50 border border-red-200 text-red-700" : "bg-red-500/10 border border-red-500/30 text-red-300"}`}>
+            <AlertTriangle size={14} className="shrink-0" />
+            {priceError}
+          </div>
+        )}
+
+        {/* Fee Preview */}
+        {serviceAmount && parseFloat(serviceAmount) > 0 && (
+          <div className={`mt-4 p-4 rounded-xl border text-sm space-y-2 ${isLight ? "bg-slate-50 border-slate-200" : "bg-black/20 border-white/5"}`}>
+            <p className={`text-xs uppercase tracking-wider font-semibold mb-2 ${isLight ? "text-slate-400" : "text-emerald-100/50"}`}>Customer will be charged</p>
+            <div className={`flex justify-between ${isLight ? "text-slate-600" : "text-emerald-100/80"}`}>
+              <span>Service Fee</span>
+              <span className="font-medium">₹{parseFloat(serviceAmount).toFixed(2)}</span>
+            </div>
+            <div className={`flex justify-between ${isLight ? "text-slate-600" : "text-emerald-100/80"}`}>
+              <span>Convenience Fee</span>
+              <span className="font-medium">₹40.00</span>
+            </div>
+            <div className={`flex justify-between ${isLight ? "text-slate-600" : "text-emerald-100/80"}`}>
+              <span>Cancellation Fee</span>
+              <span className="font-medium">₹30.00</span>
+            </div>
+            <div className={`flex justify-between ${isLight ? "text-slate-600" : "text-emerald-100/80"}`}>
+              <span>Distance Fee</span>
+              <span className="font-medium text-xs italic">calculated</span>
+            </div>
+            <div className={`flex justify-between ${isLight ? "text-slate-600" : "text-emerald-100/80"}`}>
+              <span>GST (18%)</span>
+              <span className="font-medium text-xs italic">calculated</span>
+            </div>
+            <div className={`border-t pt-2 mt-2 flex justify-between font-bold ${isLight ? "border-slate-200 text-slate-900" : "border-white/10 text-white"}`}>
+              <span>Estimated Total</span>
+              <span>₹{(((parseFloat(serviceAmount) + 40 + 30) * 1.18)).toFixed(2)}+</span>
+            </div>
+            <p className={`text-[10px] ${isLight ? "text-slate-400" : "text-white/30"}`}>
+              * Distance fee will be added based on actual distance. Night surcharge applies after 8 PM.
+            </p>
+          </div>
+        )}
+
+        <div className="mt-6 flex gap-3">
+          <Button variant="ghost" className="flex-1" onClick={() => setCompletionModal(false)}>
+            Cancel
+          </Button>
+          <Button className="flex-1" onClick={handleFinalizePrice} isLoading={submittingPrice}>
+            {submittingPrice ? <><Loader2 size={16} className="animate-spin mr-2" /> Sending...</> : "Send Invoice"}
+          </Button>
+        </div>
+      </Modal>
     </GlassCard>
   );
 }

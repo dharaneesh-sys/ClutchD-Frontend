@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { Modal } from "../ui/Modal";
 import { Button } from "../ui/Button";
-import { CreditCard, Smartphone, QrCode, Banknote, CheckCircle2, XCircle, Loader2 } from "lucide-react";
+import { CreditCard, Smartphone, QrCode, Banknote, CheckCircle2, XCircle, Loader2, ChevronDown, ChevronUp } from "lucide-react";
 import { useThemeStore } from "../../store/themeStore";
 import api from "../../lib/api";
 
@@ -26,14 +26,18 @@ function loadRazorpayScript() {
   });
 }
 
-export function PaymentModal({ isOpen, onClose, amount, jobId, onSuccess }) {
+export function PaymentModal({ isOpen, onClose, amount, pricing, jobId, onSuccess }) {
   const [method, setMethod] = useState("upi");
   const [payState, setPayState] = useState("idle"); // idle | processing | success | failed
   const [errorMsg, setErrorMsg] = useState("");
   const [qrData, setQrData] = useState(null);
+  const [showBreakdown, setShowBreakdown] = useState(false);
   const qrPollRef = useRef(null);
   const { theme } = useThemeStore();
   const isLight = theme === "light";
+
+  // Use the finalized total if available, else fall back to passed amount
+  const displayAmount = pricing?.totalAmount ?? amount ?? 0;
 
   // Cleanup QR poll on unmount
   useEffect(() => {
@@ -48,11 +52,12 @@ export function PaymentModal({ isOpen, onClose, amount, jobId, onSuccess }) {
       setPayState("idle");
       setErrorMsg("");
       setQrData(null);
+      setShowBreakdown(false);
       if (qrPollRef.current) clearInterval(qrPollRef.current);
     }
   }, [isOpen]);
 
-  const amountPaise = (amount || 0) * 100;
+  const amountPaise = Math.round(displayAmount * 100);
 
   const handleRazorpayCheckout = async (preferredMethod) => {
     setPayState("processing");
@@ -98,7 +103,7 @@ export function PaymentModal({ isOpen, onClose, amount, jobId, onSuccess }) {
             setTimeout(() => {
               onSuccess({
                 method: preferredMethod,
-                amount,
+                amount: displayAmount,
                 status: "success",
                 transactionId: response.razorpay_payment_id,
               });
@@ -152,7 +157,7 @@ export function PaymentModal({ isOpen, onClose, amount, jobId, onSuccess }) {
             setTimeout(() => {
               onSuccess({
                 method: "qr",
-                amount,
+                amount: displayAmount,
                 status: "success",
                 transactionId: data.qr_id,
               });
@@ -177,7 +182,7 @@ export function PaymentModal({ isOpen, onClose, amount, jobId, onSuccess }) {
       });
       setPayState("success");
       setTimeout(() => {
-        onSuccess({ method: "cash", amount, status: "success", transactionId: "CASH_" + Date.now() });
+        onSuccess({ method: "cash", amount: displayAmount, status: "success", transactionId: "CASH_" + Date.now() });
       }, 1500);
     } catch (err) {
       setPayState("failed");
@@ -204,7 +209,7 @@ export function PaymentModal({ isOpen, onClose, amount, jobId, onSuccess }) {
             <CheckCircle2 size={40} className={isLight ? "text-green-600" : "text-emerald-400"} />
           </div>
           <h3 className={`text-xl font-bold mb-2 ${isLight ? "text-slate-900" : "text-white"}`}>Payment Complete!</h3>
-          <p className={`text-sm ${isLight ? "text-slate-500" : "text-emerald-100/60"}`}>₹{amount} paid successfully</p>
+          <p className={`text-sm ${isLight ? "text-slate-500" : "text-emerald-100/60"}`}>₹{displayAmount.toFixed(2)} paid successfully</p>
         </div>
       </Modal>
     );
@@ -212,10 +217,55 @@ export function PaymentModal({ isOpen, onClose, amount, jobId, onSuccess }) {
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} title="Complete Payment">
-      <div className="text-center mb-6">
+      <div className="text-center mb-4">
         <p className={`text-sm mb-1 ${isLight ? "text-slate-500" : "text-emerald-100/60"}`}>Total Amount Due</p>
-        <p className={`text-4xl font-bold tracking-tight ${isLight ? "text-slate-900" : "text-white"}`}>₹{amount}</p>
+        <p className={`text-4xl font-bold tracking-tight ${isLight ? "text-slate-900" : "text-white"}`}>₹{displayAmount.toFixed(2)}</p>
       </div>
+
+      {/* Itemized breakdown toggle */}
+      {pricing && (
+        <div className="mb-4">
+          <button
+            type="button"
+            onClick={() => setShowBreakdown(!showBreakdown)}
+            className={`w-full flex items-center justify-between p-3 rounded-xl border text-sm transition-all ${isLight ? "bg-slate-50 border-slate-200 text-slate-600 hover:bg-slate-100" : "bg-white/5 border-white/10 text-emerald-100/80 hover:bg-white/10"}`}
+          >
+            <span className="font-medium">View Breakdown</span>
+            {showBreakdown ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+          </button>
+          {showBreakdown && (
+            <div className={`mt-2 p-4 rounded-xl border space-y-2 text-sm animate-in slide-in-from-top-1 ${isLight ? "bg-slate-50 border-slate-200" : "bg-black/20 border-white/5"}`}>
+              <div className={`flex justify-between ${isLight ? "text-slate-600" : "text-emerald-100/80"}`}>
+                <span>Service Fee</span>
+                <span className="font-medium">₹{pricing.serviceAmount?.toFixed(2)}</span>
+              </div>
+              <div className={`flex justify-between ${isLight ? "text-slate-600" : "text-emerald-100/80"}`}>
+                <span>Convenience Fee</span>
+                <span className="font-medium">₹{pricing.convenienceFee?.toFixed(2)}</span>
+              </div>
+              <div className={`flex justify-between ${isLight ? "text-slate-600" : "text-emerald-100/80"}`}>
+                <span>Cancellation Fee</span>
+                <span className="font-medium">₹{pricing.cancellationFee?.toFixed(2)}</span>
+              </div>
+              <div className={`flex justify-between ${isLight ? "text-slate-600" : "text-emerald-100/80"}`}>
+                <span>Distance ({pricing.distanceKm?.toFixed(1)} km)</span>
+                <span className="font-medium">₹{pricing.distanceFee?.toFixed(2)}</span>
+              </div>
+              <div className={`flex justify-between ${isLight ? "text-slate-600" : "text-emerald-100/80"}`}>
+                <span>GST (18%)</span>
+                <span className="font-medium">₹{pricing.gstAmount?.toFixed(2)}</span>
+              </div>
+              <div className={`border-t pt-2 mt-2 flex justify-between font-bold ${isLight ? "border-slate-200 text-slate-900" : "border-white/10 text-white"}`}>
+                <span>Grand Total</span>
+                <span className={isLight ? "text-yellow-600" : "text-emerald-400"}>₹{pricing.totalAmount?.toFixed(2)}</span>
+              </div>
+              <p className={`text-[10px] mt-2 ${isLight ? "text-slate-400" : "text-white/20"}`}>
+                Platform fee goes to ClutchD • Service fee goes to your provider
+              </p>
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Error */}
       {payState === "failed" && errorMsg && (
@@ -258,7 +308,7 @@ export function PaymentModal({ isOpen, onClose, amount, jobId, onSuccess }) {
           <div className="w-44 h-44 bg-white p-2 rounded-lg mx-auto mb-3 border-2 border-emerald-500/30">
             <img src={qrData.image_url} alt="QR Code" className="w-full h-full object-contain" />
           </div>
-          <p className={`text-sm font-medium mb-1 ${isLight ? "text-slate-700" : "text-white"}`}>Scan to Pay ₹{amount}</p>
+          <p className={`text-sm font-medium mb-1 ${isLight ? "text-slate-700" : "text-white"}`}>Scan to Pay ₹{displayAmount.toFixed(2)}</p>
           <p className={`text-xs ${isLight ? "text-slate-500" : "text-emerald-100/50"}`}>Waiting for payment...</p>
           <div className="flex items-center justify-center gap-2 mt-2">
             <Loader2 size={14} className="animate-spin text-emerald-400" />
@@ -270,7 +320,7 @@ export function PaymentModal({ isOpen, onClose, amount, jobId, onSuccess }) {
       {/* Pay button */}
       {!(method === "qr" && qrData) && (
         <Button className="w-full" size="lg" onClick={handlePay} isLoading={payState === "processing"}>
-          {method === "cash" ? `Confirm Cash ₹${amount}` : `Pay ₹${amount} Securely`}
+          {method === "cash" ? `Confirm Cash ₹${displayAmount.toFixed(0)}` : `Pay ₹${displayAmount.toFixed(0)} Securely`}
         </Button>
       )}
 
@@ -283,3 +333,4 @@ export function PaymentModal({ isOpen, onClose, amount, jobId, onSuccess }) {
     </Modal>
   );
 }
+

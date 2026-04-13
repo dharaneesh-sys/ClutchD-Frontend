@@ -1,7 +1,7 @@
 import { SERVICE_STATUS } from "../../lib/constants";
 import { GlassCard } from "../ui/GlassCard";
 import { Button } from "../ui/Button";
-import { Search, UserCheck, Navigation, Wrench, CheckCircle2, Phone, MessageSquare, MapPin } from "lucide-react";
+import { Search, UserCheck, Navigation, Wrench, CreditCard, CheckCircle2, Phone, MessageSquare, MapPin } from "lucide-react";
 import { useThemeStore } from "../../store/themeStore";
 
 export function ServiceStatusTracker({ request, onComplete, onCancel }) {
@@ -15,6 +15,7 @@ export function ServiceStatusTracker({ request, onComplete, onCancel }) {
     { id: SERVICE_STATUS.ASSIGNED, label: "Assigned", icon: UserCheck },
     { id: SERVICE_STATUS.EN_ROUTE, label: "En Route", icon: Navigation },
     { id: SERVICE_STATUS.IN_PROGRESS, label: "Fixing Vehicle", icon: Wrench },
+    { id: SERVICE_STATUS.PAYMENT_PENDING, label: "Invoice", icon: CreditCard },
     { id: SERVICE_STATUS.COMPLETED, label: "Completed", icon: CheckCircle2 },
   ];
 
@@ -72,7 +73,52 @@ export function ServiceStatusTracker({ request, onComplete, onCancel }) {
             </div>
           </div>
         );
-      
+
+      case SERVICE_STATUS.PAYMENT_PENDING:
+        const pricing = request.pricing;
+        return (
+          <div className="mt-4">
+            <div className={`rounded-xl border p-5 mb-4 ${isLight ? "bg-slate-50 border-slate-200" : "bg-black/20 border-white/5"}`}>
+              <h4 className={`text-sm font-bold uppercase tracking-wider mb-4 ${isLight ? "text-slate-400" : "text-emerald-100/50"}`}>
+                Invoice Breakdown
+              </h4>
+              {pricing ? (
+                <div className="space-y-3 text-sm">
+                  <div className={`flex justify-between ${isLight ? "text-slate-600" : "text-emerald-100/80"}`}>
+                    <span>Service Fee</span>
+                    <span className="font-semibold">₹{pricing.serviceAmount?.toFixed(2)}</span>
+                  </div>
+                  <div className={`flex justify-between ${isLight ? "text-slate-600" : "text-emerald-100/80"}`}>
+                    <span>Convenience Fee</span>
+                    <span className="font-semibold">₹{pricing.convenienceFee?.toFixed(2)}</span>
+                  </div>
+                  <div className={`flex justify-between ${isLight ? "text-slate-600" : "text-emerald-100/80"}`}>
+                    <span>Cancellation Fee</span>
+                    <span className="font-semibold">₹{pricing.cancellationFee?.toFixed(2)}</span>
+                  </div>
+                  <div className={`flex justify-between ${isLight ? "text-slate-600" : "text-emerald-100/80"}`}>
+                    <span>Distance ({pricing.distanceKm?.toFixed(1)} km)</span>
+                    <span className="font-semibold">₹{pricing.distanceFee?.toFixed(2)}</span>
+                  </div>
+                  <div className={`flex justify-between ${isLight ? "text-slate-600" : "text-emerald-100/80"}`}>
+                    <span>GST (18%)</span>
+                    <span className="font-semibold">₹{pricing.gstAmount?.toFixed(2)}</span>
+                  </div>
+                  <div className={`border-t pt-3 mt-3 flex justify-between font-bold text-base ${isLight ? "border-slate-200 text-slate-900" : "border-white/10 text-white"}`}>
+                    <span>Total</span>
+                    <span className={isLight ? "text-yellow-600" : "text-emerald-400"}>₹{pricing.totalAmount?.toFixed(2)}</span>
+                  </div>
+                </div>
+              ) : (
+                <p className={`text-sm ${isLight ? "text-slate-500" : "text-emerald-100/60"}`}>Loading pricing...</p>
+              )}
+            </div>
+            <Button className="w-full" size="lg" onClick={() => onComplete(request)}>
+              Pay ₹{pricing?.totalAmount?.toFixed(0) || "—"} & Review
+            </Button>
+          </div>
+        );
+
       case SERVICE_STATUS.COMPLETED:
         return (
           <div className="text-center py-6 mt-4">

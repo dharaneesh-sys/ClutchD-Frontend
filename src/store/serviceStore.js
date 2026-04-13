@@ -55,8 +55,9 @@ export const useServiceStore = create((set, get) => ({
    * @param {string} status - New status
    * @param {object|null} mechanicData - Mechanic info if assigned
    * @param {boolean} fromServer - If true, skip the backend PATCH (already from server)
+   * @param {object|null} pricingData - Pricing breakdown for payment_pending
    */
-  updateRequestStatus: async (status, mechanicData = null, fromServer = false) => {
+  updateRequestStatus: async (status, mechanicData = null, fromServer = false, pricingData = null) => {
     const currentReq = get().activeRequest;
     if (!currentReq) return;
 
@@ -76,7 +77,8 @@ export const useServiceStore = create((set, get) => ({
         activeRequest: {
           ...state.activeRequest,
           status,
-          mechanic: mechanicData || state.activeRequest.mechanic
+          mechanic: mechanicData || state.activeRequest.mechanic,
+          pricing: pricingData || state.activeRequest.pricing,
         }
       };
     });

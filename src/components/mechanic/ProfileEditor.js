@@ -4,7 +4,7 @@ import { Button } from "../ui/Button";
 import { Input } from "../ui/Input";
 import { MultiSelect } from "../ui/MultiSelect";
 import { EXPERTISE_OPTIONS } from "../../lib/constants";
-import { User, MapPin, Phone, Loader2 } from "lucide-react";
+import { User, MapPin, Phone, Loader2, QrCode } from "lucide-react";
 import { useAuthStore } from "../../store/authStore";
 import { useThemeStore } from "../../store/themeStore";
 import api from "../../lib/api";
@@ -20,6 +20,7 @@ export function ProfileEditor() {
     fullName: user?.name || user?.email?.split("@")[0] || "",
     phone: user?.phone || "",
     location: user?.location || "",
+    upiId: user?.upiId || "",
   });
 
   if (!user) {
@@ -39,6 +40,7 @@ export function ProfileEditor() {
       const payload = {
         ...formData,
         expertise,
+        upiId: formData.upiId || undefined,
       };
       const res = await api.patch("/providers/profile", payload);
       updateUserData(res.data.user);
@@ -137,6 +139,26 @@ export function ProfileEditor() {
                }) : (
                  <span className={`text-xs ${isLight ? "text-stone-400" : "text-white/30"}`}>No expertise set</span>
                )}
+            </div>
+          </div>
+        )}
+
+        {/* UPI ID */}
+        {isEditing ? (
+          <Input 
+            label="UPI ID (for payouts)" 
+            name="upiId"
+            icon={QrCode} 
+            placeholder="yourname@upi"
+            value={formData.upiId}
+            onChange={handleChange}
+          />
+        ) : (
+          <div>
+            <label className={`mb-2 block text-sm font-medium ${isLight ? "text-stone-600" : "text-emerald-100/80"}`}>UPI ID</label>
+            <div className={`flex items-center gap-2 px-3 py-2.5 rounded-xl border text-sm ${isLight ? "bg-slate-50 border-stone-200 text-stone-700" : "bg-white/5 border-white/10 text-emerald-100"}`}>
+              <QrCode size={14} className={isLight ? "text-amber-600" : "text-emerald-400"} />
+              {user?.upiId || <span className={`${isLight ? "text-stone-400" : "text-white/30"}`}>Not set — add your UPI ID to receive payouts</span>}
             </div>
           </div>
         )}

@@ -110,7 +110,9 @@ export default function CustomerDashboard() {
     const name =
       req?.mechanic?.name ?? activeRequest?.mechanic?.name ?? "the professional";
     setReviewProviderName(name);
-    setPaymentAmount(req?.priceEstimate?.min ?? activeRequest?.priceEstimate?.min ?? 1200);
+    // Use finalized totalAmount from pricing if available, else estimate
+    const finalAmount = req?.pricing?.totalAmount ?? req?.priceEstimate?.min ?? activeRequest?.priceEstimate?.min ?? 1200;
+    setPaymentAmount(finalAmount);
     setIsPaymentOpen(true);
   };
 
@@ -225,6 +227,7 @@ export default function CustomerDashboard() {
         isOpen={isPaymentOpen}
         onClose={() => setIsPaymentOpen(false)}
         amount={paymentAmount}
+        pricing={activeRequest?.pricing}
         jobId={activeRequest?.id}
         onSuccess={handlePaymentSuccess}
       />

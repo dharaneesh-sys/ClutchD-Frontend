@@ -4,7 +4,7 @@ import { Button } from "../ui/Button";
 import { Input } from "../ui/Input";
 import { MultiSelect } from "../ui/MultiSelect";
 import { EXPERTISE_OPTIONS } from "../../lib/constants";
-import { Building2, MapPin, Phone, Clock, Users, Loader2 } from "lucide-react";
+import { Building2, MapPin, Phone, Clock, Users, Loader2, QrCode } from "lucide-react";
 import { useAuthStore } from "../../store/authStore";
 import { useThemeStore } from "../../store/themeStore";
 import api from "../../lib/api";
@@ -23,6 +23,7 @@ export function GarageProfile() {
     location: user?.location || "",
     operatingHours: user?.operatingHours || "",
     mechanicCount: user?.mechanicCount || "",
+    upiId: user?.upiId || "",
   });
 
   const handleSave = async () => {
@@ -32,6 +33,7 @@ export function GarageProfile() {
         ...formData,
         mechanicCount: formData.mechanicCount ? parseInt(formData.mechanicCount) : 0,
         services,
+        upiId: formData.upiId || undefined,
       };
       const res = await api.patch("/providers/profile", payload);
       updateUserData(res.data.user);
@@ -149,6 +151,26 @@ export function GarageProfile() {
                }) : (
                  <span className={`text-xs ${isLight ? "text-stone-400" : "text-white/30"}`}>No services set</span>
                )}
+            </div>
+          </div>
+        )}
+
+        {/* UPI ID */}
+        {isEditing ? (
+          <Input 
+            label="UPI ID (for payouts)" 
+            name="upiId"
+            icon={QrCode} 
+            placeholder="garagename@upi"
+            value={formData.upiId}
+            onChange={handleChange}
+          />
+        ) : (
+          <div>
+            <label className={`mb-2 block text-sm font-medium ${isLight ? "text-stone-600" : "text-emerald-100/80"}`}>UPI ID</label>
+            <div className={`flex items-center gap-2 px-3 py-2.5 rounded-xl border text-sm ${isLight ? "bg-slate-50 border-stone-200 text-stone-700" : "bg-white/5 border-white/10 text-emerald-100"}`}>
+              <QrCode size={14} className={isLight ? "text-amber-600" : "text-emerald-400"} />
+              {user?.upiId || <span className={`${isLight ? "text-stone-400" : "text-white/30"}`}>Not set — add your UPI ID to receive payouts</span>}
             </div>
           </div>
         )}

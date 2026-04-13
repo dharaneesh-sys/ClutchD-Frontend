@@ -13,6 +13,7 @@ export const SERVICE_STATUS = {
   ASSIGNED: "assigned",
   EN_ROUTE: "en_route",
   IN_PROGRESS: "in_progress",
+  PAYMENT_PENDING: "payment_pending",
   COMPLETED: "completed",
 };
 

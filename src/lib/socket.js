@@ -62,7 +62,8 @@ export const connectWebSocket = (token) => {
           m.useServiceStore.getState().updateRequestStatus(
             data.payload.status,
             data.payload.mechanic,
-            true // fromServer — skip backend PATCH
+            true, // fromServer — skip backend PATCH
+            data.payload.pricing // pricing breakdown for payment_pending
           );
         });
       }
