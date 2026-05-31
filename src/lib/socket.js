@@ -1,5 +1,6 @@
 import { WS_URL } from "./constants";
 import { useTrackingStore } from "../store/trackingStore";
+import { getAccessToken } from "./tokenStore";
 
 let wsInstance = null;
 let reconnectTimer = null;
@@ -92,8 +93,7 @@ export const connectWebSocket = (token) => {
     }
 
     // Don't reconnect if user logged out
-    if (typeof window !== "undefined" && !localStorage.getItem("clutchd_token")) {
-      console.log("[WebSocket] User logged out, not reconnecting");
+    if (!getAccessToken()) {
       reconnectAttempts = 0;
       return;
     }
@@ -104,11 +104,9 @@ export const connectWebSocket = (token) => {
       reconnectAttempts++;
       console.log(`[WebSocket] Reconnecting in ${delay / 1000}s (attempt ${reconnectAttempts}/${MAX_RECONNECT_ATTEMPTS})`);
       reconnectTimer = setTimeout(() => {
-        // Re-read the token from localStorage so we use the latest refreshed token,
+        // Re-read the token from memory so we use the latest refreshed token,
         // not the stale one captured in the closure.
-        const freshToken = typeof window !== "undefined"
-          ? localStorage.getItem("clutchd_token")
-          : token;
+        const freshToken = getAccessToken() || token;
         connectWebSocket(freshToken);
       }, delay);
     } else {

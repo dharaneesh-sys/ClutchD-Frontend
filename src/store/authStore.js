@@ -2,6 +2,7 @@ import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import api from "../lib/api";
 import { connectWebSocket, disconnectWebSocket } from "../lib/socket";
+import { setAccessToken, getAccessToken, clearAccessToken } from "../lib/tokenStore";
 
 // Proactive refresh: refresh the access token at 80% of its TTL.
 // Default access token TTL is 15 min (from backend config); override via env.
@@ -18,11 +19,9 @@ function scheduleProactiveRefresh() {
       const res = await api.post("/auth/refresh");
       const newToken = res.data.token;
       if (typeof window !== "undefined" && newToken) {
-        localStorage.setItem("clutchd_token", newToken);
-        // Reconnect WebSocket with the fresh token
+        setAccessToken(newToken);
         connectWebSocket(newToken);
       }
-      // Schedule the next refresh
       scheduleProactiveRefresh();
     } catch {
       // Refresh failed — the 401 interceptor in api.js will handle logout
@@ -51,36 +50,21 @@ export const useAuthStore = create(
        * If successful, the user stays logged in; otherwise they are logged out.
        */
       checkAuth: async () => {
-        // Only run if Zustand thinks we are authenticated
         if (!get().isAuthenticated) return;
 
-        const existingToken =
-          typeof window !== "undefined"
-            ? localStorage.getItem("clutchd_token")
-            : null;
-
-        // If there is no stored access token at all, the session is gone
-        if (!existingToken) {
-          set({ user: null, isAuthenticated: false });
-          return;
-        }
-
         try {
-          // Attempt a silent refresh to get a guaranteed-fresh access token
           const res = await api.post("/auth/refresh");
           const newToken = res.data.token;
           if (typeof window !== "undefined" && newToken) {
-            localStorage.setItem("clutchd_token", newToken);
+            setAccessToken(newToken);
             connectWebSocket(newToken);
             scheduleProactiveRefresh();
           }
         } catch (error) {
-          // Only force logout on explicit 401/403 credentials failure.
-          // Keep the session on network or server errors.
           const status = error.response?.status;
           if (status === 401 || status === 403) {
             if (typeof window !== "undefined") {
-              localStorage.removeItem("clutchd_token");
+              clearAccessToken();
               disconnectWebSocket();
             }
             set({ user: null, isAuthenticated: false, error: null });
@@ -95,7 +79,7 @@ export const useAuthStore = create(
           const response = await api.post("/auth/login", { email, password });
           
           if (response.data.token && typeof window !== "undefined") {
-            localStorage.setItem("clutchd_token", response.data.token);
+            setAccessToken(response.data.token);
             connectWebSocket(response.data.token);
             scheduleProactiveRefresh();
           }
@@ -112,7 +96,7 @@ export const useAuthStore = create(
         }
       },
 
-      loginWithGoogle: async (credential, role = null) => {
+      loginWithGoogle: async (credential, role = null, state = null) => {
         set({ isLoading: true, error: null });
 
         const safeRole =
@@ -122,10 +106,11 @@ export const useAuthStore = create(
           const response = await api.post("/auth/oauth/google", {
             credential,
             role: safeRole || undefined,
+            state: state || undefined,
           });
 
           if (response.data.token && typeof window !== "undefined") {
-            localStorage.setItem("clutchd_token", response.data.token);
+            setAccessToken(response.data.token);
             connectWebSocket(response.data.token);
             scheduleProactiveRefresh();
           }
@@ -153,7 +138,7 @@ export const useAuthStore = create(
           const response = await api.post("/auth/signup", payload);
           
           if (response.data.token && typeof window !== "undefined") {
-            localStorage.setItem("clutchd_token", response.data.token);
+            setAccessToken(response.data.token);
             connectWebSocket(response.data.token);
             scheduleProactiveRefresh();
           }
@@ -178,11 +163,10 @@ export const useAuthStore = create(
           // ignore
         }
         if (typeof window !== "undefined") {
-          localStorage.removeItem("clutchd_token");
+          clearAccessToken();
           disconnectWebSocket();
         }
         set({ user: null, isAuthenticated: false, error: null });
-        // Navigate to auth page
         if (typeof window !== "undefined") {
           window.location.href = "/auth";
         }

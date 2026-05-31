@@ -38,15 +38,6 @@ export function LoginCard() {
     try {
       const user = await login(data.email, data.password, selectedRole);
       if (user) {
-        fetch("/api/login-log", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            email: data.email,
-            role: selectedRole,
-          }),
-        }).catch(() => {});
-
         if (user.role === "admin") router.push("/admin");
         else router.push(`/dashboard/${user.role}`);
       }
@@ -80,16 +71,12 @@ export function LoginCard() {
           if (!credential) return;
 
           const role = selectedRoleRef.current;
-          const user = await loginWithGoogle(credential, role);
+          // Generate CSRF state parameter
+          const oauthState = crypto.randomUUID();
+          sessionStorage.setItem("oauth_state", oauthState);
+          const user = await loginWithGoogle(credential, role, oauthState);
           if (!user) return;
-
-          if (user?.email && user?.role) {
-            fetch("/api/login-log", {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ email: user.email, role: user.role }),
-            }).catch(() => {});
-          }
+          sessionStorage.removeItem("oauth_state");
 
           if (user.role === "admin") router.push("/admin");
           else router.push(`/dashboard/${user.role}`);

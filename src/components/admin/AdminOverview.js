@@ -30,6 +30,7 @@ export function AdminOverview() {
   const [pendingKyc, setPendingKyc] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [chartMounted, setChartMounted] = useState(false);
 
   const fetchData = async () => {
     setLoading(true);
@@ -50,6 +51,7 @@ export function AdminOverview() {
 
   useEffect(() => {
     fetchData();
+    setChartMounted(true);
   }, []);
 
   if (loading) {
@@ -103,9 +105,10 @@ export function AdminOverview() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
          <GlassCard variant="strong" className="col-span-1 lg:col-span-2 p-6 h-[400px] flex flex-col">
             <h3 className={`font-semibold mb-6 ${isLight ? "text-stone-900" : "text-white"}`}>Platform Growth (Revenue & Users)</h3>
-            <div className="flex-1 w-full relative">
-              <ResponsiveContainer width="100%" height="100%">
-                <AreaChart data={chartData}>
+             <div className="flex-1 w-full relative min-w-0 min-h-0">
+               {chartMounted && (
+               <ResponsiveContainer width="100%" height="100%">
+                 <AreaChart data={chartData}>
                   <defs>
                     <linearGradient id="adminColorRev" x1="0" y1="0" x2="0" y2="1">
                       <stop offset="5%" stopColor={primaryColor} stopOpacity={isLight ? 0.15 : 0.3}/>
@@ -133,6 +136,7 @@ export function AdminOverview() {
                   <Area yAxisId="right" type="monotone" dataKey="users" stroke="#3b82f6" fillOpacity={1} fill="url(#adminColorUsr)" />
                 </AreaChart>
               </ResponsiveContainer>
+              )}
             </div>
          </GlassCard>
 

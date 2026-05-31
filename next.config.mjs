@@ -1,18 +1,7 @@
-const backendInternalUrl =
-  process.env.BACKEND_INTERNAL_URL || "http://127.0.0.1:8000/api";
-
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   experimental: {
     optimizePackageImports: ["lucide-react", "recharts"],
-  },
-  async rewrites() {
-    return [
-      {
-        source: "/backend-api/:path*",
-        destination: `${backendInternalUrl}/:path*`,
-      },
-    ];
   },
   async headers() {
     return [
@@ -33,4 +22,12 @@ const nextConfig = {
   },
 };
 
-export default nextConfig;
+// Conditional bundle analyzer
+const analyzeConfig =
+  process.env.ANALYZE === "true"
+    ? (await import("@next/bundle-analyzer")).default({
+        enabled: true,
+      })(nextConfig)
+    : nextConfig;
+
+export default analyzeConfig;

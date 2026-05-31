@@ -1,5 +1,6 @@
 import axios from "axios";
 import { API_BASE_URL } from "./constants";
+import { getAccessToken, setAccessToken, clearAccessToken } from "./tokenStore";
 
 const api = axios.create({
   baseURL: API_BASE_URL,
@@ -12,11 +13,11 @@ const api = axios.create({
   maxBodyLength: 10 * 1024 * 1024,    // 10MB max request
 });
 
-// Request interceptor — attach token + CSRF-style header for mutations
+// Request interceptor — attach token from memory + CSRF-style header for mutations
 api.interceptors.request.use(
   (config) => {
     if (typeof window !== "undefined") {
-      const token = localStorage.getItem("clutchd_token");
+      const token = getAccessToken();
       if (token) {
         config.headers.Authorization = `Bearer ${token}`;
       }
@@ -63,7 +64,7 @@ api.interceptors.response.use(
           const res = await api.post("/auth/refresh");
           const newToken = res.data.token;
           if (typeof window !== "undefined" && newToken) {
-            localStorage.setItem("clutchd_token", newToken);
+            setAccessToken(newToken);
           }
           isRefreshing = false;
           onTokenRefreshed(newToken);
@@ -77,7 +78,7 @@ api.interceptors.response.use(
           // Only force logout on explicit 401/403 credentials failure.
           if (status === 401 || status === 403) {
             if (typeof window !== "undefined") {
-              localStorage.removeItem("clutchd_token");
+              clearAccessToken();
               window.location.href = "/auth";
             }
           }

@@ -51,3 +51,6 @@ data/
 # Docker volumes
 pgdata/
 
+# Conversation logs
+opecode.txt
+
