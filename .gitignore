@@ -54,3 +54,8 @@ pgdata/
 # Conversation logs
 opecode.txt
 
+# Python caches
+__pycache__/
+*.pyc
+.dockerignore
+

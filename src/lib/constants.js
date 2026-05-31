@@ -52,7 +52,7 @@ export const PAYMENT_METHODS = [
   { value: "card", label: "Credit/Debit Card", icon: "CreditCard" },
 ];
 
-export const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "/backend-api";
+export const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api";
 
 function getDefaultWsUrl() {
   if (typeof window === "undefined") {
