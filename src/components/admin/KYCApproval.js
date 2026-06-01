@@ -107,7 +107,7 @@ export function KYCApproval() {
             </div>
           ) : (
             applications.map((app) => (
-              <GlassCard key={app.id} className="p-5 sm:p-6 flex flex-col h-full">
+              <GlassCard key={app.id} variant="elevated" className="p-5 sm:p-6 flex flex-col h-full">
                 <div className="flex justify-between items-start mb-4">
                   <div>
                     <h3 className={`text-lg font-bold ${isLight ? "text-stone-900" : "text-white"}`}>{app.name}</h3>

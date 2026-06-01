@@ -2,23 +2,45 @@
 @import "tailwindcss";
 
 :root {
-  /* Neutral Dark Theme with Green Accents */
-  --background: #09090b; /* Zinc 950 */
+  /* Brand Colors */
+  --background: #09090b;
   --foreground: #fafafa;
-  --primary: #10b981;    /* Emerald 500 */
+  --primary: #10b981;
   --primary-dark: #047857;
   --primary-light: #34d399;
   --accent: #10b981;
-  --glass-bg: rgba(24, 24, 27, 0.4); /* Zinc 900 with alpha */
-  --glass-border: rgba(var(--color-white-rgb), 0.08);
-  --glass-hover: rgba(39, 39, 42, 0.5); /* Zinc 800 with alpha */
   --danger: #ef4444;
   --warning: #f59e0b;
   --success: #22c55e;
-  
+
   --color-primary-rgb: 16, 185, 129;
   --color-white-rgb: 255, 255, 255;
   --color-black-rgb: 0, 0, 0;
+
+  /* Material You Surface Colors (Dark) */
+  --surface: #1c1c1f;
+  --surface-dim: #141417;
+  --surface-bright: #3c3c40;
+  --surface-container: #2b2b2e;
+  --surface-container-high: #363639;
+  --surface-container-low: #202023;
+  --surface-container-highest: #414145;
+  --on-surface: #e4e1e6;
+  --on-surface-variant: #c8c5ca;
+  --outline: #939094;
+  --outline-variant: #454347;
+
+  /* M3 Elevation Shadows */
+  --elevation-1: 0 1px 3px 1px rgba(0,0,0,0.15), 0 1px 2px 0 rgba(0,0,0,0.3);
+  --elevation-2: 0 2px 6px 2px rgba(0,0,0,0.15), 0 1px 2px 0 rgba(0,0,0,0.3);
+  --elevation-3: 0 4px 8px 3px rgba(0,0,0,0.15), 0 1px 3px 0 rgba(0,0,0,0.3);
+  --elevation-4: 0 6px 10px 4px rgba(0,0,0,0.15), 0 2px 3px 0 rgba(0,0,0,0.3);
+  --elevation-5: 0 8px 12px 6px rgba(0,0,0,0.15), 0 4px 4px 0 rgba(0,0,0,0.3);
+
+  /* Glass tokens */
+  --glass-bg: rgba(24, 24, 27, 0.4);
+  --glass-border: rgba(var(--color-white-rgb), 0.08);
+  --glass-hover: rgba(39, 39, 42, 0.5);
 }
 
 .light {
@@ -28,25 +50,45 @@
   --primary-dark: #b8860b;
   --primary-light: #f0c644;
   --accent: #d4a011;
-  --glass-bg: rgba(255, 255, 255, 0.72); 
+  --glass-bg: rgba(255, 255, 255, 0.82);
   --glass-border: rgba(28, 25, 23, 0.06);
-  --glass-hover: rgba(255, 255, 255, 0.88);
-  
+  --glass-hover: rgba(255, 255, 255, 0.94);
+
   --color-primary-rgb: 212, 160, 17;
   --color-white-rgb: 255, 255, 255;
   --color-black-rgb: 0, 0, 0;
 
-  --color-emerald-50: #451a03; 
+  /* M3 Surface Colors (Light) */
+  --surface: #fffbff;
+  --surface-dim: #dfdad8;
+  --surface-bright: #fffbff;
+  --surface-container: #f3eef0;
+  --surface-container-high: #ede9e8;
+  --surface-container-low: #f8f4f2;
+  --surface-container-highest: #e6e1e0;
+  --on-surface: #1c1b1f;
+  --on-surface-variant: #494649;
+  --outline: #7a767a;
+  --outline-variant: #cac4cf;
+
+  /* Lighter elevation for light mode */
+  --elevation-1: 0 1px 3px 1px rgba(0,0,0,0.08), 0 1px 2px 0 rgba(0,0,0,0.06);
+  --elevation-2: 0 2px 6px 2px rgba(0,0,0,0.08), 0 1px 2px 0 rgba(0,0,0,0.06);
+  --elevation-3: 0 4px 8px 3px rgba(0,0,0,0.08), 0 1px 3px 0 rgba(0,0,0,0.06);
+  --elevation-4: 0 6px 10px 4px rgba(0,0,0,0.08), 0 2px 3px 0 rgba(0,0,0,0.06);
+  --elevation-5: 0 8px 12px 6px rgba(0,0,0,0.08), 0 4px 4px 0 rgba(0,0,0,0.06);
+
+  /* Override emerald with yellow/amber tones in light */
+  --color-emerald-50: #451a03;
   --color-emerald-100: #713f12;
   --color-emerald-200: #854d0e;
   --color-emerald-300: #a16207;
   --color-emerald-400: #ca8a04;
-  --color-emerald-500: #eab308; 
+  --color-emerald-500: #eab308;
   --color-emerald-600: #facc15;
   --color-emerald-700: #fde047;
   --color-emerald-800: #fef08a;
   --color-emerald-900: #fef9c3;
-  
   --color-green-300: #ca8a04;
   --color-green-400: #eab308;
   --color-green-500: #facc15;
@@ -62,6 +104,14 @@
   --color-danger: var(--danger);
   --color-warning: var(--warning);
   --color-success: var(--success);
+  --color-surface: var(--surface);
+  --color-surface-dim: var(--surface-dim);
+  --color-surface-bright: var(--surface-bright);
+  --color-surface-container: var(--surface-container);
+  --color-on-surface: var(--on-surface);
+  --color-on-surface-variant: var(--on-surface-variant);
+  --color-outline: var(--outline);
+  --color-outline-variant: var(--outline-variant);
   --font-sans: 'Inter', sans-serif;
 }
 
@@ -69,7 +119,7 @@ body {
   font-family: 'Inter', sans-serif;
   background-color: var(--background);
   background-attachment: fixed;
-  background-image: 
+  background-image:
     radial-gradient(ellipse at top left, rgba(var(--color-primary-rgb), 0.08) 0%, transparent 40%),
     radial-gradient(ellipse at bottom right, rgba(var(--color-primary-rgb), 0.05) 0%, transparent 40%);
   color: var(--foreground);
@@ -79,26 +129,23 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-* {
-  box-sizing: border-box;
-}
+* { box-sizing: border-box; }
 
 ::selection {
   background: rgba(var(--color-primary-rgb), 0.28);
   color: #eafff5;
 }
 
+/* Focus ring - accessible */
 .focus-lux:focus-visible {
   outline: none;
   box-shadow: 0 0 0 4px rgba(var(--color-primary-rgb), 0.22);
   border-color: rgba(var(--color-primary-rgb), 0.6) !important;
 }
 
-h1, h2, h3, h4 {
-  letter-spacing: -0.02em;
-}
+h1, h2, h3, h4 { letter-spacing: -0.02em; }
 
-/* Animated background mesh (very subtle) */
+/* Animated background mesh */
 .bg-mesh {
   background-image:
     radial-gradient(ellipse at 20% 50%, rgba(var(--color-primary-rgb), 0.1) 0%, transparent 45%),
@@ -130,6 +177,73 @@ h1, h2, h3, h4 {
   box-shadow: 0 12px 30px rgba(var(--color-black-rgb), 0.3);
 }
 
+/* ============================================================
+   M3 Surface Card Variants
+   ============================================================ */
+.surface-elevated {
+  background: var(--surface-container-low);
+  border: 1px solid var(--outline-variant);
+  box-shadow: var(--elevation-1);
+  border-radius: 0.75rem;
+}
+
+.surface-filled {
+  background: var(--surface-container);
+  border-radius: 0.75rem;
+}
+
+.surface-outlined {
+  background: transparent;
+  border: 1px solid var(--outline);
+  border-radius: 0.75rem;
+}
+
+/* ============================================================
+   M3 Elevation Classes
+   ============================================================ */
+.elevation-1 { box-shadow: var(--elevation-1); }
+.elevation-2 { box-shadow: var(--elevation-2); }
+.elevation-3 { box-shadow: var(--elevation-3); }
+.elevation-4 { box-shadow: var(--elevation-4); }
+.elevation-5 { box-shadow: var(--elevation-5); }
+
+/* ============================================================
+   M3 Type Scale Utilities
+   ============================================================ */
+.type-display {
+  font-size: 3.5625rem; line-height: 1.15; font-weight: 400; letter-spacing: -0.015em;
+}
+.type-headline-1 {
+  font-size: 2rem; line-height: 1.25; font-weight: 400;
+}
+.type-headline-2 {
+  font-size: 1.75rem; line-height: 1.3; font-weight: 400;
+}
+.type-headline-3 {
+  font-size: 1.5rem; line-height: 1.35; font-weight: 500;
+}
+.type-title-1 {
+  font-size: 1.375rem; line-height: 1.4; font-weight: 500;
+}
+.type-title-2 {
+  font-size: 1rem; line-height: 1.5; font-weight: 600;
+}
+.type-title-3 {
+  font-size: 0.875rem; line-height: 1.45; font-weight: 600;
+}
+.type-body-1 {
+  font-size: 1rem; line-height: 1.5; font-weight: 400;
+}
+.type-body-2 {
+  font-size: 0.875rem; line-height: 1.45; font-weight: 400;
+}
+.type-label-1 {
+  font-size: 0.75rem; line-height: 1.35; font-weight: 600; letter-spacing: 0.025em;
+}
+.type-label-2 {
+  font-size: 0.6875rem; line-height: 1.3; font-weight: 600; letter-spacing: 0.05em;
+}
+
 /* Gradient text */
 .gradient-text {
   background: linear-gradient(135deg, #34d399 0%, #10b981 50%, #059669 100%);
@@ -138,7 +252,7 @@ h1, h2, h3, h4 {
   background-clip: text;
 }
 
-/* Green glow button */
+/* Brand glow button */
 .btn-glow {
   background: linear-gradient(135deg, #10b981 0%, #059669 100%);
   box-shadow: 0 4px 15px rgba(var(--color-primary-rgb), 0.25);
@@ -150,27 +264,16 @@ h1, h2, h3, h4 {
   transform: translateY(-1px);
 }
 
-.btn-glow:active {
-  transform: translateY(0);
-}
+.btn-glow:active { transform: translateY(0); }
 
 /* Custom scrollbar */
-::-webkit-scrollbar {
-  width: 8px;
-}
-
-::-webkit-scrollbar-track {
-  background: rgba(var(--color-white-rgb), 0.02);
-}
-
+::-webkit-scrollbar { width: 8px; }
+::-webkit-scrollbar-track { background: rgba(var(--color-white-rgb), 0.02); }
 ::-webkit-scrollbar-thumb {
   background: rgba(var(--color-primary-rgb), 0.32);
   border-radius: 3px;
 }
-
-::-webkit-scrollbar-thumb:hover {
-  background: rgba(var(--color-primary-rgb), 0.5);
-}
+::-webkit-scrollbar-thumb:hover { background: rgba(var(--color-primary-rgb), 0.5); }
 
 /* Input styling */
 .input-glass {
@@ -185,9 +288,7 @@ h1, h2, h3, h4 {
   width: 100%;
 }
 
-.input-glass::placeholder {
-  color: rgba(var(--color-white-rgb), 0.3);
-}
+.input-glass::placeholder { color: rgba(var(--color-white-rgb), 0.3); }
 
 .input-glass:focus {
   border-color: var(--primary);
@@ -200,29 +301,23 @@ h1, h2, h3, h4 {
   box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.15);
 }
 
-/* Pulse animation for online status */
+/* Pulse animation */
 @keyframes pulse-green {
   0%, 100% { box-shadow: 0 0 0 0 rgba(var(--color-primary-rgb), 0.6); }
   50% { box-shadow: 0 0 0 8px rgba(var(--color-primary-rgb), 0); }
 }
 
-.pulse-online {
-  animation: pulse-green 2s infinite;
-}
+.pulse-online { animation: pulse-green 2s infinite; }
 
 /* Custom scrollbar for modals/panels */
-.custom-scrollbar::-webkit-scrollbar {
-  width: 4px;
-}
-.custom-scrollbar::-webkit-scrollbar-track {
-  background: transparent;
-}
+.custom-scrollbar::-webkit-scrollbar { width: 4px; }
+.custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
 .custom-scrollbar::-webkit-scrollbar-thumb {
-  background: rgba(var(--color-white-rgb),0.1);
+  background: rgba(var(--color-white-rgb), 0.1);
   border-radius: 4px;
 }
 
-/* Respect reduced motion preferences */
+/* Respect reduced motion */
 @media (prefers-reduced-motion: reduce) {
   * {
     animation-duration: 0.001ms !important;
@@ -239,29 +334,22 @@ h1, h2, h3, h4 {
 .status-inprogress { color: #10b981; }
 .status-completed { color: #22c55e; }
 
-/* Leaflet map overrides - Dark theme instead of green theme */
+/* Leaflet map overrides */
 .leaflet-container {
-  background: #121214 !important; /* Dark instead of green */
+  background: #121214 !important;
   border-radius: 1rem;
 }
-
 .leaflet-tile-pane { filter: brightness(0.6) contrast(1.2) saturate(0.5); }
-
 .leaflet-popup-content-wrapper {
   background: rgba(24, 24, 27, 0.95) !important;
   backdrop-filter: blur(10px);
-  border: 1px solid rgba(var(--color-white-rgb),0.15);
+  border: 1px solid rgba(var(--color-white-rgb), 0.15);
   border-radius: 0.75rem !important;
   color: #fafafa !important;
 }
+.leaflet-popup-tip { background: rgba(24, 24, 27, 0.95) !important; }
 
-.leaflet-popup-tip {
-  background: rgba(24, 24, 27, 0.95) !important;
-}
-
-.light .leaflet-container {
-  background: #f1f5f9 !important; 
-}
+.light .leaflet-container { background: #f1f5f9 !important; }
 .light .leaflet-tile-pane { filter: none; }
 .light .leaflet-popup-content-wrapper {
   background: rgba(255, 255, 255, 0.95) !important;
@@ -269,18 +357,12 @@ h1, h2, h3, h4 {
   border: 1px solid rgba(0,0,0,0.08) !important;
   box-shadow: 0 8px 30px rgba(0,0,0,0.08) !important;
 }
-.light .leaflet-popup-tip {
-  background: rgba(255, 255, 255, 0.95) !important;
-}
+.light .leaflet-popup-tip { background: rgba(255, 255, 255, 0.95) !important; }
 
 /* ============================================================
-   LIGHT MODE — Warm Mustard + Clean White — Production Quality
-   Inspired by Bumble, Rappi, Urban Company warm palettes
+   LIGHT MODE — Warm Mustard + Clean White
    ============================================================ */
-
-/* Body — warm parchment base with very subtle golden radial wash */
-.light body,
-body.light {
+.light body, body.light {
   background-color: #faf8f3;
   background-image:
     radial-gradient(ellipse at 0% 0%, rgba(212,160,17,0.06) 0%, transparent 50%),
@@ -288,47 +370,37 @@ body.light {
   color: #1c1917;
 }
 
-/* Background mesh for light mode */
-.light .bg-mesh,
-.light.bg-mesh {
+.light .bg-mesh, .light.bg-mesh {
   background-image:
     radial-gradient(ellipse at 20% 50%, rgba(212,160,17,0.07) 0%, transparent 45%),
     radial-gradient(ellipse at 80% 20%, rgba(212,160,17,0.04) 0%, transparent 45%),
     linear-gradient(175deg, #faf8f3, #fff9eb) !important;
 }
 
-/* Selection */
 .light ::selection {
   background: rgba(212,160,17,0.2);
   color: #422006;
 }
 
-/* --- Glass cards — solid white with soft layered shadows (no frosted glass look) --- */
+/* Glass cards — light mode */
 .light .glass {
   background: rgba(255,255,255,0.82);
   border: 1px solid rgba(28,25,23,0.06);
-  box-shadow:
-    0 1px 2px rgba(0,0,0,0.04),
-    0 4px 16px rgba(0,0,0,0.04);
+  box-shadow: 0 1px 2px rgba(0,0,0,0.04), 0 4px 16px rgba(0,0,0,0.04);
 }
 
 .light .glass-strong {
   background: rgba(255,255,255,0.92);
   border: 1px solid rgba(28,25,23,0.07);
-  box-shadow:
-    0 1px 3px rgba(0,0,0,0.03),
-    0 8px 32px rgba(0,0,0,0.06);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.03), 0 8px 32px rgba(0,0,0,0.06);
 }
 
 .light .glass-hover:hover {
   background: #fff;
   border-color: rgba(212,160,17,0.2);
-  box-shadow:
-    0 1px 3px rgba(0,0,0,0.03),
-    0 12px 40px rgba(212,160,17,0.08);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.03), 0 12px 40px rgba(212,160,17,0.08);
 }
 
-/* Gradient text — richer warm mustard */
 .light .gradient-text {
   background: linear-gradient(135deg, #d4a011 0%, #b8860b 50%, #996515 100%);
   -webkit-background-clip: text;
@@ -336,54 +408,39 @@ body.light {
   background-clip: text;
 }
 
-/* Glow button — deep warm mustard, text stays dark for readability */
 .light .btn-glow {
   background: linear-gradient(135deg, #d4a011 0%, #b8860b 100%);
   box-shadow: 0 4px 14px rgba(212,160,17,0.25);
   color: #fff;
 }
-.light .btn-glow:hover {
-  box-shadow: 0 6px 24px rgba(212,160,17,0.35);
-}
 
-/* --- Inputs — clean white, warm focus ring --- */
+.light .btn-glow:hover { box-shadow: 0 6px 24px rgba(212,160,17,0.35); }
+
+/* Input light */
 .light .input-glass {
   background: #fff;
   border: 1px solid rgba(28,25,23,0.1);
   color: #1c1917;
 }
-.light .input-glass::placeholder {
-  color: rgba(28,25,23,0.35);
-}
+.light .input-glass::placeholder { color: rgba(28,25,23,0.35); }
 .light .input-glass:focus {
   border-color: #d4a011;
   box-shadow: 0 0 0 3px rgba(212,160,17,0.12);
   background: #fff;
 }
 
-/* Scrollbar light mode */
-.light ::-webkit-scrollbar-track {
-  background: rgba(0, 0, 0, 0.02);
-}
-.light ::-webkit-scrollbar-thumb {
-  background: rgba(28,25,23,0.12);
-}
-.light ::-webkit-scrollbar-thumb:hover {
-  background: rgba(28,25,23,0.22);
-}
-.light .custom-scrollbar::-webkit-scrollbar-thumb {
-  background: rgba(28,25,23,0.08);
-}
+/* Scrollbar light */
+.light ::-webkit-scrollbar-track { background: rgba(0, 0, 0, 0.02); }
+.light ::-webkit-scrollbar-thumb { background: rgba(28,25,23,0.12); }
+.light ::-webkit-scrollbar-thumb:hover { background: rgba(28,25,23,0.22); }
+.light .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(28,25,23,0.08); }
 
-/* Focus ring light mode */
 .light .focus-lux:focus-visible {
   box-shadow: 0 0 0 4px rgba(212,160,17,0.18);
   border-color: rgba(212,160,17,0.5) !important;
 }
 
-/* Pulse animation — warm mustard for light */
-.light .pulse-online,
-.light .pulse-online-light {
+.light .pulse-online, .light .pulse-online-light {
   animation: pulse-mustard 2s infinite;
 }
 @keyframes pulse-mustard {
@@ -392,21 +449,14 @@ body.light {
 }
 
 /* ============================================================
-   MOBILE-FIRST ENHANCEMENTS
+   MOBILE-FIRST — touch targets, density
    ============================================================ */
 @media (max-width: 640px) {
-  /* Bigger touch targets on mobile */
-  button, a, [role="button"] {
-    min-height: 44px;
-  }
-  
-  /* Reduce padding density on small screens */
-  .glass, .glass-strong {
-    border-radius: 0.875rem;
-  }
+  button, a, [role="button"] { min-height: 44px; }
+  .glass, .glass-strong { border-radius: 0.875rem; }
 }
 
-/* Safe-area insets for notch devices */
+/* Safe-area insets */
 @supports (padding: env(safe-area-inset-top)) {
   body {
     padding-top: env(safe-area-inset-top);
@@ -417,17 +467,12 @@ body.light {
 }
 
 /* ============================================================
-   PRINT STYLES — Invoices, service history, receipts
+   PRINT STYLES
    ============================================================ */
 @media print {
-  .no-print,
-  nav,
-  .theme-toggle,
-  [data-theme-toggle],
-  button:not(.print-keep) {
+  .no-print, nav, .theme-toggle, [data-theme-toggle], button:not(.print-keep) {
     display: none !important;
   }
-
   body {
     background: white !important;
     background-image: none !important;
@@ -435,21 +480,16 @@ body.light {
     -webkit-print-color-adjust: exact;
     print-color-adjust: exact;
   }
-
-  .glass,
-  .glass-strong {
+  .glass, .glass-strong {
     background: white !important;
     border: 1px solid #ddd !important;
     box-shadow: none !important;
     backdrop-filter: none !important;
     -webkit-backdrop-filter: none !important;
   }
-
   .gradient-text {
     -webkit-text-fill-color: #111 !important;
     background: none !important;
   }
-
   a { color: #111 !important; text-decoration: underline; }
 }
-

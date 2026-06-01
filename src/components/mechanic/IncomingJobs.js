@@ -5,6 +5,7 @@ import { GlassCard } from "../ui/GlassCard";
 import { Button } from "../ui/Button";
 import { Badge } from "../ui/Badge";
 import { Modal } from "../ui/Modal";
+import { ConfirmModal } from "../ui/ConfirmModal";
 import { Input } from "../ui/Input";
 import { Navigation, CheckCircle2, AlertTriangle, MapPin, Clock, IndianRupee, Loader2 } from "lucide-react";
 import { useThemeStore } from "../../store/themeStore";
@@ -26,6 +27,8 @@ export function IncomingJobs() {
   const [serviceAmount, setServiceAmount] = useState("");
   const [submittingPrice, setSubmittingPrice] = useState(false);
   const [priceError, setPriceError] = useState("");
+  const [deleteJob, setDeleteJob] = useState(null);
+  const [deleteLoading, setDeleteLoading] = useState(false);
 
   const showToast = (message) => {
     setToast(message);
@@ -50,8 +53,15 @@ export function IncomingJobs() {
 
   useEffect(() => {
     fetchJobs();
-    const interval = setInterval(fetchJobs, 15000);
-    return () => clearInterval(interval);
+    const interval = setInterval(() => {
+      if (!document.hidden) fetchJobs();
+    }, 15000);
+    const onVisibility = () => { if (!document.hidden) fetchJobs(); };
+    document.addEventListener("visibilitychange", onVisibility);
+    return () => {
+      clearInterval(interval);
+      document.removeEventListener("visibilitychange", onVisibility);
+    };
   }, [fetchJobs]);
 
   const acceptJob = async (id) => {
@@ -201,16 +211,7 @@ export function IncomingJobs() {
                     </>
                   )}
                   <button
-                    onClick={async () => {
-                      if (confirm("Are you sure you want to delete this job record?")) {
-                        try {
-                          await api.delete(`/jobs/${job.id}`);
-                          fetchJobs();
-                        } catch (e) {
-                          alert(`Failed to delete job: ${e.response?.data?.detail || e.message}`);
-                        }
-                      }
-                    }}
+                    onClick={() => setDeleteJob(job)}
                     className={`ml-2 flex items-center justify-center p-1.5 rounded-lg transition-colors text-red-500 hover:bg-red-50 hover:text-red-600 border border-transparent hover:border-red-200`}
                     title="Delete Job"
                   >
@@ -293,6 +294,29 @@ export function IncomingJobs() {
           </Button>
         </div>
       </Modal>
+
+      <ConfirmModal
+        isOpen={!!deleteJob}
+        onClose={() => setDeleteJob(null)}
+        onConfirm={async () => {
+          if (!deleteJob) return;
+          setDeleteLoading(true);
+          try {
+            await api.delete(`/jobs/${deleteJob.id}`);
+            fetchJobs();
+            setDeleteJob(null);
+          } catch (e) {
+            showToast(`Failed to delete job: ${e.response?.data?.detail || e.message}`);
+            setDeleteJob(null);
+          } finally {
+            setDeleteLoading(false);
+          }
+        }}
+        title="Delete Job Record"
+        message="Are you sure you want to delete this job record? This action cannot be undone."
+        confirmLabel="Delete"
+        isLoading={deleteLoading}
+      />
     </GlassCard>
   );
 }

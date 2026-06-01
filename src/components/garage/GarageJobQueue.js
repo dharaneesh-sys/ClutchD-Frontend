@@ -3,6 +3,7 @@ import { GlassCard } from "../ui/GlassCard";
 import { Button } from "../ui/Button";
 import { Badge } from "../ui/Badge";
 import { Modal } from "../ui/Modal";
+import { ConfirmModal } from "../ui/ConfirmModal";
 import { Input } from "../ui/Input";
 import { Clock, MapPin, Settings, Loader2, IndianRupee, AlertTriangle } from "lucide-react";
 import { AssignMechanicModal } from "./AssignMechanicModal";
@@ -26,6 +27,8 @@ export function GarageJobQueue() {
   const [submittingPrice, setSubmittingPrice] = useState(false);
   const [priceError, setPriceError] = useState("");
   const [toast, setToast] = useState(null);
+  const [deleteJob, setDeleteJob] = useState(null);
+  const [deleteLoading, setDeleteLoading] = useState(false);
 
   const showToast = (message) => {
     setToast(message);
@@ -45,8 +48,15 @@ export function GarageJobQueue() {
 
   useEffect(() => {
     fetchJobs();
-    const interval = setInterval(fetchJobs, 10000); // poll every 10s
-    return () => clearInterval(interval);
+    const interval = setInterval(() => {
+      if (!document.hidden) fetchJobs();
+    }, 10000);
+    const onVisibility = () => { if (!document.hidden) fetchJobs(); };
+    document.addEventListener("visibilitychange", onVisibility);
+    return () => {
+      clearInterval(interval);
+      document.removeEventListener("visibilitychange", onVisibility);
+    };
   }, []);
 
   const openAssignModal = (job) => {
@@ -194,16 +204,7 @@ export function GarageJobQueue() {
                       </div>
                     )}
                     <button
-                      onClick={async () => {
-                        if (confirm("Are you sure you want to delete this job record?")) {
-                          try {
-                            await api.delete(`/jobs/${job.id}`);
-                            fetchJobs();
-                          } catch (e) {
-                            alert(`Failed to delete job: ${e.response?.data?.detail || e.message}`);
-                          }
-                        }
-                      }}
+                      onClick={() => setDeleteJob(job)}
                       className={`ml-2 flex items-center justify-center p-1.5 rounded-lg transition-colors text-red-500 hover:bg-red-50 hover:text-red-600 border border-transparent hover:border-red-200`}
                       title="Delete Job"
                     >
@@ -294,6 +295,29 @@ export function GarageJobQueue() {
           </Button>
         </div>
       </Modal>
+
+      <ConfirmModal
+        isOpen={!!deleteJob}
+        onClose={() => setDeleteJob(null)}
+        onConfirm={async () => {
+          if (!deleteJob) return;
+          setDeleteLoading(true);
+          try {
+            await api.delete(`/jobs/${deleteJob.id}`);
+            fetchJobs();
+            setDeleteJob(null);
+          } catch (e) {
+            showToast(`Failed to delete job: ${e.response?.data?.detail || e.message}`);
+            setDeleteJob(null);
+          } finally {
+            setDeleteLoading(false);
+          }
+        }}
+        title="Delete Job Record"
+        message="Are you sure you want to delete this job record? This action cannot be removed."
+        confirmLabel="Delete"
+        isLoading={deleteLoading}
+      />
     </GlassCard>
   );
 }

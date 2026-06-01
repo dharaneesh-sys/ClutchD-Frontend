@@ -18,6 +18,10 @@ export const Button = forwardRef(
       secondary:
         "bg-gradient-to-b from-white/10 to-white/5 text-emerald-50 " +
         "border border-white/15 ring-1 ring-white/10 hover:bg-white/15 hover:border-white/25",
+      tonal:
+        "bg-emerald-500/20 text-emerald-200 " +
+        "hover:bg-emerald-500/30 hover:text-emerald-100 " +
+        "shadow-none",
       outline:
         "border-2 border-emerald-500/70 text-emerald-50 " +
         "bg-white/0 hover:bg-emerald-500/10 hover:border-emerald-400/80 " +
@@ -38,6 +42,10 @@ export const Button = forwardRef(
       secondary:
         "bg-gradient-to-b from-stone-100 to-stone-50 text-stone-700 " +
         "border border-stone-200 ring-1 ring-stone-200/50 hover:bg-stone-100 hover:border-stone-300",
+      tonal:
+        "bg-amber-500/15 text-amber-800 " +
+        "hover:bg-amber-500/25 hover:text-amber-900 " +
+        "shadow-none",
       outline:
         "border-2 border-amber-500/60 text-amber-700 " +
         "bg-transparent hover:bg-amber-500/10 hover:border-amber-500 " +

@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { GlassCard } from "../ui/GlassCard";
 import { Badge } from "../ui/Badge";
+import { ConfirmModal } from "../ui/ConfirmModal";
 import { Calendar, Download, MapPin, Loader2, Wrench, ChevronDown, ChevronUp, Receipt } from "lucide-react";
 import api, { extractApiError } from "../../lib/api";
 import { useThemeStore } from "../../store/themeStore";
@@ -14,6 +15,9 @@ export function ServiceHistory() {
   const [loading, setLoading] = useState(true);
   const [paymentJob, setPaymentJob] = useState(null);
   const [expandedInvoice, setExpandedInvoice] = useState(null);
+  const [deleteJob, setDeleteJob] = useState(null);
+  const [deleteLoading, setDeleteLoading] = useState(false);
+  const [errorToast, setErrorToast] = useState(null);
   const { theme } = useThemeStore();
   const isLight = theme === "light";
 
@@ -56,7 +60,8 @@ export function ServiceHistory() {
       link.click();
       link.parentNode.removeChild(link);
     } catch (e) {
-      alert(extractApiError(e, "Failed to download invoice. Note: PDF generation may not be available on server."));
+      setErrorToast(extractApiError(e, "Failed to download invoice."));
+      setTimeout(() => setErrorToast(null), 4000);
     }
   };
 
@@ -174,16 +179,7 @@ export function ServiceHistory() {
                     )}
                   </div>
                   <button
-                    onClick={async () => {
-                      if (confirm("Are you sure you want to delete this job record?")) {
-                        try {
-                          await api.delete(`/jobs/${job.id}`);
-                          fetchHistory();
-                        } catch (e) {
-                          alert(`Failed to delete job: ${e.response?.data?.detail || e.message}`);
-                        }
-                      }
-                    }}
+                    onClick={() => setDeleteJob(job)}
                     className={`ml-2 flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors text-red-500 hover:bg-red-50 hover:text-red-600 border border-red-200`}
                   >
                     Delete
@@ -253,6 +249,38 @@ export function ServiceHistory() {
           onSuccess={handlePaymentSuccess}
         />
       )}
+
+      {errorToast && (
+        <div className={`fixed top-4 right-4 z-[100] px-4 py-3 rounded-xl border shadow-2xl text-sm font-medium ${
+          isLight ? "bg-red-50 border-red-200 text-red-700" : "bg-red-500/20 border-red-500/30 text-red-300"
+        }`}>
+          {errorToast}
+        </div>
+      )}
+
+      <ConfirmModal
+        isOpen={!!deleteJob}
+        onClose={() => setDeleteJob(null)}
+        onConfirm={async () => {
+          if (!deleteJob) return;
+          setDeleteLoading(true);
+          try {
+            await api.delete(`/jobs/${deleteJob.id}`);
+            fetchHistory();
+            setDeleteJob(null);
+          } catch (e) {
+            setErrorToast(`Failed to delete job: ${e.response?.data?.detail || e.message}`);
+            setTimeout(() => setErrorToast(null), 4000);
+            setDeleteJob(null);
+          } finally {
+            setDeleteLoading(false);
+          }
+        }}
+        title="Delete Job Record"
+        message="Are you sure you want to delete this job record? This action cannot be undone."
+        confirmLabel="Delete"
+        isLoading={deleteLoading}
+      />
     </div>
   );
 }

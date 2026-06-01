@@ -3,6 +3,7 @@
 import { GlassCard } from "../ui/GlassCard";
 import { useThemeStore } from "../../store/themeStore";
 import { AreaChart, Area, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import { AlertTriangle } from "lucide-react";
 
 const revenueData = [
   { name: 'Mon', revenue: 15000 },
@@ -34,6 +35,12 @@ export function GarageAnalytics() {
 
   return (
     <GlassCard variant="strong" className="p-4 sm:p-6 h-full flex flex-col">
+      <div className={`mb-4 flex items-center gap-2 px-3 py-2 rounded-lg border text-xs ${
+        isLight ? "bg-amber-50 border-amber-200 text-amber-700" : "bg-amber-500/10 border-amber-500/20 text-amber-300"
+      }`}>
+        <AlertTriangle size={12} className="shrink-0" />
+        Showing sample data — live analytics coming soon.
+      </div>
       <div className="mb-6 flex justify-between items-end">
         <div>
           <h2 className={`text-xl font-bold tracking-tight ${isLight ? "text-stone-900" : "text-white"}`}>Garage Performance</h2>

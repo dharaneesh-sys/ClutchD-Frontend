@@ -1,16 +1,18 @@
 "use client";
 
-import { useEffect } from "react";
+import { useState, useEffect } from "react";
 import { Sidebar } from "../../components/admin/Sidebar";
 import { usePathname } from "next/navigation";
 import { useAuthStore } from "../../store/authStore";
 import { useThemeStore } from "../../store/themeStore";
+import { Menu, X } from "lucide-react";
 
 export default function AdminLayout({ children }) {
   const pathname = usePathname();
   const { isAuthenticated, user } = useAuthStore();
   const { theme } = useThemeStore();
   const isLight = theme === "light";
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   useEffect(() => {
     if (!isAuthenticated) {
@@ -20,17 +22,63 @@ export default function AdminLayout({ children }) {
     }
   }, [isAuthenticated, user]);
 
+  const [prevPath, setPrevPath] = useState(pathname);
+  if (pathname !== prevPath) {
+    setPrevPath(pathname);
+    setSidebarOpen(false);
+  }
+
   if (!isAuthenticated || !user || user.role !== "admin") {
-    return <div className={`h-screen w-full flex items-center justify-center ${isLight ? "bg-yellow-50" : "bg-[#09090b]"}`}><div className={`w-8 h-8 border-2 border-t-transparent rounded-full animate-spin ${isLight ? "border-yellow-500" : "border-emerald-500"}`} /></div>;
+    return (
+      <div className={`h-screen w-full flex items-center justify-center ${isLight ? "bg-[var(--background)]" : "bg-[#09090b]"}`}>
+        <div className="w-8 h-8 border-2 border-t-transparent rounded-full animate-spin border-[var(--primary)]" />
+      </div>
+    );
   }
 
   return (
-    <div className={`h-screen w-full flex overflow-hidden relative z-10 p-4 gap-6 ${isLight ? "bg-[#fffdf5] text-slate-900" : "bg-[#09090b] text-white"}`}>
-      <div className={`rounded-2xl overflow-hidden border shadow-2xl h-full ${isLight ? "border-slate-200" : "border-white/5"}`}>
-         <Sidebar currentPath={pathname} />
+    <div className={`min-h-[100dvh] w-full flex flex-col lg:flex-row overflow-hidden relative z-10 p-3 sm:p-4 lg:p-6 gap-4 lg:gap-6 ${isLight ? "bg-[var(--background)] text-[var(--foreground)]" : "bg-[#09090b] text-white"}`}>
+      {/* Mobile header */}
+      <div className="lg:hidden flex items-center justify-between px-2 py-1">
+        <div className="flex items-center gap-2">
+          <div className="w-8 h-8 rounded-lg flex items-center justify-center font-bold tracking-tighter bg-[var(--primary)] text-white">
+            M
+          </div>
+          <h1 className="text-lg font-bold">Admin</h1>
+        </div>
+        <button
+          onClick={() => setSidebarOpen(!sidebarOpen)}
+          className="p-2 rounded-xl hover:bg-[var(--foreground)]/5 transition-colors"
+          aria-label={sidebarOpen ? "Close menu" : "Open menu"}
+        >
+          {sidebarOpen ? <X size={20} /> : <Menu size={20} />}
+        </button>
       </div>
-      
-      <main className={`flex-1 rounded-2xl border shadow-2xl overflow-y-auto custom-scrollbar p-8 ${isLight ? "bg-white/60 border-slate-200" : "bg-white/5 border-white/5"}`}>
+
+      {/* Mobile overlay */}
+      {sidebarOpen && (
+        <div
+          className="lg:hidden fixed inset-0 z-40 bg-black/40 backdrop-blur-sm"
+          onClick={() => setSidebarOpen(false)}
+        />
+      )}
+
+      {/* Sidebar */}
+      <div
+        className={`
+          ${sidebarOpen ? "translate-x-0" : "-translate-x-full"}
+          lg:translate-x-0
+          fixed lg:relative top-0 left-0 z-50 lg:z-auto
+          h-full w-72 lg:w-64
+          transition-transform duration-300 ease-in-out
+          rounded-2xl overflow-hidden border shadow-2xl
+          ${isLight ? "border-slate-200" : "border-white/5"}
+        `}
+      >
+        <Sidebar currentPath={pathname} onClose={() => setSidebarOpen(false)} />
+      </div>
+
+      <main className={`flex-1 rounded-2xl border shadow-2xl overflow-y-auto custom-scrollbar p-4 sm:p-6 lg:p-8 ${isLight ? "bg-[var(--surface)]/80 border-slate-200" : "bg-white/5 border-white/5"}`}>
         {children}
       </main>
     </div>

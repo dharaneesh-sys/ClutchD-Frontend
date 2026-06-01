@@ -2,7 +2,7 @@
 
 export default function Error({ error, reset }) {
   return (
-    <div className="flex items-center justify-center min-h-screen px-4 bg-[var(--background)]">
+    <div className="flex items-center justify-center p-12">
       <div className="glass p-8 sm:p-12 text-center max-w-md w-full">
         <div className="w-16 h-16 mx-auto mb-6 rounded-full bg-red-500/10 flex items-center justify-center">
           <svg className="w-8 h-8 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>

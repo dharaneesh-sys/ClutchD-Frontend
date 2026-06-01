@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react";
 import { MapContainer, TileLayer, Marker, Popup, useMap, Polyline } from "react-leaflet";
-import "leaflet/dist/leaflet.css";
 import L from "leaflet";
 import { useTrackingStore } from "../../store/trackingStore";
 import { useThemeStore } from "../../store/themeStore";
@@ -27,6 +26,7 @@ function MapUpdater({ center }) {
 }
 
 export default function MapView() {
+  useEffect(() => { import("leaflet/dist/leaflet.css"); }, []);
   const { userLocation, mechanicLocation, navigationTarget, nearbyMechanics, nearbyGarages, fetchNearbyProviders } = useTrackingStore();
   const { theme } = useThemeStore();
   const isLight = theme === "light";

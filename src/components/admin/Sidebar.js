@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { UserCircle, Briefcase, AlertTriangle, BarChart3, Users, FileCheck, Wrench, Building2, CreditCard } from "lucide-react";
+import { UserCircle, Briefcase, AlertTriangle, BarChart3, Users, FileCheck, Wrench, Building2, CreditCard, X } from "lucide-react";
 import { cn } from "../../lib/utils";
 import { useAuthStore } from "../../store/authStore";
 import { useThemeStore } from "../../store/themeStore";
@@ -19,7 +19,7 @@ const NAV_ITEMS = [
   { name: "Disputes", icon: AlertTriangle, path: "/admin/disputes", badgeKey: "disputes" },
 ];
 
-export function Sidebar({ currentPath = "/admin" }) {
+export function Sidebar({ currentPath = "/admin", onClose }) {
   const { logout } = useAuthStore();
   const { theme } = useThemeStore();
   const isLight = theme === "light";
@@ -43,10 +43,23 @@ export function Sidebar({ currentPath = "/admin" }) {
   }, []);
 
   return (
-    <div className={`w-64 h-full flex flex-col pt-6 ${isLight ? "bg-white border-r border-slate-200" : "bg-[#0a0a0b] border-r border-white/5"}`}>
-      <div className="px-6 mb-8 flex items-center gap-2">
-        <div className={`w-8 h-8 rounded-lg flex items-center justify-center font-bold tracking-tighter ${isLight ? "bg-yellow-500 text-white" : "bg-emerald-500 text-black"}`}>M</div>
-        <h1 className={`text-xl font-bold tracking-tight ${isLight ? "text-slate-900" : "text-white"}`}>Admin</h1>
+    <div className={`w-full h-full flex flex-col pt-6 ${isLight ? "bg-[var(--surface)] border-r border-slate-200" : "bg-[#0a0a0b] border-r border-white/5"}`}>
+      <div className="px-6 mb-8 flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <div className="w-8 h-8 rounded-lg flex items-center justify-center font-bold tracking-tighter bg-[var(--primary)] text-white">
+            M
+          </div>
+          <h1 className={`text-xl font-bold tracking-tight ${isLight ? "text-[var(--foreground)]" : "text-white"}`}>Admin</h1>
+        </div>
+        {onClose && (
+          <button
+            onClick={onClose}
+            className="lg:hidden p-2 rounded-xl hover:bg-[var(--foreground)]/5 transition-colors"
+            aria-label="Close sidebar"
+          >
+            <X size={18} />
+          </button>
+        )}
       </div>
 
       <nav className="flex-1 px-4 space-y-2">
@@ -59,6 +72,8 @@ export function Sidebar({ currentPath = "/admin" }) {
             <Link
               key={item.path}
               href={item.path}
+              onClick={onClose}
+              aria-current={isActive ? "page" : undefined}
               className={cn(
                 "flex items-center justify-between px-4 py-3 rounded-xl transition-all group",
                 isActive

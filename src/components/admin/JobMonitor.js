@@ -7,7 +7,6 @@ import { MapPin, Navigation, Clock, AlertTriangle, Crosshair } from "lucide-reac
 import { useThemeStore } from "../../store/themeStore";
 import { fetchJobs, forceAssignJob, trackJob } from "../../services/adminService";
 import dynamic from "next/dynamic";
-import "leaflet/dist/leaflet.css";
 import L from "leaflet";
 
 delete L.Icon.Default.prototype._getIconUrl;
@@ -35,6 +34,7 @@ const Popup = dynamic(
 );
 
 export function JobMonitor() {
+  useEffect(() => { import("leaflet/dist/leaflet.css"); }, []);
   const [filter, setFilter] = useState("All");
   const [jobs, setJobs] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -130,7 +130,7 @@ export function JobMonitor() {
         </div>
       )}
 
-      <GlassCard className="h-full flex flex-col overflow-hidden">
+      <GlassCard variant="elevated" className="h-full flex flex-col overflow-hidden">
         <div className={`p-4 border-b flex gap-2 overflow-x-auto custom-scrollbar ${isLight ? "border-stone-200" : "border-white/5"}`}>
           {statusFilters.map(f => (
             <button

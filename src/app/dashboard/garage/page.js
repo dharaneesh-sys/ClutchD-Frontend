@@ -22,50 +22,51 @@ export default function GarageDashboard() {
   }, [isAuthenticated]);
 
   if (!isAuthenticated) {
-    return <div className={`h-screen w-full flex items-center justify-center ${isLight ? "bg-yellow-50" : "bg-[#09090b]"}`}><div className={`w-8 h-8 border-2 border-t-transparent rounded-full animate-spin ${isLight ? "border-yellow-500" : "border-emerald-500"}`} /></div>;
+    return <div className="min-h-[100dvh] w-full flex items-center justify-center bg-[var(--background)]"><div className="w-8 h-8 border-2 border-t-transparent rounded-full animate-spin border-[var(--primary)]" /></div>;
   }
 
   return (
-    <div className="h-screen w-full flex flex-col p-4 sm:p-6 pb-0 overflow-hidden relative z-10 gap-6">
+    <div className="min-h-[100dvh] w-full flex flex-col p-3 sm:p-4 lg:p-6 gap-4 lg:gap-6 relative z-10">
       
-      <header className={`flex justify-between items-center px-6 py-4 backdrop-blur-xl rounded-2xl flex-shrink-0 ${isLight ? "bg-white/70 border border-slate-200" : "bg-white/5 border border-white/10"}`}>
+      <header className={`flex justify-between items-center px-4 lg:px-6 py-3 lg:py-4 backdrop-blur-xl rounded-2xl flex-shrink-0 ${isLight ? "bg-white/70 border border-slate-200" : "bg-white/5 border border-white/10"}`}>
         <div className="flex items-center gap-2">
-           <div className={`w-8 h-8 rounded-lg flex items-center justify-center text-white font-bold tracking-tighter ${isLight ? "bg-gradient-to-br from-yellow-400 to-yellow-600" : "bg-gradient-to-br from-emerald-400 to-emerald-600"}`}>M</div>
-           <h1 className={`text-xl font-bold tracking-tight hidden sm:block ${isLight ? "text-slate-900" : "text-white"}`}>ClutchD</h1>
+           <div className="w-7 h-7 lg:w-8 lg:h-8 rounded-lg flex items-center justify-center text-white font-bold tracking-tighter bg-[var(--primary)]">M</div>
+           <h1 className={`text-lg lg:text-xl font-bold tracking-tight hidden sm:block ${isLight ? "text-slate-900" : "text-white"}`}>ClutchD</h1>
         </div>
         
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-2 lg:gap-4">
           <div className="hidden sm:flex flex-col items-end mr-2">
             <span className={`text-sm font-semibold ${isLight ? "text-slate-900" : "text-white"}`}>{user?.name || "Auto Garage"}</span>
             <span className={`text-[10px] uppercase tracking-wider ${isLight ? "text-yellow-600" : "text-emerald-100/60"}`}>Business Mode</span>
           </div>
           <NotificationBell />
-          <div className={`w-10 h-10 rounded-full flex items-center justify-center ${isLight ? "bg-yellow-500/15 border border-yellow-500/30 text-yellow-600" : "bg-emerald-500/20 border border-emerald-500/30 text-emerald-300"}`}>
-            <Building2 size={18} />
+          <div className={`w-9 h-9 lg:w-10 lg:h-10 rounded-full flex items-center justify-center ${isLight ? "bg-yellow-500/15 border border-yellow-500/30 text-yellow-600" : "bg-emerald-500/20 border border-emerald-500/30 text-emerald-300"}`}>
+            <Building2 size={16} />
           </div>
           <button 
             onClick={logout}
-            className={`w-10 h-10 rounded-full flex items-center justify-center transition-colors ml-2 ${isLight ? "bg-slate-100 hover:bg-red-50 border border-slate-200 hover:border-red-200 text-slate-500 hover:text-red-500" : "bg-white/5 hover:bg-red-500/20 border border-white/10 hover:border-red-500/30 text-white/70 hover:text-red-400"}`}
+            aria-label="Logout"
+            className={`w-9 h-9 lg:w-10 lg:h-10 rounded-full flex items-center justify-center transition-colors ${isLight ? "bg-slate-100 hover:bg-red-50 border border-slate-200 hover:border-red-200 text-slate-500 hover:text-red-500" : "bg-white/5 hover:bg-red-500/20 border border-white/10 hover:border-red-500/30 text-white/70 hover:text-red-400"}`}
           >
-            <LogOut size={16} />
+            <LogOut size={15} />
           </button>
         </div>
       </header>
 
-      <div className="flex-1 overflow-y-auto custom-scrollbar pb-6 pr-2 lg:pr-0">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 h-full min-h-[800px]">
+      <div className="flex-1 pb-4 lg:pb-6">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 lg:gap-6">
           
-          <div className="lg:col-span-5 xl:col-span-4 flex flex-col gap-6">
-            <div className="flex-1 min-h-[400px]">
+          <div className="lg:col-span-5 xl:col-span-4 flex flex-col gap-4 lg:gap-6">
+            <div>
               <GarageProfile />
             </div>
-            <div className="h-[450px]">
+            <div>
                <GarageAnalytics />
             </div>
           </div>
           
-          <div className="lg:col-span-7 xl:col-span-8 flex flex-col gap-6">
-            <div className="flex-1 min-h-[800px]">
+          <div className="lg:col-span-7 xl:col-span-8 flex flex-col gap-4 lg:gap-6">
+            <div>
               <GarageJobQueue />
             </div>
           </div>

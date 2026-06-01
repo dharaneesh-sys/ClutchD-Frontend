@@ -22,10 +22,12 @@ function LocationIndicator({ isLight }) {
   const [manualInput, setManualInput] = useState("");
   const [searching, setSearching] = useState(false);
   const [showManual, setShowManual] = useState(false);
+  const [searchError, setSearchError] = useState(null);
 
   const handleManualSearch = async () => {
     if (!manualInput.trim()) return;
     setSearching(true);
+    setSearchError(null);
     try {
       const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(manualInput)}&limit=1`);
       const data = await res.json();
@@ -34,10 +36,10 @@ function LocationIndicator({ isLight }) {
         useTrackingStore.getState().setUserLocation(coords);
         setShowManual(false);
       } else {
-        alert("Location not found. Try a more specific address.");
+        setSearchError("Location not found. Try a more specific address.");
       }
     } catch {
-      alert("Failed to search location. Check your internet connection.");
+      setSearchError("Failed to search location. Check your internet connection.");
     } finally {
       setSearching(false);
     }
@@ -134,6 +136,12 @@ function LocationIndicator({ isLight }) {
             Detect my location
           </button>
         </div>
+      )}
+
+      {searchError && (
+        <p className={`mt-2 text-xs ${isLight ? "text-red-600" : "text-red-400"}`}>
+          {searchError}
+        </p>
       )}
     </div>
   );
