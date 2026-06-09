@@ -71,8 +71,13 @@ export function LoginCard() {
           if (!credential) return;
 
           const role = selectedRoleRef.current;
-          // Generate CSRF state parameter
-          const oauthState = crypto.randomUUID();
+          let oauthState;
+          try {
+            const res = await api.get("/auth/oauth/state");
+            oauthState = res.data.state;
+          } catch {
+            oauthState = crypto.randomUUID();
+          }
           sessionStorage.setItem("oauth_state", oauthState);
           const user = await loginWithGoogle(credential, role, oauthState);
           if (!user) return;
