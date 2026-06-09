@@ -79,9 +79,13 @@ export function LoginCard() {
             oauthState = crypto.randomUUID();
           }
           sessionStorage.setItem("oauth_state", oauthState);
-          const user = await loginWithGoogle(credential, role, oauthState);
+          let user;
+          try {
+            user = await loginWithGoogle(credential, role, oauthState);
+          } finally {
+            sessionStorage.removeItem("oauth_state");
+          }
           if (!user) return;
-          sessionStorage.removeItem("oauth_state");
 
           if (user.role === "admin") router.push("/admin");
           else router.push(`/dashboard/${user.role}`);
