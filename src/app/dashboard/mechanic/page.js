@@ -12,6 +12,7 @@ import { useThemeStore } from "../../../store/themeStore";
 import { useTrackingStore } from "../../../store/trackingStore";
 import { LogOut, Wrench } from "lucide-react";
 import { NotificationBell } from "../../../components/ui/NotificationBell";
+import { ConnectionIndicator } from "../../../components/ui/ConnectionIndicator";
 
 const NavigationMap = dynamic(
   () => import("../../../components/dashboard/MapView"),
@@ -58,6 +59,7 @@ export default function MechanicDashboard() {
             <span className={`text-sm font-semibold ${isLight ? "text-slate-900" : "text-white"}`}>{user?.name || "Mechanic"}</span>
             <span className={`text-[10px] uppercase tracking-wider ${isLight ? "text-yellow-600" : "text-emerald-100/60"}`}>Provider Mode</span>
           </div>
+          <ConnectionIndicator />
           <NotificationBell />
           <div className={`w-9 h-9 lg:w-10 lg:h-10 rounded-full flex items-center justify-center ${isLight ? "bg-yellow-500/15 border border-yellow-500/30 text-yellow-600" : "bg-emerald-500/20 border border-emerald-500/30 text-emerald-300"}`}>
             <Wrench size={16} />

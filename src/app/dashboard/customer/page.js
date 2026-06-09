@@ -12,6 +12,7 @@ import { ProviderList } from "../../../components/dashboard/ProviderList";
 import { PaymentModal } from "../../../components/dashboard/PaymentModal";
 import { ReviewModal } from "../../../components/dashboard/ReviewModal";
 import { NotificationBell } from "../../../components/ui/NotificationBell";
+import { ConnectionIndicator } from "../../../components/ui/ConnectionIndicator";
 import { SOSButton } from "../../../components/ui/SOSButton";
 import { PageTransition } from "../../../components/ui/PageTransition";
 import { LogOut, User, History, Wrench } from "lucide-react";
@@ -206,6 +207,7 @@ export default function CustomerDashboard() {
               Customer Mode
             </span>
           </div>
+          <ConnectionIndicator />
           <NotificationBell />
           <div className={`w-9 h-9 lg:w-10 lg:h-10 rounded-full flex items-center justify-center ${isLight ? "bg-yellow-500/15 border border-yellow-500/30 text-yellow-600" : "bg-emerald-500/20 border border-emerald-500/30 text-emerald-300"}`}>
             <User size={16} />
