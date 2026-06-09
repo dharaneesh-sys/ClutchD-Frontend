@@ -153,7 +153,7 @@ export function LoginCard() {
 
   if (view === "forgot_email") {
     return (
-      <GlassCard variant="strong" className="w-full max-w-md p-8 pt-10">
+      <GlassCard variant="glass-lux-strong" animateBorder className="w-full max-w-md p-8 pt-10">
         <div className="mb-8 text-center">
           <h2 className={`text-2xl font-bold mb-2 tracking-tight ${isLight ? "text-slate-900" : "text-white"}`}>Reset Password</h2>
           <p className={isLight ? "text-slate-500" : "text-emerald-100/70"}>Enter your email to receive a recovery code.</p>
@@ -189,7 +189,7 @@ export function LoginCard() {
 
   if (view === "forgot_code") {
     return (
-      <GlassCard variant="strong" className="w-full max-w-md p-8 pt-10">
+      <GlassCard variant="glass-lux-strong" animateBorder className="w-full max-w-md p-8 pt-10">
         <div className="mb-8 text-center">
           <h2 className={`text-2xl font-bold mb-2 tracking-tight ${isLight ? "text-slate-900" : "text-white"}`}>Enter Code</h2>
           <p className={isLight ? "text-slate-500" : "text-emerald-100/70"}>Check your terminal logs for the 6-digit code.</p>
@@ -232,13 +232,12 @@ export function LoginCard() {
   }
 
   return (
-    <GlassCard variant="strong" className="w-full max-w-md p-8 pt-10">
+    <GlassCard variant="glass-lux-strong" animateBorder className="w-full max-w-md p-8 pt-10">
       <div className="mb-8 text-center">
         <h2 className={`text-3xl font-bold mb-2 tracking-tight ${isLight ? "text-slate-900" : "text-white"}`}>Welcome Back</h2>
         <p className={isLight ? "text-slate-500" : "text-emerald-100/70"}>Sign in to your ClutchD account</p>
       </div>
 
-      {/* Role Selector */}
       <div className="grid grid-cols-3 gap-3 mb-6">
         {ROLES.map((role) => {
           const Icon = role.icon;

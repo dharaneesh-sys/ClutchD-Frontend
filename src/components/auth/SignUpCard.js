@@ -109,11 +109,10 @@ export function SignUpCard() {
     script.onload = initGoogle;
     document.body.appendChild(script);
 
-    return () => {};
   }, [googleClientId, loginWithGoogle, router]);
 
   return (
-    <GlassCard variant="strong" className="w-full max-w-xl p-6 sm:p-8 pt-10">
+    <GlassCard variant="glass-lux-strong" animateBorder className="w-full max-w-xl p-6 sm:p-8 pt-10">
       <div className="mb-8 text-center">
         <h2 className={`text-3xl font-bold mb-2 tracking-tight ${isLight ? "text-slate-900" : "text-white"}`}>Create Account</h2>
         <p className={isLight ? "text-slate-500" : "text-emerald-100/70"}>Join the ultimate on-demand platform</p>

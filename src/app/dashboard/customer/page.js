@@ -13,7 +13,8 @@ import { PaymentModal } from "../../../components/dashboard/PaymentModal";
 import { ReviewModal } from "../../../components/dashboard/ReviewModal";
 import { NotificationBell } from "../../../components/ui/NotificationBell";
 import { SOSButton } from "../../../components/ui/SOSButton";
-import { LogOut, User, History, Wrench, Wifi, WifiOff } from "lucide-react";
+import { PageTransition } from "../../../components/ui/PageTransition";
+import { LogOut, User, History, Wrench } from "lucide-react";
 import { SERVICE_STATUS } from "../../../lib/constants";
 import api from "../../../lib/api";
 
@@ -59,7 +60,6 @@ export default function CustomerDashboard() {
     }
   }, [isAuthenticated]);
 
-  // Request GPS location on mount
   useEffect(() => {
     if (isAuthenticated) {
       useTrackingStore.getState().requestGPSLocation();
@@ -147,8 +147,22 @@ export default function CustomerDashboard() {
   };
 
   return (
-    <div className="min-h-[100dvh] w-full flex flex-col p-3 sm:p-4 lg:p-6 gap-4 lg:gap-6 relative z-10">
-      <header className={`flex justify-between items-center px-4 lg:px-6 py-3 lg:py-4 backdrop-blur-xl rounded-2xl flex-shrink-0 relative z-50 ${isLight ? "bg-white/70 border border-slate-200" : "bg-white/5 border border-white/10"}`}>
+    <PageTransition>
+      <div className="min-h-[100dvh] w-full flex flex-col p-3 sm:p-4 lg:p-6 gap-4 lg:gap-6 relative z-10">
+        <div
+          className={`absolute -top-32 -right-32 w-[28rem] h-[28rem] rounded-full blur-[140px] pointer-events-none opacity-30 ${
+            isLight ? "bg-yellow-400/20" : "bg-emerald-500/15"
+          }`}
+          style={{ animation: "float-drift 24s ease-in-out infinite" }}
+        />
+        <div
+          className={`absolute bottom-0 -left-20 w-[22rem] h-[22rem] rounded-full blur-[120px] pointer-events-none opacity-20 ${
+            isLight ? "bg-amber-300/15" : "bg-teal-400/10"
+          }`}
+          style={{ animation: "float-drift 28s ease-in-out infinite 5s" }}
+        />
+
+        <header className={`glass-lux flex justify-between items-center px-4 lg:px-6 py-3 lg:py-4 flex-shrink-0 relative z-50 ${isLight ? "" : ""}`}>
         <div className="flex items-center gap-2">
           <div className={`w-7 h-7 lg:w-8 lg:h-8 rounded-lg flex items-center justify-center text-white font-bold tracking-tighter ${isLight ? "bg-gradient-to-br from-yellow-400 to-yellow-600" : "bg-gradient-to-br from-emerald-400 to-emerald-600"}`}>
             M
@@ -158,7 +172,6 @@ export default function CustomerDashboard() {
           </h1>
         </div>
 
-        {/* Tab Navigation */}
         <div className={`flex items-center gap-1 p-1 rounded-xl ${isLight ? "bg-slate-100" : "bg-white/5"}`}>
           <button
             onClick={() => setActiveTab("request")}
@@ -212,7 +225,7 @@ export default function CustomerDashboard() {
           <div className="lg:col-span-7 xl:col-span-8 rounded-2xl overflow-hidden relative shadow-2xl min-h-[250px] sm:min-h-[350px] lg:min-h-[400px]">
             <MapView />
 
-            <div className={`absolute top-4 left-4 z-[400] backdrop-blur-md px-3 py-1.5 rounded-full border text-xs font-semibold flex items-center gap-2 ${isLight ? "bg-white/80 border-slate-200 text-slate-700" : "bg-black/60 border-white/10 text-white"}`}>
+            <div className={`absolute top-4 left-4 z-[400] glass-lux px-3 py-1.5 rounded-full text-xs font-semibold flex items-center gap-2 ${isLight ? "text-slate-700" : "text-white"}`}>
               <span className={`w-2 h-2 rounded-full animate-pulse ${isLight ? "bg-yellow-500" : "bg-emerald-400"}`} />
               Live Area Map
             </div>
@@ -256,5 +269,6 @@ export default function CustomerDashboard() {
       />
       <SOSButton />
     </div>
+    </PageTransition>
   );
 }

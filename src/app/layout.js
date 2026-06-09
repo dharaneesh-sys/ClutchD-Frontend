@@ -4,6 +4,8 @@ import { ThemeProvider } from "../components/ui/ThemeProvider";
 import { ThemeToggle } from "../components/ui/ThemeToggle";
 import { AuthInit } from "../components/ui/AuthInit";
 import { ErrorBoundary } from "../components/ui/ErrorBoundary";
+import { DemoModeProvider } from "../lib/demo/demoMode";
+import { DemoToolbar } from "../components/ui/DemoToolbar";
 
 export const metadata = {
   title: "ClutchD — On-Demand Mechanic Platform",
@@ -42,9 +44,12 @@ export default function RootLayout({ children }) {
       </head>
       <body className="min-h-full flex flex-col bg-mesh">
         <ThemeProvider>
-          <AuthInit />
-          <ErrorBoundary>{children}</ErrorBoundary>
-          <ThemeToggle />
+          <DemoModeProvider>
+            <AuthInit />
+            <ErrorBoundary>{children}</ErrorBoundary>
+            <ThemeToggle />
+            <DemoToolbar />
+          </DemoModeProvider>
         </ThemeProvider>
       </body>
     </html>
