@@ -11,6 +11,7 @@ import { CustomerFields } from "./CustomerFields";
 import { MechanicFields } from "./MechanicFields";
 import { GarageFields } from "./GarageFields";
 
+import api from "../../lib/api";
 import { useRouter } from "next/navigation";
 
 export function SignUpCard() {
@@ -82,12 +83,21 @@ export function SignUpCard() {
           if (!credential) return;
 
           const role = selectedRoleRef.current;
-          // Generate CSRF state parameter
-          const oauthState = crypto.randomUUID();
+          let oauthState;
+          try {
+            const res = await api.get("/auth/oauth/state");
+            oauthState = res.data.state;
+          } catch {
+            oauthState = crypto.randomUUID();
+          }
           sessionStorage.setItem("oauth_state", oauthState);
-          const user = await loginWithGoogle(credential, role, oauthState);
+          let user;
+          try {
+            user = await loginWithGoogle(credential, role, oauthState);
+          } finally {
+            sessionStorage.removeItem("oauth_state");
+          }
           if (!user) return;
-          sessionStorage.removeItem("oauth_state");
           
           if (user.role === "admin") router.push("/admin");
           else router.push(`/dashboard/${user.role}`);
