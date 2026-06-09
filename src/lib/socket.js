@@ -42,7 +42,7 @@ export const connectWebSocket = (token) => {
   }
 
   wsInstance.onopen = () => {
-    console.log("[WebSocket] Connected successfully");
+    console.warn("[WebSocket] Connected successfully");
     reconnectAttempts = 0; // Reset on successful connection
     if (reconnectTimer) {
       clearTimeout(reconnectTimer);
@@ -85,7 +85,7 @@ export const connectWebSocket = (token) => {
   };
 
   wsInstance.onclose = (event) => {
-    console.log("[WebSocket] Disconnected", event.code);
+    console.warn("[WebSocket] Disconnected", event.code);
     wsInstance = null;
     
     // Don't reconnect if closed intentionally (1000) or auth failed (4401)
@@ -104,7 +104,7 @@ export const connectWebSocket = (token) => {
     if (reconnectAttempts < MAX_RECONNECT_ATTEMPTS) {
       const delay = BASE_RECONNECT_DELAY * Math.pow(2, reconnectAttempts);
       reconnectAttempts++;
-      console.log(`[WebSocket] Reconnecting in ${delay / 1000}s (attempt ${reconnectAttempts}/${MAX_RECONNECT_ATTEMPTS})`);
+      console.warn(`[WebSocket] Reconnecting in ${delay / 1000}s (attempt ${reconnectAttempts}/${MAX_RECONNECT_ATTEMPTS})`);
       reconnectTimer = setTimeout(() => {
         // Re-read the token from memory so we use the latest refreshed token,
         // not the stale one captured in the closure.
