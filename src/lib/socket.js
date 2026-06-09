@@ -30,10 +30,12 @@ export const connectWebSocket = (token) => {
     reconnectTimer = null;
   }
 
-  const url = token ? `${WS_URL}?token=${token}` : WS_URL;
+  const url = WS_URL;
   
   try {
-    wsInstance = new window.WebSocket(url);
+    // Pass token as Sec-WebSocket-Protocol header (preferred, no URL leakage to logs/history).
+    // Backend falls back to query param for backward compatibility.
+    wsInstance = new window.WebSocket(url, token ? [token] : []);
   } catch (err) {
     console.warn("[WebSocket] Failed to create connection", err);
     return null;
