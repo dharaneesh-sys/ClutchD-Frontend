@@ -1,10 +1,5 @@
-export default function AuthLoading() {
-  return (
-    <div className="flex items-center justify-center min-h-screen bg-[#09090b]">
-      <div className="flex flex-col items-center gap-4">
-        <div className="w-10 h-10 border-4 border-emerald-500/30 border-t-emerald-500 rounded-full animate-spin" />
-        <p className="text-sm text-white/60 animate-pulse">Preparing sign in...</p>
-      </div>
-    </div>
-  );
+import LoadingScreen from "@/components/ui/LoadingScreen";
+
+export default function Loading() {
+  return <LoadingScreen label="Preparing sign in..." />;
 }
