@@ -3,10 +3,11 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { UserCircle, Briefcase, AlertTriangle, BarChart3, Users, FileCheck, Wrench, Building2, CreditCard, X } from "lucide-react";
-import { cn } from "../../lib/utils";
-import { useAuthStore } from "../../store/authStore";
-import { useThemeStore } from "../../store/themeStore";
-import api from "../../lib/api";
+import { cn } from "@/lib/utils";
+import { useAuthStore } from "@/store/authStore";
+import { useThemeStore } from "@/store/themeStore";
+import api from "@/lib/api";
+import { Logo } from "@/components/ui/Logo";
 
 const NAV_ITEMS = [
   { name: "Overview", icon: BarChart3, path: "/admin" },
@@ -46,10 +47,7 @@ export function Sidebar({ currentPath = "/admin", onClose }) {
     <div className={`w-full h-full flex flex-col pt-6 ${isLight ? "bg-[var(--surface)] border-r border-slate-200" : "bg-[#0a0a0b] border-r border-white/5"}`}>
       <div className="px-6 mb-8 flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-lg flex items-center justify-center font-bold tracking-tighter bg-[var(--primary)] text-white">
-            M
-          </div>
-          <h1 className={`text-xl font-bold tracking-tight ${isLight ? "text-[var(--foreground)]" : "text-white"}`}>Admin</h1>
+          <Logo size="md" showText />
         </div>
         {onClose && (
           <button
@@ -77,8 +75,8 @@ export function Sidebar({ currentPath = "/admin", onClose }) {
               className={cn(
                 "flex items-center justify-between px-4 py-3 rounded-xl transition-all group",
                 isActive
-                  ? isLight ? "bg-yellow-500/10 text-yellow-700" : "bg-emerald-500/10 text-emerald-400"
-                  : isLight ? "text-slate-500 hover:bg-yellow-50 hover:text-slate-700" : "text-white/60 hover:bg-white/5 hover:text-white"
+                  ? "bg-surface-soft text-icon-highlight"
+                  : "text-text-muted hover:bg-bg-card hover:text-text-primary"
               )}
             >
               <div className="flex items-center gap-3">
@@ -90,8 +88,8 @@ export function Sidebar({ currentPath = "/admin", onClose }) {
                 <span className={cn(
                   "text-[10px] font-bold px-2 py-0.5 rounded-full min-w-[20px] text-center",
                   isActive
-                    ? isLight ? "bg-yellow-500 text-white" : "bg-emerald-500 text-black"
-                    : isLight ? "bg-slate-100 text-slate-600" : "bg-white/10 text-white"
+                      ? "bg-surface-mid text-icon-highlight"
+                      : "bg-surface-soft text-text-primary"
                 )}>
                   {badge}
                 </span>
@@ -101,7 +99,7 @@ export function Sidebar({ currentPath = "/admin", onClose }) {
         })}
       </nav>
 
-      <div className={`p-4 border-t mx-4 mb-4 ${isLight ? "border-slate-200" : "border-white/5"}`}>
+      <div className={`p-4 border-t mx-4 mb-4 ${"border-border-subtle"}`}>
         <button
           onClick={logout}
           className="flex items-center gap-3 w-full px-4 py-3 text-red-400/80 hover:bg-red-400/10 hover:text-red-400 rounded-xl transition-all text-sm font-medium"

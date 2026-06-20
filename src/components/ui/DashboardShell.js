@@ -1,0 +1,209 @@
+"use client";
+
+import { useState } from "react";
+import { cn } from "@/lib/utils";
+import { Logo } from "@/components/ui/Logo";
+import { ConnectionIndicator } from "@/components/ui/ConnectionIndicator";
+import { NotificationBell } from "@/components/ui/NotificationBell";
+import { useAuthStore } from "@/store/authStore";
+import { useThemeStore } from "@/store/themeStore";
+import { useRouter } from "next/navigation";
+import { LogOut, User, Building2, Wrench, Menu, X } from "lucide-react";
+
+const MODE_CONFIG = {
+  customer: {
+    icon: User,
+    label: "Customer Mode",
+    color: "yellow",
+  },
+  garage: {
+    icon: Building2,
+    label: "Business Mode",
+    color: "amber",
+  },
+  mechanic: {
+    icon: Wrench,
+    label: "Provider Mode",
+    color: "emerald",
+  },
+};
+
+export function DashboardShell({
+  children,
+  title,
+  subtitle,
+  user,
+  mode = "customer",
+  sidebar,
+  className,
+}) {
+  const { theme } = useThemeStore();
+  const { logout } = useAuthStore();
+  const router = useRouter();
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const isLight = theme === "light";
+  const config = MODE_CONFIG[mode] || MODE_CONFIG.customer;
+  const ModeIcon = config.icon;
+
+  const handleLogout = () => {
+    logout();
+    router.push("/auth");
+  };
+
+  return (
+    <div className={cn("min-h-[100dvh] w-full flex flex-col", className)}>
+      {/* Header */}
+      <header className={cn(
+        "glass-lux flex justify-between items-center px-4 lg:px-6 py-3 lg:py-4 flex-shrink-0 relative z-50",
+        "border-b border-border-subtle"
+      )}>
+        {/* Left: Logo */}
+        <div className="flex items-center gap-2 lg:gap-3">
+          <Logo size="md" showText />
+        </div>
+
+        {/* Center: Title/Subtitle (desktop only) */}
+        <div className="hidden lg:flex flex-col items-center gap-0.5 flex-1">
+          {title && (
+            <h1 className={cn(
+              "text-lg font-bold tracking-tight",
+              "text-text-primary"
+            )}>
+              {title}
+            </h1>
+          )}
+          {subtitle && (
+            <span className={cn(
+              "text-[10px] uppercase tracking-wider font-medium",
+              isLight ? `text-${config.color}-600` : `text-${config.color}-100/60`
+            )}>
+              {subtitle}
+            </span>
+          )}
+        </div>
+
+        {/* Right: Actions */}
+        <div className="flex items-center gap-2 lg:gap-4">
+          {/* User info (desktop) */}
+          <div className="hidden lg:flex flex-col items-end mr-2">
+            <span className={cn(
+              "text-sm font-semibold",
+              "text-text-primary"
+            )}>
+              {user?.name || config.label}
+            </span>
+            <span className={cn(
+              "text-[10px] uppercase tracking-wider font-medium",
+              isLight ? `text-${config.color}-600` : `text-${config.color}-100/60`
+            )}>
+              {config.label}
+            </span>
+          </div>
+
+          {/* Connection & Notifications */}
+          <ConnectionIndicator />
+          <NotificationBell />
+
+          {/* User avatar */}
+          <div className={cn(
+            "w-9 h-9 lg:w-10 lg:h-10 rounded-full flex items-center justify-center",
+            isLight
+              ? `bg-${config.color}-500/15 border border-${config.color}-500/30 text-${config.color}-600`
+              : `bg-${config.color}-500/20 border border-${config.color}-500/30 text-${config.color}-300`
+          )}>
+            <ModeIcon size={16} />
+          </div>
+
+          {/* Logout button */}
+          <button
+            onClick={handleLogout}
+            aria-label="Logout"
+            className={cn(
+              "w-9 h-9 lg:w-10 lg:h-10 rounded-full flex items-center justify-center transition-colors",
+              isLight
+                ? "bg-surface-soft hover:bg-red-50 border border-border-subtle hover:border-red-200 text-text-muted hover:text-red-500"
+                : "bg-surface-soft hover:bg-red-500/20 border border-border-subtle hover:border-red-500/30 text-text-muted hover:text-red-400"
+            )}
+          >
+            <LogOut size={15} />
+          </button>
+
+          {/* Mobile menu button */}
+          <button
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            className="lg:hidden p-2 rounded-lg text-white/70 hover:text-white hover:bg-white/10"
+            aria-label={mobileMenuOpen ? "Close menu" : "Open menu"}
+            aria-expanded={mobileMenuOpen}
+          >
+            {mobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
+          </button>
+        </div>
+      </header>
+
+      {/* Mobile sidebar overlay */}
+      {mobileMenuOpen && (
+        <div
+          className="lg:hidden fixed inset-0 z-40 bg-black/50"
+          onClick={() => setMobileMenuOpen(false)}
+          aria-hidden="true"
+        />
+      )}
+
+      {/* Mobile sidebar */}
+      {mobileMenuOpen && (
+        <aside className={cn(
+          "lg:hidden fixed top-0 right-0 h-full w-64 z-50 glass-strong flex flex-col",
+          "bg-bg-card border-l border-border-subtle"
+        )}>
+          <div className="p-4 border-b flex items-center justify-between">
+            <Logo size="md" showText />
+            <button
+              onClick={() => setMobileMenuOpen(false)}
+              className="p-2 rounded-lg hover:bg-white/10"
+              aria-label="Close menu"
+            >
+              <X size={20} />
+            </button>
+          </div>
+          <nav className="flex-1 p-4 overflow-y-auto">
+            {sidebar?.map((item, index) => (
+              <button
+                key={index}
+                onClick={() => {
+                  item.onClick?.();
+                  setMobileMenuOpen(false);
+                }}
+                className={cn(
+                  "w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-colors mb-2",
+                  "text-text-muted hover:bg-surface-soft hover:text-text-primary"
+                )}
+              >
+                <item.icon size={18} />
+                <span>{item.label}</span>
+              </button>
+            ))}
+            <button
+              onClick={handleLogout}
+              className={cn(
+                "w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-colors mt-4",
+                isLight
+                  ? "text-red-600 hover:bg-red-50"
+                  : "text-red-400 hover:bg-red-500/10"
+              )}
+            >
+              <LogOut size={18} />
+              <span>Logout</span>
+            </button>
+          </nav>
+        </aside>
+      )}
+
+      {/* Main content */}
+      <main className="flex-1 pb-4 lg:pb-6">
+        <div className="p-3 sm:p-4 lg:p-6">
+          {children}
+        </div>
+      </main>
+    </div>
+  );
+}

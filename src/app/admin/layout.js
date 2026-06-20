@@ -1,26 +1,42 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Sidebar } from "../../components/admin/Sidebar";
-import { usePathname } from "next/navigation";
-import { useAuthStore } from "../../store/authStore";
-import { useThemeStore } from "../../store/themeStore";
+import { useRouter, usePathname } from "next/navigation";
+import { Sidebar } from "@/components/admin/Sidebar";
+import { useAuthStore } from "@/store/authStore";
+import { useThemeStore } from "@/store/themeStore";
 import { Menu, X } from "lucide-react";
+import { Logo } from "@/components/ui/Logo";
+import { NAVIGATION_EVENT } from "@/lib/navigation";
 
 export default function AdminLayout({ children }) {
   const pathname = usePathname();
-  const { isAuthenticated, user } = useAuthStore();
+  const { isAuthenticated, user, _hydrated } = useAuthStore();
   const { theme } = useThemeStore();
   const isLight = theme === "light";
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const router = useRouter();
 
   useEffect(() => {
+    if (!_hydrated) return;
     if (!isAuthenticated) {
-      window.location.href = "/auth";
+      router.push("/auth");
     } else if (user && user.role !== "admin") {
-      window.location.href = `/dashboard/${user.role}`;
+      router.push(`/dashboard/${user.role}`);
     }
-  }, [isAuthenticated, user]);
+  }, [_hydrated, isAuthenticated, user, router]);
+
+  // Listen for navigation events from non-React contexts (e.g., axios interceptors)
+  useEffect(() => {
+    const handleNavigation = (event) => {
+      const { path } = event.detail;
+      if (path) {
+        router.push(path);
+      }
+    };
+    window.addEventListener(NAVIGATION_EVENT, handleNavigation);
+    return () => window.removeEventListener(NAVIGATION_EVENT, handleNavigation);
+  }, [router]);
 
   const [prevPath, setPrevPath] = useState(pathname);
   if (pathname !== prevPath) {
@@ -28,23 +44,20 @@ export default function AdminLayout({ children }) {
     setSidebarOpen(false);
   }
 
-  if (!isAuthenticated || !user || user.role !== "admin") {
+  if (!_hydrated || !isAuthenticated || !user || user.role !== "admin") {
     return (
-      <div className={`h-screen w-full flex items-center justify-center ${isLight ? "bg-[var(--background)]" : "bg-[#09090b]"}`}>
+      <div className="h-screen w-full flex items-center justify-center bg-[var(--background)]">
         <div className="w-8 h-8 border-2 border-t-transparent rounded-full animate-spin border-[var(--primary)]" />
       </div>
     );
   }
 
   return (
-    <div className={`min-h-[100dvh] w-full flex flex-col lg:flex-row overflow-hidden relative z-10 p-3 sm:p-4 lg:p-6 gap-4 lg:gap-6 ${isLight ? "bg-[var(--background)] text-[var(--foreground)]" : "bg-[#09090b] text-white"}`}>
+    <div className={`min-h-[100dvh] w-full flex flex-col lg:flex-row overflow-hidden relative z-10 p-3 sm:p-4 lg:p-6 gap-4 lg:gap-6 bg-[var(--background)] text-[var(--foreground)]`}>
       {/* Mobile header */}
       <div className="lg:hidden flex items-center justify-between px-2 py-1">
         <div className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-lg flex items-center justify-center font-bold tracking-tighter bg-[var(--primary)] text-white">
-            M
-          </div>
-          <h1 className="text-lg font-bold">Admin</h1>
+          <Logo size="md" showText />
         </div>
         <button
           onClick={() => setSidebarOpen(!sidebarOpen)}
