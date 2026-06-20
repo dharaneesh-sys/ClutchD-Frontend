@@ -1,6 +1,6 @@
-import { WS_URL } from "./constants";
-import { useTrackingStore } from "../store/trackingStore";
-import { getAccessToken } from "./tokenStore";
+import { WS_URL } from "@/lib/constants";
+import { useTrackingStore } from "@/store/trackingStore";
+import { getAccessToken } from "@/lib/tokenStore";
 
 let wsInstance = null;
 let reconnectTimer = null;

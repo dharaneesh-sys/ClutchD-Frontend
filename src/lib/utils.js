@@ -1,7 +1,9 @@
+import { twMerge } from "tailwind-merge";
+
 // Utility helpers
 
 export function cn(...classes) {
-  return classes.filter(Boolean).join(" ");
+  return twMerge(classes.filter(Boolean).join(" "));
 }
 
 export function formatCurrency(amount) {

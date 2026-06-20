@@ -1,6 +1,9 @@
 import axios from "axios";
-import { API_BASE_URL } from "./constants";
-import { getAccessToken, setAccessToken, clearAccessToken } from "./tokenStore";
+import { API_BASE_URL } from "@/lib/constants";
+import { getAccessToken, setAccessToken, clearAccessToken } from "@/lib/tokenStore";
+import { navigateToAuth } from "@/lib/navigation";
+
+let _demoApiModule = null;
 
 const api = axios.create({
   baseURL: API_BASE_URL,
@@ -13,16 +16,35 @@ const api = axios.create({
   maxBodyLength: 10 * 1024 * 1024,    // 10MB max request
 });
 
-// Request interceptor — attach token from memory + CSRF-style header for mutations
 api.interceptors.request.use(
-  (config) => {
+  async (config) => {
+    if (typeof window !== "undefined" && window.__DEMO_MODE__) {
+      if (!_demoApiModule) {
+        _demoApiModule = await import("./demo/apiInterceptor");
+      }
+      const result = _demoApiModule.handleDemoApiRequest(
+        config.method || "get",
+        config.url,
+        config.data,
+        { params: config.params }
+      );
+      if (result) {
+        config.adapter = () => Promise.resolve({
+          data: result.data,
+          status: 200,
+          statusText: "OK",
+          headers: {},
+          config,
+        });
+      }
+    }
+
     if (typeof window !== "undefined") {
       const token = getAccessToken();
       if (token) {
         config.headers.Authorization = `Bearer ${token}`;
       }
     }
-    // Add CSRF-style header for state-changing requests
     const method = (config.method || "").toUpperCase();
     if (["POST", "PUT", "PATCH", "DELETE"].includes(method)) {
       config.headers["X-Requested-With"] = "XMLHttpRequest";
@@ -74,14 +96,19 @@ api.interceptors.response.use(
           isRefreshing = false;
           pendingRequests = [];
           
-          const status = refreshError.response?.status;
-          // Only force logout on explicit 401/403 credentials failure.
-          if (status === 401 || status === 403) {
-            if (typeof window !== "undefined") {
-              clearAccessToken();
-              window.location.href = "/auth";
-            }
-          }
+           const status = refreshError.response?.status;
+           // Only force logout on explicit 401/403 credentials failure.
+           if (status === 401 || status === 403) {
+             if (typeof window !== "undefined") {
+               // Don't redirect demo users — their tokens can't validate against real backend
+               try {
+                 const stored = JSON.parse(localStorage.getItem("auth-storage") || "{}");
+                 if (stored?.state?.user?.id?.startsWith?.("demo-")) return Promise.reject(refreshError);
+               } catch (e) {}
+               clearAccessToken();
+               navigateToAuth();
+             }
+           }
           return Promise.reject(refreshError);
         }
       }
@@ -95,12 +122,6 @@ api.interceptors.response.use(
       });
     }
 
-    if (!error.response) {
-      // No HTTP response — timeout / CORS / backend offline
-    } else if (error.response?.status >= 500) {
-      console.warn("[API] Server Error:", error.response.data);
-    }
-    
     return Promise.reject(error);
   }
 );

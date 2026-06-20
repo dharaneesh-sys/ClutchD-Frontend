@@ -3,14 +3,24 @@ import { z } from "zod";
 // ── Auth ────────────────────────────────────────
 export const loginSchema = z.object({
   email: z.string().email("Please enter a valid email address"),
-  password: z.string().min(6, "Password must be at least 6 characters"),
+  password: z
+    .string()
+    .min(8, "Password must be at least 8 characters")
+    .regex(/[A-Z]/, "Must include an uppercase letter")
+    .regex(/[a-z]/, "Must include a lowercase letter")
+    .regex(/[0-9]/, "Must include a number"),
 });
 
 export const customerSignupSchema = z
   .object({
     fullName: z.string().min(2, "Enter your full name"),
     email: z.string().email("Please enter a valid email address"),
-    password: z.string().min(6, "Password must be at least 6 characters"),
+    password: z
+      .string()
+      .min(8, "Password must be at least 8 characters")
+      .regex(/[A-Z]/, "Must include an uppercase letter")
+      .regex(/[a-z]/, "Must include a lowercase letter")
+      .regex(/[0-9]/, "Must include a number"),
     confirmPassword: z.string(),
   })
   .refine((data) => data.password === data.confirmPassword, {
@@ -21,7 +31,12 @@ export const customerSignupSchema = z
 export const mechanicSignupSchema = z
   .object({
     email: z.string().email("Please enter a valid email"),
-    password: z.string().min(6, "Min 6 characters"),
+    password: z
+      .string()
+      .min(8, "Password must be at least 8 characters")
+      .regex(/[A-Z]/, "Must include an uppercase letter")
+      .regex(/[a-z]/, "Must include a lowercase letter")
+      .regex(/[0-9]/, "Must include a number"),
     confirmPassword: z.string(),
     fullName: z.string().min(2, "Enter your full name"),
     phone: z.string().min(10, "Enter a valid phone number"),
@@ -37,7 +52,12 @@ export const mechanicSignupSchema = z
 export const garageSignupSchema = z
   .object({
     email: z.string().email("Please enter a valid email"),
-    password: z.string().min(6, "Min 6 characters"),
+    password: z
+      .string()
+      .min(8, "Password must be at least 8 characters")
+      .regex(/[A-Z]/, "Must include an uppercase letter")
+      .regex(/[a-z]/, "Must include a lowercase letter")
+      .regex(/[0-9]/, "Must include a number"),
     confirmPassword: z.string(),
     garageName: z.string().min(2, "Enter garage name"),
     ownerName: z.string().min(2, "Enter owner name"),

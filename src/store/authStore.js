@@ -1,8 +1,8 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
-import api from "../lib/api";
-import { connectWebSocket, disconnectWebSocket } from "../lib/socket";
-import { setAccessToken, getAccessToken, clearAccessToken } from "../lib/tokenStore";
+import api from "@/lib/api";
+import { connectWebSocket, disconnectWebSocket } from "@/lib/socket";
+import { setAccessToken, getAccessToken, clearAccessToken } from "@/lib/tokenStore";
 
 // Proactive refresh: refresh the access token at 80% of its TTL.
 // Default access token TTL is 15 min (from backend config); override via env.
@@ -41,6 +41,7 @@ export const useAuthStore = create(
     (set, get) => ({
       user: null,
       isAuthenticated: false,
+      _hydrated: false,
       isLoading: false,
       error: null,
 
@@ -51,6 +52,8 @@ export const useAuthStore = create(
        */
       checkAuth: async () => {
         if (!get().isAuthenticated) return;
+        // Demo users have fake tokens — skip refresh against real backend
+        if (get().user?.id?.startsWith?.("demo-")) return;
 
         try {
           const res = await api.post("/auth/refresh");
@@ -84,7 +87,7 @@ export const useAuthStore = create(
             scheduleProactiveRefresh();
           }
           
-          set({ user: response.data.user, isAuthenticated: true, isLoading: false });
+          set({ user: response.data.user, isAuthenticated: true, _hydrated: true, isLoading: false });
           return response.data.user;
           
         } catch (error) {
@@ -118,6 +121,7 @@ export const useAuthStore = create(
           set({
             user: response.data.user,
             isAuthenticated: true,
+            _hydrated: true,
             isLoading: false,
           });
           return response.data.user;
@@ -143,7 +147,7 @@ export const useAuthStore = create(
             scheduleProactiveRefresh();
           }
           
-          set({ user: response.data.user, isAuthenticated: true, isLoading: false });
+          set({ user: response.data.user, isAuthenticated: true, _hydrated: true, isLoading: false });
           return response.data.user;
           
         } catch (error) {
@@ -166,22 +170,36 @@ export const useAuthStore = create(
           clearAccessToken();
           disconnectWebSocket();
         }
-        set({ user: null, isAuthenticated: false, error: null });
-        if (typeof window !== "undefined") {
-          window.location.href = "/auth";
-        }
+        set({ user: null, isAuthenticated: false, _hydrated: true, error: null });
       },
 
       clearError: () => set({ error: null }),
-      setUser: (user) => set({ user, isAuthenticated: !!user }),
+      setUser: (user) => set({ user, isAuthenticated: !!user, _hydrated: true }),
       updateUserData: (userData) => set((state) => ({ user: { ...state.user, ...userData } })),
+      setDemoUser: (user) => {
+        if (typeof window !== "undefined") {
+          const { setAccessToken } = require("../lib/tokenStore");
+          setAccessToken("demo-jwt-token-12345");
+        }
+        set({ user, isAuthenticated: !!user, _hydrated: true, isLoading: false, error: null });
+      },
     }),
     {
       name: "auth-storage",
       partialize: (state) => ({
-        user: state.user,
+        userId: state.user?.id,
+        userRole: state.user?.role,
         isAuthenticated: state.isAuthenticated,
+        _hydrated: state._hydrated,
       }),
+      onRehydrateStorage: () => (state) => {
+        // Reconstruct minimal user from persisted fields; full user fetched via checkAuth()
+        if (state?.userId) {
+          state.user = { id: state.userId, role: state.userRole };
+        }
+        // Mark hydration complete so redirect guards don't fire before state is restored
+        useAuthStore.setState({ _hydrated: true });
+      },
     }
   )
 );

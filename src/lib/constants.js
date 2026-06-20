@@ -69,3 +69,18 @@ export const WS_URL = process.env.NEXT_PUBLIC_WS_URL || getDefaultWsUrl();
 
 export const MAP_DEFAULT_CENTER = [11.0168, 76.9558]; // Coimbatore
 export const MAP_DEFAULT_ZOOM = 13;
+
+// Fee and pricing constants
+export const PLATFORM_FEE_PERCENT = 5;
+export const PLATFORM_FEE_FLAT = 40;
+export const GST_RATE = 0.18;
+export const DISTANCE_FEE_PER_KM = 30;
+export const CANCELLATION_FEE = 30;
+
+export const FEE_CONSTANTS = {
+  PLATFORM_FEE_PERCENT,
+  PLATFORM_FEE_FLAT,
+  GST_RATE,
+  DISTANCE_FEE_PER_KM,
+  CANCELLATION_FEE,
+};

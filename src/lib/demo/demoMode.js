@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useContext, useState, useCallback, useRef } from "react";
+import { createContext, useContext, useState, useCallback, useRef, useEffect } from "react";
 import {
   MOCK_USERS,
   MOCK_MECHANICS,
@@ -9,9 +9,50 @@ import {
   MOCK_NOTIFICATIONS,
   DEMO_SERVICE_STATUSES,
   createMockServiceRequest,
-} from "./mockData";
+} from "@/lib/demo/mockData";
+import { useAuthStore } from "@/store/authStore";
+import { useServiceStore } from "@/store/serviceStore";
+import { useTrackingStore } from "@/store/trackingStore";
 
 const DemoModeContext = createContext(null);
+
+// Per-role guided tour steps showcasing every feature
+const ROLE_TOURS = {
+  customer: [
+    "Explore live map of nearby mechanics and garages",
+    "Add a vehicle to your profile (make, model, plate)",
+    "Create a service request — describe your issue and get price estimates",
+    "Track the mechanic en-route with real-time location updates",
+    "Review invoice, complete payment via UPI or card",
+    "Rate the service and leave a review",
+  ],
+  mechanic: [
+    "Toggle your availability to receive incoming job requests",
+    "View your job queue with customer details and location",
+    "Accept a job and navigate to the customer's location",
+    "Update job status as you perform the service",
+    "Complete the job and receive payment confirmation",
+    "Check your earnings history and completed jobs",
+  ],
+  garage: [
+    "View and update your garage business profile",
+    "Browse the current job queue assigned to your garage",
+    "Assign jobs to mechanics in your team",
+    "Track all active jobs across your team in real-time",
+    "View business analytics — jobs completed, revenue, ratings",
+    "Review earnings breakdown and team performance",
+  ],
+  admin: [
+    "View platform-wide statistics — users, mechanics, garages, revenue",
+    "Browse all registered users on the platform",
+    "Manage mechanics — verify, review, and monitor activity",
+    "Review garages — performance, ratings, compliance",
+    "Monitor all jobs across the platform in real-time",
+    "View payment transactions, disputes, and KYC status",
+  ],
+};
+
+const TOUR_STEPS_TOTAL = 6;
 
 export function DemoModeProvider({ children }) {
   const [isDemoMode, setIsDemoMode] = useState(false);
@@ -23,6 +64,7 @@ export function DemoModeProvider({ children }) {
   // Stable refs for mock data (persist across renders)
   const mechanicsRef = useRef([...MOCK_MECHANICS]);
   const garagesRef = useRef([...MOCK_GARAGES]);
+  const stepTimeoutsRef = useRef([]);
   const vehiclesRef = useRef([...MOCK_VEHICLES]);
   const notificationsRef = useRef([...MOCK_NOTIFICATIONS]);
 
@@ -32,17 +74,18 @@ export function DemoModeProvider({ children }) {
         ? MOCK_USERS.mechanic
         : role === "garage"
           ? MOCK_USERS.garage
-          : MOCK_USERS.customer;
+          : role === "admin"
+            ? MOCK_USERS.admin
+            : MOCK_USERS.customer;
     setDemoUser(user);
     setIsDemoMode(true);
-    // Signal the API interceptor
+    useAuthStore.getState().setDemoUser(user);
     if (typeof window !== "undefined") {
       window.__DEMO_MODE__ = true;
       window.__DEMO_USER__ = user;
       sessionStorage.setItem("demo_token", "demo-jwt-token-12345");
-      // Dynamically set token in tokenStore
       import("../tokenStore").then((m) => {
-        m.setAccessToken("demo-jwt-token-12345");
+        m.setDemoAccessToken("demo-jwt-token-12345");
       });
     }
   }, []);
@@ -53,6 +96,7 @@ export function DemoModeProvider({ children }) {
     setDemoRequest(null);
     setIsTourActive(false);
     setTourStep(0);
+    useAuthStore.getState().setDemoUser(null);
     if (typeof window !== "undefined") {
       window.__DEMO_MODE__ = false;
       window.__DEMO_USER__ = null;
@@ -66,30 +110,99 @@ export function DemoModeProvider({ children }) {
   const startTour = useCallback(() => {
     setIsTourActive(true);
     setTourStep(0);
-    setDemoRequest(createMockServiceRequest());
-  }, []);
+    const role = demoUser?.role || "customer";
+    // Create a service request for customer tour; for other roles just advance steps
+    if (role === "customer") {
+      setDemoRequest(createMockServiceRequest());
+    }
+  }, [demoUser, createMockServiceRequest]);
 
   const advanceTour = useCallback(() => {
-    setTourStep((prev) => {
-      const next = prev + 1;
-      if (next >= 1 && next <= DEMO_SERVICE_STATUSES.length) {
-        setDemoRequest((prevReq) =>
-          prevReq
-            ? {
-                ...prevReq,
-                status: DEMO_SERVICE_STATUSES[next - 1],
-                mechanic: next >= 2 ? MOCK_MECHANICS[0] : null,
-                pricing:
-                  DEMO_SERVICE_STATUSES[next - 1] === "payment_pending"
-                    ? { totalAmount: 850, partsCost: 350, laborCost: 500, tax: 0 }
-                    : prevReq.pricing,
-              }
-            : prevReq,
-        );
+    const total = (ROLE_TOURS[demoUser?.role] || ROLE_TOURS.customer).length;
+    const nextStep = tourStep + 1;
+    if (nextStep >= total) {
+      setIsTourActive(false);
+      setTourStep(0);
+    } else {
+      setTourStep(nextStep);
+    }
+  }, [demoUser, tourStep]);
+
+  // Tour step side effects: push store updates so UI components react to tour progression
+  useEffect(() => {
+    if (!isTourActive || !demoUser) return;
+
+    stepTimeoutsRef.current.forEach(clearTimeout);
+    stepTimeoutsRef.current = [];
+
+    const role = demoUser.role;
+    const step = tourStep;
+
+    if (role === "customer") {
+      // Step 1: Show live map with nearby mechanics & garages
+      if (step === 1) {
+        useTrackingStore.getState().setUserLocation([11.0208, 76.9558]);
+        useTrackingStore.setState({
+          nearbyMechanics: MOCK_MECHANICS.filter((m) => m.available),
+          nearbyGarages: MOCK_GARAGES,
+        });
       }
-      return next;
-    });
-  }, []);
+      // Step 2: Create a service request (status = "searching")
+      else if (step === 2) {
+        const req = createMockServiceRequest();
+        setDemoRequest(req);
+        useServiceStore.setState({ activeRequest: req });
+      }
+      // Step 3: Track the mechanic — auto-advance through assigned → en_route → in_progress
+      else if (step === 3) {
+        const mechanic = MOCK_MECHANICS[0];
+        setDemoRequest((prev) => (prev ? { ...prev, mechanic, status: "assigned" } : prev));
+        useServiceStore.setState((s) => ({
+          activeRequest: s.activeRequest ? { ...s.activeRequest, mechanic, status: "assigned" } : null,
+        }));
+        const t1 = setTimeout(() => {
+          useTrackingStore.getState().setMechanicLocation([11.022, 76.958]);
+          useServiceStore.setState((s) => ({
+            activeRequest: s.activeRequest ? { ...s.activeRequest, status: "en_route" } : null,
+          }));
+        }, 1000);
+        const t2 = setTimeout(() => {
+          useServiceStore.setState((s) => ({
+            activeRequest: s.activeRequest ? { ...s.activeRequest, status: "in_progress" } : null,
+          }));
+        }, 2500);
+        stepTimeoutsRef.current.push(t1, t2);
+      }
+      // Step 4: Review invoice + complete payment via UPI or card
+      else if (step === 4) {
+        const pricing = {
+          totalAmount: 850,
+          serviceAmount: 570,
+          convenienceFee: 50,
+          cancellationFee: 0,
+          distanceKm: 3.2,
+          distanceFee: 100,
+          gstAmount: 130,
+        };
+        setDemoRequest((prev) => (prev ? { ...prev, status: "payment_pending", pricing } : prev));
+        useServiceStore.setState((s) => ({
+          activeRequest: s.activeRequest ? { ...s.activeRequest, status: "payment_pending", pricing } : null,
+        }));
+      }
+      // Step 5: Complete job + leave a review
+      else if (step === 5) {
+        useServiceStore.getState().completeRequest({
+          method: "upi",
+          amount: 850,
+          transactionId: "TXN-DEMO-" + Date.now(),
+        });
+      }
+    } else if (role === "mechanic") {
+      if (step === 1) {
+        useTrackingStore.getState().setUserLocation([11.0208, 76.9558]);
+      }
+    }
+  }, [tourStep, isTourActive, demoUser]);
 
   const setDemoRole = useCallback((role) => {
     const user =
@@ -97,8 +210,11 @@ export function DemoModeProvider({ children }) {
         ? MOCK_USERS.mechanic
         : role === "garage"
           ? MOCK_USERS.garage
-          : MOCK_USERS.customer;
+          : role === "admin"
+            ? MOCK_USERS.admin
+            : MOCK_USERS.customer;
     setDemoUser(user);
+    useAuthStore.getState().setDemoUser(user);
     if (typeof window !== "undefined") {
       window.__DEMO_USER__ = user;
     }
@@ -131,12 +247,20 @@ export function DemoModeProvider({ children }) {
     });
   }, []);
 
+  // Current tour step label derived from active role
+  const tourLabel = isTourActive
+    ? (ROLE_TOURS[demoUser?.role] || ROLE_TOURS.customer)[tourStep] || ""
+    : "";
+  const tourStepsTotal = (ROLE_TOURS[demoUser?.role] || ROLE_TOURS.customer).length;
+
   const value = {
     isDemoMode,
     demoUser,
     demoRequest,
     isTourActive,
     tourStep,
+    tourLabel,
+    tourStepsTotal,
     mechanics: mechanicsRef.current,
     garages: garagesRef.current,
     vehicles: vehiclesRef.current,

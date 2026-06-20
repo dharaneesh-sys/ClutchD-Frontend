@@ -1,4 +1,4 @@
-import api, { extractApiError } from "../lib/api";
+import api, { extractApiError } from "@/lib/api";
 
 export async function fetchAnalytics() {
   const res = await api.get("/admin/analytics");

@@ -1,6 +1,6 @@
 import { create } from "zustand";
-import api from "../lib/api";
-import { MAP_DEFAULT_CENTER } from "../lib/constants";
+import api from "@/lib/api";
+import { MAP_DEFAULT_CENTER } from "@/lib/constants";
 
 export const useTrackingStore = create((set, get) => ({
   userLocation: MAP_DEFAULT_CENTER,
@@ -39,9 +39,7 @@ export const useTrackingStore = create((set, get) => ({
         get().fetchNearbyProviders();
       },
       (error) => {
-        console.warn("GPS denied or unavailable:", error.message);
         set({ gpsStatus: error.code === 1 ? "denied" : "unavailable" });
-        // Keep the default / previously set location
       },
       { enableHighAccuracy: true, timeout: 10000, maximumAge: 60000 }
     );
@@ -62,7 +60,6 @@ export const useTrackingStore = create((set, get) => ({
         set({ userLocation: coords, gpsStatus: "granted" });
       },
       (error) => {
-        console.warn("GPS watch error:", error.message);
       },
       { enableHighAccuracy: true, timeout: 15000, maximumAge: 5000 }
     );

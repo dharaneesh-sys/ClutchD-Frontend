@@ -9,7 +9,7 @@ import {
   MOCK_VEHICLES,
   DEMO_SERVICE_STATUSES,
   MOCK_PRICE_ESTIMATES,
-} from "./mockData";
+} from "@/lib/demo/mockData";
 
 // In-memory mutable state for demo progression
 let demoState = {
@@ -77,6 +77,8 @@ function matchRoute(url, method) {
   if (path.includes("/admin/garages") && m === "get") return "admin_garages";
   if (path.includes("/admin/jobs") && m === "get") return "admin_jobs";
   if (path.includes("/admin/payments") && m === "get") return "admin_payments";
+  if (path.includes("/payments/create") && m === "post") return "payment_create";
+  if (path.includes("/payments/verify") && m === "post") return "payment_verify";
   if (path.includes("/admin/disputes") && m === "get") return "admin_disputes";
   if (path.includes("/admin/kyc") && m === "get") return "admin_kyc";
 
@@ -152,7 +154,15 @@ function handleRoute(routeDef, reqData) {
             statusIdx >= 1 ? MOCK_MECHANICS[0] : demoState.activeRequest.mechanic,
           pricing:
             newStatus === "payment_pending"
-              ? { totalAmount: 850, partsCost: 350, laborCost: 500, tax: 0 }
+              ? {
+                  totalAmount: 850,
+                  serviceAmount: 570,
+                  convenienceFee: 50,
+                  cancellationFee: 0,
+                  distanceKm: 3.2,
+                  distanceFee: 100,
+                  gstAmount: 130,
+                }
               : demoState.activeRequest.pricing,
         };
       }
@@ -239,6 +249,20 @@ function handleRoute(routeDef, reqData) {
     case "admin_payments":
       return { data: { payments: MOCK_PAYMENTS, total: MOCK_PAYMENTS.length } };
 
+    case "payment_create":
+      return {
+        data: {
+          order_id: "order_demo_" + Date.now(),
+          amount: data?.amount || 85000,
+          currency: "inr",
+          key_id: "rzp_demo_key",
+          payment_id: "pmt_demo_" + Date.now(),
+        },
+      };
+
+    case "payment_verify":
+      return { data: { ok: true, status: "captured" } };
+
     case "admin_disputes":
       return { data: { disputes: [], total: 0 } };
 
@@ -262,7 +286,6 @@ function handleRoute(routeDef, reqData) {
       return { data: { ...MOCK_USERS.customer, ...data } };
 
     default:
-      console.warn("[Demo API] Unhandled route:", route);
       return { data: { success: true } };
   }
 }
@@ -276,7 +299,6 @@ export function createDemoApi() {
     await delayMs();
     const routeDef = matchRoute(url, method);
     if (!routeDef) {
-      console.warn("[Demo API] No route match:", method, url);
       return { data: {} };
     }
     return handleRoute(routeDef, data || config?.params);
@@ -294,6 +316,12 @@ export function createDemoApi() {
     },
     defaults: {},
   };
+}
+
+export function handleDemoApiRequest(method, url, data, config) {
+  const routeDef = matchRoute(url, method);
+  if (!routeDef) return null;
+  return handleRoute(routeDef, data || config?.params);
 }
 
 const demoApi = createDemoApi();

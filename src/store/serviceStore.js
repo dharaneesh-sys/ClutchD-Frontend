@@ -1,6 +1,6 @@
 import { create } from "zustand";
-import api from "../lib/api";
-import { SERVICE_STATUS } from "../lib/constants";
+import api from "@/lib/api";
+import { SERVICE_STATUS } from "@/lib/constants";
 
 export const useServiceStore = create((set, get) => ({
   activeRequest: null,
@@ -65,8 +65,7 @@ export const useServiceStore = create((set, get) => ({
     if (!fromServer) {
       try {
         await api.patch(`/service/request/${currentReq.id}/status`, { status, mechanicId: mechanicData?.id });
-      } catch (error) {
-        console.warn("Backend updateRequestStatus failed.", error.message);
+      } catch {
       }
     }
     
@@ -91,8 +90,7 @@ export const useServiceStore = create((set, get) => ({
     try {
       await api.post(`/service/request/${currentReq.id}/complete`, paymentDetails);
     } catch (error) {
-      const msg = error.response?.data?.detail || "Completion failed.";
-      console.warn("Backend completeRequest failed:", msg);
+      // completion endpoint failed — non-critical
     }
 
     set(state => {
