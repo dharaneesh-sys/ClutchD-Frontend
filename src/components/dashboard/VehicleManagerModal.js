@@ -1,12 +1,12 @@
 import { useState, useEffect } from "react";
-import { Modal } from "../ui/Modal";
-import { Button } from "../ui/Button";
-import { Input } from "../ui/Input";
-import { ConfirmModal } from "../ui/ConfirmModal";
+import { Modal } from "@/components/ui/Modal";
+import { Button } from "@/components/ui/Button";
+import { Input } from "@/components/ui/Input";
+import { ConfirmModal } from "@/components/ui/ConfirmModal";
 import { Trash2, Plus, Car, Loader2, AlertTriangle } from "lucide-react";
-import api from "../../lib/api";
-import { useThemeStore } from "../../store/themeStore";
-import { extractApiError } from "../../lib/api";
+import api from "@/lib/api";
+import { useThemeStore } from "@/store/themeStore";
+import { extractApiError } from "@/lib/api";
 
 export function VehicleManagerModal({ isOpen, onClose, onVehiclesChanged }) {
   const [vehicles, setVehicles] = useState([]);
@@ -97,11 +97,11 @@ export function VehicleManagerModal({ isOpen, onClose, onVehiclesChanged }) {
       )}
       {loading ? (
         <div className="py-8 flex justify-center">
-          <Loader2 size={32} className={`animate-spin ${isLight ? "text-yellow-500" : "text-emerald-400"}`} />
+          <Loader2 size={32} className="animate-spin text-icon-highlight" />
         </div>
       ) : adding ? (
         <form onSubmit={handleAddSubmit} className="space-y-4">
-          <h4 className={`text-sm font-semibold mb-2 ${isLight ? "text-slate-900" : "text-white"}`}>Add New Vehicle</h4>
+          <h4 className="text-sm font-semibold mb-2 text-text-primary">Add New Vehicle</h4>
           <div className="grid grid-cols-2 gap-4">
             <Input label="Make *" name="make" required value={formData.make} onChange={handleChange} placeholder="e.g. Honda" />
             <Input label="Model *" name="model" required value={formData.model} onChange={handleChange} placeholder="e.g. Civic" />
@@ -122,21 +122,21 @@ export function VehicleManagerModal({ isOpen, onClose, onVehiclesChanged }) {
       ) : (
         <div className="space-y-4">
           {vehicles.length === 0 ? (
-            <div className={`text-center py-6 border border-dashed rounded-xl ${isLight ? "border-slate-300 bg-slate-50" : "border-white/10 bg-white/5"}`}>
-              <Car size={32} className={`mx-auto mb-2 ${isLight ? "text-slate-300" : "text-white/20"}`} />
-              <p className={isLight ? "text-slate-500" : "text-white/50"}>No vehicles added yet</p>
+            <div className="text-center py-6 border border-dashed rounded-xl border-border-subtle bg-bg-card">
+              <Car size={32} className="mx-auto mb-2 text-text-dim" />
+              <p className="text-text-muted">No vehicles added yet</p>
             </div>
           ) : (
             <div className="space-y-2 max-h-[300px] overflow-y-auto custom-scrollbar pr-2">
               {vehicles.map(v => (
-                <div key={v.id} className={`flex items-center justify-between p-3 rounded-xl border ${isLight ? "bg-slate-50 border-slate-200" : "bg-white/5 border-white/10"}`}>
+                <div key={v.id} className="flex items-center justify-between p-3 rounded-xl border bg-bg-card border-border-subtle">
                   <div className="flex items-center gap-3">
-                    <div className={`w-10 h-10 rounded-full flex items-center justify-center ${isLight ? "bg-yellow-500/20 text-yellow-600" : "bg-emerald-500/20 text-emerald-400"}`}>
+                    <div className="w-10 h-10 rounded-full flex items-center justify-center bg-surface-soft text-icon-highlight">
                       <Car size={18} />
                     </div>
                     <div>
-                      <p className={`font-semibold ${isLight ? "text-slate-900" : "text-white"}`}>{v.year} {v.make} {v.model}</p>
-                      <p className={`text-xs ${isLight ? "text-slate-500" : "text-white/50"}`}>
+                      <p className="font-semibold text-text-primary">{v.year} {v.make} {v.model}</p>
+                      <p className="text-xs text-text-muted">
                         {v.license_plate || "No plate"} {v.color ? `• ${v.color}` : ""}
                       </p>
                     </div>

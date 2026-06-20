@@ -1,10 +1,10 @@
 import { useState } from "react";
 import { Mail, Lock, User, Phone, MapPin } from "lucide-react";
-import { Input } from "../ui/Input";
-import { Select } from "../ui/Select";
-import { MultiSelect } from "../ui/MultiSelect";
-import { FileUpload } from "../ui/FileUpload";
-import { EXPERTISE_OPTIONS } from "../../lib/constants";
+import { Input } from "@/components/ui/Input";
+import { Select } from "@/components/ui/Select";
+import { MultiSelect } from "@/components/ui/MultiSelect";
+import { FileUpload } from "@/components/ui/FileUpload";
+import { EXPERTISE_OPTIONS } from "@/lib/constants";
 
 export function MechanicFields({ register, errors, setValue, watch }) {
   const watchExpertise = watch("expertise") || [];

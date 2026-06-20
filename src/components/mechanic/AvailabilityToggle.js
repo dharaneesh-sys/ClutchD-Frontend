@@ -1,10 +1,10 @@
 import { useState, useEffect } from "react";
-import { GlassCard } from "../ui/GlassCard";
+import { GlassCard } from "@/components/ui/GlassCard";
 import { Power, Loader2 } from "lucide-react";
-import { cn } from "../../lib/utils";
-import api from "../../lib/api";
-import { useAuthStore } from "../../store/authStore";
-import { useThemeStore } from "../../store/themeStore";
+import { cn } from "@/lib/utils";
+import api from "@/lib/api";
+import { useAuthStore } from "@/store/authStore";
+import { useThemeStore } from "@/store/themeStore";
 
 export function AvailabilityToggle() {
   const { user, updateUserData } = useAuthStore();
@@ -39,8 +39,8 @@ export function AvailabilityToggle() {
     <GlassCard variant="strong" className="p-6">
       <div className="flex items-center justify-between">
         <div>
-          <h3 className={`text-lg font-bold mb-1 ${isLight ? "text-slate-900" : "text-white"}`}>Status</h3>
-          <p className={`text-sm ${isLight ? "text-slate-500" : "text-emerald-100/60"}`}>
+          <h3 className="text-lg font-bold mb-1 text-text-primary">Status</h3>
+          <p className="text-sm text-text-muted">
             {isOnline ? "You are receiving job requests" : "You are currently hidden"}
           </p>
         </div>
@@ -52,24 +52,24 @@ export function AvailabilityToggle() {
             "w-16 h-16 rounded-full flex items-center justify-center transition-all shadow-lg border-2 relative",
             loading && "opacity-80 cursor-wait",
             isOnline 
-              ? (isLight ? "bg-yellow-500 border-yellow-400 text-white pulse-online-light" : "bg-emerald-500 border-emerald-400 text-white pulse-online") 
-              : (isLight ? "bg-slate-100 border-slate-200 text-slate-400 hover:bg-slate-200" : "bg-white/10 border-white/20 text-white/50 hover:bg-white/20")
+              ? "bg-primary border-primary-light text-white pulse-online" 
+              : "bg-bg-card border-border-subtle text-text-muted"
           )}
         >
           {loading ? <Loader2 className="animate-spin" size={24} /> : <Power size={24} />}
         </button>
       </div>
       
-      <div className={`mt-6 pt-5 flex gap-4 border-t ${isLight ? "border-slate-100" : "border-white/10"}`}>
-         <div className={`flex-1 rounded-xl p-3 text-center border ${isLight ? "bg-slate-50 border-slate-200" : "bg-black/20 border-white/5"}`}>
-            <p className={`text-xs mb-1 ${isLight ? "text-slate-500" : "text-white/50"}`}>Status</p>
-            <p className={cn("font-bold", isOnline ? (isLight ? "text-yellow-600" : "text-emerald-400") : (isLight ? "text-slate-400" : "text-white/40"))}>
+      <div className="mt-6 pt-5 flex gap-4 border-t border-border-subtle">
+         <div className="flex-1 rounded-xl p-3 text-center border bg-surface-soft border-border-subtle">
+            <p className="text-xs mb-1 text-text-muted">Status</p>
+            <p className={cn("font-bold", isOnline ? "text-icon-highlight" : "text-text-dim")}>
               {isOnline ? "ONLINE" : "OFFLINE"}
             </p>
          </div>
-         <div className={`flex-1 rounded-xl p-3 text-center border ${isLight ? "bg-slate-50 border-slate-200" : "bg-black/20 border-white/5"}`}>
-            <p className={`text-xs mb-1 ${isLight ? "text-slate-500" : "text-white/50"}`}>Hours Today</p>
-            <p className={`font-bold ${isLight ? "text-slate-900" : "text-white"}`}>4.5 hrs</p>
+         <div className="flex-1 rounded-xl p-3 text-center border bg-surface-soft border-border-subtle">
+            <p className="text-xs mb-1 text-text-muted">Hours Today</p>
+            <p className="font-bold text-text-primary">4.5 hrs</p>
          </div>
       </div>
     </GlassCard>

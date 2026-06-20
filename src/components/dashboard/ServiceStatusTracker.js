@@ -1,8 +1,8 @@
-import { SERVICE_STATUS } from "../../lib/constants";
-import { GlassCard } from "../ui/GlassCard";
-import { Button } from "../ui/Button";
-import { Search, UserCheck, Navigation, Wrench, CreditCard, CheckCircle2, Phone, MessageSquare, MapPin } from "lucide-react";
-import { useThemeStore } from "../../store/themeStore";
+import { SERVICE_STATUS, GST_RATE } from "@/lib/constants";
+import { GlassCard } from "@/components/ui/GlassCard";
+import { Button } from "@/components/ui/Button";
+import { Search, UserCheck, Navigation, Wrench, CreditCard, CheckCircle2, Phone, MessageSquare, MapPin, Star } from "lucide-react";
+import { useThemeStore } from "@/store/themeStore";
 
 export function ServiceStatusTracker({ request, onComplete, onCancel }) {
   const { theme } = useThemeStore();
@@ -27,12 +27,12 @@ export function ServiceStatusTracker({ request, onComplete, onCancel }) {
       case SERVICE_STATUS.SEARCHING:
         return (
           <div className="text-center py-6">
-            <div className={`w-16 h-16 mx-auto rounded-full flex items-center justify-center mb-4 relative ${isLight ? "bg-yellow-500/15 text-yellow-600" : "bg-amber-500/20 text-amber-400"}`}>
+            <div className="w-16 h-16 mx-auto rounded-full flex items-center justify-center mb-4 relative bg-surface-soft text-icon-highlight">
               <div className={`absolute inset-0 rounded-full border-2 animate-ping ${isLight ? "border-yellow-400/30" : "border-amber-400/30"}`}></div>
               <Search size={28} />
             </div>
-            <h3 className={`text-lg font-bold mb-2 ${isLight ? "text-slate-900" : "text-white"}`}>Locating Providers Nearby</h3>
-            <p className={`text-sm ${isLight ? "text-slate-500" : "text-emerald-100/70"}`}>We&apos;re pinging the closest available mechanics to your location.</p>
+            <h3 className="text-lg font-bold mb-2 text-text-primary">Locating Providers Nearby</h3>
+            <p className="text-sm text-text-muted">We&apos;re pinging the closest available mechanics to your location.</p>
           </div>
         );
 
@@ -40,34 +40,34 @@ export function ServiceStatusTracker({ request, onComplete, onCancel }) {
       case SERVICE_STATUS.EN_ROUTE:
       case SERVICE_STATUS.IN_PROGRESS:
         return (
-          <div className={`rounded-xl p-4 border mb-6 mt-4 ${isLight ? "bg-slate-50 border-slate-200" : "bg-black/20 border-white/5"}`}>
-            <div className={`flex items-center gap-4 border-b pb-4 mb-4 ${isLight ? "border-slate-200" : "border-white/5"}`}>
-              <div className={`w-12 h-12 rounded-full flex items-center justify-center overflow-hidden border ${isLight ? "bg-yellow-500/15 border-yellow-500/30" : "bg-emerald-500/20 border-emerald-500/30"}`}>
+          <div className="rounded-xl p-4 border mb-6 mt-4 bg-bg-card border-border-subtle">
+            <div className="flex items-center gap-4 border-b pb-4 mb-4 border-border-subtle">
+              <div className="w-12 h-12 rounded-full flex items-center justify-center overflow-hidden border bg-surface-soft border-border-subtle">
                 {request.mechanic?.image ? (
-                  <img src={request.mechanic.image} alt={request.mechanic.name} className="w-full h-full object-cover" />
+                  <img src={request.mechanic.image} alt="Mechanic profile photo" className="w-full h-full object-cover" />
                 ) : (
-                  <UserCheck className={isLight ? "text-yellow-600" : "text-emerald-400"} />
+                  <UserCheck className="text-icon-highlight" />
                 )}
               </div>
               <div className="flex-1">
-                <h4 className={`font-semibold ${isLight ? "text-slate-900" : "text-white"}`}>{request.mechanic?.name || "Assigning..."}</h4>
-                <div className={`flex items-center text-xs mt-0.5 ${isLight ? "text-yellow-600" : "text-amber-400"}`}>
-                  ⭐ {request.mechanic?.rating || "—"} <span className={`ml-2 ${isLight ? "text-slate-500" : "text-emerald-100/50"}`}>• Verified Provider</span>
+                <h4 className="font-semibold text-text-primary">{request.mechanic?.name || "Assigning..."}</h4>
+                <div className="flex items-center text-xs mt-0.5 text-icon-highlight">
+                  <Star size={12} className="fill-current mr-0.5" /> {request.mechanic?.rating || "—"} <span className="ml-2 text-text-muted">• Verified Provider</span>
                 </div>
               </div>
-              <div className={`flex gap-2 ${isLight ? "text-slate-600" : "text-white"}`}>
-                 <button type="button" className={`w-9 h-9 flex items-center justify-center rounded-full transition-colors ${isLight ? "bg-slate-200 hover:bg-yellow-500 hover:text-white" : "bg-white/10 hover:bg-emerald-500 hover:text-white"}`}>
+              <div className="flex gap-2 text-text-primary">
+                <button type="button" className={`w-9 h-9 flex items-center justify-center rounded-full transition-colors ${isLight ? "bg-slate-200 hover:bg-yellow-500 hover:text-white" : "bg-white/10 hover:bg-primary hover:text-white"}`}>
                   <Phone size={16} />
-                 </button>
-                 <button type="button" className={`w-9 h-9 flex items-center justify-center rounded-full transition-colors ${isLight ? "bg-slate-200 hover:bg-yellow-500 hover:text-white" : "bg-white/10 hover:bg-emerald-500 hover:text-white"}`}>
+                </button>
+                <button type="button" className={`w-9 h-9 flex items-center justify-center rounded-full transition-colors ${isLight ? "bg-slate-200 hover:bg-yellow-500 hover:text-white" : "bg-white/10 hover:bg-primary hover:text-white"}`}>
                   <MessageSquare size={16} />
-                 </button>
+                </button>
               </div>
             </div>
-            <div className={`flex items-start gap-3 text-sm ${isLight ? "text-slate-600" : "text-emerald-100/80"}`}>
-              <MapPin size={16} className={`shrink-0 mt-0.5 ${isLight ? "text-yellow-600" : "text-emerald-400"}`} />
+            <div className="flex items-start gap-3 text-sm text-text-primary">
+              <MapPin size={16} className="shrink-0 mt-0.5 text-icon-highlight" />
               <div>
-                <p className={`font-medium mb-0.5 ${isLight ? "text-slate-900" : "text-white"}`}>Estimated Arrival</p>
+                <p className="font-medium mb-0.5 text-text-primary">Estimated Arrival</p>
                 <p>{request.mechanic?.distance ? `${request.mechanic.distance} away` : "Calculating..."}</p>
               </div>
             </div>
@@ -78,39 +78,39 @@ export function ServiceStatusTracker({ request, onComplete, onCancel }) {
         const pricing = request.pricing;
         return (
           <div className="mt-4">
-            <div className={`rounded-xl border p-5 mb-4 ${isLight ? "bg-slate-50 border-slate-200" : "bg-black/20 border-white/5"}`}>
-              <h4 className={`text-sm font-bold uppercase tracking-wider mb-4 ${isLight ? "text-slate-400" : "text-emerald-100/50"}`}>
+            <div className="rounded-xl border p-5 mb-4 bg-bg-card border-border-subtle">
+              <h4 className="text-sm font-bold uppercase tracking-wider mb-4 text-text-dim">
                 Invoice Breakdown
               </h4>
               {pricing ? (
                 <div className="space-y-3 text-sm">
-                  <div className={`flex justify-between ${isLight ? "text-slate-600" : "text-emerald-100/80"}`}>
+                  <div className="flex justify-between text-text-primary">
                     <span>Service Fee</span>
                     <span className="font-semibold">₹{pricing.serviceAmount?.toFixed(2)}</span>
                   </div>
-                  <div className={`flex justify-between ${isLight ? "text-slate-600" : "text-emerald-100/80"}`}>
+                  <div className="flex justify-between text-text-primary">
                     <span>Convenience Fee</span>
                     <span className="font-semibold">₹{pricing.convenienceFee?.toFixed(2)}</span>
                   </div>
-                  <div className={`flex justify-between ${isLight ? "text-slate-600" : "text-emerald-100/80"}`}>
+                  <div className="flex justify-between text-text-primary">
                     <span>Cancellation Fee</span>
                     <span className="font-semibold">₹{pricing.cancellationFee?.toFixed(2)}</span>
                   </div>
-                  <div className={`flex justify-between ${isLight ? "text-slate-600" : "text-emerald-100/80"}`}>
+                  <div className="flex justify-between text-text-primary">
                     <span>Distance ({pricing.distanceKm?.toFixed(1)} km)</span>
                     <span className="font-semibold">₹{pricing.distanceFee?.toFixed(2)}</span>
                   </div>
-                  <div className={`flex justify-between ${isLight ? "text-slate-600" : "text-emerald-100/80"}`}>
-                    <span>GST (18%)</span>
+                  <div className="flex justify-between text-text-primary">
+                    <span>GST ({GST_RATE * 100}%)</span>
                     <span className="font-semibold">₹{pricing.gstAmount?.toFixed(2)}</span>
                   </div>
-                  <div className={`border-t pt-3 mt-3 flex justify-between font-bold text-base ${isLight ? "border-slate-200 text-slate-900" : "border-white/10 text-white"}`}>
+                  <div className="border-t pt-3 mt-3 flex justify-between font-bold text-base border-border-subtle text-text-primary">
                     <span>Total</span>
-                    <span className={isLight ? "text-yellow-600" : "text-emerald-400"}>₹{pricing.totalAmount?.toFixed(2)}</span>
+                    <span className="text-icon-highlight">₹{pricing.totalAmount?.toFixed(2)}</span>
                   </div>
                 </div>
               ) : (
-                <p className={`text-sm ${isLight ? "text-slate-500" : "text-emerald-100/60"}`}>Loading pricing...</p>
+                <p className="text-sm text-text-muted">Loading pricing...</p>
               )}
             </div>
             <Button className="w-full" size="lg" onClick={() => onComplete(request)}>
@@ -124,11 +124,11 @@ export function ServiceStatusTracker({ request, onComplete, onCancel }) {
           <div className="text-center py-6 mt-4">
             <div className="inline-flex flex-col gap-4">
                <div>
-                 <p className={`text-sm mb-1 ${isLight ? "text-slate-500" : "text-emerald-100/70"}`}>Estimated Amount</p>
-                 <p className={`text-3xl font-bold tracking-tight ${isLight ? "text-slate-900" : "text-white"}`}>
+                 <p className="text-sm mb-1 text-text-muted">Estimated Amount</p>
+                 <p className="text-3xl font-bold tracking-tight text-text-primary">
                    ₹{request.priceEstimate?.min || "—"} – ₹{request.priceEstimate?.max || "—"}
                  </p>
-                 <p className={`text-xs mt-1 ${isLight ? "text-slate-400" : "text-emerald-100/50"}`}>Final amount confirmed after review</p>
+                 <p className="text-xs mt-1 text-text-dim">Final amount confirmed after review</p>
                </div>
                <Button onClick={() => onComplete(request)}>Pay & Review</Button>
             </div>
@@ -143,15 +143,15 @@ export function ServiceStatusTracker({ request, onComplete, onCancel }) {
   return (
     <GlassCard variant="strong" className="w-full p-6 flex flex-col flex-shrink-0">
       <div className="mb-8">
-        <h2 className={`text-2xl font-bold mb-1 ${isLight ? "text-slate-900" : "text-white"}`}>Service Status</h2>
-        <p className={`text-sm ${isLight ? "text-slate-500" : "text-emerald-100/70"}`}>Track your request in real-time</p>
+        <h2 className="text-2xl font-bold mb-1 text-text-primary">Service Status</h2>
+        <p className="text-sm text-text-muted">Track your request in real-time</p>
       </div>
 
       {/* Progress Timeline */}
       <div className="relative mb-6 pb-2">
-        <div className={`absolute top-5 left-[10%] right-[10%] h-1 rounded-full ${isLight ? "bg-slate-200" : "bg-white/10"}`}>
+        <div className="absolute top-5 left-[10%] right-[10%] h-1 rounded-full bg-bg-card">
           <div 
-            className={`absolute top-0 left-0 h-full rounded-full transition-all duration-500 ${isLight ? "bg-yellow-500" : "bg-emerald-500"}`}
+            className="absolute top-0 left-0 h-full rounded-full transition-all duration-500 bg-primary"
             style={{ width: `${(Math.max(0, currentStepIdx) / (steps.length - 1)) * 100}%` }}
           ></div>
         </div>
@@ -167,16 +167,16 @@ export function ServiceStatusTracker({ request, onComplete, onCancel }) {
                 <div 
                   className={`relative w-10 h-10 rounded-full flex items-center justify-center border-2 transition-all duration-300 ${
                     isCurrent 
-                      ? (isLight ? "bg-white border-yellow-500 text-yellow-600 shadow-[0_0_15px_rgba(234,179,8,0.4)]" : "bg-[#064e3b] border-emerald-400 text-emerald-400 shadow-[0_0_15px_rgba(16,185,129,0.4)]")
+                      ? "bg-primary-strong border-primary text-primary-text shadow-[0_0_15px_rgba(16,185,129,0.4)]"
                       : isCompleted
-                        ? (isLight ? "bg-yellow-500 border-yellow-500 text-white" : "bg-emerald-500 border-emerald-500 text-white")
-                        : (isLight ? "bg-slate-100 border-slate-200 text-slate-400" : "bg-black/50 border-white/20 text-white/30")
+                        ? "bg-primary border-primary text-white"
+                        : "bg-bg-card border-border-subtle text-text-dim"
                   }`}
                 >
                   <Icon size={18} />
                 </div>
                 {/* Text label */}
-                <span className={`text-[10px] font-medium mt-2 w-full text-center leading-tight ${isCompleted ? (isLight ? 'text-slate-800' : 'text-emerald-100') : (isLight ? 'text-slate-400' : 'text-white/30')} ${idx > 0 && idx < steps.length - 1 ? 'hidden sm:block' : ''}`}>
+                <span className={`text-[10px] font-medium mt-2 w-full text-center leading-tight ${isCompleted ? 'text-text-primary' : 'text-text-dim'} ${idx > 0 && idx < steps.length - 1 ? 'hidden sm:block' : ''}`}>
                   {step.label}
                 </span>
               </div>
@@ -190,7 +190,7 @@ export function ServiceStatusTracker({ request, onComplete, onCancel }) {
       </div>
 
       {request.status !== SERVICE_STATUS.COMPLETED && (
-         <div className={`mt-4 pt-4 border-t text-center ${isLight ? "border-slate-200" : "border-white/5"}`}>
+         <div className="mt-4 pt-4 border-t text-center border-border-subtle">
            <button 
              type="button"
              onClick={onCancel}

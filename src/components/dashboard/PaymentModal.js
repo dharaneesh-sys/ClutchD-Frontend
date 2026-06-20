@@ -1,9 +1,11 @@
 import { useState, useEffect, useRef } from "react";
-import { Modal } from "../ui/Modal";
-import { Button } from "../ui/Button";
+import { Modal } from "@/components/ui/Modal";
+import { Button } from "@/components/ui/Button";
 import { CreditCard, Smartphone, QrCode, Banknote, CheckCircle2, XCircle, Loader2, ChevronDown, ChevronUp } from "lucide-react";
-import { useThemeStore } from "../../store/themeStore";
-import api from "../../lib/api";
+import { useThemeStore } from "@/store/themeStore";
+import { GST_RATE } from "@/lib/constants";
+import { useToast } from "@/components/ui/ToastProvider";
+import api from "@/lib/api";
 
 const METHODS = [
   { id: "upi", label: "Google Pay / UPI", desc: "GPay, PhonePe, Paytm, BHIM", icon: Smartphone },
@@ -29,11 +31,11 @@ function loadRazorpayScript() {
 export function PaymentModal({ isOpen, onClose, amount, pricing, jobId, onSuccess }) {
   const [method, setMethod] = useState("upi");
   const [payState, setPayState] = useState("idle"); // idle | processing | success | failed
-  const [errorMsg, setErrorMsg] = useState("");
   const [qrData, setQrData] = useState(null);
   const [showBreakdown, setShowBreakdown] = useState(false);
   const qrPollRef = useRef(null);
   const { theme } = useThemeStore();
+  const { error: showError, success: showSuccess } = useToast();
   const isLight = theme === "light";
 
   // Use the finalized total if available, else fall back to passed amount
@@ -56,6 +58,31 @@ export function PaymentModal({ isOpen, onClose, amount, pricing, jobId, onSucces
       if (qrPollRef.current) clearInterval(qrPollRef.current);
     }
   }, [isOpen]);
+
+  // Demo mode: auto-process payment after showing the modal briefly
+  useEffect(() => {
+    if (!isOpen || payState !== "idle") return;
+    const isDemo = typeof window !== "undefined" && window.__DEMO_MODE__;
+    if (!isDemo) return;
+
+    const showTimer = setTimeout(() => {
+      setPayState("processing");
+      const completeTimer = setTimeout(() => {
+        setPayState("success");
+        const callbackTimer = setTimeout(() => {
+          onSuccess({
+            method,
+            amount: displayAmount,
+            status: "success",
+            transactionId: "TXN_DEMO_" + Date.now(),
+          });
+        }, 1500);
+        return () => clearTimeout(callbackTimer);
+      }, 800);
+      return () => clearTimeout(completeTimer);
+    }, 2000);
+    return () => clearTimeout(showTimer);
+  }, [isOpen, payState, method, displayAmount, onSuccess]);
 
   const amountPaise = Math.round(displayAmount * 100);
 
@@ -110,7 +137,7 @@ export function PaymentModal({ isOpen, onClose, amount, pricing, jobId, onSucces
             }, 1500);
           } catch {
             setPayState("failed");
-            setErrorMsg("Payment verification failed. Contact support if money was deducted.");
+            showError("Payment verification failed. Contact support if money was deducted.");
           }
         },
       };
@@ -125,12 +152,12 @@ export function PaymentModal({ isOpen, onClose, amount, pricing, jobId, onSucces
       const rzp = new window.Razorpay(options);
       rzp.on("payment.failed", (resp) => {
         setPayState("failed");
-        setErrorMsg(resp.error?.description || "Payment failed. Please try again.");
+        showError(resp.error?.description || "Payment failed. Please try again.");
       });
       rzp.open();
     } catch (err) {
       setPayState("failed");
-      setErrorMsg(err.response?.data?.detail || "Could not initiate payment. Please try again.");
+      showError(err.response?.data?.detail || "Could not initiate payment. Please try again.");
     }
   };
 
@@ -169,7 +196,7 @@ export function PaymentModal({ isOpen, onClose, amount, pricing, jobId, onSucces
       }, 3000);
     } catch (err) {
       setPayState("failed");
-      setErrorMsg(err.response?.data?.detail || "QR code generation failed.");
+      showError(err.response?.data?.detail || "QR code generation failed.");
     }
   };
 
@@ -186,7 +213,7 @@ export function PaymentModal({ isOpen, onClose, amount, pricing, jobId, onSucces
       }, 1500);
     } catch (err) {
       setPayState("failed");
-      setErrorMsg(err.response?.data?.detail || "Cash confirmation failed.");
+      showError(err.response?.data?.detail || "Cash confirmation failed.");
     }
   };
 
@@ -202,14 +229,17 @@ export function PaymentModal({ isOpen, onClose, amount, pricing, jobId, onSucces
 
   // Success state
   if (payState === "success") {
+    useEffect(() => {
+      showSuccess(`₹${displayAmount.toFixed(2)} paid successfully`);
+    }, []);
     return (
       <Modal isOpen={isOpen} onClose={onClose} title="Payment Successful">
         <div className="text-center py-8">
-          <div className={`w-20 h-20 rounded-full mx-auto flex items-center justify-center mb-4 ${isLight ? "bg-green-100" : "bg-emerald-500/20"}`}>
-            <CheckCircle2 size={40} className={isLight ? "text-green-600" : "text-emerald-400"} />
+          <div className="w-20 h-20 rounded-full mx-auto flex items-center justify-center mb-4 bg-surface-soft">
+            <CheckCircle2 size={40} className="text-icon-highlight" />
           </div>
-          <h3 className={`text-xl font-bold mb-2 ${isLight ? "text-slate-900" : "text-white"}`}>Payment Complete!</h3>
-          <p className={`text-sm ${isLight ? "text-slate-500" : "text-emerald-100/60"}`}>₹{displayAmount.toFixed(2)} paid successfully</p>
+          <h3 className="text-xl font-bold mb-2 text-text-primary">Payment Complete!</h3>
+          <p className="text-sm text-text-muted">₹{displayAmount.toFixed(2)} paid successfully</p>
         </div>
       </Modal>
     );
@@ -218,8 +248,8 @@ export function PaymentModal({ isOpen, onClose, amount, pricing, jobId, onSucces
   return (
     <Modal isOpen={isOpen} onClose={onClose} title="Complete Payment">
       <div className="text-center mb-4">
-        <p className={`text-sm mb-1 ${isLight ? "text-slate-500" : "text-emerald-100/60"}`}>Total Amount Due</p>
-        <p className={`text-4xl font-bold tracking-tight ${isLight ? "text-slate-900" : "text-white"}`}>₹{displayAmount.toFixed(2)}</p>
+        <p className="text-sm mb-1 text-text-muted">Total Amount Due</p>
+        <p className="text-4xl font-bold tracking-tight text-text-primary">₹{displayAmount.toFixed(2)}</p>
       </div>
 
       {/* Itemized breakdown toggle */}
@@ -228,38 +258,38 @@ export function PaymentModal({ isOpen, onClose, amount, pricing, jobId, onSucces
           <button
             type="button"
             onClick={() => setShowBreakdown(!showBreakdown)}
-            className={`w-full flex items-center justify-between p-3 rounded-xl border text-sm transition-all ${isLight ? "bg-slate-50 border-slate-200 text-slate-600 hover:bg-slate-100" : "bg-white/5 border-white/10 text-emerald-100/80 hover:bg-white/10"}`}
+            className="w-full flex items-center justify-between p-3 rounded-xl border text-sm transition-all bg-bg-card border-border-subtle text-text-primary hover:bg-surface-soft"
           >
             <span className="font-medium">View Breakdown</span>
             {showBreakdown ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
           </button>
           {showBreakdown && (
-            <div className={`mt-2 p-4 rounded-xl border space-y-2 text-sm animate-in slide-in-from-top-1 ${isLight ? "bg-slate-50 border-slate-200" : "bg-black/20 border-white/5"}`}>
-              <div className={`flex justify-between ${isLight ? "text-slate-600" : "text-emerald-100/80"}`}>
+            <div className="mt-2 p-4 rounded-xl border space-y-2 text-sm animate-in slide-in-from-top-1 bg-bg-card border-border-subtle">
+              <div className="flex justify-between text-text-primary">
                 <span>Service Fee</span>
                 <span className="font-medium">₹{pricing.serviceAmount?.toFixed(2)}</span>
               </div>
-              <div className={`flex justify-between ${isLight ? "text-slate-600" : "text-emerald-100/80"}`}>
+              <div className="flex justify-between text-text-primary">
                 <span>Convenience Fee</span>
                 <span className="font-medium">₹{pricing.convenienceFee?.toFixed(2)}</span>
               </div>
-              <div className={`flex justify-between ${isLight ? "text-slate-600" : "text-emerald-100/80"}`}>
+              <div className="flex justify-between text-text-primary">
                 <span>Cancellation Fee</span>
                 <span className="font-medium">₹{pricing.cancellationFee?.toFixed(2)}</span>
               </div>
-              <div className={`flex justify-between ${isLight ? "text-slate-600" : "text-emerald-100/80"}`}>
+              <div className="flex justify-between text-text-primary">
                 <span>Distance ({pricing.distanceKm?.toFixed(1)} km)</span>
                 <span className="font-medium">₹{pricing.distanceFee?.toFixed(2)}</span>
               </div>
-              <div className={`flex justify-between ${isLight ? "text-slate-600" : "text-emerald-100/80"}`}>
-                <span>GST (18%)</span>
+              <div className="flex justify-between text-text-primary">
+                <span>GST ({GST_RATE * 100}%)</span>
                 <span className="font-medium">₹{pricing.gstAmount?.toFixed(2)}</span>
               </div>
-              <div className={`border-t pt-2 mt-2 flex justify-between font-bold ${isLight ? "border-slate-200 text-slate-900" : "border-white/10 text-white"}`}>
+              <div className="border-t pt-2 mt-2 flex justify-between font-bold border-border-subtle text-text-primary">
                 <span>Grand Total</span>
-                <span className={isLight ? "text-yellow-600" : "text-emerald-400"}>₹{pricing.totalAmount?.toFixed(2)}</span>
+                <span className="text-icon-highlight">₹{pricing.totalAmount?.toFixed(2)}</span>
               </div>
-              <p className={`text-[10px] mt-2 ${isLight ? "text-slate-400" : "text-white/20"}`}>
+              <p className="text-[10px] mt-2 text-text-dim">
                 Platform fee goes to ClutchD • Service fee goes to your provider
               </p>
             </div>
@@ -267,36 +297,30 @@ export function PaymentModal({ isOpen, onClose, amount, pricing, jobId, onSucces
         </div>
       )}
 
-      {/* Error */}
-      {payState === "failed" && errorMsg && (
-        <div className={`flex items-center gap-2 p-3 rounded-xl mb-4 text-sm ${isLight ? "bg-red-50 border border-red-200 text-red-700" : "bg-red-500/10 border border-red-500/30 text-red-300"}`}>
-          <XCircle size={16} className="shrink-0" />
-          {errorMsg}
-        </div>
-      )}
+      
 
       {/* Method selection */}
       <div className="space-y-2 mb-6">
-        <label className={`text-sm font-medium mb-2 block ${isLight ? "text-slate-700" : "text-emerald-100/80"}`}>Select Payment Method</label>
+        <label className="text-sm font-medium mb-2 block text-text-primary">Select Payment Method</label>
         {METHODS.map(({ id, label, desc, icon: Icon }) => (
           <div
             key={id}
             onClick={() => { setMethod(id); setQrData(null); setPayState("idle"); setErrorMsg(""); }}
             className={`flex items-center gap-4 p-3.5 rounded-xl border cursor-pointer transition-all ${
               method === id
-                ? (isLight ? "bg-yellow-500/15 border-yellow-500 shadow-[0_0_10px_rgba(234,179,8,0.12)]" : "bg-emerald-500/20 border-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.12)]")
-                : (isLight ? "bg-slate-50 border-slate-200 hover:bg-yellow-50" : "bg-white/5 border-white/10 hover:bg-white/10")
+                ? "bg-surface-soft border-border-subtle shadow-[0_0_10px_rgba(234,179,8,0.12)]"
+                : "bg-bg-card border-border-subtle hover:bg-surface-soft"
             }`}
           >
-            <div className={`w-9 h-9 rounded-full flex items-center justify-center ${isLight ? "bg-yellow-500/20 text-yellow-600" : "bg-white/10 text-emerald-400"}`}>
+            <div className="w-9 h-9 rounded-full flex items-center justify-center bg-surface-soft text-icon-highlight">
               <Icon size={18} />
             </div>
             <div className="flex-1">
-              <h4 className={`font-medium text-sm ${isLight ? "text-slate-900" : "text-white"}`}>{label}</h4>
-              <p className={`text-xs ${isLight ? "text-slate-500" : "text-white/50"}`}>{desc}</p>
+              <h4 className="font-medium text-sm text-text-primary">{label}</h4>
+              <p className="text-xs text-text-muted">{desc}</p>
             </div>
-            <div className={`w-4.5 h-4.5 rounded-full border-2 flex items-center justify-center ${method === id ? (isLight ? "border-yellow-600" : "border-emerald-400") : (isLight ? "border-slate-300" : "border-white/30")}`}>
-              {method === id && <div className={`w-2 h-2 rounded-full ${isLight ? "bg-yellow-600" : "bg-emerald-400"}`} />}
+            <div className={`w-4.5 h-4.5 rounded-full border-2 flex items-center justify-center ${method === id ? "border-icon-highlight" : "border-border-subtle"}`}>
+              {method === id && <div className="w-2 h-2 rounded-full bg-icon-highlight" />}
             </div>
           </div>
         ))}
@@ -304,15 +328,15 @@ export function PaymentModal({ isOpen, onClose, amount, pricing, jobId, onSucces
 
       {/* QR Code display */}
       {method === "qr" && qrData && (
-        <div className={`p-4 rounded-xl border text-center mb-6 animate-in slide-in-from-top-2 ${isLight ? "bg-slate-50 border-slate-200" : "bg-black/20 border-white/5"}`}>
-          <div className="w-44 h-44 bg-white p-2 rounded-lg mx-auto mb-3 border-2 border-emerald-500/30">
-            <img src={qrData.image_url} alt="QR Code" className="w-full h-full object-contain" />
+        <div className="p-4 rounded-xl border text-center mb-6 animate-in slide-in-from-top-2 bg-bg-card border-border-subtle">
+          <div className="w-44 h-44 bg-white p-2 rounded-lg mx-auto mb-3 border-2 border-border-subtle">
+            <img src={qrData.image_url} alt={`QR code for ₹${displayAmount.toFixed(2)}`} className="w-full h-full object-contain" />
           </div>
-          <p className={`text-sm font-medium mb-1 ${isLight ? "text-slate-700" : "text-white"}`}>Scan to Pay ₹{displayAmount.toFixed(2)}</p>
-          <p className={`text-xs ${isLight ? "text-slate-500" : "text-emerald-100/50"}`}>Waiting for payment...</p>
+          <p className="text-sm font-medium mb-1 text-text-primary">Scan to Pay ₹{displayAmount.toFixed(2)}</p>
+          <p className="text-xs text-text-muted">Waiting for payment...</p>
           <div className="flex items-center justify-center gap-2 mt-2">
-            <Loader2 size={14} className="animate-spin text-emerald-400" />
-            <span className="text-xs text-emerald-400">Checking...</span>
+            <Loader2 size={14} className="animate-spin text-icon-highlight" />
+            <span className="text-xs text-icon-highlight">Checking...</span>
           </div>
         </div>
       )}
@@ -325,8 +349,8 @@ export function PaymentModal({ isOpen, onClose, amount, pricing, jobId, onSucces
       )}
 
       {/* Trust footer */}
-      <div className={`mt-4 pt-3 border-t text-center ${isLight ? "border-slate-200" : "border-white/5"}`}>
-        <p className={`text-[10px] uppercase tracking-wider ${isLight ? "text-slate-400" : "text-white/20"}`}>
+      <div className="mt-4 pt-3 border-t text-center border-border-subtle">
+        <p className="text-[10px] uppercase tracking-wider text-text-dim">
           {method === "cash" ? "Confirmed between you and the mechanic" : "Secured by Razorpay • 256-bit SSL"}
         </p>
       </div>

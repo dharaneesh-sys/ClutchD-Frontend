@@ -1,5 +1,5 @@
 import { Star } from "lucide-react";
-import { cn } from "../../lib/utils";
+import { cn } from "@/lib/utils";
 
 export function StarRating({ rating = 0, max = 5, size = 16, interactive = false, onChange }) {
   return (

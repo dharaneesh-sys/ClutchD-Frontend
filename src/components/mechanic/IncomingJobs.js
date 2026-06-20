@@ -1,24 +1,26 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { GlassCard } from "../ui/GlassCard";
-import { Button } from "../ui/Button";
-import { Badge } from "../ui/Badge";
-import { Modal } from "../ui/Modal";
-import { ConfirmModal } from "../ui/ConfirmModal";
-import { Input } from "../ui/Input";
+import { GlassCard } from "@/components/ui/GlassCard";
+import { Button } from "@/components/ui/Button";
+import { Badge } from "@/components/ui/Badge";
+import { Modal } from "@/components/ui/Modal";
+import { ConfirmModal } from "@/components/ui/ConfirmModal";
+import { Input } from "@/components/ui/Input";
 import { Navigation, CheckCircle2, AlertTriangle, MapPin, Clock, IndianRupee, Loader2 } from "lucide-react";
-import { useThemeStore } from "../../store/themeStore";
-import { useTrackingStore } from "../../store/trackingStore";
-import api from "../../lib/api";
+import { useThemeStore } from "@/store/themeStore";
+import { FEE_CONSTANTS } from "@/lib/constants";
+import { useTrackingStore } from "@/store/trackingStore";
+import { useToast } from "@/components/ui/ToastProvider";
+import api from "@/lib/api";
 
 export function IncomingJobs() {
   const [jobs, setJobs] = useState([]);
-  const [toast, setToast] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   const { theme } = useThemeStore();
   const { setNavigationTarget } = useTrackingStore();
+  const { success: showSuccess, error: showError } = useToast();
   const isLight = theme === "light";
 
   // --- Job Completion Modal State ---
@@ -29,11 +31,6 @@ export function IncomingJobs() {
   const [priceError, setPriceError] = useState("");
   const [deleteJob, setDeleteJob] = useState(null);
   const [deleteLoading, setDeleteLoading] = useState(false);
-
-  const showToast = (message) => {
-    setToast(message);
-    setTimeout(() => setToast(null), 3000);
-  };
 
   const fetchJobs = useCallback(async () => {
     try {
@@ -68,9 +65,9 @@ export function IncomingJobs() {
     try {
       await api.patch(`/service/request/${id}/status`, { status: "en_route" });
       setJobs(jobs.map(j => j.id === id ? { ...j, status: "accepted" } : j));
-      showToast("Job accepted! Navigate to the customer's location.");
+      showSuccess("Job accepted! Navigate to the customer's location.");
     } catch (err) {
-      showToast(`Failed to accept: ${err.response?.data?.detail || err.message}`);
+      showError(`Failed to accept: ${err.response?.data?.detail || err.message}`);
     }
   };
 
@@ -105,7 +102,7 @@ export function IncomingJobs() {
       });
       setJobs(jobs.filter(j => j.id !== completionJobId));
       setCompletionModal(false);
-      showToast(`Invoice of ₹${amount} sent to customer. Awaiting payment.`);
+      showSuccess(`Invoice of ₹${amount} sent to customer. Awaiting payment.`);
     } catch (err) {
       setPriceError(err.response?.data?.detail || "Failed to submit price. Please try again.");
     } finally {
@@ -115,19 +112,12 @@ export function IncomingJobs() {
 
   return (
     <GlassCard variant="strong" className="p-4 sm:p-6 h-full flex flex-col relative">
-      {/* Toast Notification */}
-      {toast && (
-        <div className={`absolute top-4 left-1/2 -translate-x-1/2 z-50 flex items-center gap-2 px-4 py-3 backdrop-blur-xl rounded-xl shadow-lg animate-in slide-in-from-top-2 max-w-[90%] ${isLight ? "bg-green-50 border border-green-200" : "bg-emerald-500/20 border border-emerald-500/30"}`}>
-          <CheckCircle2 size={16} className={isLight ? "text-green-600 shrink-0" : "text-emerald-400 shrink-0"} />
-          <span className={`text-sm font-medium ${isLight ? "text-green-800" : "text-emerald-100"}`}>{toast}</span>
-        </div>
-      )}
 
       <div className="flex justify-between items-center mb-6">
-        <div>
-           <h2 className={`text-xl font-bold tracking-tight ${isLight ? "text-stone-900" : "text-white"}`}>Job Queue</h2>
-           <p className={`text-sm ${isLight ? "text-stone-500" : "text-emerald-100/60"}`}>Manage your service requests</p>
-        </div>
+         <div>
+            <h2 className="text-xl font-bold tracking-tight text-text-primary">Job Queue</h2>
+            <p className="text-sm text-text-muted">Manage your service requests</p>
+         </div>
         <Badge variant="warning" className="animate-pulse">
            {jobs.filter(j => j.status === 'pending' || j.status === 'assigned').length} Request(s)
         </Badge>
@@ -135,19 +125,19 @@ export function IncomingJobs() {
 
       <div className="flex-1 overflow-y-auto pr-2 custom-scrollbar space-y-4">
         {isLoading ? (
-           <div className={`h-full flex flex-col items-center justify-center ${isLight ? "text-stone-400" : "text-white/40"}`}>
-             <div className={`w-8 h-8 border-2 border-t-transparent rounded-full animate-spin mb-4 ${isLight ? "border-amber-500/30 border-t-amber-500" : "border-emerald-500/30 border-t-emerald-500"}`}></div>
+           <div className="h-full flex flex-col items-center justify-center text-text-dim">
+              <div className="w-8 h-8 border-2 border-t-transparent rounded-full animate-spin mb-4 border-primary/30 border-t-primary"></div>
              <p>Loading jobs...</p>
            </div>
         ) : error ? (
-           <div className={`h-full flex flex-col items-center justify-center ${isLight ? "text-stone-400" : "text-white/40"}`}>
-             <AlertTriangle size={40} className="mb-4 text-amber-400/50" />
-             <p>{error}</p>
+           <div className="h-full flex flex-col items-center justify-center text-text-dim">
+              <AlertTriangle size={40} className="mb-4 text-amber-400/50" />
+              <p>{error}</p>
              <Button variant="ghost" size="sm" className="mt-2" onClick={fetchJobs}>Retry</Button>
            </div>
         ) : jobs.length === 0 ? (
-           <div className={`h-full flex flex-col items-center justify-center ${isLight ? "text-stone-400" : "text-white/40"}`}>
-             <Clock size={40} className="mb-4 opacity-50" />
+           <div className="h-full flex flex-col items-center justify-center text-text-dim">
+              <Clock size={40} className="mb-4 opacity-50" />
              <p>No jobs in queue.</p>
              <p className="text-sm">Stay online to receive requests.</p>
            </div>
@@ -155,12 +145,12 @@ export function IncomingJobs() {
           jobs.map(job => (
             <div key={job.id} className={`p-4 rounded-xl border transition-all ${
               job.status === 'accepted' || job.status === 'en_route' || job.status === 'in_progress'
-                ? (isLight ? 'bg-green-50 border-green-200' : 'bg-emerald-500/10 border-emerald-500/30')
-                : (isLight ? 'bg-white border-stone-200' : 'bg-white/5 border-white/10')
+                ? 'bg-surface-soft border-border-subtle'
+                : 'bg-bg-card border-border-subtle'
             }`}>
               <div className="flex justify-between items-start mb-2">
-                <h4 className={`font-semibold ${isLight ? "text-stone-900" : "text-white"}`}>{job.issueTag || job.customer || "Service Request"}</h4>
-                <span className={`text-xs flex items-center ${isLight ? "text-stone-400" : "text-white/50"}`}>
+                <h4 className="font-semibold text-text-primary">{job.issueTag || job.customer || "Service Request"}</h4>
+                <span className="text-xs flex items-center text-text-muted">
                   <Clock size={12} className="mr-1"/>
                   {job.createdAt ? new Date(job.createdAt).toLocaleTimeString() : "—"}
                 </span>
@@ -170,19 +160,19 @@ export function IncomingJobs() {
                 <Badge variant={job.status === 'assigned' || job.status === 'pending' ? 'danger' : 'success'} className="mb-2">
                   {job.issueTag || "Unknown"}
                 </Badge>
-                <p className={`text-sm mb-2 ${isLight ? "text-stone-600" : "text-emerald-100/80"}`}>{job.description || "No description"}</p>
+                <p className="text-sm mb-2 text-text-muted">{job.description || "No description"}</p>
                 {job.mechanic?.distance && (
-                  <div className={`flex items-center text-xs font-medium ${isLight ? "text-stone-500" : "text-emerald-100/60"}`}>
-                     <MapPin size={12} className={`mr-1 ${isLight ? "text-amber-600" : "text-emerald-400"}`} />
-                     {job.mechanic.distance} away
-                  </div>
+                   <div className="flex items-center text-xs font-medium text-text-muted">
+                      <MapPin size={12} className="mr-1 text-icon-highlight" />
+                      {job.mechanic.distance} away
+                   </div>
                 )}
               </div>
 
-              <div className={`border-t pt-3 mt-3 flex items-center justify-between ${isLight ? "border-stone-100" : "border-white/5"}`}>
+              <div className="border-t pt-3 mt-3 flex items-center justify-between border-border-subtle">
                 <div>
-                  <p className={`text-[10px] uppercase tracking-wider mb-0.5 ${isLight ? "text-stone-400" : "text-emerald-100/50"}`}>Est. Cost</p>
-                  <p className={`font-bold ${isLight ? "text-amber-700" : "text-emerald-300"}`}>
+                  <p className="text-[10px] uppercase tracking-wider mb-0.5 text-text-dim">Est. Cost</p>
+                  <p className="font-bold text-icon-highlight">
                     {job.priceEstimate ? `₹${job.priceEstimate.min} - ₹${job.priceEstimate.max}` : "—"}
                   </p>
                 </div>
@@ -198,9 +188,9 @@ export function IncomingJobs() {
                       <Button variant="outline" size="sm" onClick={() => {
                         if (job.customerLocation) {
                           setNavigationTarget(job.customerLocation);
-                          showToast("Navigating to customer location...");
+                          showSuccess("Navigating to customer location...");
                         } else {
-                          showToast("Customer location not available.");
+                          showError("Customer location not available.");
                         }
                       }}>
                         <Navigation size={14} className="mr-1.5" /> Navigate
@@ -227,10 +217,10 @@ export function IncomingJobs() {
       {/* ── Job Completion Modal ── */}
       <Modal isOpen={completionModal} onClose={() => setCompletionModal(false)} title="Submit Service Bill">
         <div className="text-center mb-6">
-          <div className={`w-16 h-16 mx-auto rounded-full flex items-center justify-center mb-4 ${isLight ? "bg-yellow-500/15" : "bg-emerald-500/20"}`}>
-            <IndianRupee size={32} className={isLight ? "text-yellow-600" : "text-emerald-400"} />
+          <div className="w-16 h-16 mx-auto rounded-full flex items-center justify-center mb-4 bg-surface-soft">
+            <IndianRupee size={32} className="text-icon-highlight" />
           </div>
-          <p className={`text-sm ${isLight ? "text-slate-500" : "text-emerald-100/60"}`}>
+          <p className="text-sm text-text-muted">
             Enter the service charge for the work you completed. Additional fees (convenience, distance, GST) will be automatically calculated and added to the customer&apos;s bill.
           </p>
         </div>
@@ -245,7 +235,7 @@ export function IncomingJobs() {
         />
 
         {priceError && (
-          <div className={`mt-3 flex items-center gap-2 p-3 rounded-xl text-sm ${isLight ? "bg-red-50 border border-red-200 text-red-700" : "bg-red-500/10 border border-red-500/30 text-red-300"}`}>
+          <div className="mt-3 flex items-center gap-2 p-3 rounded-xl text-sm bg-red-500/10 border border-red-500/30 text-red-400">
             <AlertTriangle size={14} className="shrink-0" />
             {priceError}
           </div>
@@ -253,33 +243,33 @@ export function IncomingJobs() {
 
         {/* Fee Preview */}
         {serviceAmount && parseFloat(serviceAmount) > 0 && (
-          <div className={`mt-4 p-4 rounded-xl border text-sm space-y-2 ${isLight ? "bg-slate-50 border-slate-200" : "bg-black/20 border-white/5"}`}>
-            <p className={`text-xs uppercase tracking-wider font-semibold mb-2 ${isLight ? "text-slate-400" : "text-emerald-100/50"}`}>Customer will be charged</p>
-            <div className={`flex justify-between ${isLight ? "text-slate-600" : "text-emerald-100/80"}`}>
+          <div className="mt-4 p-4 rounded-xl border text-sm space-y-2 bg-bg-card border-border-subtle">
+            <p className="text-xs uppercase tracking-wider font-semibold mb-2 text-text-dim">Customer will be charged</p>
+            <div className="flex justify-between text-text-muted">
               <span>Service Fee</span>
               <span className="font-medium">₹{parseFloat(serviceAmount).toFixed(2)}</span>
             </div>
-            <div className={`flex justify-between ${isLight ? "text-slate-600" : "text-emerald-100/80"}`}>
+            <div className="flex justify-between text-text-muted">
               <span>Convenience Fee</span>
-              <span className="font-medium">₹40.00</span>
+              <span className="font-medium">₹{FEE_CONSTANTS.PLATFORM_FEE_FLAT}.00</span>
             </div>
-            <div className={`flex justify-between ${isLight ? "text-slate-600" : "text-emerald-100/80"}`}>
+            <div className="flex justify-between text-text-muted">
               <span>Cancellation Fee</span>
-              <span className="font-medium">₹30.00</span>
+              <span className="font-medium">₹{FEE_CONSTANTS.CANCELLATION_FEE}.00</span>
             </div>
-            <div className={`flex justify-between ${isLight ? "text-slate-600" : "text-emerald-100/80"}`}>
+            <div className="flex justify-between text-text-muted">
               <span>Distance Fee</span>
               <span className="font-medium text-xs italic">calculated</span>
             </div>
-            <div className={`flex justify-between ${isLight ? "text-slate-600" : "text-emerald-100/80"}`}>
-              <span>GST (18%)</span>
+            <div className="flex justify-between text-text-muted">
+              <span>GST ({FEE_CONSTANTS.GST_RATE * 100}%)</span>
               <span className="font-medium text-xs italic">calculated</span>
             </div>
-            <div className={`border-t pt-2 mt-2 flex justify-between font-bold ${isLight ? "border-slate-200 text-slate-900" : "border-white/10 text-white"}`}>
+            <div className="border-t pt-2 mt-2 flex justify-between font-bold border-border-subtle text-text-primary">
               <span>Estimated Total</span>
-              <span>₹{(((parseFloat(serviceAmount) + 40 + 30) * 1.18)).toFixed(2)}+</span>
+              <span>₹{(((parseFloat(serviceAmount) + FEE_CONSTANTS.PLATFORM_FEE_FLAT + FEE_CONSTANTS.CANCELLATION_FEE) * (1 + FEE_CONSTANTS.GST_RATE))).toFixed(2)}+</span>
             </div>
-            <p className={`text-[10px] ${isLight ? "text-slate-400" : "text-white/30"}`}>
+            <p className="text-[10px] text-text-dim">
               * Distance fee will be added based on actual distance. Night surcharge applies after 8 PM.
             </p>
           </div>
@@ -306,7 +296,7 @@ export function IncomingJobs() {
             fetchJobs();
             setDeleteJob(null);
           } catch (e) {
-            showToast(`Failed to delete job: ${e.response?.data?.detail || e.message}`);
+            showError(`Failed to delete job: ${e.response?.data?.detail || e.message}`);
             setDeleteJob(null);
           } finally {
             setDeleteLoading(false);

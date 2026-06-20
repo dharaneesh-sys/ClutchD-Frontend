@@ -1,7 +1,7 @@
 "use client";
 
-import { GlassCard } from "../ui/GlassCard";
-import { useThemeStore } from "../../store/themeStore";
+import { GlassCard } from "@/components/ui/GlassCard";
+import { useThemeStore } from "@/store/themeStore";
 import { AreaChart, Area, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { AlertTriangle } from "lucide-react";
 
@@ -35,33 +35,31 @@ export function GarageAnalytics() {
 
   return (
     <GlassCard variant="strong" className="p-4 sm:p-6 h-full flex flex-col">
-      <div className={`mb-4 flex items-center gap-2 px-3 py-2 rounded-lg border text-xs ${
-        isLight ? "bg-amber-50 border-amber-200 text-amber-700" : "bg-amber-500/10 border-amber-500/20 text-amber-300"
-      }`}>
+      <div className="mb-4 flex items-center gap-2 px-3 py-2 rounded-lg border text-xs bg-amber-500/10 border-amber-500/20 text-amber-300">
         <AlertTriangle size={12} className="shrink-0" />
         Showing sample data — live analytics coming soon.
       </div>
       <div className="mb-6 flex justify-between items-end">
         <div>
-          <h2 className={`text-xl font-bold tracking-tight ${isLight ? "text-stone-900" : "text-white"}`}>Garage Performance</h2>
-          <p className={`text-sm ${isLight ? "text-stone-500" : "text-emerald-100/60"}`}>Current Week</p>
+          <h2 className="text-xl font-bold tracking-tight text-text-primary">Garage Performance</h2>
+          <p className="text-sm text-text-muted">Current Week</p>
         </div>
       </div>
 
       <div className="grid grid-cols-2 gap-4 mb-8">
-        <div className={`p-4 rounded-xl border ${isLight ? "bg-amber-50 border-amber-200" : "bg-black/20 border-white/5"}`}>
-          <p className={`text-xs uppercase tracking-wider mb-1 ${isLight ? "text-stone-500" : "text-emerald-100/60"}`}>Total Revenue</p>
-          <p className={`text-3xl font-bold ${isLight ? "text-amber-700" : "text-emerald-400"}`}>₹2.35L</p>
-          <p className={`text-xs mt-2 font-medium ${isLight ? "text-green-600" : "text-green-400"}`}>↑ 12% vs last week</p>
+        <div className="p-4 rounded-xl border bg-surface-soft border-border-subtle">
+          <p className="text-xs uppercase tracking-wider mb-1 text-text-muted">Total Revenue</p>
+          <p className="text-3xl font-bold text-icon-highlight">₹2.35L</p>
+          <p className="text-xs mt-2 font-medium text-green-400">↑ 12% vs last week</p>
         </div>
-        <div className={`p-4 rounded-xl border ${isLight ? "bg-stone-50 border-stone-200" : "bg-black/20 border-white/5"}`}>
-          <p className={`text-xs uppercase tracking-wider mb-1 ${isLight ? "text-stone-500" : "text-emerald-100/60"}`}>Completed Jobs</p>
-          <p className={`text-3xl font-bold ${isLight ? "text-stone-900" : "text-white"}`}>129</p>
-          <p className={`text-xs mt-2 font-medium ${isLight ? "text-green-600" : "text-green-400"}`}>↑ 5% vs last week</p>
+        <div className="p-4 rounded-xl border bg-surface-soft border-border-subtle">
+          <p className="text-xs uppercase tracking-wider mb-1 text-text-muted">Completed Jobs</p>
+          <p className="text-3xl font-bold text-text-primary">129</p>
+          <p className="text-xs mt-2 font-medium text-green-400">↑ 5% vs last week</p>
         </div>
       </div>
       
-      <h3 className={`text-sm font-medium mb-4 ${isLight ? "text-stone-700" : "text-white"}`}>Revenue Trends</h3>
+      <h3 className="text-sm font-medium mb-4 text-text-primary">Revenue Trends</h3>
       <div className="flex-1 min-h-[150px] w-full mb-6 relative">
         <ResponsiveContainer width="100%" height="100%">
           <AreaChart data={revenueData} margin={{ top: 0, right: 0, left: -20, bottom: 0 }}>
@@ -89,7 +87,7 @@ export function GarageAnalytics() {
         </ResponsiveContainer>
       </div>
 
-      <h3 className={`text-sm font-medium mb-4 ${isLight ? "text-stone-700" : "text-white"}`}>Daily Job Volume</h3>
+      <h3 className="text-sm font-medium mb-4 text-text-primary">Daily Job Volume</h3>
       <div className="flex-1 min-h-[150px] w-full">
         <ResponsiveContainer width="100%" height="100%">
           <BarChart data={jobsData} margin={{ top: 0, right: 0, left: -20, bottom: 0 }}>

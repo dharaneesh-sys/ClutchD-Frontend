@@ -1,7 +1,7 @@
-import { Modal } from "./Modal";
-import { Button } from "./Button";
+import { Modal } from "@/components/ui/Modal";
+import { Button } from "@/components/ui/Button";
 import { AlertTriangle } from "lucide-react";
-import { useThemeStore } from "../../store/themeStore";
+import { useThemeStore } from "@/store/themeStore";
 
 export function ConfirmModal({
   isOpen,
@@ -17,36 +17,20 @@ export function ConfirmModal({
   const isLight = theme === "light";
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} title={title}>
+    <Modal isOpen={isOpen} onClose={onClose} title={title} role="alertdialog">
       <div className="text-center">
-        <div
-          className={`w-14 h-14 mx-auto mb-4 rounded-full flex items-center justify-center ${
-            variant === "danger"
-              ? isLight
-                ? "bg-red-50"
-                : "bg-red-500/10"
-              : isLight
-                ? "bg-amber-50"
-                : "bg-amber-500/10"
-          }`}
-        >
+        <div className="w-14 h-14 mx-auto mb-4 rounded-full flex items-center justify-center bg-surface-soft">
           <AlertTriangle
             size={28}
             className={
               variant === "danger"
-                ? isLight
-                  ? "text-red-500"
-                  : "text-red-400"
-                : isLight
-                  ? "text-amber-500"
-                  : "text-amber-400"
+                ? "text-red-500"
+                : "text-amber-500"
             }
           />
         </div>
         <p
-          className={`text-sm mb-6 ${
-            isLight ? "text-slate-600" : "text-white/70"
-          }`}
+          className="text-sm mb-6 text-text-muted"
         >
           {message}
         </p>
@@ -59,9 +43,7 @@ export function ConfirmModal({
             isLoading={isLoading}
             className={`flex-1 ${
               variant === "danger"
-                ? isLight
-                  ? "!bg-red-500 hover:!bg-red-600 !text-white"
-                  : "!bg-red-500/80 hover:!bg-red-500 !text-white"
+                ? "!bg-red-500 hover:!bg-red-600 !text-white"
                 : ""
             }`}
           >

@@ -1,8 +1,10 @@
-import { cn } from "../../lib/utils";
+import { cn } from "@/lib/utils";
 
 export function Skeleton({ className, variant = "text" }) {
   return (
     <div
+      aria-hidden="true"
+      tabIndex={-1}
       className={cn(
         "animate-pulse rounded-md bg-white/10",
         variant === "text" && "h-4 w-full",

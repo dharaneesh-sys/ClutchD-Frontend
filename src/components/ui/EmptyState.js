@@ -1,5 +1,5 @@
-import { cn } from "../../lib/utils";
-import { useThemeStore } from "../../store/themeStore";
+import { cn } from "@/lib/utils";
+import { useThemeStore } from "@/store/themeStore";
 
 export function EmptyState({
   icon: Icon,
@@ -37,11 +37,7 @@ export function EmptyState({
         {title}
       </h3>
       {description && (
-        <p
-          className={`text-sm max-w-sm ${
-            isLight ? "text-slate-500" : "text-white/50"
-          }`}
-        >
+        <p className="text-sm max-w-sm text-text-muted">
           {description}
         </p>
       )}

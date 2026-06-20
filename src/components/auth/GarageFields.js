@@ -1,8 +1,8 @@
 import { Building, User, Mail, Phone, MapPin, Clock, Users, Lock } from "lucide-react";
-import { Input } from "../ui/Input";
-import { MultiSelect } from "../ui/MultiSelect";
-import { FileUpload } from "../ui/FileUpload";
-import { EXPERTISE_OPTIONS } from "../../lib/constants";
+import { Input } from "@/components/ui/Input";
+import { MultiSelect } from "@/components/ui/MultiSelect";
+import { FileUpload } from "@/components/ui/FileUpload";
+import { EXPERTISE_OPTIONS } from "@/lib/constants";
 
 export function GarageFields({ register, errors, setValue, watch }) {
   const watchServices = watch("services") || [];

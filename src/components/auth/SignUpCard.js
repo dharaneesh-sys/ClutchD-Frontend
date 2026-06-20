@@ -1,17 +1,17 @@
 import { useState, useRef, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { customerSignupSchema, mechanicSignupSchema, garageSignupSchema } from "../../lib/validators";
-import { useAuthStore } from "../../store/authStore";
-import { useThemeStore } from "../../store/themeStore";
+import { customerSignupSchema, mechanicSignupSchema, garageSignupSchema } from "@/lib/validators";
+import { useAuthStore } from "@/store/authStore";
+import { useThemeStore } from "@/store/themeStore";
 import { UserCircle, Wrench, Building2, UserPlus } from "lucide-react";
-import { GlassCard } from "../ui/GlassCard";
-import { Button } from "../ui/Button";
-import { CustomerFields } from "./CustomerFields";
-import { MechanicFields } from "./MechanicFields";
-import { GarageFields } from "./GarageFields";
+import { GlassCard } from "@/components/ui/GlassCard";
+import { Button } from "@/components/ui/Button";
+import { CustomerFields } from "@/components/auth/CustomerFields";
+import { MechanicFields } from "@/components/auth/MechanicFields";
+import { GarageFields } from "@/components/auth/GarageFields";
 
-import api from "../../lib/api";
+import api from "@/lib/api";
 import { useRouter } from "next/navigation";
 
 export function SignUpCard() {
@@ -116,16 +116,18 @@ export function SignUpCard() {
     script.src = "https://accounts.google.com/gsi/client";
     script.async = true;
     script.defer = true;
+    script.integrity = "sha384-IX4ObMWsEDYKqiZlpojF/mzYgFbk0t5RQaxRysGboK0JQerbAAMxt2O1gO/Y/JnB";
+    script.crossOrigin = "anonymous";
     script.onload = initGoogle;
     document.body.appendChild(script);
 
   }, [googleClientId, loginWithGoogle, router]);
 
   return (
-    <GlassCard variant="glass-lux-strong" animateBorder className="w-full max-w-xl p-6 sm:p-8 pt-10">
+    <GlassCard variant="glass-lux-strong" className="w-full max-w-xl p-6 sm:p-8 pt-10">
       <div className="mb-8 text-center">
-        <h2 className={`text-3xl font-bold mb-2 tracking-tight ${isLight ? "text-slate-900" : "text-white"}`}>Create Account</h2>
-        <p className={isLight ? "text-slate-500" : "text-emerald-100/70"}>Join the ultimate on-demand platform</p>
+        <h2 className="text-3xl font-bold mb-2 tracking-tight text-text-primary">Create Account</h2>
+        <p className="text-text-muted">Join the ultimate on-demand platform</p>
       </div>
 
       <div className="grid grid-cols-3 gap-3 mb-8">
@@ -141,16 +143,12 @@ export function SignUpCard() {
                 flex flex-col items-center p-3 sm:p-4 rounded-xl border transition-all text-center group
                 ${
                   isSelected
-                    ? isLight
-                      ? "bg-yellow-500/15 border-yellow-500 text-slate-900 shadow-[0_0_15px_rgba(234,179,8,0.2)]"
-                      : "bg-emerald-500/20 border-emerald-400 text-white shadow-[0_0_15px_rgba(16,185,129,0.2)]"
-                    : isLight
-                      ? "bg-slate-100 border-slate-200 text-slate-500 hover:bg-yellow-50 hover:text-slate-700"
-                      : "bg-white/5 border-white/10 text-white/60 hover:bg-white/10 hover:text-white"
+                    ? "bg-surface-soft border-border-subtle text-text-primary shadow-[0_0_15px_rgba(234,179,8,0.2)]"
+                    : "bg-bg-card border-border-subtle text-text-muted hover:bg-surface-soft hover:text-text-primary"
                 }
               `}
             >
-              <Icon size={24} className={`mb-2 ${isSelected ? (isLight ? "text-yellow-600" : "text-emerald-400") : (isLight ? "text-slate-400 group-hover:text-slate-600" : "text-white/50 group-hover:text-white/80")}`} />
+              <Icon size={24} className={`mb-2 ${isSelected ? "text-icon-highlight" : "text-text-dim group-hover:text-text-primary"}`} />
               <span className="text-sm font-medium mb-1">{role.label}</span>
               <span className="text-[10px] opacity-70 leading-tight hidden sm:block">{role.desc}</span>
             </button>
@@ -178,17 +176,17 @@ export function SignUpCard() {
 
         <div className="relative my-6">
           <div className="absolute inset-0 flex items-center">
-             <div className={`w-full border-t ${isLight ? "border-slate-200" : "border-white/10"}`}></div>
+             <div className="w-full border-t border-border-subtle"></div>
           </div>
-          <div className="relative flex justify-center text-sm">
-             <span className={`px-2 ${isLight ? "bg-white text-slate-400" : "bg-[#0d3f2d] text-emerald-100/50"}`}>Or sign up with</span>
-          </div>
+           <div className="relative flex justify-center text-sm">
+              <span className="px-2 bg-primary-soft text-primary-text">Or sign up with</span>
+           </div>
         </div>
 
         <div className="w-full space-y-3">
           {googleClientId ? (
             <>
-              <div className={`w-full rounded-xl border p-3 ${isLight ? "border-slate-200 bg-slate-50" : "border-white/10 bg-white/5"}`}>
+              <div className="w-full rounded-xl border p-3 border-border-subtle bg-bg-card">
                 <div
                   id={googleContainerId}
                   ref={(el) => {
@@ -206,12 +204,12 @@ export function SignUpCard() {
                   }}
                 />
               </div>
-              <p className={`text-xs text-center ${isLight ? "text-slate-400" : "text-white/40"}`}>
-                 Google signup will use <span className={`font-medium ${isLight ? "text-yellow-700" : "text-emerald-200/80"}`}>{selectedRole}</span>.
+              <p className="text-xs text-center text-text-dim">
+                 Google signup will use <span className="font-medium text-text-primary">{selectedRole}</span>.
               </p>
             </>
           ) : (
-             <div className={`w-full p-3 rounded-xl border text-sm text-center ${isLight ? "border-slate-200 bg-slate-50 text-slate-500" : "border-white/10 bg-white/5 text-white/60"}`}>
+             <div className="w-full p-3 rounded-xl border text-sm text-center border-border-subtle bg-bg-card text-text-muted">
                Set `NEXT_PUBLIC_GOOGLE_CLIENT_ID` to enable Google.
              </div>
           )}

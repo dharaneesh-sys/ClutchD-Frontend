@@ -3,8 +3,8 @@
 import { useEffect, useState } from "react";
 import { MapContainer, TileLayer, Marker, Popup, useMap, Polyline } from "react-leaflet";
 import L from "leaflet";
-import { useTrackingStore } from "../../store/trackingStore";
-import { useThemeStore } from "../../store/themeStore";
+import { useTrackingStore } from "@/store/trackingStore";
+import { useThemeStore } from "@/store/themeStore";
 
 // Fix for default Leaflet icon in Next.js
 const customMarkerIcon = (color) => new L.Icon({
@@ -109,7 +109,7 @@ export default function MapView() {
         )}
 
         {/* Nearby Mechanics (if no active request) */}
-        {!mechanicLocation && nearbyMechanics.map(mechanic => (
+        {!mechanicLocation && nearbyMechanics.filter(m => m.location).map(mechanic => (
           <Marker 
             key={mechanic.id} 
             position={mechanic.location}
@@ -124,7 +124,7 @@ export default function MapView() {
         ))}
 
         {/* Nearby Garages (if no active request) */}
-        {!mechanicLocation && nearbyGarages.map(garage => (
+        {!mechanicLocation && nearbyGarages.filter(g => g.location).map(garage => (
           <Marker 
             key={garage.id} 
             position={garage.location}

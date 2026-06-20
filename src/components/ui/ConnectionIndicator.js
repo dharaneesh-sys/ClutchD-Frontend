@@ -1,13 +1,13 @@
 import { useState, useEffect } from "react";
-import { getConnectionState } from "../../lib/socket";
-import { useThemeStore } from "../../store/themeStore";
+import { getConnectionState } from "@/lib/socket";
+import { useThemeStore } from "@/store/themeStore";
 
 const POLL_INTERVAL = 3000;
 
 const STATE_CONFIG = {
   connected: {
     label: "Live: Connected",
-    dot: "bg-emerald-400",
+    dot: "bg-primary-light",
     pulse: false,
   },
   connecting: {

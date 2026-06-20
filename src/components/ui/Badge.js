@@ -1,5 +1,5 @@
-import { cn } from "../../lib/utils";
-import { useThemeStore } from "../../store/themeStore";
+import { cn } from "@/lib/utils";
+import { useThemeStore } from "@/store/themeStore";
 
 export function Badge({ children, className, variant = "default" }) {
   const { theme } = useThemeStore();
@@ -7,7 +7,7 @@ export function Badge({ children, className, variant = "default" }) {
 
   const darkVariants = {
     default:
-      "bg-gradient-to-b from-emerald-500/25 to-emerald-500/10 text-emerald-300 border-emerald-500/35",
+      "bg-gradient-to-b from-primary/25 to-primary/10 text-primary-light border-primary/35",
     success:
       "bg-gradient-to-b from-green-500/25 to-green-500/10 text-green-300 border-green-500/35",
     warning:

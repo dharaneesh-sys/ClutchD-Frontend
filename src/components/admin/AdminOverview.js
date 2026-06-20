@@ -2,11 +2,11 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { GlassCard } from "../ui/GlassCard";
-import { Badge } from "../ui/Badge";
-import { useThemeStore } from "../../store/themeStore";
+import { GlassCard } from "@/components/ui/GlassCard";
+import { Badge } from "@/components/ui/Badge";
+import { useThemeStore } from "@/store/themeStore";
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
-import { fetchAnalytics, fetchPendingKyc } from "../../services/adminService";
+import { fetchAnalytics, fetchPendingKyc } from "@/services/adminService";
 
 const chartData = [
   { name: 'Jan', revenue: 4000, users: 240 },
@@ -57,7 +57,7 @@ export function AdminOverview() {
   if (loading) {
     return (
       <div className="flex items-center justify-center py-20">
-        <div className={`w-8 h-8 border-2 border-t-transparent rounded-full animate-spin ${isLight ? "border-amber-500" : "border-emerald-500"}`} />
+        <div className="w-8 h-8 border-2 border-t-transparent rounded-full animate-spin border-primary" />
       </div>
     );
   }
@@ -95,16 +95,16 @@ export function AdminOverview() {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
          {statCards.map((stat, i) => (
            <GlassCard key={i} className="p-5">
-             <p className={`text-xs uppercase tracking-wider mb-2 ${isLight ? "text-stone-500" : "text-white/50"}`}>{stat.label}</p>
-             <p className={`text-2xl font-bold mb-2 ${isLight ? "text-stone-900" : "text-white"}`}>{stat.val}</p>
-             <p className={`text-xs font-medium ${isLight ? "text-emerald-600" : "text-emerald-400"}`}>{stat.trend}</p>
+             <p className={`text-xs uppercase tracking-wider mb-2 ${"text-text-muted"}`}>{stat.label}</p>
+             <p className={`text-2xl font-bold mb-2 ${"text-text-primary"}`}>{stat.val}</p>
+             <p className={`text-xs font-medium ${"text-icon-highlight"}`}>{stat.trend}</p>
            </GlassCard>
          ))}
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
          <GlassCard variant="strong" className="col-span-1 lg:col-span-2 p-6 h-[400px] flex flex-col">
-            <h3 className={`font-semibold mb-6 ${isLight ? "text-stone-900" : "text-white"}`}>Platform Growth (Revenue & Users)</h3>
+            <h3 className={`font-semibold mb-6 ${"text-text-primary"}`}>Platform Growth (Revenue & Users)</h3>
              <div className="flex-1 w-full relative min-w-0 min-h-0">
                {chartMounted && (
                <ResponsiveContainer width="100%" height="100%">
@@ -142,23 +142,23 @@ export function AdminOverview() {
 
          <GlassCard className="col-span-1 p-6 flex flex-col">
             <div className="flex justify-between items-center mb-6">
-              <h3 className={`font-semibold ${isLight ? "text-stone-900" : "text-white"}`}>Pending KYC</h3>
+              <h3 className={`font-semibold ${"text-text-primary"}`}>Pending KYC</h3>
               <Badge variant="warning">{pendingKyc.length} Awaiting</Badge>
             </div>
 
             <div className="flex-1 space-y-3">
                {pendingKyc.length === 0 ? (
-                 <p className={`text-sm ${isLight ? "text-stone-400" : "text-white/40"}`}>No pending KYC applications.</p>
+                 <p className={`text-sm ${"text-text-dim"}`}>No pending KYC applications.</p>
                ) : (
                  pendingKyc.slice(0, 5).map((app, i) => (
-                   <div key={i} className={`p-3 rounded-xl border flex items-center justify-between ${isLight ? "bg-stone-50 border-stone-200" : "bg-white/5 border-white/5"}`}>
+                   <div key={i} className={`p-3 rounded-xl border flex items-center justify-between ${"bg-bg-card border-border-subtle"}`}>
                       <div>
-                        <p className={`text-sm font-medium ${isLight ? "text-stone-800" : "text-white"}`}>{app.name}</p>
-                        <p className={`text-[10px] ${isLight ? "text-stone-400" : "text-white/50"}`}>Submitted {timeAgo(app.submitted)}</p>
+                        <p className={`text-sm font-medium ${"text-text-primary"}`}>{app.name}</p>
+                        <p className={`text-[10px] ${"text-text-muted"}`}>Submitted {timeAgo(app.submitted)}</p>
                       </div>
                       <button
                         onClick={() => router.push("/admin/kyc")}
-                        className={`px-3 py-1 rounded text-xs border transition-colors ${isLight ? "bg-amber-50 text-amber-700 border-amber-200 hover:bg-amber-100" : "bg-emerald-500/20 text-emerald-400 border-emerald-500/30 hover:bg-emerald-500/30"}`}
+                        className={`px-3 py-1 rounded text-xs border transition-colors ${"bg-surface-soft text-icon-highlight border-border-subtle hover:bg-bg-card"}`}
                       >
                         Review
                       </button>
@@ -168,7 +168,7 @@ export function AdminOverview() {
             </div>
             <button
               onClick={() => router.push("/admin/kyc")}
-              className={`w-full mt-4 py-2 text-sm transition-colors ${isLight ? "text-stone-400 hover:text-stone-600" : "text-white/50 hover:text-white"}`}
+              className={`w-full mt-4 py-2 text-sm transition-colors ${"text-text-muted hover:text-text-primary"}`}
             >
               View All Actions →
             </button>

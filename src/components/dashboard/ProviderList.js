@@ -1,10 +1,10 @@
 "use client";
 
-import { useTrackingStore } from "../../store/trackingStore";
-import { useThemeStore } from "../../store/themeStore";
+import { useTrackingStore } from "@/store/trackingStore";
+import { useThemeStore } from "@/store/themeStore";
 import { MapPin, Star, Wrench, Building2, Navigation } from "lucide-react";
-import { GlassCard } from "../ui/GlassCard";
-import { cn } from "../../lib/utils";
+import { GlassCard } from "@/components/ui/GlassCard";
+import { cn } from "@/lib/utils";
 
 export function ProviderList() {
   const { nearbyMechanics, nearbyGarages, isLoading, error } = useTrackingStore();
@@ -15,7 +15,7 @@ export function ProviderList() {
     return (
       <div className="space-y-4 animate-pulse">
         {[1, 2, 3].map((i) => (
-          <div key={i} className={`h-24 rounded-2xl ${isLight ? "bg-slate-100" : "bg-white/5"}`} />
+          <div key={i} className="h-24 rounded-2xl bg-bg-card" />
         ))}
       </div>
     );
@@ -45,7 +45,7 @@ export function ProviderList() {
 
   return (
     <div className="space-y-3 pb-4">
-      <h3 className={`px-2 text-sm font-semibold uppercase tracking-wider mb-4 ${isLight ? "text-slate-500" : "text-emerald-100/50"}`}>
+      <h3 className="px-2 text-sm font-semibold uppercase tracking-wider mb-4 text-text-muted">
         Nearby Professionals ({allProviders.length})
       </h3>
       
@@ -53,10 +53,10 @@ export function ProviderList() {
         <GlassCard 
           key={`${provider.type}-${provider.id}`} 
           variant="flat"
-          className={cn(
-            "p-4 flex items-start gap-4 hover:scale-[1.02] transition-transform cursor-pointer group",
-            isLight ? "hover:border-yellow-500/30" : "hover:border-emerald-500/30"
-          )}
+            className={cn(
+              "p-4 flex items-start gap-4 hover-lift cursor-pointer group",
+              isLight ? "hover:border-yellow-500/30" : "hover:border-primary/30"
+            )}
         >
           <div className={cn(
             "w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0",
@@ -69,7 +69,7 @@ export function ProviderList() {
           
           <div className="flex-grow min-w-0">
             <div className="flex justify-between items-start mb-1">
-              <h4 className={cn("font-bold truncate", isLight ? "text-slate-900" : "text-white")}>
+              <h4 className="font-bold truncate text-text-primary">
                 {provider.name}
               </h4>
               <div className="flex items-center gap-1 text-sm font-medium text-amber-400 flex-shrink-0 ml-2">
@@ -78,7 +78,7 @@ export function ProviderList() {
               </div>
             </div>
             
-            <div className={`flex items-center gap-2 text-xs mb-2 ${isLight ? "text-slate-500" : "text-emerald-100/60"}`}>
+            <div className="flex items-center gap-2 text-xs mb-2 text-text-muted">
               <MapPin size={12} />
               <span>{provider.distanceKm} km away</span>
               <span className="opacity-40">•</span>
@@ -90,11 +90,7 @@ export function ProviderList() {
                 {(provider.expertise || provider.services).slice(0, 3).map((tag) => (
                   <span 
                     key={tag}
-                    className={`px-2 py-0.5 rounded-full text-[10px] uppercase font-bold ${
-                      isLight 
-                        ? "bg-slate-100 text-slate-600" 
-                        : "bg-white/10 text-emerald-100/70"
-                    }`}
+                    className="px-2 py-0.5 rounded-full text-[10px] uppercase font-bold bg-badge-bg text-badge-text"
                   >
                     {tag}
                   </span>

@@ -1,13 +1,14 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { GlassCard } from "../ui/GlassCard";
-import { Button } from "../ui/Button";
-import { Badge } from "../ui/Badge";
-import { Modal } from "../ui/Modal";
+import { GlassCard } from "@/components/ui/GlassCard";
+import { Button } from "@/components/ui/Button";
+import { Badge } from "@/components/ui/Badge";
+import { Modal } from "@/components/ui/Modal";
 import { FileText, CheckCircle, XCircle } from "lucide-react";
-import { useThemeStore } from "../../store/themeStore";
-import { fetchPendingKyc, verifyMechanic, verifyGarage } from "../../services/adminService";
+import { useThemeStore } from "@/store/themeStore";
+import { useToast } from "@/components/ui/ToastProvider";
+import { fetchPendingKyc, verifyMechanic, verifyGarage } from "@/services/adminService";
 
 export function KYCApproval() {
   const [applications, setApplications] = useState([]);
@@ -15,14 +16,9 @@ export function KYCApproval() {
   const [error, setError] = useState(null);
   const [actionLoading, setActionLoading] = useState(null);
   const [confirmModal, setConfirmModal] = useState(null);
-  const [toast, setToast] = useState(null);
   const { theme } = useThemeStore();
+  const { success: showSuccess, error: showError } = useToast();
   const isLight = theme === "light";
-
-  const showToast = (message, type = "success") => {
-    setToast({ message, type });
-    setTimeout(() => setToast(null), 3000);
-  };
 
   const loadApplications = async () => {
     setLoading(true);
@@ -50,9 +46,9 @@ export function KYCApproval() {
         await verifyMechanic(app.id, true);
       }
       setApplications(prev => prev.filter(a => a.id !== app.id));
-      showToast(`${app.name} approved successfully.`);
+      showSuccess(`${app.name} approved successfully.`);
     } catch (err) {
-      showToast(err?.response?.data?.detail || "Failed to approve", "error");
+      showError(err?.response?.data?.detail || "Failed to approve");
     } finally {
       setActionLoading(null);
       setConfirmModal(null);
@@ -68,9 +64,9 @@ export function KYCApproval() {
         await verifyMechanic(app.id, false);
       }
       setApplications(prev => prev.filter(a => a.id !== app.id));
-      showToast(`${app.name} rejected.`);
+      showSuccess(`${app.name} rejected.`);
     } catch (err) {
-      showToast(err?.response?.data?.detail || "Failed to reject", "error");
+      showError(err?.response?.data?.detail || "Failed to reject");
     } finally {
       setActionLoading(null);
       setConfirmModal(null);
@@ -79,19 +75,9 @@ export function KYCApproval() {
 
   return (
     <>
-      {toast && (
-        <div className={`fixed top-4 right-4 z-[100] px-4 py-3 rounded-xl border shadow-2xl text-sm font-medium ${
-          toast.type === "error"
-            ? isLight ? "bg-red-50 border-red-200 text-red-700" : "bg-red-500/20 border-red-500/30 text-red-300"
-            : isLight ? "bg-green-50 border-green-200 text-green-700" : "bg-emerald-500/20 border-emerald-500/30 text-emerald-300"
-        }`}>
-          {toast.message}
-        </div>
-      )}
-
       {loading ? (
         <div className="col-span-full py-12 text-center">
-          <div className={`w-8 h-8 border-2 border-t-transparent rounded-full animate-spin mx-auto ${isLight ? "border-amber-500" : "border-emerald-500"}`} />
+          <div className="w-8 h-8 border-2 border-t-transparent rounded-full animate-spin mx-auto border-primary" />
         </div>
       ) : error ? (
         <div className={`col-span-full py-12 text-center ${isLight ? "text-red-500" : "text-red-400"}`}>
@@ -101,7 +87,7 @@ export function KYCApproval() {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
           {applications.length === 0 ? (
-            <div className={`col-span-full py-12 text-center ${isLight ? "text-stone-400" : "text-white/50"}`}>
+            <div className={`col-span-full py-12 text-center ${"text-text-muted"}`}>
               <FileText size={48} className="mx-auto mb-4 opacity-20" />
               <p>No pending KYC applications.</p>
             </div>
@@ -110,25 +96,25 @@ export function KYCApproval() {
               <GlassCard key={app.id} variant="elevated" className="p-5 sm:p-6 flex flex-col h-full">
                 <div className="flex justify-between items-start mb-4">
                   <div>
-                    <h3 className={`text-lg font-bold ${isLight ? "text-stone-900" : "text-white"}`}>{app.name}</h3>
-                    <p className={`text-xs font-medium ${isLight ? "text-amber-700" : "text-emerald-400"}`}>{app.type}</p>
+                    <h3 className={`text-lg font-bold ${"text-text-primary"}`}>{app.name}</h3>
+                    <p className={`text-xs font-medium ${"text-icon-highlight"}`}>{app.type}</p>
                   </div>
                   <Badge variant="warning">{app.status}</Badge>
                 </div>
 
                 <div className="mb-4">
-                  <p className={`text-xs mb-2 ${isLight ? "text-stone-400" : "text-white/40"}`}>Submitted {app.submitted}</p>
-                  <p className={`text-sm font-medium mb-1 ${isLight ? "text-stone-700" : "text-white/80"}`}>Attached Documents:</p>
-                  <ul className={`text-sm space-y-1 ${isLight ? "text-stone-500" : "text-white/60"}`}>
+                  <p className={`text-xs mb-2 ${"text-text-dim"}`}>Submitted {app.submitted}</p>
+                  <p className={`text-sm font-medium mb-1 ${"text-text-primary"}`}>Attached Documents:</p>
+                  <ul className={`text-sm space-y-1 ${"text-text-muted"}`}>
                     {app.documents.map((doc, i) => (
                       <li key={i} className="flex items-center gap-2">
-                        <FileText size={12} className={isLight ? "text-amber-500" : "text-emerald-500/70"} /> {doc}
+                        <FileText size={12} className={"text-icon-highlight"} /> {doc}
                       </li>
                     ))}
                   </ul>
                 </div>
 
-                <div className={`mt-auto grid grid-cols-2 gap-3 pt-4 border-t ${isLight ? "border-stone-200" : "border-white/5"}`}>
+                <div className={`mt-auto grid grid-cols-2 gap-3 pt-4 border-t ${"border-border-subtle"}`}>
                   <Button
                     variant="outline"
                     className={isLight ? "text-red-600 border-red-200 hover:bg-red-50 hover:text-red-700" : "text-red-400 border-red-500/30 hover:bg-red-500/10 hover:text-red-400"}
@@ -155,7 +141,7 @@ export function KYCApproval() {
         onClose={() => setConfirmModal(null)}
         title={confirmModal?.action === "approve" ? "Approve KYC" : "Reject KYC"}
       >
-        <p className={`mb-6 ${isLight ? "text-stone-600" : "text-white/70"}`}>
+        <p className={`mb-6 ${"text-text-primary"}`}>
           {confirmModal?.action === "approve"
             ? `Are you sure you want to approve ${confirmModal?.app?.name}?`
             : `Are you sure you want to reject ${confirmModal?.app?.name}?`}

@@ -1,10 +1,10 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { GlassCard } from "../ui/GlassCard";
+import { GlassCard } from "@/components/ui/GlassCard";
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
-import api from "../../lib/api";
-import { useThemeStore } from "../../store/themeStore";
+import api from "@/lib/api";
+import { useThemeStore } from "@/store/themeStore";
 import { Loader2 } from "lucide-react";
 
 export function EarningsChart() {
@@ -36,23 +36,23 @@ export function EarningsChart() {
     <GlassCard variant="strong" className="p-6 h-full flex flex-col relative">
       <div className="mb-6 flex justify-between items-end">
         <div>
-          <h2 className={`text-xl font-bold tracking-tight ${isLight ? "text-slate-900" : "text-white"}`}>Earnings Overview</h2>
-          <p className={`text-sm ${isLight ? "text-slate-500" : "text-emerald-100/60"}`}>This week</p>
+          <h2 className="text-xl font-bold tracking-tight text-text-primary">Earnings Overview</h2>
+          <p className="text-sm text-text-muted">This week</p>
         </div>
         <div className="text-right">
-          <p className={`text-sm mb-0.5 ${isLight ? "text-slate-500" : "text-emerald-100/60"}`}>Total</p>
-          <p className={`text-2xl font-bold ${isLight ? "text-yellow-600" : "text-emerald-400"}`}>₹{total}</p>
+          <p className="text-sm mb-0.5 text-text-muted">Total</p>
+          <p className="text-2xl font-bold text-icon-highlight">₹{total}</p>
         </div>
       </div>
       
       <div className="flex-1 min-h-[200px] w-full mt-4 flex items-center justify-center">
         {loading ? (
           <div className="flex flex-col items-center">
-            <Loader2 size={32} className={`animate-spin mb-2 ${isLight ? "text-yellow-500" : "text-emerald-400"}`} />
-            <span className={isLight ? "text-slate-400" : "text-white/40"}>Loading data...</span>
+            <Loader2 size={32} className="animate-spin mb-2 text-icon-highlight" />
+            <span className="text-text-dim">Loading data...</span>
           </div>
         ) : data.length === 0 ? (
-          <span className={isLight ? "text-slate-400" : "text-white/40"}>No earnings this week</span>
+          <span className="text-text-dim">No earnings this week</span>
         ) : (
           <ResponsiveContainer width="100%" height="100%">
             <AreaChart data={data} margin={{ top: 10, right: 0, left: -20, bottom: 0 }}>

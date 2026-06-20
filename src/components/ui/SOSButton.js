@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { AlertTriangle, Loader2, X } from "lucide-react";
-import { useThemeStore } from "../../store/themeStore";
-import api, { extractApiError } from "../../lib/api";
+import { useThemeStore } from "@/store/themeStore";
+import api, { extractApiError } from "@/lib/api";
 
 export function SOSButton() {
   const [loading, setLoading] = useState(false);
@@ -66,7 +66,7 @@ export function SOSButton() {
           status === "confirming"
             ? "w-48 h-14 rounded-xl bg-red-600 hover:bg-red-700 shadow-[0_0_20px_rgba(220,38,38,0.5)] cursor-pointer"
             : status === "sent"
-              ? "w-48 h-14 rounded-xl bg-emerald-600 shadow-[0_0_20px_rgba(5,150,105,0.5)] cursor-default"
+              ? "w-48 h-14 rounded-xl bg-success shadow-[0_0_20px_rgba(34,197,94,0.5)] cursor-default"
               : "w-14 h-14 rounded-full bg-red-500 hover:bg-red-600 shadow-[0_0_20px_rgba(239,68,68,0.5)] cursor-pointer"
         }`}
       >

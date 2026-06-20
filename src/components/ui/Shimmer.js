@@ -1,8 +1,4 @@
-import { cn } from "../../lib/utils";
-
-const shimmerStyles = {
-  base: "relative overflow-hidden rounded-xl",
-};
+import { cn } from "@/lib/utils";
 
 const shimmerVariants = {
   text: "h-4 w-full",
@@ -19,21 +15,19 @@ const shimmerVariants = {
 export function Shimmer({ className, variant = "text", children, ...props }) {
   return (
     <div
+      aria-hidden="true"
+      tabIndex={-1}
       className={cn(
-        shimmerStyles.base,
+        "relative overflow-hidden rounded-xl",
         shimmerVariants[variant] || shimmerVariants.text,
         className
       )}
       {...props}
     >
       <div
-        className={cn(
-          "absolute inset-0 rounded-[inherit]",
-          "bg-gradient-to-r from-transparent via-white/[0.06] to-transparent",
-          "shimmer-slide"
-        )}
+        className="absolute inset-0 rounded-[inherit] bg-gradient-to-r from-transparent via-white/[0.06] to-transparent"
         style={{
-          animation: "shimmer-slide 2s ease-in-out infinite",
+          animation: "shimmer-pulse 2s ease-in-out infinite",
           backgroundSize: "200% 100%",
         }}
       />

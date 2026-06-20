@@ -1,14 +1,15 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { GlassCard } from "../ui/GlassCard";
-import { Badge } from "../ui/Badge";
-import { ConfirmModal } from "../ui/ConfirmModal";
+import { GlassCard } from "@/components/ui/GlassCard";
+import { Badge } from "@/components/ui/Badge";
+import { ConfirmModal } from "@/components/ui/ConfirmModal";
 import { Calendar, Download, MapPin, Loader2, Wrench, ChevronDown, ChevronUp, Receipt } from "lucide-react";
-import api, { extractApiError } from "../../lib/api";
-import { useThemeStore } from "../../store/themeStore";
+import api, { extractApiError } from "@/lib/api";
+import { useThemeStore } from "@/store/themeStore";
+import { GST_RATE } from "@/lib/constants";
 import { format } from "date-fns";
-import { PaymentModal } from "./PaymentModal";
+import { PaymentModal } from "@/components/dashboard/PaymentModal";
 
 export function ServiceHistory() {
   const [history, setHistory] = useState([]);
@@ -72,18 +73,18 @@ export function ServiceHistory() {
   if (loading) {
     return (
       <div className="flex flex-col items-center justify-center p-12">
-        <Loader2 size={40} className={`animate-spin mb-4 ${isLight ? "text-yellow-500" : "text-emerald-500"}`} />
-        <p className={isLight ? "text-slate-500" : "text-white/40"}>Loading your history...</p>
+        <Loader2 size={40} className="animate-spin mb-4 text-icon-highlight" />
+        <p className="text-text-muted">Loading your history...</p>
       </div>
     );
   }
 
   if (history.length === 0) {
     return (
-      <div className={`flex flex-col items-center justify-center p-12 text-center rounded-2xl border ${isLight ? "bg-slate-50 border-slate-200" : "bg-black/20 border-white/5"}`}>
-        <Wrench size={48} className={`mb-4 opacity-50 ${isLight ? "text-slate-300" : "text-white/20"}`} />
-        <h3 className={`text-xl font-semibold mb-2 ${isLight ? "text-slate-900" : "text-white"}`}>No History Yet</h3>
-        <p className={isLight ? "text-slate-500" : "text-emerald-100/60"}>
+      <div className="flex flex-col items-center justify-center p-12 text-center rounded-2xl border bg-bg-card border-border-subtle">
+        <Wrench size={48} className="mb-4 opacity-50 text-text-dim" />
+        <h3 className="text-xl font-semibold mb-2 text-text-primary">No History Yet</h3>
+        <p className="text-text-muted">
           Your completed and cancelled service requests will appear here.
         </p>
       </div>
@@ -102,27 +103,27 @@ export function ServiceHistory() {
             <div className="flex flex-col sm:flex-row gap-4 sm:items-center justify-between">
               <div className="flex-1">
                 <div className="flex items-center gap-3 mb-2">
-                   <h4 className={`text-lg font-bold ${isLight ? "text-slate-900" : "text-white"}`}>{job.issueTag}</h4>
+                   <h4 className="text-lg font-bold text-text-primary">{job.issueTag}</h4>
                    <Badge variant={job.status === "completed" ? "success" : "danger"}>
                      {job.status.toUpperCase()}
                    </Badge>
                 </div>
-                <p className={`text-sm mb-3 line-clamp-2 ${isLight ? "text-slate-600" : "text-emerald-100/80"}`}>{job.description}</p>
+                <p className="text-sm mb-3 line-clamp-2 text-text-primary">{job.description}</p>
                 
-                <div className={`flex flex-wrap items-center gap-4 text-xs ${isLight ? "text-slate-500" : "text-emerald-100/60"}`}>
+                <div className="flex flex-wrap items-center gap-4 text-xs text-text-muted">
                    <div className="flex items-center gap-1.5">
-                     <Calendar size={14} className={isLight ? "text-yellow-600" : "text-emerald-400"} />
+                     <Calendar size={14} className="text-icon-highlight" />
                      {job.createdAt ? format(new Date(job.createdAt), "MMM d, yyyy h:mm a") : "Unknown Date"}
                    </div>
                    {job.mechanic && (
                      <div className="flex items-center gap-1.5">
-                       <Wrench size={14} className={isLight ? "text-yellow-600" : "text-emerald-400"} />
+                       <Wrench size={14} className="text-icon-highlight" />
                        Serviced by: {job.mechanic.name}
                      </div>
                    )}
                    {job.customerLocation && (
                      <div className="flex items-center gap-1.5">
-                       <MapPin size={14} className={isLight ? "text-yellow-600" : "text-emerald-400"} />
+                       <MapPin size={14} className="text-icon-highlight" />
                        {job.customerLocation.lat?.toFixed(4)}, {job.customerLocation.lng?.toFixed(4)}
                      </div>
                    )}
@@ -130,12 +131,12 @@ export function ServiceHistory() {
               </div>
               
               {job.status === "completed" && (
-                <div className={`flex sm:flex-col items-center sm:items-end justify-between pt-4 sm:pt-0 border-t sm:border-t-0 sm:border-l sm:pl-6 ${isLight ? "border-slate-200" : "border-white/10"}`}>
+                <div className="flex sm:flex-col items-center sm:items-end justify-between pt-4 sm:pt-0 border-t sm:border-t-0 sm:border-l sm:pl-6 border-border-subtle">
                   <div className="text-left sm:text-right mb-0 sm:mb-3">
-                    <p className={`text-[10px] uppercase tracking-wider mb-1 ${isLight ? "text-slate-400" : "text-emerald-100/50"}`}>
+                    <p className="text-[10px] uppercase tracking-wider mb-1 text-text-dim">
                       {job.isPaid ? "Amount Paid" : "Amount Due"}
                     </p>
-                    <p className={`text-xl font-bold ${isLight ? "text-yellow-600" : "text-emerald-400"}`}>
+                    <p className="text-xl font-bold text-icon-highlight">
                       ₹{displayAmount.toFixed ? displayAmount.toFixed(2) : displayAmount}
                     </p>
                   </div>
@@ -144,7 +145,7 @@ export function ServiceHistory() {
                     {!job.isPaid ? (
                       <button 
                         onClick={() => setPaymentJob(job)}
-                        className={`flex items-center gap-1.5 px-4 py-1.5 rounded-lg text-xs font-semibold text-white shadow transition-transform active:scale-95 ${isLight ? "bg-yellow-600 hover:bg-yellow-500" : "bg-emerald-600 hover:bg-emerald-500"}`}
+                        className="flex items-center gap-1.5 px-4 py-1.5 rounded-lg text-xs font-semibold text-white shadow transition-transform active:scale-95 bg-primary-strong hover:bg-primary"
                       >
                         Pay Now
                       </button>
@@ -153,11 +154,7 @@ export function ServiceHistory() {
                         {pricing && (
                           <button 
                             onClick={() => toggleInvoice(job.id)}
-                            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors ${
-                              isLight 
-                                ? "bg-yellow-50 text-yellow-700 hover:bg-yellow-100 border border-yellow-200" 
-                                : "bg-emerald-500/10 text-emerald-300 hover:bg-emerald-500/20 border border-emerald-500/20"
-                            }`}
+                            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors bg-surface-soft text-icon-highlight hover:opacity-80 border border-border-subtle"
                           >
                             <Receipt size={14} />
                             Invoice
@@ -166,11 +163,7 @@ export function ServiceHistory() {
                         )}
                         <button 
                           onClick={() => downloadInvoice(job.id)}
-                          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors ${
-                            isLight 
-                              ? "bg-slate-100 text-slate-700 hover:bg-yellow-50 hover:text-yellow-700 active:bg-yellow-100" 
-                              : "bg-white/10 text-white hover:bg-white/20 active:bg-white/30"
-                          }`}
+                          className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors bg-bg-card text-text-primary hover:bg-surface-soft hover:text-icon-highlight active:bg-surface-soft"
                         >
                           <Download size={14} />
                           PDF
@@ -190,45 +183,45 @@ export function ServiceHistory() {
 
             {/* Inline Invoice Breakdown */}
             {isExpanded && pricing && (
-              <div className={`mt-4 p-4 rounded-xl border space-y-2 text-sm animate-in slide-in-from-top-1 ${isLight ? "bg-gradient-to-br from-yellow-50 to-orange-50 border-yellow-200" : "bg-gradient-to-br from-emerald-950/30 to-black/30 border-emerald-500/20"}`}>
+              <div className="mt-4 p-4 rounded-xl border space-y-2 text-sm animate-in slide-in-from-top-1 bg-surface-soft border-border-subtle">
                 <div className="flex items-center gap-2 mb-3">
-                  <Receipt size={16} className={isLight ? "text-yellow-600" : "text-emerald-400"} />
-                  <h5 className={`font-bold text-sm ${isLight ? "text-slate-800" : "text-white"}`}>
+                  <Receipt size={16} className="text-icon-highlight" />
+                  <h5 className="font-bold text-sm text-text-primary">
                     Invoice #{job.id.substring(0, 8).toUpperCase()}
                   </h5>
                 </div>
 
-                <div className={`flex justify-between ${isLight ? "text-slate-600" : "text-emerald-100/80"}`}>
+                <div className="flex justify-between text-text-primary">
                   <span>Service Fee</span>
                   <span className="font-medium">₹{pricing.serviceAmount?.toFixed(2) ?? "0.00"}</span>
                 </div>
-                <div className={`flex justify-between ${isLight ? "text-slate-600" : "text-emerald-100/80"}`}>
+                <div className="flex justify-between text-text-primary">
                   <span>Convenience Fee</span>
                   <span className="font-medium">₹{pricing.convenienceFee?.toFixed(2) ?? "0.00"}</span>
                 </div>
-                <div className={`flex justify-between ${isLight ? "text-slate-600" : "text-emerald-100/80"}`}>
+                <div className="flex justify-between text-text-primary">
                   <span>Cancellation Fee</span>
                   <span className="font-medium">₹{pricing.cancellationFee?.toFixed(2) ?? "0.00"}</span>
                 </div>
-                <div className={`flex justify-between ${isLight ? "text-slate-600" : "text-emerald-100/80"}`}>
+                <div className="flex justify-between text-text-primary">
                   <span>Distance ({pricing.distanceKm?.toFixed(1) ?? "0.0"} km)</span>
                   <span className="font-medium">₹{pricing.distanceFee?.toFixed(2) ?? "0.00"}</span>
                 </div>
-                <div className={`flex justify-between ${isLight ? "text-slate-600" : "text-emerald-100/80"}`}>
-                  <span>GST (18%)</span>
+                <div className="flex justify-between text-text-primary">
+                  <span>GST ({GST_RATE * 100}%)</span>
                   <span className="font-medium">₹{pricing.gstAmount?.toFixed(2) ?? "0.00"}</span>
                 </div>
-                <div className={`border-t pt-2 mt-2 flex justify-between font-bold ${isLight ? "border-yellow-300 text-slate-900" : "border-emerald-500/30 text-white"}`}>
+                <div className="border-t pt-2 mt-2 flex justify-between font-bold border-border-subtle text-text-primary">
                   <span>Grand Total</span>
-                  <span className={isLight ? "text-yellow-600" : "text-emerald-400"}>₹{pricing.totalAmount?.toFixed(2) ?? "0.00"}</span>
+                  <span className="text-icon-highlight">₹{pricing.totalAmount?.toFixed(2) ?? "0.00"}</span>
                 </div>
 
-                <div className={`mt-3 pt-2 border-t space-y-1 ${isLight ? "border-yellow-200" : "border-white/5"}`}>
-                  <p className={`text-[10px] ${isLight ? "text-slate-400" : "text-white/30"}`}>
+                <div className="mt-3 pt-2 border-t space-y-1 border-border-subtle">
+                  <p className="text-[10px] text-text-dim">
                     Service fee paid to your provider • Platform fees paid to ClutchD
                   </p>
                   {pricing.providerUpiId && (
-                    <p className={`text-[10px] ${isLight ? "text-slate-400" : "text-white/30"}`}>
+                    <p className="text-[10px] text-text-dim">
                       Provider UPI: {pricing.providerUpiId}
                     </p>
                   )}

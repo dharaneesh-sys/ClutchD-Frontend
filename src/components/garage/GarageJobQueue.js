@@ -1,14 +1,16 @@
 import { useState, useEffect } from "react";
-import { GlassCard } from "../ui/GlassCard";
-import { Button } from "../ui/Button";
-import { Badge } from "../ui/Badge";
-import { Modal } from "../ui/Modal";
-import { ConfirmModal } from "../ui/ConfirmModal";
-import { Input } from "../ui/Input";
+import { GlassCard } from "@/components/ui/GlassCard";
+import { Button } from "@/components/ui/Button";
+import { Badge } from "@/components/ui/Badge";
+import { Modal } from "@/components/ui/Modal";
+import { ConfirmModal } from "@/components/ui/ConfirmModal";
+import { Input } from "@/components/ui/Input";
 import { Clock, MapPin, Settings, Loader2, IndianRupee, AlertTriangle } from "lucide-react";
-import { AssignMechanicModal } from "./AssignMechanicModal";
-import api from "../../lib/api";
-import { useThemeStore } from "../../store/themeStore";
+import { AssignMechanicModal } from "@/components/garage/AssignMechanicModal";
+import api from "@/lib/api";
+import { useThemeStore } from "@/store/themeStore";
+import { FEE_CONSTANTS } from "@/lib/constants";
+import { useToast } from "@/components/ui/ToastProvider";
 import { formatDistanceToNow } from "date-fns";
 
 export function GarageJobQueue() {
@@ -18,6 +20,7 @@ export function GarageJobQueue() {
   const [selectedJob, setSelectedJob] = useState(null);
   
   const { theme } = useThemeStore();
+  const { success: showSuccess, error: showError } = useToast();
   const isLight = theme === "light";
 
   // --- Job Completion Modal State ---
@@ -26,14 +29,8 @@ export function GarageJobQueue() {
   const [serviceAmount, setServiceAmount] = useState("");
   const [submittingPrice, setSubmittingPrice] = useState(false);
   const [priceError, setPriceError] = useState("");
-  const [toast, setToast] = useState(null);
   const [deleteJob, setDeleteJob] = useState(null);
   const [deleteLoading, setDeleteLoading] = useState(false);
-
-  const showToast = (message) => {
-    setToast(message);
-    setTimeout(() => setToast(null), 3000);
-  };
 
   const fetchJobs = async () => {
     try {
@@ -106,7 +103,7 @@ export function GarageJobQueue() {
       });
       setJobs(jobs.filter(j => j.id !== completionJobId));
       setCompletionModal(false);
-      showToast(`Invoice of ₹${amount} sent to customer. Awaiting payment.`);
+      showSuccess(`Invoice of ₹${amount} sent to customer. Awaiting payment.`);
     } catch (err) {
       setPriceError(err.response?.data?.detail || "Failed to submit price. Please try again.");
     } finally {
@@ -116,19 +113,12 @@ export function GarageJobQueue() {
 
   return (
     <GlassCard variant="strong" className="p-6 h-full flex flex-col relative">
-      {/* Toast Notification */}
-      {toast && (
-        <div className={`absolute top-4 left-1/2 -translate-x-1/2 z-50 flex items-center gap-2 px-4 py-3 backdrop-blur-xl rounded-xl shadow-lg animate-in slide-in-from-top-2 max-w-[90%] ${isLight ? "bg-green-50 border border-green-200" : "bg-emerald-500/20 border border-emerald-500/30"}`}>
-          <IndianRupee size={16} className={isLight ? "text-green-600 shrink-0" : "text-emerald-400 shrink-0"} />
-          <span className={`text-sm font-medium ${isLight ? "text-green-800" : "text-emerald-100"}`}>{toast}</span>
-        </div>
-      )}
 
       <div className="flex justify-between items-center mb-6">
-        <div>
-           <h2 className={`text-xl font-bold tracking-tight ${isLight ? "text-slate-900" : "text-white"}`}>Garage Queue</h2>
-           <p className={`text-sm ${isLight ? "text-slate-500" : "text-emerald-100/60"}`}>Dispatch to your staff</p>
-        </div>
+         <div>
+            <h2 className="text-xl font-bold tracking-tight text-text-primary">Garage Queue</h2>
+            <p className="text-sm text-text-muted">Dispatch to your staff</p>
+         </div>
         <Badge variant="warning" className="animate-pulse">
            {jobs.filter(j => j.status === 'searching' || j.status === 'assigned_to_garage').length} Unassigned
         </Badge>
@@ -137,11 +127,11 @@ export function GarageJobQueue() {
       <div className="flex-1 overflow-y-auto pr-2 custom-scrollbar space-y-4">
         {loading && jobs.length === 0 ? (
           <div className="h-full flex flex-col items-center justify-center">
-            <Loader2 size={40} className={`mb-4 animate-spin ${isLight ? "text-yellow-500" : "text-emerald-500"}`} />
-            <p className={isLight ? "text-slate-500" : "text-white/40"}>Loading jobs...</p>
+            <Loader2 size={40} className="mb-4 animate-spin text-icon-highlight" />
+            <p className="text-text-dim">Loading jobs...</p>
           </div>
         ) : jobs.length === 0 ? (
-           <div className={`h-full flex flex-col items-center justify-center ${isLight ? "text-slate-400" : "text-white/40"}`}>
+           <div className="h-full flex flex-col items-center justify-center text-text-dim">
              <Clock size={40} className="mb-4 opacity-50" />
              <p>No active jobs.</p>
            </div>
@@ -152,11 +142,11 @@ export function GarageJobQueue() {
             return (
               <div key={job.id} className={`p-4 rounded-xl border transition-all ${
                 !isUnassigned 
-                  ? (isLight ? 'bg-slate-50 border-slate-200 opacity-80' : 'bg-black/20 border-white/5 opacity-80')
-                  : (isLight ? 'bg-white border-yellow-200 shadow-sm' : 'bg-white/5 border-emerald-500/30')
+                  ? 'bg-surface-soft border-border-subtle opacity-80'
+                  : 'bg-bg-card border-border-subtle shadow-sm'
               }`}>
                 <div className="flex justify-between items-start mb-2">
-                  <h4 className={`font-semibold ${isLight ? "text-slate-900" : "text-white"}`}>Customer</h4>
+                  <h4 className="font-semibold text-text-primary">Customer</h4>
                   <Badge variant={!isUnassigned ? 'success' : 'danger'}>
                     {job.status.toUpperCase()}
                   </Badge>
@@ -164,12 +154,12 @@ export function GarageJobQueue() {
                 
                 <div className="mb-3">
                   <p className="text-sm font-medium text-red-400 mb-1">{job.issueTag}</p>
-                  <p className={`text-sm mb-2 ${isLight ? "text-slate-600" : "text-emerald-100/80"}`}>{job.description}</p>
-                  <div className={`flex items-center justify-between text-xs ${isLight ? "text-slate-500" : "text-emerald-100/60"}`}>
-                     <div className="flex items-center gap-1">
-                       <MapPin size={12} className={isLight ? "text-yellow-600" : "text-emerald-400"} />
-                       {job.customerLat?.toFixed(4)}, {job.customerLng?.toFixed(4)}
-                     </div>
+                  <p className="text-sm mb-2 text-text-muted">{job.description}</p>
+                  <div className="flex items-center justify-between text-xs text-text-muted">
+                      <div className="flex items-center gap-1">
+                        <MapPin size={12} className="text-icon-highlight" />
+                        {job.customerLat?.toFixed(4)}, {job.customerLng?.toFixed(4)}
+                      </div>
                      <div className="flex items-center gap-1">
                        <Clock size={12} />
                        {job.createdAt ? formatDistanceToNow(new Date(job.createdAt), { addSuffix: true }) : "recently"}
@@ -177,10 +167,10 @@ export function GarageJobQueue() {
                   </div>
                 </div>
 
-                <div className={`border-t pt-3 mt-3 flex items-center justify-between ${isLight ? "border-slate-100" : "border-white/5"}`}>
+                <div className="border-t pt-3 mt-3 flex items-center justify-between border-border-subtle">
                   <div>
-                    <p className={`text-[10px] uppercase tracking-wider mb-0.5 ${isLight ? "text-slate-400" : "text-emerald-100/50"}`}>Est. Value</p>
-                    <p className={`font-bold ${isLight ? "text-yellow-600" : "text-emerald-300"}`}>
+                    <p className="text-[10px] uppercase tracking-wider mb-0.5 text-text-dim">Est. Value</p>
+                    <p className="font-bold text-icon-highlight">
                       ₹{job.priceEstimate?.min || 0} - ₹{job.priceEstimate?.max || 0}
                     </p>
                   </div>
@@ -195,13 +185,13 @@ export function GarageJobQueue() {
                         <IndianRupee size={14} className="mr-1" /> Bill Customer
                       </Button>
                     ) : (
-                      <div className="text-right">
-                         <p className={`text-[10px] uppercase tracking-wider mb-0.5 ${isLight ? "text-slate-400" : "text-emerald-100/50"}`}>Assigned To</p>
-                         <p className={`font-bold text-sm flex items-center justify-end ${isLight ? "text-slate-900" : "text-white"}`}>
-                           <Settings size={12} className={`mr-1 ${isLight ? "text-yellow-600" : "text-emerald-400"}`} /> 
-                           {job.mechanic?.name || "Mechanic"}
-                         </p>
-                      </div>
+                       <div className="text-right">
+                          <p className="text-[10px] uppercase tracking-wider mb-0.5 text-text-dim">Assigned To</p>
+                          <p className="font-bold text-sm flex items-center justify-end text-text-primary">
+                            <Settings size={12} className="mr-1 text-icon-highlight" /> 
+                            {job.mechanic?.name || "Mechanic"}
+                          </p>
+                       </div>
                     )}
                     <button
                       onClick={() => setDeleteJob(job)}
@@ -228,10 +218,10 @@ export function GarageJobQueue() {
       {/* ── Job Completion Modal ── */}
       <Modal isOpen={completionModal} onClose={() => setCompletionModal(false)} title="Submit Service Bill">
         <div className="text-center mb-6">
-          <div className={`w-16 h-16 mx-auto rounded-full flex items-center justify-center mb-4 ${isLight ? "bg-yellow-500/15" : "bg-emerald-500/20"}`}>
-            <IndianRupee size={32} className={isLight ? "text-yellow-600" : "text-emerald-400"} />
+          <div className="w-16 h-16 mx-auto rounded-full flex items-center justify-center mb-4 bg-surface-soft">
+            <IndianRupee size={32} className="text-icon-highlight" />
           </div>
-          <p className={`text-sm ${isLight ? "text-slate-500" : "text-emerald-100/60"}`}>
+          <p className="text-sm text-text-muted">
             Enter the service charge for the work completed. Additional fees (convenience, distance, GST) will be automatically calculated and added to the customer&apos;s bill.
           </p>
         </div>
@@ -246,7 +236,7 @@ export function GarageJobQueue() {
         />
 
         {priceError && (
-          <div className={`mt-3 flex items-center gap-2 p-3 rounded-xl text-sm ${isLight ? "bg-red-50 border border-red-200 text-red-700" : "bg-red-500/10 border border-red-500/30 text-red-300"}`}>
+          <div className="mt-3 flex items-center gap-2 p-3 rounded-xl text-sm bg-red-500/10 border border-red-500/30 text-red-400">
             <AlertTriangle size={14} className="shrink-0" />
             {priceError}
           </div>
@@ -254,33 +244,33 @@ export function GarageJobQueue() {
 
         {/* Fee Preview */}
         {serviceAmount && parseFloat(serviceAmount) > 0 && (
-          <div className={`mt-4 p-4 rounded-xl border text-sm space-y-2 ${isLight ? "bg-slate-50 border-slate-200" : "bg-black/20 border-white/5"}`}>
-            <p className={`text-xs uppercase tracking-wider font-semibold mb-2 ${isLight ? "text-slate-400" : "text-emerald-100/50"}`}>Customer will be charged</p>
-            <div className={`flex justify-between ${isLight ? "text-slate-600" : "text-emerald-100/80"}`}>
+          <div className="mt-4 p-4 rounded-xl border text-sm space-y-2 bg-bg-card border-border-subtle">
+            <p className="text-xs uppercase tracking-wider font-semibold mb-2 text-text-dim">Customer will be charged</p>
+            <div className="flex justify-between text-text-muted">
               <span>Service Fee</span>
               <span className="font-medium">₹{parseFloat(serviceAmount).toFixed(2)}</span>
             </div>
-            <div className={`flex justify-between ${isLight ? "text-slate-600" : "text-emerald-100/80"}`}>
+            <div className="flex justify-between text-text-muted">
               <span>Convenience Fee</span>
-              <span className="font-medium">₹40.00</span>
+              <span className="font-medium">₹{FEE_CONSTANTS.PLATFORM_FEE_FLAT}.00</span>
             </div>
-            <div className={`flex justify-between ${isLight ? "text-slate-600" : "text-emerald-100/80"}`}>
+            <div className="flex justify-between text-text-muted">
               <span>Cancellation Fee</span>
-              <span className="font-medium">₹30.00</span>
+              <span className="font-medium">₹{FEE_CONSTANTS.CANCELLATION_FEE}.00</span>
             </div>
-            <div className={`flex justify-between ${isLight ? "text-slate-600" : "text-emerald-100/80"}`}>
+            <div className="flex justify-between text-text-muted">
               <span>Distance Fee</span>
               <span className="font-medium text-xs italic">calculated</span>
             </div>
-            <div className={`flex justify-between ${isLight ? "text-slate-600" : "text-emerald-100/80"}`}>
-              <span>GST (18%)</span>
+            <div className="flex justify-between text-text-muted">
+              <span>GST ({FEE_CONSTANTS.GST_RATE * 100}%)</span>
               <span className="font-medium text-xs italic">calculated</span>
             </div>
-            <div className={`border-t pt-2 mt-2 flex justify-between font-bold ${isLight ? "border-slate-200 text-slate-900" : "border-white/10 text-white"}`}>
+            <div className="border-t pt-2 mt-2 flex justify-between font-bold border-border-subtle text-text-primary">
               <span>Estimated Total</span>
-              <span>₹{(((parseFloat(serviceAmount) + 40 + 30) * 1.18)).toFixed(2)}+</span>
+              <span>₹{(((parseFloat(serviceAmount) + FEE_CONSTANTS.PLATFORM_FEE_FLAT + FEE_CONSTANTS.CANCELLATION_FEE) * (1 + FEE_CONSTANTS.GST_RATE))).toFixed(2)}+</span>
             </div>
-            <p className={`text-[10px] ${isLight ? "text-slate-400" : "text-white/30"}`}>
+            <p className="text-[10px] text-text-dim">
               * Distance fee will be added based on actual distance. Night surcharge applies after 8 PM.
             </p>
           </div>
@@ -307,7 +297,7 @@ export function GarageJobQueue() {
             fetchJobs();
             setDeleteJob(null);
           } catch (e) {
-            showToast(`Failed to delete job: ${e.response?.data?.detail || e.message}`);
+            showError(`Failed to delete job: ${e.response?.data?.detail || e.message}`);
             setDeleteJob(null);
           } finally {
             setDeleteLoading(false);

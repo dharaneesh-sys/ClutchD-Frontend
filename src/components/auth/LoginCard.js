@@ -1,14 +1,14 @@
 import { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { loginSchema } from "../../lib/validators";
-import { useAuthStore } from "../../store/authStore";
-import { useThemeStore } from "../../store/themeStore";
+import { loginSchema } from "@/lib/validators";
+import { useAuthStore } from "@/store/authStore";
+import { useThemeStore } from "@/store/themeStore";
 import { Mail, Lock, LogIn, UserCircle, Wrench, Building2 } from "lucide-react";
-import { GlassCard } from "../ui/GlassCard";
-import { Button } from "../ui/Button";
-import { Input } from "../ui/Input";
-import api from "../../lib/api";
+import { GlassCard } from "@/components/ui/GlassCard";
+import { Button } from "@/components/ui/Button";
+import { Input } from "@/components/ui/Input";
+import api from "@/lib/api";
 
 import { useRouter } from "next/navigation";
 
@@ -104,6 +104,8 @@ export function LoginCard() {
     script.src = "https://accounts.google.com/gsi/client";
     script.async = true;
     script.defer = true;
+    script.integrity = "sha384-IX4ObMWsEDYKqiZlpojF/mzYgFbk0t5RQaxRysGboK0JQerbAAMxt2O1gO/Y/JnB";
+    script.crossOrigin = "anonymous";
     script.onload = initGoogle;
     document.body.appendChild(script);
 
@@ -162,10 +164,10 @@ export function LoginCard() {
 
   if (view === "forgot_email") {
     return (
-      <GlassCard variant="glass-lux-strong" animateBorder className="w-full max-w-md p-8 pt-10">
+      <GlassCard variant="glass-lux-strong" className="w-full max-w-md p-8 pt-10">
         <div className="mb-8 text-center">
-          <h2 className={`text-2xl font-bold mb-2 tracking-tight ${isLight ? "text-slate-900" : "text-white"}`}>Reset Password</h2>
-          <p className={isLight ? "text-slate-500" : "text-emerald-100/70"}>Enter your email to receive a recovery code.</p>
+          <h2 className="text-2xl font-bold mb-2 tracking-tight text-text-primary">Reset Password</h2>
+          <p className="text-text-muted">Enter your email to receive a recovery code.</p>
         </div>
         <form onSubmit={handleForgotRequest} className="space-y-4">
           <Input 
@@ -187,21 +189,21 @@ export function LoginCard() {
           <button 
              type="button" 
              onClick={() => setView("login")} 
-             className={`w-full text-sm mt-4 text-center hover:underline ${isLight ? "text-slate-500" : "text-white/60"}`}
+              className={`w-full text-sm mt-4 text-center hover:underline text-text-muted`}
           >
              Back to Login
-          </button>
-        </form>
-      </GlassCard>
-    );
-  }
+           </button>
+         </form>
+       </GlassCard>
+     );
+   }
 
-  if (view === "forgot_code") {
+   if (view === "forgot_code") {
     return (
-      <GlassCard variant="glass-lux-strong" animateBorder className="w-full max-w-md p-8 pt-10">
+      <GlassCard variant="glass-lux-strong" className="w-full max-w-md p-8 pt-10">
         <div className="mb-8 text-center">
-          <h2 className={`text-2xl font-bold mb-2 tracking-tight ${isLight ? "text-slate-900" : "text-white"}`}>Enter Code</h2>
-          <p className={isLight ? "text-slate-500" : "text-emerald-100/70"}>Check your terminal logs for the 6-digit code.</p>
+          <h2 className="text-2xl font-bold mb-2 tracking-tight text-text-primary">Enter Code</h2>
+          <p className="text-text-muted">Check your terminal logs for the 6-digit code.</p>
         </div>
         <form onSubmit={handleForgotReset} className="space-y-4">
           <Input 
@@ -231,20 +233,20 @@ export function LoginCard() {
           <button 
              type="button" 
              onClick={() => setView("login")} 
-             className={`w-full text-sm mt-4 text-center hover:underline ${isLight ? "text-slate-500" : "text-white/60"}`}
+              className={`w-full text-sm mt-4 text-center hover:underline text-text-muted`}
           >
              Back to Login
-          </button>
-        </form>
-      </GlassCard>
-    );
-  }
+           </button>
+         </form>
+       </GlassCard>
+     );
+   }
 
-  return (
-    <GlassCard variant="glass-lux-strong" animateBorder className="w-full max-w-md p-8 pt-10">
+   return (
+    <GlassCard variant="glass-lux-strong" className="w-full max-w-md p-8 pt-10">
       <div className="mb-8 text-center">
-        <h2 className={`text-3xl font-bold mb-2 tracking-tight ${isLight ? "text-slate-900" : "text-white"}`}>Welcome Back</h2>
-        <p className={isLight ? "text-slate-500" : "text-emerald-100/70"}>Sign in to your ClutchD account</p>
+        <h2 className="text-3xl font-bold mb-2 tracking-tight text-text-primary">Welcome Back</h2>
+        <p className="text-text-muted">Sign in to your ClutchD account</p>
       </div>
 
       <div className="grid grid-cols-3 gap-3 mb-6">
@@ -260,18 +262,14 @@ export function LoginCard() {
                 flex flex-col items-center p-3 rounded-xl border transition-all text-center group
                 ${
                   isSelected
-                    ? isLight
-                      ? "bg-yellow-500/15 border-yellow-500 text-slate-900 shadow-[0_0_15px_rgba(234,179,8,0.2)]"
-                      : "bg-emerald-500/20 border-emerald-400 text-white shadow-[0_0_15px_rgba(16,185,129,0.2)]"
-                    : isLight
-                      ? "bg-slate-100 border-slate-200 text-slate-500 hover:bg-yellow-50 hover:text-slate-700"
-                      : "bg-white/5 border-white/10 text-white/60 hover:bg-white/10 hover:text-white"
+                    ? "bg-surface-soft border-border-subtle text-text-primary shadow-[0_0_15px_rgba(234,179,8,0.2)]"
+                    : "bg-bg-card border-border-subtle text-text-muted hover:bg-surface-soft hover:text-text-primary"
                 }
               `}
             >
               <Icon
                 size={24}
-                className={`mb-2 ${isSelected ? (isLight ? "text-yellow-600" : "text-emerald-400") : isLight ? "text-slate-400 group-hover:text-slate-600" : "text-white/50 group-hover:text-white/80"}`}
+                className={`mb-2 ${isSelected ? "text-icon-highlight" : "text-text-dim group-hover:text-text-primary"}`}
               />
               <span className="text-sm font-medium mb-1">{role.label}</span>
               <span className="text-[10px] opacity-70 leading-tight hidden sm:block">{role.desc}</span>
@@ -303,7 +301,7 @@ export function LoginCard() {
             <button
               type="button"
               onClick={() => setView("forgot_email")}
-              className={`text-sm font-medium transition-colors ${isLight ? "text-yellow-600 hover:text-yellow-700" : "text-emerald-400 hover:text-emerald-300"}`}
+              className="text-sm font-medium transition-colors text-icon-highlight"
             >
               Forgot password?
             </button>
@@ -323,17 +321,17 @@ export function LoginCard() {
 
         <div className="relative my-6">
           <div className="absolute inset-0 flex items-center">
-            <div className={`w-full border-t ${isLight ? "border-slate-200" : "border-white/10"}`}></div>
+            <div className="w-full border-t border-border-subtle"></div>
           </div>
-          <div className="relative flex justify-center text-sm">
-            <span className={`px-2 ${isLight ? "bg-white text-stone-400" : "bg-zinc-900 text-emerald-100/50"}`}>Or continue with</span>
-          </div>
+           <div className="relative flex justify-center text-sm">
+             <span className="px-2 bg-primary-soft text-primary-text">Or continue with</span>
+           </div>
         </div>
 
         <div className="w-full space-y-3">
           {googleClientId ? (
             <>
-              <div className={`w-full rounded-xl border p-3 ${isLight ? "border-slate-200 bg-slate-50" : "border-white/10 bg-white/5"}`}>
+              <div className="w-full rounded-xl border p-3 border-border-subtle bg-bg-card">
                 <div
                   id={googleContainerId}
                   ref={(el) => {
@@ -351,12 +349,12 @@ export function LoginCard() {
                   }}
                 />
               </div>
-              <p className={`text-xs text-center ${isLight ? "text-slate-400" : "text-white/40"}`}>
-                Google login will continue as <span className={`font-medium ${isLight ? "text-yellow-700" : "text-emerald-200/80"}`}>{selectedRole}</span>.
+              <p className="text-xs text-center text-text-dim">
+                Google login will continue as <span className="font-medium text-text-primary">{selectedRole}</span>.
               </p>
             </>
           ) : (
-            <div className={`w-full p-3 rounded-xl border text-sm text-center ${isLight ? "border-slate-200 bg-slate-50 text-slate-500" : "border-white/10 bg-white/5 text-white/60"}`}>
+            <div className="w-full p-3 rounded-xl border text-sm text-center border-border-subtle bg-bg-card text-text-muted">
               Set `NEXT_PUBLIC_GOOGLE_CLIENT_ID` to enable Google login.
             </div>
           )}
