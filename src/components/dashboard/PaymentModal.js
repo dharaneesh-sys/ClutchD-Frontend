@@ -48,11 +48,16 @@ export function PaymentModal({ isOpen, onClose, amount, pricing, jobId, onSucces
     };
   }, []);
 
+  useEffect(() => {
+    if (payState === "success") {
+      showSuccess(`₹${displayAmount.toFixed(2)} paid successfully`);
+    }
+  }, [payState, displayAmount, showSuccess]);
+
   // Reset state when modal opens
   useEffect(() => {
     if (isOpen) {
       setPayState("idle");
-      setErrorMsg("");
       setQrData(null);
       setShowBreakdown(false);
       if (qrPollRef.current) clearInterval(qrPollRef.current);
@@ -88,7 +93,6 @@ export function PaymentModal({ isOpen, onClose, amount, pricing, jobId, onSucces
 
   const handleRazorpayCheckout = async (preferredMethod) => {
     setPayState("processing");
-    setErrorMsg("");
 
     try {
       // 1. Create order on backend
@@ -102,7 +106,7 @@ export function PaymentModal({ isOpen, onClose, amount, pricing, jobId, onSucces
       const loaded = await loadRazorpayScript();
       if (!loaded) {
         setPayState("failed");
-        setErrorMsg("Failed to load payment gateway. Please try again.");
+        showError("Failed to load payment gateway. Please try again.");
         return;
       }
 
@@ -163,7 +167,6 @@ export function PaymentModal({ isOpen, onClose, amount, pricing, jobId, onSucces
 
   const handleQRPayment = async () => {
     setPayState("processing");
-    setErrorMsg("");
     try {
       const { data } = await api.post("/payments/qr", {
         job_id: jobId,
@@ -227,11 +230,7 @@ export function PaymentModal({ isOpen, onClose, amount, pricing, jobId, onSucces
     }
   };
 
-  // Success state
   if (payState === "success") {
-    useEffect(() => {
-      showSuccess(`₹${displayAmount.toFixed(2)} paid successfully`);
-    }, []);
     return (
       <Modal isOpen={isOpen} onClose={onClose} title="Payment Successful">
         <div className="text-center py-8">
@@ -305,7 +304,7 @@ export function PaymentModal({ isOpen, onClose, amount, pricing, jobId, onSucces
         {METHODS.map(({ id, label, desc, icon: Icon }) => (
           <div
             key={id}
-            onClick={() => { setMethod(id); setQrData(null); setPayState("idle"); setErrorMsg(""); }}
+            onClick={() => { setMethod(id); setQrData(null); setPayState("idle"); }}
             className={`flex items-center gap-4 p-3.5 rounded-xl border cursor-pointer transition-all ${
               method === id
                 ? "bg-surface-soft border-border-subtle shadow-[0_0_10px_rgba(234,179,8,0.12)]"

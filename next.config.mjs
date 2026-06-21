@@ -19,7 +19,7 @@ const nextConfig = {
           {
             key: "Content-Security-Policy",
             value:
-              "default-src 'self'; script-src 'self' https://accounts.google.com https://checkout.razorpay.com 'unsafe-inline' https://raw.githubusercontent.com; style-src 'self' 'unsafe-inline' https://unpkg.com; img-src 'self' data: https:; connect-src 'self' https://nominatim.openstreetmap.org https://router.project-osrm.org wss:; font-src 'self' data:; frame-src https://accounts.google.com",
+              "default-src 'self'; script-src 'self' https://accounts.google.com https://checkout.razorpay.com 'unsafe-inline' 'unsafe-eval' https://raw.githubusercontent.com; style-src 'self' 'unsafe-inline' https://unpkg.com; img-src 'self' data: https:; connect-src 'self' https://nominatim.openstreetmap.org https://router.project-osrm.org wss:; font-src 'self' data:; frame-src https://accounts.google.com",
           },
         ],
       },
