@@ -857,7 +857,7 @@ Max Concurrent: 8 (Wave 1, Wave 2A)
   - Message: `feat(demo): add compile-time demo mode flag`
   - Files: `src/lib/demo/demoFlag.js`, `next.config.mjs`
 
-- [ ] 16. **Demo mode — Refactor layout.js and api.js for conditional imports**
+- [x] 16. **Demo mode — Refactor layout.js and api.js for conditional imports**
 
   **What to do**:
   - Refactor `src/app/layout.js`:

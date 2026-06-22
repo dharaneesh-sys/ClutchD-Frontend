@@ -4,9 +4,9 @@ import { ThemeProvider } from "@/components/ui/ThemeProvider";
 import { ThemeToggle } from "@/components/ui/ThemeToggle";
 import { AuthInit } from "@/components/ui/AuthInit";
 import { ErrorBoundary } from "@/components/ui/ErrorBoundary";
-import { DemoModeProvider } from "@/lib/demo/demoMode";
-import { DemoToolbar } from "@/components/ui/DemoToolbar";
+import { DEMO_MODE } from "@/lib/demo/demoFlag";
 import { ToastProvider } from "@/components/ui/ToastProvider";
+import DemoModeClient from "@/components/ui/DemoModeClient";
 
 export const metadata = {
   title: "ClutchD — On-Demand Mechanic Platform",
@@ -61,15 +61,13 @@ export default function RootLayout({ children }) {
           Skip to main content
         </a>
         <ThemeProvider>
-          <DemoModeProvider>
-            <AuthInit />
-            <ErrorBoundary>
-              <div id="main-content">{children}</div>
-            </ErrorBoundary>
-            <ThemeToggle />
-            <DemoToolbar />
-            <ToastProvider />
-          </DemoModeProvider>
+          <AuthInit />
+          <ErrorBoundary>
+            <div id="main-content">{children}</div>
+          </ErrorBoundary>
+          <ThemeToggle />
+          <DemoModeClient show={DEMO_MODE} />
+          <ToastProvider />
         </ThemeProvider>
       </body>
     </html>

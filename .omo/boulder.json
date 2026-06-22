@@ -125,6 +125,19 @@
       "status": "completed",
       "ended_at": "2026-06-22T04:47:20.711Z",
       "elapsed_ms": 63653
+    },
+    "todo:16": {
+      "task_key": "todo:16",
+      "task_label": "16",
+      "task_title": "**Demo mode — Refactor layout.js and api.js for conditional imports**",
+      "session_id": "opencode:ses_11257f2f2ffeYZARXVqtfuouWr",
+      "agent": "Sisyphus-Junior",
+      "category": "deep",
+      "updated_at": "2026-06-22T05:06:30.430Z",
+      "started_at": "2026-06-22T05:06:02.944Z",
+      "status": "completed",
+      "ended_at": "2026-06-22T05:06:30.430Z",
+      "elapsed_ms": 27486
     }
   },
   "schema_version": 2,
@@ -149,7 +162,7 @@
       "plan_name": "clutchd-production-plan",
       "status": "active",
       "started_at": "2026-06-22T04:17:08.542Z",
-      "updated_at": "2026-06-22T04:47:20.711Z",
+      "updated_at": "2026-06-22T05:06:30.430Z",
       "session_ids": [
         "opencode:ses_1159bc0deffePWr1QqlGWtjoeo"
       ],
@@ -274,12 +287,25 @@
           "status": "completed",
           "ended_at": "2026-06-22T04:47:20.711Z",
           "elapsed_ms": 63653
+        },
+        "todo:16": {
+          "task_key": "todo:16",
+          "task_label": "16",
+          "task_title": "**Demo mode — Refactor layout.js and api.js for conditional imports**",
+          "session_id": "opencode:ses_11257f2f2ffeYZARXVqtfuouWr",
+          "agent": "Sisyphus-Junior",
+          "category": "deep",
+          "updated_at": "2026-06-22T05:06:30.430Z",
+          "started_at": "2026-06-22T05:06:02.944Z",
+          "status": "completed",
+          "ended_at": "2026-06-22T05:06:30.430Z",
+          "elapsed_ms": 27486
         }
       }
     }
   },
   "active_work_id": "clutchd-production-plan-5cb8e94a",
   "status": "active",
-  "updated_at": "2026-06-22T04:47:20.711Z",
+  "updated_at": "2026-06-22T05:06:30.430Z",
   "agent": "atlas"
 }

@@ -2,7 +2,7 @@
 
 import { useState, useCallback, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { useDemoMode } from "@/lib/demo/demoMode";
+import { useDemoMode } from "@/lib/demo/demoContext";
 import { wsSimulator } from "@/lib/demo/wsSimulator";
 import { resetDemoState } from "@/lib/demo/apiInterceptor";
 import { DemoToggle } from "@/components/ui/demo/DemoToggle";

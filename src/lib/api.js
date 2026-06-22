@@ -2,6 +2,7 @@ import axios from "axios";
 import { API_BASE_URL } from "@/lib/constants";
 import { getAccessToken, setAccessToken, clearAccessToken } from "@/lib/tokenStore";
 import { navigateToAuth } from "@/lib/navigation";
+import { DEMO_MODE } from "@/lib/demo/demoFlag";
 
 let _demoApiModule = null;
 
@@ -18,7 +19,7 @@ const api = axios.create({
 
 api.interceptors.request.use(
   async (config) => {
-    if (typeof window !== "undefined" && window.__DEMO_MODE__) {
+    if (DEMO_MODE) {
       if (!_demoApiModule) {
         _demoApiModule = await import("./demo/apiInterceptor");
       }
