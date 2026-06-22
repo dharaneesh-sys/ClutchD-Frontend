@@ -56,6 +56,18 @@ export default function RootLayout({ children }) {
             `,
           }}
         />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "Organization",
+              name: "ClutchD",
+              description: "On-Demand Mechanic Platform",
+              url: "https://clutchd-app.onrender.com",
+            }),
+          }}
+        />
         <script src="/sw-register.js" defer />
       </head>
       <body className="min-h-full flex flex-col">

@@ -1,3 +1,5 @@
+import { withSentryConfig } from "@sentry/nextjs";
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   experimental: {
@@ -107,12 +109,18 @@ const nextConfig = {
   },
 };
 
-// Conditional bundle analyzer
+// Sentry error monitoring — disabled until SENTRY_DSN is set
+const sentryConfig = withSentryConfig(nextConfig, {
+  silent: !process.env.CI,
+  hideSourceMaps: true,
+});
+
+// Conditional bundle analyzer (wraps the Sentry-instrumented config)
 const analyzeConfig =
   process.env.ANALYZE === "true"
     ? (await import("@next/bundle-analyzer")).default({
         enabled: true,
-      })(nextConfig)
-    : nextConfig;
+      })(sentryConfig)
+    : sentryConfig;
 
 export default analyzeConfig;

@@ -168,12 +168,14 @@
       "task_key": "todo:18",
       "task_label": "18",
       "task_title": "**Vitest setup + initial tests (stores, utils, validators)**",
-      "session_id": "opencode:ses_11243b58effefOD5FF7J7LnsGS",
+      "session_id": "opencode:ses_11244b494ffeJ6sOW1sm1kHQNt",
       "agent": "Sisyphus-Junior",
       "category": "quick",
       "started_at": "2026-06-22T05:10:06.738Z",
-      "status": "running",
-      "updated_at": "2026-06-22T05:10:07.382Z"
+      "status": "completed",
+      "updated_at": "2026-06-22T05:13:59.291Z",
+      "ended_at": "2026-06-22T05:13:59.291Z",
+      "elapsed_ms": 232553
     }
   },
   "schema_version": 2,
@@ -198,7 +200,7 @@
       "plan_name": "clutchd-production-plan",
       "status": "active",
       "started_at": "2026-06-22T04:17:08.542Z",
-      "updated_at": "2026-06-22T05:10:07.381Z",
+      "updated_at": "2026-06-22T05:13:59.291Z",
       "session_ids": [
         "opencode:ses_1159bc0deffePWr1QqlGWtjoeo",
         "opencode:ses_112467e7affe17C1zHkmAiwpPR",
@@ -366,18 +368,20 @@
           "task_key": "todo:18",
           "task_label": "18",
           "task_title": "**Vitest setup + initial tests (stores, utils, validators)**",
-          "session_id": "opencode:ses_11243b58effefOD5FF7J7LnsGS",
+          "session_id": "opencode:ses_11244b494ffeJ6sOW1sm1kHQNt",
           "agent": "Sisyphus-Junior",
           "category": "quick",
           "started_at": "2026-06-22T05:10:06.738Z",
-          "status": "running",
-          "updated_at": "2026-06-22T05:10:07.382Z"
+          "status": "completed",
+          "updated_at": "2026-06-22T05:13:59.291Z",
+          "ended_at": "2026-06-22T05:13:59.291Z",
+          "elapsed_ms": 232553
         }
       }
     }
   },
   "active_work_id": "clutchd-production-plan-5cb8e94a",
   "status": "active",
-  "updated_at": "2026-06-22T05:10:07.381Z",
+  "updated_at": "2026-06-22T05:13:59.291Z",
   "agent": "atlas"
 }

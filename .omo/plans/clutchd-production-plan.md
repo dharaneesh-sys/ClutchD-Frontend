@@ -973,7 +973,7 @@ Max Concurrent: 8 (Wave 1, Wave 2A)
   - Message: `refactor(demo): eliminate window.__DEMO_MODE__ globals, verify tree-shake`
   - Files: As needed from grep results
 
-- [ ] 18. **Vitest setup + initial tests (stores, utils, validators)**
+- [x] 18. **Vitest setup + initial tests (stores, utils, validators)**
 
   **What to do**:
   - Configure `vitest.config.js` (or inline in vite config)
@@ -1233,7 +1233,7 @@ Max Concurrent: 8 (Wave 1, Wave 2A)
   - Message: `ci: add lint, test, and e2e steps to workflow`
   - Files: `.github/workflows/ci.yml`
 
-- [ ] 23. **Error monitoring setup (Sentry)**
+- [x] 23. **Error monitoring setup (Sentry)**
 
   **What to do**:
   - Install `@sentry/nextjs` package
@@ -1270,7 +1270,7 @@ Max Concurrent: 8 (Wave 1, Wave 2A)
   - Message: `feat(monitoring): add Sentry error tracking scaffolding`
   - Files: `package.json`, `sentry.client.config.js` (or similar)
 
-- [ ] 24. **SEO — sitemap.xml, robots.txt, structured data**
+- [x] 24. **SEO — sitemap.xml, robots.txt, structured data**
 
   **What to do**:
   - Create `public/robots.txt`:
