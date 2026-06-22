@@ -50,11 +50,7 @@ export default function RootLayout({ children }) {
             __html: `
               (function() {
                 var t = localStorage.getItem('clutchd_theme');
-                if (t === 'light') {
-                  document.documentElement.classList.add('light');
-                } else {
-                  document.documentElement.classList.remove('light');
-                }
+                document.documentElement.setAttribute('data-theme', t === 'light' ? 'light' : 'dark');
               })();
             `,
           }}

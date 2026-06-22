@@ -6,11 +6,7 @@ export function ThemeProvider({ children }) {
   const { theme } = useThemeStore();
 
   useEffect(() => {
-    if (theme === "light") {
-      document.documentElement.classList.add("light");
-    } else {
-      document.documentElement.classList.remove("light");
-    }
+    document.documentElement.setAttribute("data-theme", theme);
   }, [theme]);
 
   return <>{children}</>;
