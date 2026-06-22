@@ -65,10 +65,15 @@ function getDefaultWsUrl() {
     return "ws://127.0.0.1:8000/ws";
   }
 
+  const isCapacitor = window.Capacitor || window.__CAPACITOR__;
+  if (isCapacitor) {
+    // In Capacitor, always use secure WebSocket with the backend host from API_BASE_URL
+    const apiUrl = new URL(API_BASE_URL);
+    return `wss://${apiUrl.host}/ws`;
+  }
+
   const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
-  const hostname = window.location.hostname || "127.0.0.1";
-  const port = process.env.NEXT_PUBLIC_WS_PORT || "8000";
-  return `${protocol}//${hostname}:${port}/ws`;
+  return `${protocol}//${window.location.host}/ws`;
 }
 
 export const WS_URL = process.env.NEXT_PUBLIC_WS_URL || getDefaultWsUrl();

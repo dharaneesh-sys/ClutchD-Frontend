@@ -5,12 +5,15 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
+    "build:android": "NEXT_PUBLIC_BUILD_MODE=export next build && npx cap copy && npx cap sync android",
     "start": "next start",
     "lint": "eslint",
     "analyze": "ANALYZE=true next build",
     "test": "vitest run",
     "test:watch": "vitest",
-    "test:e2e": "playwright test"
+    "test:e2e": "playwright test",
+    "cap:sync": "npx cap sync",
+    "cap:copy": "npx cap copy"
   },
   "dependencies": {
     "@capacitor/android": "^8.4.1",
