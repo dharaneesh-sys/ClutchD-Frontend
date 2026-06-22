@@ -62,6 +62,7 @@ describe("serviceStore", () => {
       customerLng: 76.9558,
       mediaUrl: undefined,
       vehicleId: "v-1",
+      scheduledAt: null,
     };
 
     it("creates a service request without media upload", async () => {
@@ -79,6 +80,7 @@ describe("serviceStore", () => {
         customerLng: 76.9558,
         mediaUrl: undefined,
         vehicleId: "v-1",
+        scheduledAt: null,
       });
       expect(useServiceStore.getState().activeRequest).toEqual(created);
       expect(useServiceStore.getState().isLoading).toBe(false);

@@ -499,6 +499,228 @@ h1, h2, h3, h4 { letter-spacing: -0.02em; }
 }
 :is(.light, [data-theme="light"]) .leaflet-popup-tip { background: rgba(255, 255, 255, 0.95) !important; }
 
+/* ─── Custom SVG Marker Styles ────────────────────────────────────────── */
+.marker-custom,
+.marker-user-location {
+  background: none !important;
+  border: none !important;
+}
+.marker-custom div,
+.marker-user-location div {
+  background: none !important;
+  border: none !important;
+  margin: 0 !important;
+  width: auto !important;
+  height: auto !important;
+}
+.marker-custom svg,
+.marker-user-location svg {
+  display: block;
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+}
+
+/* ─── My Location Button ───────────────────────────────────────────────── */
+.my-location-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  margin: 0;
+  background: var(--glass-lux-bg);
+  backdrop-filter: blur(16px) saturate(1.3);
+  -webkit-backdrop-filter: blur(16px) saturate(1.3);
+  border: 1px solid var(--glass-lux-border);
+  border-radius: 8px;
+  color: var(--foreground);
+  cursor: pointer;
+  box-shadow: var(--elevation-2);
+  transition: background 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+  position: relative;
+}
+.my-location-btn:hover {
+  background: var(--glass-hover);
+  border-color: var(--glass-lux-border-accent);
+  box-shadow: var(--elevation-3);
+}
+.my-location-btn:active {
+  transform: scale(0.95);
+}
+.my-location-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.my-location-spinner {
+  position: absolute;
+  inset: 0;
+  border: 2px solid transparent;
+  border-top-color: var(--primary);
+  border-radius: 8px;
+  animation: my-location-spin 0.6s linear infinite;
+  pointer-events: none;
+}
+
+@keyframes my-location-spin {
+  to { transform: rotate(360deg); }
+}
+
+:is(.light, [data-theme="light"]) .my-location-btn {
+  background: rgba(255, 255, 255, 0.85);
+  border-color: rgba(28, 25, 23, 0.1);
+  color: #1c1917;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+:is(.light, [data-theme="light"]) .my-location-btn:hover {
+  background: #ffffff;
+  border-color: rgba(212, 160, 17, 0.25);
+}
+
+/* ─── Map Legend ───────────────────────────────────────────────────────── */
+.map-legend {
+  background: var(--glass-lux-bg-strong);
+  backdrop-filter: blur(20px) saturate(1.3);
+  -webkit-backdrop-filter: blur(20px) saturate(1.3);
+  border: 1px solid var(--glass-lux-border);
+  border-radius: 10px;
+  padding: 8px 12px;
+  box-shadow: var(--elevation-2);
+  min-width: 100px;
+  user-select: none;
+}
+.map-legend-title {
+  display: block;
+  font-size: 0.625rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--color-text-muted);
+  margin-bottom: 6px;
+}
+.map-legend-items {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.map-legend-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.6875rem;
+  font-weight: 500;
+  color: var(--foreground);
+  line-height: 1;
+}
+.legend-dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.3);
+}
+.legend-dot-blue    { background: #3b82f6; }
+.legend-dot-red     { background: #ef4444; }
+.legend-dot-green   { background: #22c55e; }
+.legend-dot-violet  { background: #8b5cf6; }
+.legend-dot-orange  { background: #f59e0b; }
+
+:is(.light, [data-theme="light"]) .map-legend {
+  background: rgba(255, 255, 255, 0.9);
+  border-color: rgba(28, 25, 23, 0.08);
+}
+:is(.light, [data-theme="light"]) .map-legend-item {
+  color: #1c1917;
+}
+
+/* ─── Glass-Lux Map Popups ──────────────────────────────────────────────── */
+.leaflet-popup-content {
+  margin: 0 !important;
+  min-width: 160px;
+}
+.map-popup-glass {
+  padding: 10px 4px 2px;
+}
+.map-popup-name {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--foreground);
+  line-height: 1.3;
+  margin-bottom: 4px;
+}
+.map-popup-rating {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.6875rem;
+  color: #f59e0b;
+  margin-bottom: 2px;
+}
+.map-popup-rating span {
+  color: var(--color-text-muted);
+}
+.map-popup-subtitle {
+  font-size: 0.6875rem;
+  color: var(--color-text-muted);
+  line-height: 1.3;
+}
+
+:is(.light, [data-theme="light"]) .map-popup-name { color: #1c1917; }
+:is(.light, [data-theme="light"]) .map-popup-rating span { color: rgba(130,130,130,0.7); }
+:is(.light, [data-theme="light"]) .map-popup-subtitle { color: rgba(130,130,130,0.7); }
+
+/* ─── Marker Cluster Overrides (dark theme) ────────────────────────────── */
+.marker-cluster-small {
+  background-color: rgba(16, 185, 129, 0.2) !important;
+}
+.marker-cluster-small div {
+  background-color: rgba(16, 185, 129, 0.5) !important;
+  color: #fafafa !important;
+  font-weight: 600;
+  font-size: 0.8125rem;
+}
+.marker-cluster-medium {
+  background-color: rgba(245, 158, 11, 0.2) !important;
+}
+.marker-cluster-medium div {
+  background-color: rgba(245, 158, 11, 0.5) !important;
+  color: #fafafa !important;
+  font-weight: 600;
+  font-size: 0.8125rem;
+}
+.marker-cluster-large {
+  background-color: rgba(239, 68, 68, 0.2) !important;
+}
+.marker-cluster-large div {
+  background-color: rgba(239, 68, 68, 0.5) !important;
+  color: #fafafa !important;
+  font-weight: 600;
+  font-size: 0.875rem;
+}
+
+:is(.light, [data-theme="light"]) .marker-cluster-small {
+  background-color: rgba(212, 160, 17, 0.15) !important;
+}
+:is(.light, [data-theme="light"]) .marker-cluster-small div {
+  background-color: rgba(212, 160, 17, 0.4) !important;
+  color: #1c1917 !important;
+}
+:is(.light, [data-theme="light"]) .marker-cluster-medium {
+  background-color: rgba(245, 158, 11, 0.15) !important;
+}
+:is(.light, [data-theme="light"]) .marker-cluster-medium div {
+  background-color: rgba(245, 158, 11, 0.4) !important;
+  color: #1c1917 !important;
+}
+:is(.light, [data-theme="light"]) .marker-cluster-large {
+  background-color: rgba(239, 68, 68, 0.15) !important;
+}
+:is(.light, [data-theme="light"]) .marker-cluster-large div {
+  background-color: rgba(239, 68, 68, 0.4) !important;
+  color: #1c1917 !important;
+}
+
 /* LIGHT MODE — Warm Mustard + Clean White */
 .light body, body.light, [data-theme="light"] body, body[data-theme="light"] {
   background-color: #faf8f3;

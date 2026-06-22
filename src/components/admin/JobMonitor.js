@@ -7,14 +7,9 @@ import { MapPin, Navigation, Clock, AlertTriangle, Crosshair } from "lucide-reac
 import { useToast } from "@/components/ui/ToastProvider";
 import { fetchJobs, forceAssignJob, trackJob } from "@/services/adminService";
 import dynamic from "next/dynamic";
-import L from "leaflet";
 
-delete L.Icon.Default.prototype._getIconUrl;
-L.Icon.Default.mergeOptions({
-  iconRetinaUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon-2x.png",
-  iconUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon.png",
-  shadowUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png",
-});
+// CSP-safe SVG markers
+import { createMechanicIcon, createTargetIcon } from "@/lib/mapMarkers";
 
 const MapContainer = dynamic(
   () => import("react-leaflet").then((m) => m.MapContainer),
@@ -300,12 +295,18 @@ export function JobMonitor() {
                     url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                   />
                   {trackData.customerLat && trackData.customerLon && (
-                    <Marker position={[trackData.customerLat, trackData.customerLon]}>
+                    <Marker
+                      position={[trackData.customerLat, trackData.customerLon]}
+                      icon={createTargetIcon()}
+                    >
                       <Popup>{trackMapModal.customer} (Customer)</Popup>
                     </Marker>
                   )}
                   {trackData.providerLat && trackData.providerLon && (
-                    <Marker position={[trackData.providerLat, trackData.providerLon]}>
+                    <Marker
+                      position={[trackData.providerLat, trackData.providerLon]}
+                      icon={createMechanicIcon()}
+                    >
                       <Popup>{trackMapModal.provider} (Provider)</Popup>
                     </Marker>
                   )}

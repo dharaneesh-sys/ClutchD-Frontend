@@ -7,7 +7,7 @@ import { ConnectionIndicator } from "@/components/ui/ConnectionIndicator";
 import { NotificationBell } from "@/components/ui/NotificationBell";
 import { useAuthStore } from "@/store/authStore";
 import { useRouter } from "next/navigation";
-import { LogOut, User, Building2, Wrench, Menu, X } from "lucide-react";
+import { LogOut, User, Building2, Wrench, Gift, Menu, X } from "lucide-react";
 
 const MODE_CONFIG = {
   customer: {
@@ -40,6 +40,7 @@ export function DashboardShell({
   user,
   mode = "customer",
   sidebar,
+  onReferral,
   className,
 }) {
   const { logout } = useAuthStore();
@@ -181,6 +182,24 @@ export function DashboardShell({
                 <span>{item.label}</span>
               </button>
             ))}
+
+            {/* Referral Link */}
+            {onReferral && (
+              <button
+                onClick={() => {
+                  onReferral();
+                  setMobileMenuOpen(false);
+                }}
+                className={cn(
+                  "w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-colors mb-2",
+                  "text-text-muted hover:bg-surface-soft hover:text-text-primary"
+                )}
+              >
+                <Gift size={18} />
+                <span>Referral</span>
+              </button>
+            )}
+
             <button
               onClick={handleLogout}
               className={cn(

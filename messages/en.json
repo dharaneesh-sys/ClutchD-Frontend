@@ -1,0 +1,38 @@
+{
+  "skipToContent": "Skip to main content",
+  "nav": {
+    "signIn": "Sign In"
+  },
+  "hero": {
+    "badge": "Now live in Coimbatore",
+    "headline": "Vehicle Service,\nOn Demand.",
+    "subtitle": "Connect instantly with top-rated mechanics and premium garages nearby. Real-time tracking, transparent pricing, and trusted professionals.",
+    "getStarted": "Get Started",
+    "signIn": "Sign In"
+  },
+  "howItWorks": {
+    "title": "How it works",
+    "description": "Three steps to professional vehicle service",
+    "step1": "Describe your issue and share your location",
+    "step2": "Get matched with verified mechanics nearby",
+    "step3": "Track arrival, approve pricing, and pay securely"
+  },
+  "features": {
+    "instantConnect": {
+      "title": "Instant Connect",
+      "desc": "Get matched with nearby mechanics in seconds, not hours."
+    },
+    "liveTracking": {
+      "title": "Live Tracking",
+      "desc": "Watch your mechanic arrive in real-time on the map."
+    },
+    "verifiedPros": {
+      "title": "Verified Pros",
+      "desc": "Every mechanic and garage is background-checked and rated."
+    },
+    "available247": {
+      "title": "24/7 Available",
+      "desc": "Round-the-clock service for emergencies and scheduled repairs."
+    }
+  }
+}

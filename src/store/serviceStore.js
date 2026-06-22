@@ -33,6 +33,7 @@ export const useServiceStore = create((set, get) => ({
         customerLng: data.customerLng,
         mediaUrl: mediaUrl,
         vehicleId: data.vehicleId,
+        scheduledAt: data.scheduledAt || null,
       };
 
       const response = await api.post("/service/request", payload);

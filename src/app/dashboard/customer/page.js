@@ -16,8 +16,9 @@ import { NotificationBell } from "@/components/ui/NotificationBell";
 import { ConnectionIndicator } from "@/components/ui/ConnectionIndicator";
 import { SOSButton } from "@/components/ui/SOSButton";
 import { DashboardShell } from "@/components/ui/DashboardShell";
-import { LogOut, User, History, Wrench } from "lucide-react";
+import { LogOut, User, History, Wrench, Calendar } from "lucide-react";
 import { SERVICE_STATUS } from "@/lib/constants";
+import { ScheduleBookingModal } from "@/components/dashboard/ScheduleBookingModal";
 import api from "@/lib/api";
 import { Logo } from "@/components/ui/Logo";
 import { NAVIGATION_EVENT } from "@/lib/navigation";
@@ -54,6 +55,8 @@ export default function CustomerDashboard() {
   const [reviewProviderName, setReviewProviderName] = useState("the professional");
   const [paymentAmount, setPaymentAmount] = useState(1200);
   const [activeTab, setActiveTab] = useState("request"); // "request" | "history"
+  const [isScheduleModalOpen, setIsScheduleModalOpen] = useState(false);
+  const [isScheduleLoading, setIsScheduleLoading] = useState(false);
   const paymentTriggeredRef = useRef(false);
 
   const { isDemoMode, isTourActive } = useDemoMode();
@@ -162,6 +165,16 @@ export default function CustomerDashboard() {
     setIsPaymentOpen(true);
   };
 
+  const handleScheduleSubmit = async (scheduledAt) => {
+    setIsScheduleLoading(true);
+    try {
+      await createRequest({ scheduledAt });
+      setIsScheduleModalOpen(false);
+    } finally {
+      setIsScheduleLoading(false);
+    }
+  };
+
   const handlePaymentSuccess = (paymentDetails) => {
     setIsPaymentOpen(false);
     completeRequest(paymentDetails);
@@ -179,6 +192,7 @@ export default function CustomerDashboard() {
 
   const sidebarItems = [
     { icon: Wrench, label: "Service", onClick: () => setActiveTab("request") },
+    { icon: Calendar, label: "Schedule", onClick: () => setActiveTab("schedule") },
     { icon: History, label: "History", onClick: () => setActiveTab("history") },
   ];
 
@@ -190,7 +204,32 @@ export default function CustomerDashboard() {
       mode="customer"
       sidebar={sidebarItems}
     >
-      {activeTab === "request" ? (
+      {activeTab === "schedule" ? (
+        <div className="flex-1 pb-4 lg:pb-6">
+          <div className="max-w-lg mx-auto">
+            <div className="glass-lux p-8 rounded-2xl text-center">
+              <div className="w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6 bg-surface-soft">
+                <Calendar size={40} className="text-icon-highlight" />
+              </div>
+              <h2 className="text-2xl font-bold mb-2 text-text-primary">
+                Schedule a Service
+              </h2>
+              <p className="text-sm text-text-muted mb-8 max-w-sm mx-auto">
+                Book a date and time that works for you. We&apos;ll dispatch a
+                professional at your chosen slot.
+              </p>
+              <Button
+                onClick={() => setIsScheduleModalOpen(true)}
+                className="w-full sm:w-auto"
+                size="lg"
+              >
+                <Calendar size={18} className="mr-2" />
+                Book Appointment
+              </Button>
+            </div>
+          </div>
+        </div>
+      ) : activeTab === "request" ? (
         <div className="flex-1 grid grid-cols-1 lg:grid-cols-12 gap-4 lg:gap-6 pb-4 lg:pb-6">
           <div className="lg:col-span-7 xl:col-span-8 rounded-2xl overflow-hidden relative shadow-2xl min-h-[250px] sm:min-h-[350px] lg:min-h-[400px]">
             <MapView />
@@ -229,6 +268,13 @@ export default function CustomerDashboard() {
         pricing={activeRequest?.pricing}
         jobId={activeRequest?.id}
         onSuccess={handlePaymentSuccess}
+      />
+
+      <ScheduleBookingModal
+        isOpen={isScheduleModalOpen}
+        onClose={() => setIsScheduleModalOpen(false)}
+        onSubmit={handleScheduleSubmit}
+        isLoading={isScheduleLoading}
       />
 
       <ReviewModal
