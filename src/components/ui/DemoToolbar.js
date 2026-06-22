@@ -43,15 +43,13 @@ export function DemoToolbar() {
     }
   }, [demoUser?.role, isDemoMode, router]);
 
-  // Sync window.__DEMO_MODE__ and wsSimulator on toggle
+  // Sync wsSimulator on toggle
   useEffect(() => {
     if (isDemoMode) {
-      window.__DEMO_MODE__ = true;
       if (!wsSimulator.isActive()) {
         wsSimulator.start();
       }
     } else {
-      window.__DEMO_MODE__ = false;
       if (wsSimulator.isActive()) {
         wsSimulator.stop();
       }

@@ -2,11 +2,23 @@
   "active_plan": "/home/dinusus/ClutchD-App/.omo/plans/clutchd-production-plan.md",
   "started_at": "2026-06-22T04:17:08.542Z",
   "session_ids": [
-    "opencode:ses_1159bc0deffePWr1QqlGWtjoeo"
+    "opencode:ses_1159bc0deffePWr1QqlGWtjoeo",
+    "opencode:ses_112467e7affe17C1zHkmAiwpPR",
+    "opencode:ses_112465f7effeAiiVqY2xn80zr0",
+    "opencode:ses_1124645feffe50FFCB5xKOZsnA",
+    "opencode:ses_1124625e5ffejlNF01yOjyRDeO",
+    "opencode:ses_112460656ffeiL00q1upTpsqZ0",
+    "opencode:ses_1124510eeffeeqk5i2bO9nlptj"
   ],
   "plan_name": "clutchd-production-plan",
   "session_origins": {
-    "opencode:ses_1159bc0deffePWr1QqlGWtjoeo": "direct"
+    "opencode:ses_1159bc0deffePWr1QqlGWtjoeo": "direct",
+    "opencode:ses_112467e7affe17C1zHkmAiwpPR": "appended",
+    "opencode:ses_112465f7effeAiiVqY2xn80zr0": "appended",
+    "opencode:ses_1124645feffe50FFCB5xKOZsnA": "appended",
+    "opencode:ses_1124625e5ffejlNF01yOjyRDeO": "appended",
+    "opencode:ses_112460656ffeiL00q1upTpsqZ0": "appended",
+    "opencode:ses_1124510eeffeeqk5i2bO9nlptj": "appended"
   },
   "task_sessions": {
     "todo:5": {
@@ -138,6 +150,30 @@
       "status": "completed",
       "ended_at": "2026-06-22T05:06:30.430Z",
       "elapsed_ms": 27486
+    },
+    "todo:17": {
+      "task_key": "todo:17",
+      "task_label": "17",
+      "task_title": "**Demo mode — Verify tree-shaking (zero bytes in production bundle)**",
+      "session_id": "opencode:ses_1124510eeffeeqk5i2bO9nlptj",
+      "agent": "Sisyphus-Junior",
+      "category": "quick",
+      "started_at": "2026-06-22T05:08:55.931Z",
+      "status": "completed",
+      "updated_at": "2026-06-22T05:09:59.094Z",
+      "ended_at": "2026-06-22T05:09:59.094Z",
+      "elapsed_ms": 63163
+    },
+    "todo:18": {
+      "task_key": "todo:18",
+      "task_label": "18",
+      "task_title": "**Vitest setup + initial tests (stores, utils, validators)**",
+      "session_id": "opencode:ses_11243b58effefOD5FF7J7LnsGS",
+      "agent": "Sisyphus-Junior",
+      "category": "quick",
+      "started_at": "2026-06-22T05:10:06.738Z",
+      "status": "running",
+      "updated_at": "2026-06-22T05:10:07.382Z"
     }
   },
   "schema_version": 2,
@@ -162,12 +198,24 @@
       "plan_name": "clutchd-production-plan",
       "status": "active",
       "started_at": "2026-06-22T04:17:08.542Z",
-      "updated_at": "2026-06-22T05:06:30.430Z",
+      "updated_at": "2026-06-22T05:10:07.381Z",
       "session_ids": [
-        "opencode:ses_1159bc0deffePWr1QqlGWtjoeo"
+        "opencode:ses_1159bc0deffePWr1QqlGWtjoeo",
+        "opencode:ses_112467e7affe17C1zHkmAiwpPR",
+        "opencode:ses_112465f7effeAiiVqY2xn80zr0",
+        "opencode:ses_1124645feffe50FFCB5xKOZsnA",
+        "opencode:ses_1124625e5ffejlNF01yOjyRDeO",
+        "opencode:ses_112460656ffeiL00q1upTpsqZ0",
+        "opencode:ses_1124510eeffeeqk5i2bO9nlptj"
       ],
       "session_origins": {
-        "opencode:ses_1159bc0deffePWr1QqlGWtjoeo": "direct"
+        "opencode:ses_1159bc0deffePWr1QqlGWtjoeo": "direct",
+        "opencode:ses_112467e7affe17C1zHkmAiwpPR": "appended",
+        "opencode:ses_112465f7effeAiiVqY2xn80zr0": "appended",
+        "opencode:ses_1124645feffe50FFCB5xKOZsnA": "appended",
+        "opencode:ses_1124625e5ffejlNF01yOjyRDeO": "appended",
+        "opencode:ses_112460656ffeiL00q1upTpsqZ0": "appended",
+        "opencode:ses_1124510eeffeeqk5i2bO9nlptj": "appended"
       },
       "agent": "atlas",
       "task_sessions": {
@@ -300,12 +348,36 @@
           "status": "completed",
           "ended_at": "2026-06-22T05:06:30.430Z",
           "elapsed_ms": 27486
+        },
+        "todo:17": {
+          "task_key": "todo:17",
+          "task_label": "17",
+          "task_title": "**Demo mode — Verify tree-shaking (zero bytes in production bundle)**",
+          "session_id": "opencode:ses_1124510eeffeeqk5i2bO9nlptj",
+          "agent": "Sisyphus-Junior",
+          "category": "quick",
+          "started_at": "2026-06-22T05:08:55.931Z",
+          "status": "completed",
+          "updated_at": "2026-06-22T05:09:59.094Z",
+          "ended_at": "2026-06-22T05:09:59.094Z",
+          "elapsed_ms": 63163
+        },
+        "todo:18": {
+          "task_key": "todo:18",
+          "task_label": "18",
+          "task_title": "**Vitest setup + initial tests (stores, utils, validators)**",
+          "session_id": "opencode:ses_11243b58effefOD5FF7J7LnsGS",
+          "agent": "Sisyphus-Junior",
+          "category": "quick",
+          "started_at": "2026-06-22T05:10:06.738Z",
+          "status": "running",
+          "updated_at": "2026-06-22T05:10:07.382Z"
         }
       }
     }
   },
   "active_work_id": "clutchd-production-plan-5cb8e94a",
   "status": "active",
-  "updated_at": "2026-06-22T05:06:30.430Z",
+  "updated_at": "2026-06-22T05:10:07.381Z",
   "agent": "atlas"
 }

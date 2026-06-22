@@ -93,7 +93,6 @@ export function DemoModeProvider({ children }) {
     setIsDemoMode(true);
     useAuthStore.getState().setDemoUser(user);
     if (typeof window !== "undefined") {
-      window.__DEMO_MODE__ = true;
       window.__DEMO_USER__ = user;
       sessionStorage.setItem("demo_token", "demo-jwt-token-12345");
       import("../tokenStore").then((t) => {
@@ -110,7 +109,6 @@ export function DemoModeProvider({ children }) {
     setTourStep(0);
     useAuthStore.getState().setDemoUser(null);
     if (typeof window !== "undefined") {
-      window.__DEMO_MODE__ = false;
       window.__DEMO_USER__ = null;
       sessionStorage.removeItem("demo_token");
       import("../tokenStore").then((t) => {

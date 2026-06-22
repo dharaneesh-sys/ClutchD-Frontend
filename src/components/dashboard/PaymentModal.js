@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/Button";
 import { CreditCard, Smartphone, QrCode, Banknote, CheckCircle2, XCircle, Loader2, ChevronDown, ChevronUp } from "lucide-react";
 import { GST_RATE } from "@/lib/constants";
 import { useToast } from "@/components/ui/ToastProvider";
+import { DEMO_MODE } from "@/lib/demo/demoFlag";
 import api from "@/lib/api";
 
 const METHODS = [
@@ -64,7 +65,7 @@ export function PaymentModal({ isOpen, onClose, amount, pricing, jobId, onSucces
   // Demo mode: auto-process payment after showing the modal briefly
   useEffect(() => {
     if (!isOpen || payState !== "idle") return;
-    const isDemo = typeof window !== "undefined" && window.__DEMO_MODE__;
+    const isDemo = DEMO_MODE;
     if (!isDemo) return;
 
     const showTimer = setTimeout(() => {

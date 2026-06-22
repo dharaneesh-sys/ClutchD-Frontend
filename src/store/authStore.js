@@ -3,6 +3,7 @@ import { persist } from "zustand/middleware";
 import api from "@/lib/api";
 import { connectWebSocket, disconnectWebSocket } from "@/lib/socket";
 import { setAccessToken, getAccessToken, clearAccessToken } from "@/lib/tokenStore";
+import { DEMO_MODE } from "@/lib/demo/demoFlag";
 
 // Proactive refresh: refresh the access token at 80% of its TTL.
 // Default access token TTL is 15 min (from backend config); override via env.
@@ -177,6 +178,7 @@ export const useAuthStore = create(
       setUser: (user) => set({ user, isAuthenticated: !!user, _hydrated: true }),
       updateUserData: (userData) => set((state) => ({ user: { ...state.user, ...userData } })),
       setDemoUser: (user) => {
+        if (!DEMO_MODE) return;
         if (typeof window !== "undefined") {
           const { setAccessToken } = require("../lib/tokenStore");
           setAccessToken("demo-jwt-token-12345");

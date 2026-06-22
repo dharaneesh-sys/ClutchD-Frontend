@@ -924,7 +924,7 @@ Max Concurrent: 8 (Wave 1, Wave 2A)
   - Message: `refactor(demo): gate demo mode with build-time conditional imports`
   - Files: `src/app/layout.js`, `src/lib/api.js`, `src/lib/demo/demoFlag.js`
 
-- [ ] 17. **Demo mode — Verify tree-shaking (zero bytes in production bundle)**
+- [x] 17. **Demo mode — Verify tree-shaking (zero bytes in production bundle)**
 
   **What to do**:
   - Build with `NEXT_PUBLIC_DEMO_MODE=false` and verify zero demo code reaches the bundle
@@ -1027,7 +1027,7 @@ Max Concurrent: 8 (Wave 1, Wave 2A)
   - Message: `test: add vitest tests for utils, validators, and stores`
   - Files: `vitest.config.js`, `src/lib/__tests__/*`, `src/store/__tests__/*`
 
-- [ ] 19. **Playwright setup + config + CI integration**
+- [x] 19. **Playwright setup + config + CI integration**
 
   **What to do**:
   - Configure `playwright.config.js` with:
@@ -1079,7 +1079,7 @@ Max Concurrent: 8 (Wave 1, Wave 2A)
   - Message: `test: add playwright e2e smoke tests`
   - Files: `playwright.config.js`, `e2e/*.spec.js`
 
-- [ ] 20. **PWA manifest + service worker**
+- [x] 20. **PWA manifest + service worker**
 
   **What to do**:
   - Create `public/manifest.json`:
@@ -1144,7 +1144,7 @@ Max Concurrent: 8 (Wave 1, Wave 2A)
   - Message: `feat(pwa): add manifest.json and service worker`
   - Files: `public/manifest.json`, `public/sw.js`, `public/icon-192.png`, `public/icon-512.png`, `src/app/layout.js`
 
-- [ ] 21. **CSP hardening + security headers review**
+- [x] 21. **CSP hardening + security headers review**
 
   **What to do**:
   - Review and tighten `next.config.mjs` CSP headers:
@@ -1197,7 +1197,7 @@ Max Concurrent: 8 (Wave 1, Wave 2A)
   - Message: `security: tighten CSP, add HSTS and frame-ancestors`
   - Files: `next.config.mjs`
 
-- [ ] 22. **CI pipeline — Add lint + test steps to GitHub Actions**
+- [x] 22. **CI pipeline — Add lint + test steps to GitHub Actions**
 
   **What to do**:
   - Update `.github/workflows/ci.yml`:
