@@ -1,6 +1,6 @@
 "use client";
 
-import { useToastStore } from "@/lib/stores/toastStore";
+import { useToastStore } from "@/store/toastStore";
 
 export function useToast() {
   const { addToast, removeToast, clearToasts, success, error, info, warning } =

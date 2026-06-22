@@ -3,6 +3,15 @@ const nextConfig = {
   experimental: {
     optimizePackageImports: ["lucide-react", "recharts"],
   },
+  output:
+    process.env.NEXT_PUBLIC_BUILD_MODE !== "export" ? "standalone" : "export",
+  images: {
+    unoptimized: true,
+  },
+  env: {
+    NEXT_PUBLIC_DEMO_MODE: process.env.NEXT_PUBLIC_DEMO_MODE || "true",
+    NEXT_PUBLIC_BUILD_MODE: process.env.NEXT_PUBLIC_BUILD_MODE || "",
+  },
   async headers() {
     return [
       {

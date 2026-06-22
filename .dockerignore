@@ -1,9 +1,9 @@
 node_modules
-.next
 .git
+.next
+.env*
 *.md
+Dockerfile*
 data/
 *.log
 backend/
-.env.local
-.env.docker

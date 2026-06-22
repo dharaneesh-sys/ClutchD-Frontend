@@ -54,6 +54,12 @@ export const PAYMENT_METHODS = [
 
 export const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api";
 
+// Demo mode flag
+export const DEMO_MODE = process.env.NEXT_PUBLIC_DEMO_MODE !== "false";
+
+// Build output mode: "standalone" (default) or "export"
+export const BUILD_MODE = process.env.NEXT_PUBLIC_BUILD_MODE || "standalone";
+
 function getDefaultWsUrl() {
   if (typeof window === "undefined") {
     return "ws://127.0.0.1:8000/ws";
@@ -76,6 +82,53 @@ export const PLATFORM_FEE_FLAT = 40;
 export const GST_RATE = 0.18;
 export const DISTANCE_FEE_PER_KM = 30;
 export const CANCELLATION_FEE = 30;
+
+/**
+ * Validate critical environment variables at build/startup time.
+ * - Required vars missing  → throws an error (fail fast)
+ * - Optional vars missing  → logs a warning with the fallback value
+ *
+ * Runs only on the server side (including during `next build`).
+ */
+export function validateEnv() {
+  if (typeof window !== "undefined") return; // client-side: skip
+
+  const required = {
+    NEXT_PUBLIC_API_URL: API_BASE_URL === "http://localhost:8000/api" ? null : API_BASE_URL,
+  };
+
+  const requiredMissing = Object.entries(required).filter(([, v]) => v === null);
+  if (requiredMissing.length > 0) {
+    throw new Error(
+      `[env] Missing required environment variable(s): ${requiredMissing.map(([k]) => k).join(", ")}. ` +
+      "Set them in .env.local or in your deployment dashboard."
+    );
+  }
+
+  const optional = {
+    NEXT_PUBLIC_GOOGLE_CLIENT_ID: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || null,
+    NEXT_PUBLIC_ACCESS_TTL_MINUTES: process.env.NEXT_PUBLIC_ACCESS_TTL_MINUTES || null,
+    NEXT_PUBLIC_DEMO_MODE: process.env.NEXT_PUBLIC_DEMO_MODE || null,
+    NEXT_PUBLIC_BUILD_MODE: process.env.NEXT_PUBLIC_BUILD_MODE || null,
+  };
+
+  const optionalDefaults = {
+    NEXT_PUBLIC_GOOGLE_CLIENT_ID: "(SSO disabled)",
+    NEXT_PUBLIC_ACCESS_TTL_MINUTES: "15",
+    NEXT_PUBLIC_DEMO_MODE: "true",
+    NEXT_PUBLIC_BUILD_MODE: "standalone",
+  };
+
+  for (const [key, value] of Object.entries(optional)) {
+    if (!value) {
+      console.warn(
+        `[env] Optional var ${key} is not set — using default "${optionalDefaults[key]}".`
+      );
+    }
+  }
+}
+
+validateEnv();
 
 export const FEE_CONSTANTS = {
   PLATFORM_FEE_PERCENT,

@@ -60,7 +60,7 @@
   --color-badge-text: #34d399;
 }
 
-.light {
+.light, [data-theme="light"] {
   --background: #faf8f3;
   --foreground: #1c1917;
   --primary: #d4a011;
@@ -392,6 +392,30 @@ h1, h2, h3, h4 { letter-spacing: -0.02em; }
   transform: scale(0.98);
 }
 
+/* Theme-aware semantic utility classes — replaces isLight/isDark checks */
+.bg-surface { background-color: var(--surface); }
+.bg-surface-dim { background-color: var(--surface-dim); }
+.bg-surface-bright { background-color: var(--surface-bright); }
+.bg-surface-container { background-color: var(--surface-container); }
+.bg-surface-container-low { background-color: var(--surface-container-low); }
+.bg-surface-container-high { background-color: var(--surface-container-high); }
+.bg-surface-container-highest { background-color: var(--surface-container-highest); }
+.bg-primary-soft { background-color: var(--color-surface-soft); }
+.bg-primary-mid { background-color: var(--color-surface-mid); }
+.bg-card { background-color: var(--color-bg-card); }
+.badge-bg { background-color: var(--color-badge-bg); }
+
+.text-foreground { color: var(--foreground); }
+.text-on-surface { color: var(--on-surface); }
+.text-on-surface-variant { color: var(--on-surface-variant); }
+.text-primary { color: var(--color-text-primary); }
+.text-muted { color: var(--color-text-muted); }
+.text-dim { color: var(--color-text-dim); }
+.badge-text { color: var(--color-badge-text); }
+.icon-highlight { color: var(--color-icon-highlight); }
+
+.border-subtle { border-color: var(--color-border-subtle); }
+
 /* Shimmer for loading skeletons */
 @keyframes shimmer-pulse {
   0% { background-position: 200% 0; }
@@ -465,41 +489,41 @@ h1, h2, h3, h4 { letter-spacing: -0.02em; }
 }
 .leaflet-popup-tip { background: rgba(24, 24, 27, 0.95) !important; }
 
-.light .leaflet-container { background: #f1f5f9 !important; }
-.light .leaflet-tile-pane { filter: none; }
-.light .leaflet-popup-content-wrapper {
+:is(.light, [data-theme="light"]) .leaflet-container { background: #f1f5f9 !important; }
+:is(.light, [data-theme="light"]) .leaflet-tile-pane { filter: none; }
+:is(.light, [data-theme="light"]) .leaflet-popup-content-wrapper {
   background: rgba(255, 255, 255, 0.95) !important;
   color: #1c1917 !important;
   border: 1px solid rgba(0,0,0,0.08) !important;
   box-shadow: 0 8px 30px rgba(0,0,0,0.08) !important;
 }
-.light .leaflet-popup-tip { background: rgba(255, 255, 255, 0.95) !important; }
+:is(.light, [data-theme="light"]) .leaflet-popup-tip { background: rgba(255, 255, 255, 0.95) !important; }
 
 /* LIGHT MODE — Warm Mustard + Clean White */
-.light body, body.light {
+.light body, body.light, [data-theme="light"] body, body[data-theme="light"] {
   background-color: #faf8f3;
   color: #1c1917;
 }
 
-.light .glass {
+:is(.light, [data-theme="light"]) .glass {
   background: rgba(255,255,255,0.82);
   border: 1px solid rgba(28,25,23,0.06);
   box-shadow: 0 1px 2px rgba(0,0,0,0.04), 0 4px 16px rgba(0,0,0,0.04);
 }
 
-.light .glass-strong {
+:is(.light, [data-theme="light"]) .glass-strong {
   background: rgba(255,255,255,0.92);
   border: 1px solid rgba(28,25,23,0.07);
   box-shadow: 0 1px 3px rgba(0,0,0,0.03), 0 8px 32px rgba(0,0,0,0.06);
 }
 
-.light .glass-hover:hover {
+:is(.light, [data-theme="light"]) .glass-hover:hover {
   background: #fff;
   border-color: rgba(212,160,17,0.2);
   box-shadow: 0 1px 3px rgba(0,0,0,0.03), 0 12px 40px rgba(212,160,17,0.08);
 }
 
-.light .glass-lux {
+:is(.light, [data-theme="light"]) .glass-lux {
   background: rgba(255, 255, 255, 0.75);
   backdrop-filter: blur(20px) saturate(1.2);
   -webkit-backdrop-filter: blur(20px) saturate(1.2);
@@ -507,7 +531,7 @@ h1, h2, h3, h4 { letter-spacing: -0.02em; }
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04), 0 1px 4px rgba(0, 0, 0, 0.03), inset 0 1px 0 rgba(255, 255, 255, 0.8);
 }
 
-.light .glass-lux-strong {
+:is(.light, [data-theme="light"]) .glass-lux-strong {
   background: rgba(255, 255, 255, 0.88);
   backdrop-filter: blur(32px) saturate(1.3);
   -webkit-backdrop-filter: blur(32px) saturate(1.3);
@@ -515,7 +539,7 @@ h1, h2, h3, h4 { letter-spacing: -0.02em; }
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05), 0 1px 6px rgba(0, 0, 0, 0.03), inset 0 1px 0 rgba(255, 255, 255, 0.9);
 }
 
-.light .glass-lux-interactive {
+:is(.light, [data-theme="light"]) .glass-lux-interactive {
   background: rgba(255, 255, 255, 0.75);
   backdrop-filter: blur(20px) saturate(1.2);
   -webkit-backdrop-filter: blur(20px) saturate(1.2);
@@ -523,54 +547,54 @@ h1, h2, h3, h4 { letter-spacing: -0.02em; }
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04), 0 1px 4px rgba(0, 0, 0, 0.03);
 }
 
-.light .glass-lux-interactive:hover {
+:is(.light, [data-theme="light"]) .glass-lux-interactive:hover {
   border-color: rgba(212, 160, 17, 0.2);
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.06), 0 2px 8px rgba(0, 0, 0, 0.04), inset 0 1px 0 rgba(255, 255, 255, 0.9);
 }
 
-.light .hover-lift:hover {
+:is(.light, [data-theme="light"]) .hover-lift:hover {
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06), 0 2px 8px rgba(0, 0, 0, 0.04);
 }
 
-.light .hover-glow:hover {
+:is(.light, [data-theme="light"]) .hover-glow:hover {
   box-shadow: 0 0 0 2px rgba(212, 160, 17, 0.12),
               0 0 16px rgba(212, 160, 17, 0.08),
               0 6px 20px rgba(0, 0, 0, 0.05);
 }
 
-.light .gradient-text {
+:is(.light, [data-theme="light"]) .gradient-text {
   background: linear-gradient(135deg, #d4a011 0%, #b8860b 50%, #996515 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
 
-.light .btn-glow {
+:is(.light, [data-theme="light"]) .btn-glow {
   background: linear-gradient(135deg, #d4a011 0%, #b8860b 100%);
   box-shadow: 0 4px 14px rgba(212,160,17,0.25);
   color: #fff;
 }
 
-.light .btn-glow:hover { box-shadow: 0 6px 24px rgba(212,160,17,0.35); }
+:is(.light, [data-theme="light"]) .btn-glow:hover { box-shadow: 0 6px 24px rgba(212,160,17,0.35); }
 
-.light .input-glass {
+:is(.light, [data-theme="light"]) .input-glass {
   background: #fff;
   border: 1px solid rgba(28,25,23,0.1);
   color: #1c1917;
 }
-.light .input-glass::placeholder { color: rgba(28,25,23,0.35); }
-.light .input-glass:focus {
+:is(.light, [data-theme="light"]) .input-glass::placeholder { color: rgba(28,25,23,0.35); }
+:is(.light, [data-theme="light"]) .input-glass:focus {
   border-color: #d4a011;
   box-shadow: 0 0 0 3px rgba(212,160,17,0.12);
   background: #fff;
 }
 
-.light ::-webkit-scrollbar-track { background: rgba(0, 0, 0, 0.02); }
-.light ::-webkit-scrollbar-thumb { background: rgba(28,25,23,0.12); }
-.light ::-webkit-scrollbar-thumb:hover { background: rgba(28,25,23,0.22); }
-.light .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(28,25,23,0.08); }
+:is(.light, [data-theme="light"]) ::-webkit-scrollbar-track { background: rgba(0, 0, 0, 0.02); }
+:is(.light, [data-theme="light"]) ::-webkit-scrollbar-thumb { background: rgba(28,25,23,0.12); }
+:is(.light, [data-theme="light"]) ::-webkit-scrollbar-thumb:hover { background: rgba(28,25,23,0.22); }
+:is(.light, [data-theme="light"]) .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(28,25,23,0.08); }
 
-.light .focus-lux:focus-visible {
+:is(.light, [data-theme="light"]) .focus-lux:focus-visible {
   box-shadow: 0 0 0 4px rgba(212,160,17,0.18);
   border-color: rgba(212,160,17,0.5) !important;
 }

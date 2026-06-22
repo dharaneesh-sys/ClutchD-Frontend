@@ -1,6 +1,6 @@
 "use client";
 
-import { useToastStore } from "@/lib/stores/toastStore";
+import { useToastStore } from "@/store/toastStore";
 import { Toast } from "@/components/ui/Toast";
 
 export function ToastProvider() {
