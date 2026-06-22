@@ -1,12 +1,9 @@
 import { forwardRef, useId } from "react";
 import { cn } from "@/lib/utils";
 import { UploadCloud, X } from "lucide-react";
-import { useThemeStore } from "@/store/themeStore";
 
 export const FileUpload = forwardRef(
   ({ className, error, label, value, onChange, accept = "image/*", multiple = false, maxSizeMB = 5, ...props }, ref) => {
-    const { theme } = useThemeStore();
-    const isLight = theme === "light";
     const generatedId = useId();
     
     const handleFileChange = (e) => {
@@ -60,9 +57,7 @@ export const FileUpload = forwardRef(
           <div 
             className={cn(
               "relative flex flex-col items-center justify-center w-full min-h-[120px] rounded-xl border border-dashed px-4 py-6 text-center transition-all cursor-pointer",
-              isLight
-                ? "border-border-subtle bg-surface-soft hover:bg-yellow-50 hover:border-yellow-400"
-                : "border-border-subtle bg-surface-soft hover:bg-white/10 hover:border-primary/50",
+              "border-border-subtle bg-surface-soft hover:bg-surface-mid hover:border-primary/50",
               error && "border-red-500/50 bg-red-500/5",
               className
             )}
@@ -79,12 +74,12 @@ export const FileUpload = forwardRef(
               ref={ref}
               {...props}
             />
-            <UploadCloud size={32} className={`mb-3 opacity-80 ${isLight ? "text-slate-400" : "text-primary-light"}`} />
+            <UploadCloud size={32} className="mb-3 opacity-80 text-icon-highlight" />
             <p className="text-sm font-medium mb-1 text-text-primary">Click to upload or drag & drop</p>
             <p className="text-xs text-text-muted">PNG, JPG up to {maxSizeMB}MB</p>
           </div>
         ) : (
-          <div className={`flex items-center justify-between w-full rounded-xl border px-4 py-3 ${isLight ? "border-yellow-200 bg-yellow-50" : "border-primary/30 bg-primary/10"}`}>
+          <div className="flex items-center justify-between w-full rounded-xl border px-4 py-3 border-primary/30 bg-primary/10">
             <div className="flex items-center gap-3 overflow-hidden">
               <UploadCloud size={20} className="shrink-0 text-icon-highlight" />
               <span className="text-sm truncate text-text-primary">
@@ -93,7 +88,7 @@ export const FileUpload = forwardRef(
             </div>
             <button
               onClick={clearFile}
-              className={`p-1 rounded-md transition-colors shrink-0 ml-2 ${isLight ? "hover:bg-yellow-100 text-icon-highlight hover:text-yellow-800" : "hover:bg-white/10 text-text-muted hover:text-white"}`}
+              className="p-1 rounded-md transition-colors shrink-0 ml-2 hover:bg-surface-soft text-text-muted hover:text-foreground"
               type="button"
             >
               <X size={16} />

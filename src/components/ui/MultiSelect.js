@@ -1,13 +1,9 @@
 import { useState, useRef, useEffect } from "react";
 import { cn } from "@/lib/utils";
 import { Check, ChevronDown, X } from "lucide-react";
-import { useThemeStore } from "@/store/themeStore";
-
 export function MultiSelect({ options = [], value = [], onChange, label, error, placeholder = "Select options..." }) {
   const [isOpen, setIsOpen] = useState(false);
   const [activeIndex, setActiveIndex] = useState(-1);
-  const { theme } = useThemeStore();
-  const isLight = theme === "light";
   const containerRef = useRef(null);
   const triggerRef = useRef(null);
 
@@ -105,9 +101,7 @@ export function MultiSelect({ options = [], value = [], onChange, label, error, 
         className={cn(
           "min-h-[48px] w-full rounded-xl border px-4 py-2 text-sm",
           "transition-all cursor-pointer flex flex-wrap gap-2 items-center",
-          isLight
-            ? "border-border-subtle bg-white text-text-primary focus-within:border-yellow-500 focus-within:bg-white focus-within:ring-2 focus-within:ring-yellow-500/20"
-            : "border-border-subtle bg-bg-card text-text-primary focus-within:border-primary focus-within:bg-white/10 focus-within:ring-2 focus-within:ring-primary/20",
+          "border-border-subtle bg-surface text-text-primary focus-within:border-primary focus-within:bg-surface focus-within:ring-2 focus-within:ring-primary/20",
           error && "border-red-500/50"
         )}
         onClick={() => {
@@ -123,14 +117,14 @@ export function MultiSelect({ options = [], value = [], onChange, label, error, 
           selectedLabels.map((lbl, idx) => (
             <span 
               key={idx} 
-              className={`inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs border ${isLight ? "bg-yellow-500/15 text-icon-highlight border-yellow-500/25" : "bg-primary/20 text-primary-light border-primary/30"}`}
+              className="inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs border bg-primary/20 text-primary-light border-primary/30"
             >
               {lbl}
               <button
                 type="button"
                 aria-label={`Remove ${lbl}`}
                 onClick={(e) => removeOption(e, value[idx])}
-                className={`focus:outline-none ${isLight ? "hover:text-yellow-900" : "hover:text-primary-light"}`}
+                className="focus:outline-none hover:text-primary-light"
               >
                 <X size={14} />
               </button>
@@ -147,7 +141,7 @@ export function MultiSelect({ options = [], value = [], onChange, label, error, 
         <div
           id={listboxId}
           role="listbox"
-          className={`absolute z-20 mt-2 w-full rounded-xl border shadow-xl max-h-60 overflow-auto ${isLight ? "border-border-subtle bg-white" : "border-border-subtle bg-[#064e3b]"}`}
+          className="absolute z-20 mt-2 w-full rounded-xl border shadow-xl max-h-60 overflow-auto border-border-subtle bg-surface"
         >
           {options.map((option, index) => (
             <div

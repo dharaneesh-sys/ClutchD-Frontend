@@ -1,15 +1,12 @@
 "use client";
 
 import { useTrackingStore } from "@/store/trackingStore";
-import { useThemeStore } from "@/store/themeStore";
 import { MapPin, Star, Wrench, Building2, Navigation } from "lucide-react";
 import { GlassCard } from "@/components/ui/GlassCard";
 import { cn } from "@/lib/utils";
 
 export function ProviderList() {
   const { nearbyMechanics, nearbyGarages, isLoading, error } = useTrackingStore();
-  const { theme } = useThemeStore();
-  const isLight = theme === "light";
 
   if (isLoading) {
     return (
@@ -53,17 +50,9 @@ export function ProviderList() {
         <GlassCard 
           key={`${provider.type}-${provider.id}`} 
           variant="flat"
-            className={cn(
-              "p-4 flex items-start gap-4 hover-lift cursor-pointer group",
-              isLight ? "hover:border-yellow-500/30" : "hover:border-primary/30"
-            )}
+            className="p-4 flex items-start gap-4 hover-lift cursor-pointer group hover:border-icon-highlight/30"
         >
-          <div className={cn(
-            "w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0",
-            provider.type === "mechanic" 
-              ? (isLight ? "bg-blue-100 text-blue-600" : "bg-blue-500/20 text-blue-400")
-              : (isLight ? "bg-purple-100 text-purple-600" : "bg-purple-500/20 text-purple-400")
-          )}>
+          <div className="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 bg-surface-soft text-icon-highlight">
             {provider.type === "mechanic" ? <Wrench size={20} /> : <Building2 size={20} />}
           </div>
           

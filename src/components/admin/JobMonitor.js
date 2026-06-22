@@ -4,7 +4,6 @@ import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { Modal } from "@/components/ui/Modal";
 import { MapPin, Navigation, Clock, AlertTriangle, Crosshair } from "lucide-react";
-import { useThemeStore } from "@/store/themeStore";
 import { useToast } from "@/components/ui/ToastProvider";
 import { fetchJobs, forceAssignJob, trackJob } from "@/services/adminService";
 import dynamic from "next/dynamic";
@@ -47,9 +46,7 @@ export function JobMonitor() {
   const [trackMapModal, setTrackMapModal] = useState(null);
   const [trackData, setTrackData] = useState(null);
   const [mapLoading, setMapLoading] = useState(false);
-  const { theme } = useThemeStore();
   const { success: showSuccess, error: showError } = useToast();
-  const isLight = theme === "light";
 
   const loadJobs = async () => {
     setLoading(true);

@@ -6,7 +6,6 @@ import { Logo } from "@/components/ui/Logo";
 import { ConnectionIndicator } from "@/components/ui/ConnectionIndicator";
 import { NotificationBell } from "@/components/ui/NotificationBell";
 import { useAuthStore } from "@/store/authStore";
-import { useThemeStore } from "@/store/themeStore";
 import { useRouter } from "next/navigation";
 import { LogOut, User, Building2, Wrench, Menu, X } from "lucide-react";
 
@@ -15,16 +14,22 @@ const MODE_CONFIG = {
     icon: User,
     label: "Customer Mode",
     color: "yellow",
+    textClass: "text-yellow-600 dark:text-yellow-100/60",
+    avatarClass: "bg-yellow-500/15 dark:bg-yellow-500/20 border border-yellow-500/30 text-yellow-600 dark:text-yellow-300",
   },
   garage: {
     icon: Building2,
     label: "Business Mode",
     color: "amber",
+    textClass: "text-amber-600 dark:text-amber-100/60",
+    avatarClass: "bg-amber-500/15 dark:bg-amber-500/20 border border-amber-500/30 text-amber-600 dark:text-amber-300",
   },
   mechanic: {
     icon: Wrench,
     label: "Provider Mode",
     color: "emerald",
+    textClass: "text-emerald-600 dark:text-emerald-100/60",
+    avatarClass: "bg-emerald-500/15 dark:bg-emerald-500/20 border border-emerald-500/30 text-emerald-600 dark:text-emerald-300",
   },
 };
 
@@ -37,11 +42,9 @@ export function DashboardShell({
   sidebar,
   className,
 }) {
-  const { theme } = useThemeStore();
   const { logout } = useAuthStore();
   const router = useRouter();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const isLight = theme === "light";
   const config = MODE_CONFIG[mode] || MODE_CONFIG.customer;
   const ModeIcon = config.icon;
 
@@ -75,7 +78,7 @@ export function DashboardShell({
           {subtitle && (
             <span className={cn(
               "text-[10px] uppercase tracking-wider font-medium",
-              isLight ? `text-${config.color}-600` : `text-${config.color}-100/60`
+              config.textClass
             )}>
               {subtitle}
             </span>
@@ -94,7 +97,7 @@ export function DashboardShell({
             </span>
             <span className={cn(
               "text-[10px] uppercase tracking-wider font-medium",
-              isLight ? `text-${config.color}-600` : `text-${config.color}-100/60`
+              config.textClass
             )}>
               {config.label}
             </span>
@@ -107,9 +110,7 @@ export function DashboardShell({
           {/* User avatar */}
           <div className={cn(
             "w-9 h-9 lg:w-10 lg:h-10 rounded-full flex items-center justify-center",
-            isLight
-              ? `bg-${config.color}-500/15 border border-${config.color}-500/30 text-${config.color}-600`
-              : `bg-${config.color}-500/20 border border-${config.color}-500/30 text-${config.color}-300`
+            config.avatarClass
           )}>
             <ModeIcon size={16} />
           </div>
@@ -120,9 +121,7 @@ export function DashboardShell({
             aria-label="Logout"
             className={cn(
               "w-9 h-9 lg:w-10 lg:h-10 rounded-full flex items-center justify-center transition-colors",
-              isLight
-                ? "bg-surface-soft hover:bg-red-50 border border-border-subtle hover:border-red-200 text-text-muted hover:text-red-500"
-                : "bg-surface-soft hover:bg-red-500/20 border border-border-subtle hover:border-red-500/30 text-text-muted hover:text-red-400"
+              "bg-surface-soft hover:bg-red-50 dark:hover:bg-red-500/20 border border-border-subtle hover:border-red-200 dark:hover:border-red-500/30 text-text-muted hover:text-red-500 dark:hover:text-red-400"
             )}
           >
             <LogOut size={15} />
@@ -186,9 +185,7 @@ export function DashboardShell({
               onClick={handleLogout}
               className={cn(
                 "w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-colors mt-4",
-                isLight
-                  ? "text-red-600 hover:bg-red-50"
-                  : "text-red-400 hover:bg-red-500/10"
+                "text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-500/10"
               )}
             >
               <LogOut size={18} />

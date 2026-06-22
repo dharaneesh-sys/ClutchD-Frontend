@@ -5,7 +5,6 @@ import { Button } from "@/components/ui/Button";
 import { Modal } from "@/components/ui/Modal";
 import { Input } from "@/components/ui/Input";
 import { AlertCircle, FileText, CheckCircle2, DollarSign, AlertTriangle, MessageSquare } from "lucide-react";
-import { useThemeStore } from "@/store/themeStore";
 import { useToast } from "@/components/ui/ToastProvider";
 import { fetchDisputes, resolveDisputeWithStatus, refundDispute, penalizeProvider, messageDisputeParties } from "@/services/adminService";
 
@@ -19,9 +18,7 @@ export function DisputePanel() {
   const [messageModal, setMessageModal] = useState(null);
   const [messageText, setMessageText] = useState("");
   const [amountInput, setAmountInput] = useState("");
-  const { theme } = useThemeStore();
   const { success: showSuccess, error: showError } = useToast();
-  const isLight = theme === "light";
 
   const loadDisputes = async () => {
     setLoading(true);

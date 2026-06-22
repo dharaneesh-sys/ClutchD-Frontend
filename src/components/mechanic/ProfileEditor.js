@@ -6,15 +6,12 @@ import { MultiSelect } from "@/components/ui/MultiSelect";
 import { EXPERTISE_OPTIONS } from "@/lib/constants";
 import { User, MapPin, Phone, Loader2, QrCode } from "lucide-react";
 import { useAuthStore } from "@/store/authStore";
-import { useThemeStore } from "@/store/themeStore";
 import { useToast } from "@/components/ui/ToastProvider";
 import api from "@/lib/api";
 
 export function ProfileEditor() {
   const { user, updateUserData } = useAuthStore();
-  const { theme } = useThemeStore();
   const { error: showError } = useToast();
-  const isLight = theme === "light";
   const [isEditing, setIsEditing] = useState(false);
   const [expertise, setExpertise] = useState(user?.expertise || []);
   const [saving, setSaving] = useState(false);

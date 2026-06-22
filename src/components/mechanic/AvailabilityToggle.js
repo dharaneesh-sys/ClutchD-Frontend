@@ -4,15 +4,13 @@ import { Power, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import api from "@/lib/api";
 import { useAuthStore } from "@/store/authStore";
-import { useThemeStore } from "@/store/themeStore";
 
 export function AvailabilityToggle() {
   const { user, updateUserData } = useAuthStore();
   const [isOnline, setIsOnline] = useState(user?.isOnline ?? true);
   const [loading, setLoading] = useState(false);
   
-  const { theme } = useThemeStore();
-  const isLight = theme === "light";
+
 
   useEffect(() => {
     if (user && user.isOnline !== undefined) {

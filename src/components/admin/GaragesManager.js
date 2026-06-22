@@ -5,7 +5,6 @@ import { Input } from "@/components/ui/Input";
 import { Modal } from "@/components/ui/Modal";
 import { Button } from "@/components/ui/Button";
 import { Search, Star, MapPin, Phone, Users, Clock, Wrench, Eye, CheckCircle, XCircle } from "lucide-react";
-import { useThemeStore } from "@/store/themeStore";
 import { useToast } from "@/components/ui/ToastProvider";
 import { fetchGarages, verifyGarage } from "@/services/adminService";
 
@@ -16,9 +15,7 @@ export function GaragesManager() {
   const [error, setError] = useState(null);
   const [actionLoading, setActionLoading] = useState(null);
   const [profileModal, setProfileModal] = useState(null);
-  const { theme } = useThemeStore();
   const { success: showSuccess, error: showError } = useToast();
-  const isLight = theme === "light";
 
   const loadData = async () => {
     setLoading(true);

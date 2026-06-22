@@ -3,7 +3,6 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { loginSchema } from "@/lib/validators";
 import { useAuthStore } from "@/store/authStore";
-import { useThemeStore } from "@/store/themeStore";
 import { Mail, Lock, LogIn, UserCircle, Wrench, Building2 } from "lucide-react";
 import { GlassCard } from "@/components/ui/GlassCard";
 import { Button } from "@/components/ui/Button";
@@ -14,8 +13,6 @@ import { useRouter } from "next/navigation";
 
 export function LoginCard() {
   const { login, loginWithGoogle, isLoading, error: authError } = useAuthStore();
-  const { theme } = useThemeStore();
-  const isLight = theme === "light";
   const router = useRouter();
   const [selectedRole, setSelectedRole] = useState("customer");
   const selectedRoleRef = useRef(selectedRole);

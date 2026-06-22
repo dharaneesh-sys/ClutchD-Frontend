@@ -9,7 +9,6 @@ import { AvailabilityToggle } from "@/components/mechanic/AvailabilityToggle";
 import { IncomingJobs } from "@/components/mechanic/IncomingJobs";
 import { EarningsChart } from "@/components/mechanic/EarningsChart";
 import { useAuthStore } from "@/store/authStore";
-import { useThemeStore } from "@/store/themeStore";
 import { useTrackingStore } from "@/store/trackingStore";
 import { LogOut, Wrench, Briefcase, MapPin, DollarSign } from "lucide-react";
 import { NotificationBell } from "@/components/ui/NotificationBell";
@@ -28,8 +27,6 @@ const NavigationMap = dynamic(
 
 export default function MechanicDashboard() {
   const { user, logout, isAuthenticated, _hydrated } = useAuthStore();
-  const { theme } = useThemeStore();
-  const isLight = theme === "light";
   const router = useRouter();
 
   useEffect(() => {
@@ -98,7 +95,7 @@ export default function MechanicDashboard() {
             
             <div className="h-[250px] sm:h-[300px] rounded-2xl overflow-hidden relative shadow-2xl border">
                <NavigationMap />
-               <div className={`absolute top-4 left-4 z-[400] backdrop-blur-md px-3 py-1.5 rounded-full border text-xs font-semibold flex items-center gap-2 ${isLight ? "bg-white/80 border-slate-200 text-slate-700" : "bg-black/60 border-white/10 text-white"}`}>
+               <div className="absolute top-4 left-4 z-[400] backdrop-blur-md px-3 py-1.5 rounded-full border text-xs font-semibold flex items-center gap-2 bg-white/80 dark:bg-black/60 border-slate-200 dark:border-white/10 text-slate-700 dark:text-white">
                  <span className="w-2 h-2 rounded-full bg-blue-400 animate-pulse" />
                  Navigation
                </div>

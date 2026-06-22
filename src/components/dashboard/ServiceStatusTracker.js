@@ -2,11 +2,8 @@ import { SERVICE_STATUS, GST_RATE } from "@/lib/constants";
 import { GlassCard } from "@/components/ui/GlassCard";
 import { Button } from "@/components/ui/Button";
 import { Search, UserCheck, Navigation, Wrench, CreditCard, CheckCircle2, Phone, MessageSquare, MapPin, Star } from "lucide-react";
-import { useThemeStore } from "@/store/themeStore";
 
 export function ServiceStatusTracker({ request, onComplete, onCancel }) {
-  const { theme } = useThemeStore();
-  const isLight = theme === "light";
 
   if (!request) return null;
 
@@ -28,7 +25,7 @@ export function ServiceStatusTracker({ request, onComplete, onCancel }) {
         return (
           <div className="text-center py-6">
             <div className="w-16 h-16 mx-auto rounded-full flex items-center justify-center mb-4 relative bg-surface-soft text-icon-highlight">
-              <div className={`absolute inset-0 rounded-full border-2 animate-ping ${isLight ? "border-yellow-400/30" : "border-amber-400/30"}`}></div>
+              <div className="absolute inset-0 rounded-full border-2 animate-ping border-icon-highlight/30"></div>
               <Search size={28} />
             </div>
             <h3 className="text-lg font-bold mb-2 text-text-primary">Locating Providers Nearby</h3>
@@ -56,10 +53,10 @@ export function ServiceStatusTracker({ request, onComplete, onCancel }) {
                 </div>
               </div>
               <div className="flex gap-2 text-text-primary">
-                <button type="button" className={`w-9 h-9 flex items-center justify-center rounded-full transition-colors ${isLight ? "bg-slate-200 hover:bg-yellow-500 hover:text-white" : "bg-white/10 hover:bg-primary hover:text-white"}`}>
+                <button type="button" className="w-9 h-9 flex items-center justify-center rounded-full transition-colors bg-surface-soft hover:bg-icon-highlight hover:text-white">
                   <Phone size={16} />
                 </button>
-                <button type="button" className={`w-9 h-9 flex items-center justify-center rounded-full transition-colors ${isLight ? "bg-slate-200 hover:bg-yellow-500 hover:text-white" : "bg-white/10 hover:bg-primary hover:text-white"}`}>
+                <button type="button" className="w-9 h-9 flex items-center justify-center rounded-full transition-colors bg-surface-soft hover:bg-icon-highlight hover:text-white">
                   <MessageSquare size={16} />
                 </button>
               </div>

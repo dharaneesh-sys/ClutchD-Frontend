@@ -4,7 +4,6 @@ import { useState, useEffect } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import { Sidebar } from "@/components/admin/Sidebar";
 import { useAuthStore } from "@/store/authStore";
-import { useThemeStore } from "@/store/themeStore";
 import { Menu, X } from "lucide-react";
 import { Logo } from "@/components/ui/Logo";
 import { NAVIGATION_EVENT } from "@/lib/navigation";
@@ -12,8 +11,6 @@ import { NAVIGATION_EVENT } from "@/lib/navigation";
 export default function AdminLayout({ children }) {
   const pathname = usePathname();
   const { isAuthenticated, user, _hydrated } = useAuthStore();
-  const { theme } = useThemeStore();
-  const isLight = theme === "light";
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const router = useRouter();
 
@@ -85,13 +82,13 @@ export default function AdminLayout({ children }) {
           h-full w-72 lg:w-64
           transition-transform duration-300 ease-in-out
           rounded-2xl overflow-hidden border shadow-2xl
-          ${isLight ? "border-slate-200" : "border-white/5"}
+          border-border-subtle
         `}
       >
         <Sidebar currentPath={pathname} onClose={() => setSidebarOpen(false)} />
       </div>
 
-      <main className={`flex-1 rounded-2xl border shadow-2xl overflow-y-auto custom-scrollbar p-4 sm:p-6 lg:p-8 ${isLight ? "bg-[var(--surface)]/80 border-slate-200" : "bg-white/5 border-white/5"}`}>
+      <main className="flex-1 rounded-2xl border shadow-2xl overflow-y-auto custom-scrollbar p-4 sm:p-6 lg:p-8 bg-bg-card border-border-subtle">
         {children}
       </main>
     </div>

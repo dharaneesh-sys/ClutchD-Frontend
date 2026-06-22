@@ -4,7 +4,6 @@ import { useState, useEffect } from "react";
 import { GlassCard } from "@/components/ui/GlassCard";
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import api from "@/lib/api";
-import { useThemeStore } from "@/store/themeStore";
 import { Loader2 } from "lucide-react";
 
 export function EarningsChart() {
@@ -12,10 +11,18 @@ export function EarningsChart() {
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(true);
   
-  const { theme } = useThemeStore();
-  const isLight = theme === "light";
+  const getCSSVar = (name, fallback) => {
+    if (typeof document === 'undefined') return fallback;
+    return getComputedStyle(document.documentElement).getPropertyValue(name).trim() || fallback;
+  };
   
-  const primaryColor = isLight ? "#eab308" : "#10b981";
+  const primaryColor = getCSSVar('--primary', '#10b981');
+  const tickColor = getCSSVar('--on-surface-variant', 'rgba(255,255,255,0.4)');
+  const gridColor = getCSSVar('--outline-variant', 'rgba(255,255,255,0.05)');
+  const tooltipBg = getCSSVar('--surface-container', '#18181b');
+  const tooltipBorder = getCSSVar('--outline-variant', 'rgba(255,255,255,0.1)');
+  const tooltipColor = getCSSVar('--on-surface', '#fff');
+  const boxShadow = getCSSVar('--elevation-2', '0 2px 6px 2px rgba(0,0,0,0.15)');
 
   useEffect(() => {
     async function fetchEarnings() {
@@ -58,31 +65,31 @@ export function EarningsChart() {
             <AreaChart data={data} margin={{ top: 10, right: 0, left: -20, bottom: 0 }}>
               <defs>
                 <linearGradient id="colorEarnings" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor={primaryColor} stopOpacity={isLight ? 0.2 : 0.3}/>
+                  <stop offset="5%" stopColor={primaryColor} stopOpacity={0.25}/>
                   <stop offset="95%" stopColor={primaryColor} stopOpacity={0}/>
                 </linearGradient>
               </defs>
-              <CartesianGrid strokeDasharray="3 3" stroke={isLight ? "rgba(15,23,42,0.05)" : "rgba(255,255,255,0.05)"} vertical={false} />
+              <CartesianGrid strokeDasharray="3 3" stroke={gridColor} vertical={false} />
               <XAxis 
                 dataKey="name" 
-                tick={{fill: isLight ? 'rgba(15,23,42,0.5)' : 'rgba(255,255,255,0.4)', fontSize: 12}} 
+                tick={{fill: tickColor, fontSize: 12}} 
                 axisLine={false} 
                 tickLine={false} 
                 dy={10}
               />
               <YAxis 
-                tick={{fill: isLight ? 'rgba(15,23,42,0.5)' : 'rgba(255,255,255,0.4)', fontSize: 12}} 
+                tick={{fill: tickColor, fontSize: 12}} 
                 axisLine={false} 
                 tickLine={false} 
                 tickFormatter={(value) => `₹${value}`}
               />
               <Tooltip 
                 contentStyle={{ 
-                  backgroundColor: isLight ? '#ffffff' : '#18181b', 
-                  borderColor: isLight ? '#e2e8f0' : 'rgba(255,255,255,0.1)', 
+                  backgroundColor: tooltipBg,
+                  borderColor: tooltipBorder,
                   borderRadius: '8px', 
-                  color: isLight ? '#0f172a' : '#fff',
-                  boxShadow: isLight ? '0 4px 6px -1px rgb(0 0 0 / 0.1)' : 'none'
+                  color: tooltipColor,
+                  boxShadow: boxShadow,
                 }}
                 itemStyle={{ color: primaryColor }}
                 formatter={(value) => [`₹${value}`, 'Earnings']}

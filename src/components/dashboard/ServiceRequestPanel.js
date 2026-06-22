@@ -11,13 +11,12 @@ import { Button } from "@/components/ui/Button";
 import { Select } from "@/components/ui/Select";
 import { FileUpload } from "@/components/ui/FileUpload";
 import { Navigation, CheckCircle2, CarFront, PlusCircle, MapPin, Loader2, LocateFixed } from "lucide-react";
-import { useThemeStore } from "@/store/themeStore";
 import { useTrackingStore } from "@/store/trackingStore";
 import { cn } from "@/lib/utils";
 import api from "@/lib/api";
 import { VehicleManagerModal } from "@/components/dashboard/VehicleManagerModal";
 
-function LocationIndicator({ isLight }) {
+function LocationIndicator() {
   const { userLocation, gpsStatus, requestGPSLocation } = useTrackingStore();
   const [manualInput, setManualInput] = useState("");
   const [searching, setSearching] = useState(false);
@@ -149,8 +148,7 @@ export function ServiceRequestPanel({ onSubmit, isLoading }) {
   const [vehicles, setVehicles] = useState([]);
   const [isVehicleModalOpen, setIsVehicleModalOpen] = useState(false);
 
-  const { theme } = useThemeStore();
-  const isLight = theme === "light";
+
 
   const {
     register,
@@ -226,7 +224,7 @@ export function ServiceRequestPanel({ onSubmit, isLoading }) {
         <div className="space-y-4">
 
           {/* GPS Location */}
-          <LocationIndicator isLight={isLight} />
+          <LocationIndicator />
           
           {/* Vehicle Selection */}
           <div className="w-full">

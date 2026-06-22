@@ -1,7 +1,6 @@
 import { Modal } from "@/components/ui/Modal";
 import { Button } from "@/components/ui/Button";
 import { AlertTriangle } from "lucide-react";
-import { useThemeStore } from "@/store/themeStore";
 
 export function ConfirmModal({
   isOpen,
@@ -13,8 +12,6 @@ export function ConfirmModal({
   isLoading = false,
   variant = "danger",
 }) {
-  const { theme } = useThemeStore();
-  const isLight = theme === "light";
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} title={title} role="alertdialog">

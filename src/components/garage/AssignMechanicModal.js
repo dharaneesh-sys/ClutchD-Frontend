@@ -2,7 +2,6 @@ import { useState } from "react";
 import { Modal } from "@/components/ui/Modal";
 import { Button } from "@/components/ui/Button";
 import { User, CheckCircle2 } from "lucide-react";
-import { useThemeStore } from "@/store/themeStore";
 
 const MOCK_STAFF = [
   { id: "m1", name: "Rahul S.", rating: 4.8, status: "available", jobsToday: 2 },
@@ -13,8 +12,6 @@ const MOCK_STAFF = [
 
 export function AssignMechanicModal({ isOpen, onClose, job, onAssign }) {
   const [selectedMechanic, setSelectedMechanic] = useState(null);
-  const { theme } = useThemeStore();
-  const isLight = theme === "light";
   
   if (!job) return null;
 

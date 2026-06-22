@@ -1,7 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { Bell, Loader2, CheckCircle2 } from "lucide-react";
 import { useNotificationStore } from "@/store/notificationStore";
-import { useThemeStore } from "@/store/themeStore";
 import { useToast } from "@/components/ui/ToastProvider";
 import api from "@/lib/api";
 import { formatDistanceToNow } from "date-fns";
@@ -13,9 +12,7 @@ export function NotificationBell() {
   const dropdownRef = useRef(null);
   
   const { unreadCount, setUnreadCount } = useNotificationStore();
-  const { theme } = useThemeStore();
   const { error: showError } = useToast();
-  const isLight = theme === "light";
 
   // Initial fetch of unread count
   useEffect(() => {
@@ -80,9 +77,7 @@ export function NotificationBell() {
     <div className="relative" ref={dropdownRef}>
       <button 
         onClick={toggleDropdown}
-        className={`relative w-10 h-10 rounded-full flex items-center justify-center transition-colors ${
-          isLight ? "bg-slate-100 hover:bg-slate-200 text-slate-600" : "bg-white/5 hover:bg-white/10 text-white/70"
-        }`}
+        className="relative w-10 h-10 rounded-full flex items-center justify-center transition-colors bg-surface-soft hover:bg-surface-mid text-text-muted"
       >
         <Bell size={18} />
         {unreadCount > 0 && (
@@ -93,15 +88,13 @@ export function NotificationBell() {
       </button>
 
       {isOpen && (
-        <div className={`absolute right-0 mt-2 w-80 rounded-2xl shadow-xl border z-[500] flex flex-col overflow-hidden max-h-[400px] ${
-          isLight ? "bg-white border-slate-200" : "bg-[#18181b] border-white/10"
-        }`}>
-          <div className={`p-4 flex items-center justify-between border-b ${isLight ? "border-slate-100 bg-slate-50" : "border-white/5 bg-black/20"}`}>
-            <h3 className={`font-semibold ${isLight ? "text-slate-900" : "text-white"}`}>Notifications</h3>
+        <div className="absolute right-0 mt-2 w-80 rounded-2xl shadow-xl border z-[500] flex flex-col overflow-hidden max-h-[400px] bg-surface border-border-subtle">
+          <div className="p-4 flex items-center justify-between border-b border-border-subtle bg-surface-container-low">
+            <h3 className="font-semibold text-text-primary">Notifications</h3>
               {unreadCount > 0 && (
                 <button 
                   onClick={markAllRead} 
-                  className={`text-xs flex items-center gap-1 hover:underline ${isLight ? "text-slate-500" : "text-primary-light"}`}
+                  className="text-xs flex items-center gap-1 hover:underline text-text-muted"
                 >
                   <CheckCircle2 size={12} /> Mark all read
                 </button>
@@ -111,14 +104,14 @@ export function NotificationBell() {
           <div className="flex-1 overflow-y-auto custom-scrollbar">
             {loading ? (
               <div className="flex justify-center p-8">
-                <Loader2 size={24} className={`animate-spin ${isLight ? "text-slate-400" : "text-primary-light"}`} />
+                <Loader2 size={24} className="animate-spin text-text-muted" />
               </div>
             ) : notifications.length === 0 ? (
               <div className="p-8 text-center text-sm opacity-50">
                 You have no notifications.
               </div>
             ) : (
-              <div className={`divide-y ${isLight ? "divide-stone-100" : "divide-white/5"}`}>
+              <div className="divide-y divide-border-subtle">
                 {notifications.map(n => (
                   <div 
                     key={n.id} 
@@ -126,17 +119,17 @@ export function NotificationBell() {
                       className={`p-4 transition-colors cursor-pointer ${
                         !n.read 
                           ? "bg-surface-soft" 
-                          : (isLight ? "hover:bg-slate-50" : "hover:bg-white/5")
+                          : "hover:bg-surface-container-low"
                       }`}
                   >
                     <div className="flex items-start justify-between gap-2">
-                       <h4 className={`text-sm font-semibold mb-1 ${!n.read ? (isLight ? "text-yellow-700" : "text-primary-light") : (isLight ? "text-slate-800" : "text-white/80")}`}>
+                       <h4 className={`text-sm font-semibold mb-1 ${!n.read ? "text-icon-highlight" : "text-text-primary"}`}>
                           {n.title}
                         </h4>
                         {!n.read && <span className="w-2 h-2 rounded-full flex-shrink-0 mt-1 bg-primary" />}
                     </div>
-                    <p className={`text-xs mb-2 ${isLight ? "text-slate-600" : "text-on-surface-variant"}`}>{n.body}</p>
-                    <p className={`text-[10px] ${isLight ? "text-slate-400" : "text-on-surface-variant/40"}`}>
+                    <p className="text-xs mb-2 text-text-muted">{n.body}</p>
+                    <p className="text-[10px] text-text-dim">
                       {formatDistanceToNow(new Date(n.created_at), { addSuffix: true })}
                     </p>
                   </div>

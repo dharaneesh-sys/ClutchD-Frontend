@@ -4,7 +4,6 @@ import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 
 import { useAuthStore } from "@/store/authStore";
-import { useThemeStore } from "@/store/themeStore";
 import { LogOut, Building2, LayoutDashboard, Users, BarChart3 } from "lucide-react";
 import { ConnectionIndicator } from "@/components/ui/ConnectionIndicator";
 import { NotificationBell } from "@/components/ui/NotificationBell";
@@ -17,8 +16,6 @@ import { NAVIGATION_EVENT } from "@/lib/navigation";
 
 export default function GarageDashboard() {
   const { user, logout, isAuthenticated, _hydrated } = useAuthStore();
-  const { theme } = useThemeStore();
-  const isLight = theme === "light";
   const router = useRouter();
 
   useEffect(() => {

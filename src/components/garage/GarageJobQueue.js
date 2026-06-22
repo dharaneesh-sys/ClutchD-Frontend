@@ -8,7 +8,6 @@ import { Input } from "@/components/ui/Input";
 import { Clock, MapPin, Settings, Loader2, IndianRupee, AlertTriangle } from "lucide-react";
 import { AssignMechanicModal } from "@/components/garage/AssignMechanicModal";
 import api from "@/lib/api";
-import { useThemeStore } from "@/store/themeStore";
 import { FEE_CONSTANTS } from "@/lib/constants";
 import { useToast } from "@/components/ui/ToastProvider";
 import { formatDistanceToNow } from "date-fns";
@@ -19,9 +18,7 @@ export function GarageJobQueue() {
   const [assignModalOpen, setAssignModalOpen] = useState(false);
   const [selectedJob, setSelectedJob] = useState(null);
   
-  const { theme } = useThemeStore();
   const { success: showSuccess, error: showError } = useToast();
-  const isLight = theme === "light";
 
   // --- Job Completion Modal State ---
   const [completionModal, setCompletionModal] = useState(false);

@@ -6,7 +6,6 @@ import { useRouter } from "next/navigation";
 import { useServiceStore } from "@/store/serviceStore";
 import { useAuthStore } from "@/store/authStore";
 import { useTrackingStore } from "@/store/trackingStore";
-import { useThemeStore } from "@/store/themeStore";
 import { useDemoMode } from "@/lib/demo/demoMode";
 import { ServiceRequestPanel } from "@/components/dashboard/ServiceRequestPanel";
 import { ServiceStatusTracker } from "@/components/dashboard/ServiceStatusTracker";
@@ -41,8 +40,6 @@ const ServiceHistory = dynamic(
 export default function CustomerDashboard() {
   const { user, logout, isAuthenticated, _hydrated } = useAuthStore();
   const { activeRequest, createRequest, cancelRequest, restoreActiveRequest } = useServiceStore();
-  const { theme } = useThemeStore();
-  const isLight = theme === "light";
   const updateRequestStatus = useCallback(
     (...args) => useServiceStore.getState().updateRequestStatus(...args),
     []
@@ -198,8 +195,8 @@ export default function CustomerDashboard() {
           <div className="lg:col-span-7 xl:col-span-8 rounded-2xl overflow-hidden relative shadow-2xl min-h-[250px] sm:min-h-[350px] lg:min-h-[400px]">
             <MapView />
 
-            <div className={`absolute top-4 left-4 z-[400] glass-lux px-3 py-1.5 rounded-full text-xs font-semibold flex items-center gap-2 ${isLight ? "text-slate-700" : "text-white"}`}>
-              <span className={`w-2 h-2 rounded-full ${isLight ? "bg-yellow-500" : "bg-primary-light"}`} />
+            <div className="absolute top-4 left-4 z-[400] glass-lux px-3 py-1.5 rounded-full text-xs font-semibold flex items-center gap-2 text-foreground">
+              <span className="w-2 h-2 rounded-full bg-yellow-500 dark:bg-primary-light" />
               Live Area Map
             </div>
           </div>

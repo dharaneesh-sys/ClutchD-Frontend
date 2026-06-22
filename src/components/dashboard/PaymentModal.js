@@ -2,7 +2,6 @@ import { useState, useEffect, useRef } from "react";
 import { Modal } from "@/components/ui/Modal";
 import { Button } from "@/components/ui/Button";
 import { CreditCard, Smartphone, QrCode, Banknote, CheckCircle2, XCircle, Loader2, ChevronDown, ChevronUp } from "lucide-react";
-import { useThemeStore } from "@/store/themeStore";
 import { GST_RATE } from "@/lib/constants";
 import { useToast } from "@/components/ui/ToastProvider";
 import api from "@/lib/api";
@@ -34,9 +33,7 @@ export function PaymentModal({ isOpen, onClose, amount, pricing, jobId, onSucces
   const [qrData, setQrData] = useState(null);
   const [showBreakdown, setShowBreakdown] = useState(false);
   const qrPollRef = useRef(null);
-  const { theme } = useThemeStore();
   const { error: showError, success: showSuccess } = useToast();
-  const isLight = theme === "light";
 
   // Use the finalized total if available, else fall back to passed amount
   const displayAmount = pricing?.totalAmount ?? amount ?? 0;
@@ -119,7 +116,7 @@ export function PaymentModal({ isOpen, onClose, amount, pricing, jobId, onSucces
         description: "Vehicle Service Payment",
         order_id: orderData.order_id,
         prefill: {},
-        theme: { color: isLight ? "#eab308" : "#10b981" },
+        theme: { color: getComputedStyle(document.documentElement).getPropertyValue('--primary').trim() || '#10b981' },
         modal: { ondismiss: () => setPayState("idle") },
         handler: async (response) => {
           // 4. Verify on backend

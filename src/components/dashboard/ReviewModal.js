@@ -5,13 +5,10 @@ import { reviewSchema } from "@/lib/validators";
 import { Modal } from "@/components/ui/Modal";
 import { Button } from "@/components/ui/Button";
 import { StarRating } from "@/components/ui/StarRating";
-import { useThemeStore } from "@/store/themeStore";
 import { cn } from "@/lib/utils";
 
 export function ReviewModal({ isOpen, onClose, providerName, onSubmit }) {
   const [rating, setRating] = useState(0);
-  const { theme } = useThemeStore();
-  const isLight = theme === "light";
 
   const {
     register,
@@ -61,12 +58,7 @@ export function ReviewModal({ isOpen, onClose, providerName, onSubmit }) {
             Leave a comment (Optional)
           </label>
             <textarea
-              className={cn(
-                "w-full rounded-xl border px-4 py-3 text-sm transition-all min-h-[120px] resize-none",
-                isLight 
-                  ? "bg-bg-card border-border-subtle text-text-primary focus:border-yellow-500 focus:ring-2 focus:ring-yellow-500/20 focus:outline-none placeholder:text-text-dim"
-                  : "bg-bg-card border-border-subtle text-text-primary focus:border-primary focus:bg-white/10 focus:outline-none focus:ring-2 focus:ring-primary/20 placeholder:text-text-dim"
-              )}
+              className="w-full rounded-xl border px-4 py-3 text-sm transition-all min-h-[120px] resize-none bg-bg-card border-border-subtle text-text-primary placeholder:text-text-dim focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
               placeholder="Tell us what you liked or what could be improved..."
               {...register("comment")}
             />

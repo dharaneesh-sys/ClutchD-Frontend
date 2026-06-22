@@ -5,7 +5,6 @@ import { Input } from "@/components/ui/Input";
 import { Modal } from "@/components/ui/Modal";
 import { Button } from "@/components/ui/Button";
 import { Search, DollarSign, CreditCard, Receipt, RefreshCw } from "lucide-react";
-import { useThemeStore } from "@/store/themeStore";
 import { useToast } from "@/components/ui/ToastProvider";
 import { fetchPayments } from "@/services/adminService";
 import api from "@/lib/api";
@@ -19,9 +18,7 @@ export function PaymentsManager() {
   const [actionLoading, setActionLoading] = useState(null);
   const [refundModal, setRefundModal] = useState(null);
   const [refundAmount, setRefundAmount] = useState("");
-  const { theme } = useThemeStore();
   const { success: showSuccess, error: showError } = useToast();
-  const isLight = theme === "light";
 
   const loadData = async () => {
     setLoading(true);

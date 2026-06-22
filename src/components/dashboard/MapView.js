@@ -4,7 +4,6 @@ import { useEffect, useState } from "react";
 import { MapContainer, TileLayer, Marker, Popup, useMap, Polyline } from "react-leaflet";
 import L from "leaflet";
 import { useTrackingStore } from "@/store/trackingStore";
-import { useThemeStore } from "@/store/themeStore";
 
 // Fix for default Leaflet icon in Next.js
 const customMarkerIcon = (color) => new L.Icon({
@@ -28,8 +27,6 @@ function MapUpdater({ center }) {
 export default function MapView() {
   useEffect(() => { import("leaflet/dist/leaflet.css"); }, []);
   const { userLocation, mechanicLocation, navigationTarget, nearbyMechanics, nearbyGarages, fetchNearbyProviders } = useTrackingStore();
-  const { theme } = useThemeStore();
-  const isLight = theme === "light";
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
@@ -63,7 +60,7 @@ export default function MapView() {
   }, [navigationTarget, userLocation]);
 
   if (!mounted) {
-    return <div className={`w-full h-full rounded-2xl animate-pulse ${isLight ? "bg-stone-100" : "bg-[#0a2a1a]"}`} />;
+    return <div className="w-full h-full rounded-2xl animate-pulse bg-surface-container-low" />;
   }
 
   return (

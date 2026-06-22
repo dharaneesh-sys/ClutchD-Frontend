@@ -1,5 +1,4 @@
 import { cn } from "@/lib/utils";
-import { useThemeStore } from "@/store/themeStore";
 
 export function EmptyState({
   icon: Icon,
@@ -8,32 +7,21 @@ export function EmptyState({
   action,
   className,
 }) {
-  const { theme } = useThemeStore();
-  const isLight = theme === "light";
-
   return (
     <div
       className={cn(
         "flex flex-col items-center justify-center py-12 px-6 text-center rounded-2xl border",
-        isLight
-          ? "bg-slate-50/80 border-slate-200"
-          : "bg-black/20 border-white/5",
+        "bg-surface-container-low border-border-subtle",
         className
       )}
     >
       {Icon && (
         <Icon
           size={48}
-          className={`mb-4 opacity-40 ${
-            isLight ? "text-slate-300" : "text-white/20"
-          }`}
+          className="mb-4 opacity-40 text-text-dim"
         />
       )}
-      <h3
-        className={`text-lg font-semibold mb-1 ${
-          isLight ? "text-slate-800" : "text-white"
-        }`}
-      >
+      <h3 className="text-lg font-semibold mb-1 text-foreground">
         {title}
       </h3>
       {description && (

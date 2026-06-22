@@ -6,15 +6,12 @@ import { MultiSelect } from "@/components/ui/MultiSelect";
 import { EXPERTISE_OPTIONS } from "@/lib/constants";
 import { Building2, MapPin, Phone, Clock, Users, Loader2, QrCode } from "lucide-react";
 import { useAuthStore } from "@/store/authStore";
-import { useThemeStore } from "@/store/themeStore";
 import { useToast } from "@/components/ui/ToastProvider";
 import api from "@/lib/api";
 
 export function GarageProfile() {
   const { user, updateUserData } = useAuthStore();
-  const { theme } = useThemeStore();
   const { error: showError } = useToast();
-  const isLight = theme === "light";
   const [isEditing, setIsEditing] = useState(false);
   const [services, setServices] = useState(user?.services || []);
   const [saving, setSaving] = useState(false);

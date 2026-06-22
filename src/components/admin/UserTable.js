@@ -5,7 +5,6 @@ import { Input } from "@/components/ui/Input";
 import { Modal } from "@/components/ui/Modal";
 import { Button } from "@/components/ui/Button";
 import { Search, MoreVertical, Eye, ShieldOff, ShieldCheck } from "lucide-react";
-import { useThemeStore } from "@/store/themeStore";
 import { useToast } from "@/components/ui/ToastProvider";
 import { fetchUsers, toggleUserStatus } from "@/services/adminService";
 
@@ -20,9 +19,7 @@ export function UserTable() {
   const [openDropdown, setOpenDropdown] = useState(null);
   const [profileModal, setProfileModal] = useState(null);
   const dropdownRef = useRef(null);
-  const { theme } = useThemeStore();
   const { success: showSuccess, error: showError } = useToast();
-  const isLight = theme === "light";
 
   const loadUsers = async () => {
     setLoading(true);

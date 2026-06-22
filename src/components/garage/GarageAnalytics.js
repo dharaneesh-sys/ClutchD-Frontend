@@ -1,7 +1,6 @@
 "use client";
 
 import { GlassCard } from "@/components/ui/GlassCard";
-import { useThemeStore } from "@/store/themeStore";
 import { AreaChart, Area, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { AlertTriangle } from "lucide-react";
 
@@ -26,12 +25,18 @@ const jobsData = [
 ];
 
 export function GarageAnalytics() {
-  const { theme } = useThemeStore();
-  const isLight = theme === "light";
-  const primaryColor = isLight ? "#d4a011" : "#10b981";
-  const barColor = isLight ? "#6366f1" : "#3b82f6";
-  const tickColor = isLight ? 'rgba(28,25,23,0.45)' : 'rgba(255,255,255,0.4)';
-  const gridColor = isLight ? 'rgba(28,25,23,0.06)' : 'rgba(255,255,255,0.05)';
+  const getCSSVar = (name, fallback) => {
+    if (typeof document === 'undefined') return fallback;
+    return getComputedStyle(document.documentElement).getPropertyValue(name).trim() || fallback;
+  };
+  const primaryColor = getCSSVar('--primary', '#10b981');
+  const barColor = getCSSVar('--primary', '#10b981');
+  const tickColor = getCSSVar('--on-surface-variant', 'rgba(255,255,255,0.4)');
+  const gridColor = getCSSVar('--outline-variant', 'rgba(255,255,255,0.05)');
+  const tooltipBg = getCSSVar('--surface-container', '#18181b');
+  const tooltipBorder = getCSSVar('--outline-variant', 'rgba(255,255,255,0.1)');
+  const tooltipColor = getCSSVar('--on-surface', '#fff');
+  const boxShadow = getCSSVar('--elevation-2', '0 2px 6px 2px rgba(0,0,0,0.15)');
 
   return (
     <GlassCard variant="strong" className="p-4 sm:p-6 h-full flex flex-col">
@@ -65,7 +70,7 @@ export function GarageAnalytics() {
           <AreaChart data={revenueData} margin={{ top: 0, right: 0, left: -20, bottom: 0 }}>
             <defs>
               <linearGradient id="garageColorRev" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor={primaryColor} stopOpacity={isLight ? 0.15 : 0.3}/>
+                <stop offset="5%" stopColor={primaryColor} stopOpacity={0.25}/>
                 <stop offset="95%" stopColor={primaryColor} stopOpacity={0}/>
               </linearGradient>
             </defs>
@@ -74,11 +79,11 @@ export function GarageAnalytics() {
             <YAxis tick={{fill: tickColor, fontSize: 10}} axisLine={false} tickLine={false} tickFormatter={(val) => `₹${val/1000}k`} />
             <Tooltip 
               contentStyle={{ 
-                backgroundColor: isLight ? '#fff' : '#18181b', 
-                borderColor: isLight ? '#e7e5e4' : 'rgba(255,255,255,0.1)',
+                backgroundColor: tooltipBg,
+                borderColor: tooltipBorder,
                 borderRadius: '10px', 
-                color: isLight ? '#1c1917' : '#fff',
-                boxShadow: isLight ? '0 8px 30px rgba(0,0,0,0.08)' : 'none'
+                color: tooltipColor,
+                boxShadow: boxShadow,
               }}
               itemStyle={{ color: primaryColor }}
             />
@@ -95,13 +100,13 @@ export function GarageAnalytics() {
             <XAxis dataKey="name" tick={{fill: tickColor, fontSize: 10}} axisLine={false} tickLine={false} />
             <YAxis tick={{fill: tickColor, fontSize: 10}} axisLine={false} tickLine={false} />
             <Tooltip 
-              cursor={{fill: isLight ? 'rgba(28,25,23,0.03)' : 'rgba(255,255,255,0.05)'}}
+              cursor={{fill: 'rgba(128,128,128,0.04)'}}
               contentStyle={{ 
-                backgroundColor: isLight ? '#fff' : '#18181b', 
-                borderColor: isLight ? '#e7e5e4' : 'rgba(255,255,255,0.1)', 
+                backgroundColor: tooltipBg,
+                borderColor: tooltipBorder,
                 borderRadius: '10px', 
-                color: isLight ? '#1c1917' : '#fff',
-                boxShadow: isLight ? '0 8px 30px rgba(0,0,0,0.08)' : 'none'
+                color: tooltipColor,
+                boxShadow: boxShadow,
               }}
               itemStyle={{ color: barColor }}
             />

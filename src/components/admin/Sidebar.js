@@ -5,7 +5,6 @@ import Link from "next/link";
 import { UserCircle, Briefcase, AlertTriangle, BarChart3, Users, FileCheck, Wrench, Building2, CreditCard, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAuthStore } from "@/store/authStore";
-import { useThemeStore } from "@/store/themeStore";
 import api from "@/lib/api";
 import { Logo } from "@/components/ui/Logo";
 
@@ -22,8 +21,6 @@ const NAV_ITEMS = [
 
 export function Sidebar({ currentPath = "/admin", onClose }) {
   const { logout } = useAuthStore();
-  const { theme } = useThemeStore();
-  const isLight = theme === "light";
   const [badgeCounts, setBadgeCounts] = useState({ kyc: null, disputes: null });
 
   useEffect(() => {
@@ -44,7 +41,7 @@ export function Sidebar({ currentPath = "/admin", onClose }) {
   }, []);
 
   return (
-    <div className={`w-full h-full flex flex-col pt-6 ${isLight ? "bg-[var(--surface)] border-r border-slate-200" : "bg-[#0a0a0b] border-r border-white/5"}`}>
+    <div className="w-full h-full flex flex-col pt-6 bg-[var(--surface)] border-r border-border-subtle">
       <div className="px-6 mb-8 flex items-center justify-between">
         <div className="flex items-center gap-2">
           <Logo size="md" showText />

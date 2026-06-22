@@ -8,7 +8,6 @@ import { Modal } from "@/components/ui/Modal";
 import { ConfirmModal } from "@/components/ui/ConfirmModal";
 import { Input } from "@/components/ui/Input";
 import { Navigation, CheckCircle2, AlertTriangle, MapPin, Clock, IndianRupee, Loader2 } from "lucide-react";
-import { useThemeStore } from "@/store/themeStore";
 import { FEE_CONSTANTS } from "@/lib/constants";
 import { useTrackingStore } from "@/store/trackingStore";
 import { useToast } from "@/components/ui/ToastProvider";
@@ -18,10 +17,8 @@ export function IncomingJobs() {
   const [jobs, setJobs] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
-  const { theme } = useThemeStore();
   const { setNavigationTarget } = useTrackingStore();
   const { success: showSuccess, error: showError } = useToast();
-  const isLight = theme === "light";
 
   // --- Job Completion Modal State ---
   const [completionModal, setCompletionModal] = useState(false);

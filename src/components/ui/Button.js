@@ -1,15 +1,12 @@
 import { forwardRef } from "react";
 import { cn } from "@/lib/utils";
 import { Loader2 } from "lucide-react";
-import { useThemeStore } from "@/store/themeStore";
 
 export const Button = forwardRef(
   ({ className, variant = "primary", size = "md", isLoading, children, ...props }, ref) => {
-    const { theme } = useThemeStore();
-    const isLight = theme === "light";
     const baseClass = "inline-flex items-center justify-center rounded-xl font-medium transition-all focus:outline-none disabled:opacity-50 disabled:pointer-events-none";
     
-    const darkVariants = {
+    const variants = {
       primary:
         "bg-gradient-to-b from-primary via-primary to-primary-dark text-white " +
         "shadow-[0_10px_26px_rgba(var(--color-primary-rgb),0.25)] " +
@@ -32,32 +29,6 @@ export const Button = forwardRef(
         "shadow-[0_10px_26px_rgba(239,68,68,0.22)] ring-1 ring-red-300/20 " +
         "hover:shadow-[0_16px_40px_rgba(239,68,68,0.20)] hover-lift",
     };
-
-    const lightVariants = {
-      primary:
-        "bg-gradient-to-b from-amber-500 via-amber-500 to-amber-600 text-white " +
-        "shadow-[0_4px_14px_rgba(212,160,17,0.3)] " +
-        "ring-1 ring-amber-400/30 hover:ring-amber-300/50 " +
-        "hover:shadow-[0_8px_24px_rgba(212,160,17,0.25)] hover-lift",
-      secondary:
-        "bg-gradient-to-b from-stone-100 to-stone-50 text-stone-700 " +
-        "border border-stone-200 ring-1 ring-stone-200/50 hover:bg-stone-100 hover:border-stone-300",
-      tonal:
-        "bg-amber-500/15 text-amber-800 " +
-        "hover:bg-amber-500/25 hover:text-amber-900 " +
-        "shadow-none",
-      outline:
-        "border-2 border-amber-500/60 text-amber-700 " +
-        "bg-transparent hover:bg-amber-500/10 hover:border-amber-500 " +
-        "shadow-[0_0_0_1px_rgba(212,160,17,0.1)]",
-      ghost: "hover:bg-amber-50 text-stone-700 border border-transparent hover:border-amber-200",
-      danger:
-        "bg-gradient-to-b from-red-500 via-red-500 to-red-600 text-white " +
-        "shadow-[0_10px_26px_rgba(239,68,68,0.22)] ring-1 ring-red-300/20 " +
-        "hover:shadow-[0_16px_40px_rgba(239,68,68,0.20)] hover-lift",
-    };
-
-    const variants = isLight ? lightVariants : darkVariants;
 
     const sizes = {
       sm: "h-9 px-4 text-sm",

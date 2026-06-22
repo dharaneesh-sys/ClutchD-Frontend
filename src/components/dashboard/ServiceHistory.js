@@ -6,7 +6,6 @@ import { Badge } from "@/components/ui/Badge";
 import { ConfirmModal } from "@/components/ui/ConfirmModal";
 import { Calendar, Download, MapPin, Loader2, Wrench, ChevronDown, ChevronUp, Receipt } from "lucide-react";
 import api, { extractApiError } from "@/lib/api";
-import { useThemeStore } from "@/store/themeStore";
 import { GST_RATE } from "@/lib/constants";
 import { format } from "date-fns";
 import { PaymentModal } from "@/components/dashboard/PaymentModal";
@@ -19,8 +18,6 @@ export function ServiceHistory() {
   const [deleteJob, setDeleteJob] = useState(null);
   const [deleteLoading, setDeleteLoading] = useState(false);
   const [errorToast, setErrorToast] = useState(null);
-  const { theme } = useThemeStore();
-  const isLight = theme === "light";
 
   const fetchHistory = async () => {
     try {
@@ -244,9 +241,7 @@ export function ServiceHistory() {
       )}
 
       {errorToast && (
-        <div className={`fixed top-4 right-4 z-[100] px-4 py-3 rounded-xl border shadow-2xl text-sm font-medium ${
-          isLight ? "bg-red-50 border-red-200 text-red-700" : "bg-red-500/20 border-red-500/30 text-red-300"
-        }`}>
+        <div className="fixed top-4 right-4 z-[100] px-4 py-3 rounded-xl border shadow-2xl text-sm font-medium bg-red-500/10 border-red-500/30 text-red-400">
           {errorToast}
         </div>
       )}

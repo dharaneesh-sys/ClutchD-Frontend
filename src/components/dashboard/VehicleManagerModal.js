@@ -5,7 +5,6 @@ import { Input } from "@/components/ui/Input";
 import { ConfirmModal } from "@/components/ui/ConfirmModal";
 import { Trash2, Plus, Car, Loader2, AlertTriangle } from "lucide-react";
 import api from "@/lib/api";
-import { useThemeStore } from "@/store/themeStore";
 import { extractApiError } from "@/lib/api";
 
 export function VehicleManagerModal({ isOpen, onClose, onVehiclesChanged }) {
@@ -16,8 +15,6 @@ export function VehicleManagerModal({ isOpen, onClose, onVehiclesChanged }) {
   const [deletingId, setDeletingId] = useState(null);
   const [deleteConfirmId, setDeleteConfirmId] = useState(null);
   const [deleteError, setDeleteError] = useState(null);
-  const { theme } = useThemeStore();
-  const isLight = theme === "light";
 
   const [formData, setFormData] = useState({
     make: "",
@@ -88,9 +85,7 @@ export function VehicleManagerModal({ isOpen, onClose, onVehiclesChanged }) {
   return (
     <Modal isOpen={isOpen} onClose={onClose} title="Manage My Vehicles">
       {deleteError && (
-        <div className={`mb-4 flex items-center gap-2 p-3 rounded-xl text-sm ${
-          isLight ? "bg-red-50 border border-red-200 text-red-700" : "bg-red-500/10 border border-red-500/30 text-red-300"
-        }`}>
+        <div className="mb-4 flex items-center gap-2 p-3 rounded-xl text-sm bg-red-500/10 border border-red-500/30 text-red-400">
           <AlertTriangle size={14} className="shrink-0" />
           {deleteError}
         </div>

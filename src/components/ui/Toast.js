@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
-import { useThemeStore } from "@/store/themeStore";
 import {
   CheckCircle2,
   XCircle,
@@ -47,8 +46,6 @@ const PROGRESS_CLASSES = {
 };
 
 export function Toast({ toast, onDismiss }) {
-  const { theme } = useThemeStore();
-  const isLight = theme === "light";
   const Icon = ICONS[toast.type] || Info;
   const [progress, setProgress] = useState(100);
 

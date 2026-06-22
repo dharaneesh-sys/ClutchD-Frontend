@@ -1,7 +1,6 @@
 import { useEffect, useRef } from "react";
 import { X } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { useThemeStore } from "@/store/themeStore";
 
 const FOCUSABLE =
   'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])';
@@ -15,8 +14,6 @@ export function Modal({
   maxWidth = "max-w-md",
   role = "dialog",
 }) {
-  const { theme } = useThemeStore();
-  const isLight = theme === "light";
   const modalRef = useRef(null);
   const previousActiveElement = useRef(null);
   const titleId = useRef(
@@ -108,7 +105,7 @@ export function Modal({
       {/* Backdrop */}
       <div
         onClick={onClose}
-        className={`fixed inset-0 z-40 backdrop-blur-sm animate-[backdrop-in_0.2s_ease] ${isLight ? "bg-black/30" : "bg-black/60"}`}
+        className="fixed inset-0 z-40 backdrop-blur-sm animate-[backdrop-in_0.2s_ease] bg-black/50"
         aria-hidden="true"
       />
 
@@ -123,9 +120,7 @@ export function Modal({
           className={cn(
             "relative w-full rounded-2xl border pointer-events-auto animate-[modal-in_0.25s_ease]",
             "p-6 backdrop-blur-3xl",
-              isLight
-                ? "border-border-subtle bg-white shadow-[0_30px_80px_rgba(0,0,0,0.08)] ring-1 ring-amber-400/10"
-                : "border-border-subtle bg-gradient-to-b from-zinc-900/90 to-zinc-950/95 shadow-[0_30px_80px_rgba(0,0,0,0.65)] ring-1 ring-primary/10",
+            "border-border-subtle bg-surface shadow-[0_30px_80px_rgba(var(--color-black-rgb),0.35)] ring-1 ring-primary/10",
             maxWidth,
             className
           )}

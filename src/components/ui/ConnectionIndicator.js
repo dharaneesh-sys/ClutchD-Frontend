@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import { getConnectionState } from "@/lib/socket";
-import { useThemeStore } from "@/store/themeStore";
 
 const POLL_INTERVAL = 3000;
 
@@ -30,8 +29,6 @@ const STATE_CONFIG = {
 export function ConnectionIndicator() {
   const [state, setState] = useState("disconnected");
   const [hovered, setHovered] = useState(false);
-  const { theme } = useThemeStore();
-  const isLight = theme === "light";
 
   useEffect(() => {
     // Poll immediately on mount
@@ -61,11 +58,7 @@ export function ConnectionIndicator() {
 
       {hovered && (
         <div
-          className={`absolute top-full left-1/2 -translate-x-1/2 mt-2 px-2.5 py-1 rounded-lg text-[10px] font-semibold whitespace-nowrap z-[600] pointer-events-none shadow-lg ${
-            isLight
-              ? "bg-slate-900 text-white"
-              : "bg-white/90 text-slate-900"
-          }`}
+          className="absolute top-full left-1/2 -translate-x-1/2 mt-2 px-2.5 py-1 rounded-lg text-[10px] font-semibold whitespace-nowrap z-[600] pointer-events-none shadow-lg bg-foreground text-background"
         >
           {config.label}
         </div>

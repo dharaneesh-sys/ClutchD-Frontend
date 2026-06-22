@@ -3,7 +3,6 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { customerSignupSchema, mechanicSignupSchema, garageSignupSchema } from "@/lib/validators";
 import { useAuthStore } from "@/store/authStore";
-import { useThemeStore } from "@/store/themeStore";
 import { UserCircle, Wrench, Building2, UserPlus } from "lucide-react";
 import { GlassCard } from "@/components/ui/GlassCard";
 import { Button } from "@/components/ui/Button";
@@ -18,8 +17,6 @@ export function SignUpCard() {
   const [selectedRole, setSelectedRole] = useState("customer");
   const selectedRoleRef = useRef(selectedRole);
   const { signup, loginWithGoogle, isLoading, error: authError } = useAuthStore();
-  const { theme } = useThemeStore();
-  const isLight = theme === "light";
   const router = useRouter();
 
   const ROLES = [

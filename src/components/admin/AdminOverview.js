@@ -4,7 +4,6 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { GlassCard } from "@/components/ui/GlassCard";
 import { Badge } from "@/components/ui/Badge";
-import { useThemeStore } from "@/store/themeStore";
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { fetchAnalytics, fetchPendingKyc } from "@/services/adminService";
 
@@ -20,11 +19,16 @@ const chartData = [
 
 export function AdminOverview() {
   const router = useRouter();
-  const { theme } = useThemeStore();
-  const isLight = theme === "light";
-  const primaryColor = isLight ? "#d4a011" : "#10b981";
-  const tickColor = isLight ? 'rgba(28,25,23,0.45)' : 'rgba(255,255,255,0.4)';
-  const gridColor = isLight ? 'rgba(28,25,23,0.06)' : 'rgba(255,255,255,0.05)';
+  const getCSSVar = (name) => {
+    if (typeof window === 'undefined') return '';
+    return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+  };
+  const primaryColor = getCSSVar('--primary') || '#10b981';
+  const foreground = getCSSVar('--foreground') || '#ffffff';
+  const tickColor = foreground ? `${foreground}66` : 'rgba(255,255,255,0.4)';
+  const gridColor = foreground ? `${foreground}0D` : 'rgba(255,255,255,0.05)';
+  const surfaceColor = getCSSVar('--surface') || '#1c1c1f';
+  const borderColor = getCSSVar('--color-border-subtle') || 'rgba(255,255,255,0.1)';
 
   const [stats, setStats] = useState(null);
   const [pendingKyc, setPendingKyc] = useState([]);
@@ -64,7 +68,7 @@ export function AdminOverview() {
 
   if (error) {
     return (
-      <div className={`flex flex-col items-center justify-center py-20 ${isLight ? "text-red-500" : "text-red-400"}`}>
+      <div className="flex flex-col items-center justify-center py-20 text-red-500">
         <p>{error}</p>
         <button onClick={fetchData} className="mt-3 text-sm underline">Retry</button>
       </div>
@@ -111,11 +115,11 @@ export function AdminOverview() {
                  <AreaChart data={chartData}>
                   <defs>
                     <linearGradient id="adminColorRev" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor={primaryColor} stopOpacity={isLight ? 0.15 : 0.3}/>
+                      <stop offset="5%" stopColor={primaryColor} stopOpacity={0.2}/>
                       <stop offset="95%" stopColor={primaryColor} stopOpacity={0}/>
                     </linearGradient>
                     <linearGradient id="adminColorUsr" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#3b82f6" stopOpacity={isLight ? 0.15 : 0.3}/>
+                      <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.2}/>
                       <stop offset="95%" stopColor="#3b82f6" stopOpacity={0}/>
                     </linearGradient>
                   </defs>
@@ -123,15 +127,15 @@ export function AdminOverview() {
                   <XAxis dataKey="name" tick={{fill: tickColor, fontSize: 12}} axisLine={false} tickLine={false} />
                   <YAxis yAxisId="left" tick={{fill: tickColor, fontSize: 12}} axisLine={false} tickLine={false} />
                   <YAxis yAxisId="right" orientation="right" tick={{fill: tickColor, fontSize: 12}} axisLine={false} tickLine={false} />
-                  <Tooltip
-                     contentStyle={{
-                       backgroundColor: isLight ? '#fff' : '#18181b',
-                       borderColor: isLight ? '#e7e5e4' : 'rgba(255,255,255,0.1)',
-                       borderRadius: '10px',
-                       color: isLight ? '#1c1917' : '#fff',
-                       boxShadow: isLight ? '0 8px 30px rgba(0,0,0,0.08)' : 'none'
-                     }}
-                  />
+                   <Tooltip
+                      contentStyle={{
+                        backgroundColor: surfaceColor,
+                        borderColor: borderColor,
+                        borderRadius: '10px',
+                        color: foreground,
+                        boxShadow: `0 8px 30px ${foreground}14`
+                      }}
+                   />
                   <Area yAxisId="left" type="monotone" dataKey="revenue" stroke={primaryColor} fillOpacity={1} fill="url(#adminColorRev)" />
                   <Area yAxisId="right" type="monotone" dataKey="users" stroke="#3b82f6" fillOpacity={1} fill="url(#adminColorUsr)" />
                 </AreaChart>

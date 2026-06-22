@@ -1,14 +1,11 @@
 import { useState } from "react";
 import { AlertTriangle, Loader2, X } from "lucide-react";
-import { useThemeStore } from "@/store/themeStore";
 import api, { extractApiError } from "@/lib/api";
 
 export function SOSButton() {
   const [loading, setLoading] = useState(false);
   const [status, setStatus] = useState("idle");
   const [errorMsg, setErrorMsg] = useState(null);
-  const { theme } = useThemeStore();
-  const isLight = theme === "light";
 
   const handleSOS = () => {
     if (status === "idle") {
@@ -50,9 +47,7 @@ export function SOSButton() {
   return (
     <>
       {errorMsg && (
-        <div className={`fixed bottom-24 left-6 z-[100] flex items-center gap-2 px-4 py-3 rounded-xl border shadow-2xl text-sm font-medium backdrop-blur-xl ${
-          isLight ? "bg-red-50 border-red-200 text-red-700" : "bg-red-500/20 border-red-500/30 text-red-300"
-        }`}>
+        <div className="fixed bottom-24 left-6 z-[100] flex items-center gap-2 px-4 py-3 rounded-xl border shadow-2xl text-sm font-medium backdrop-blur-xl bg-red-500/10 border-red-500/30 text-red-400">
           <span>{errorMsg}</span>
           <button onClick={() => setErrorMsg(null)} className="ml-2 opacity-60 hover:opacity-100">
             <X size={14} />

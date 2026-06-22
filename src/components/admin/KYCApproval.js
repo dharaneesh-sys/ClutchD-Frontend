@@ -6,7 +6,6 @@ import { Button } from "@/components/ui/Button";
 import { Badge } from "@/components/ui/Badge";
 import { Modal } from "@/components/ui/Modal";
 import { FileText, CheckCircle, XCircle } from "lucide-react";
-import { useThemeStore } from "@/store/themeStore";
 import { useToast } from "@/components/ui/ToastProvider";
 import { fetchPendingKyc, verifyMechanic, verifyGarage } from "@/services/adminService";
 
@@ -16,9 +15,7 @@ export function KYCApproval() {
   const [error, setError] = useState(null);
   const [actionLoading, setActionLoading] = useState(null);
   const [confirmModal, setConfirmModal] = useState(null);
-  const { theme } = useThemeStore();
   const { success: showSuccess, error: showError } = useToast();
-  const isLight = theme === "light";
 
   const loadApplications = async () => {
     setLoading(true);
@@ -80,7 +77,7 @@ export function KYCApproval() {
           <div className="w-8 h-8 border-2 border-t-transparent rounded-full animate-spin mx-auto border-primary" />
         </div>
       ) : error ? (
-        <div className={`col-span-full py-12 text-center ${isLight ? "text-red-500" : "text-red-400"}`}>
+        <div className="col-span-full py-12 text-center text-red-500">
           <p>{error}</p>
           <button onClick={loadApplications} className="mt-3 text-sm underline">Retry</button>
         </div>
@@ -117,7 +114,7 @@ export function KYCApproval() {
                 <div className={`mt-auto grid grid-cols-2 gap-3 pt-4 border-t ${"border-border-subtle"}`}>
                   <Button
                     variant="outline"
-                    className={isLight ? "text-red-600 border-red-200 hover:bg-red-50 hover:text-red-700" : "text-red-400 border-red-500/30 hover:bg-red-500/10 hover:text-red-400"}
+                    className="text-red-500 border-red-500/30 hover:bg-red-500/10 hover:text-red-500"
                     isLoading={actionLoading === app.id}
                     onClick={() => setConfirmModal({ app, action: "reject" })}
                   >
