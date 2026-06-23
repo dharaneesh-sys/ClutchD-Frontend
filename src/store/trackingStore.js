@@ -21,12 +21,43 @@ export const useTrackingStore = create((set, get) => ({
   setNavigationTarget: (coords) => set({ navigationTarget: coords }),
 
   /**
-   * Request the user's GPS location via the browser Geolocation API.
-   * Falls back to the default map center if denied or unavailable.
+   * Fallback to IP-based geolocation when GPS is unavailable/denied.
+   * Uses ip-api.com (free tier, no API key required, 45 RPM limit).
+   */
+  _fallbackIPGeolocation: async () => {
+    try {
+      const res = await fetch("https://ip-api.com/json/");
+      if (!res.ok) return;
+      const data = await res.json();
+      if (data.status === "success" && data.lat && data.lon) {
+        const coords = [data.lat, data.lon];
+        set({ userLocation: coords, gpsStatus: "granted" });
+        get().fetchNearbyProviders();
+        return true;
+      }
+    } catch {
+      // Silent — IP geolocation is a best-effort fallback
+    }
+    return false;
+  },
+
+  /**
+   * Request the user's location via the browser Geolocation API.
+   *
+   * Strategy:
+   *   1. Primary — WiFi/cell-tower positioning (enableHighAccuracy: false).
+   *      Returns in 1-5s, works indoors, accurate to ~50m. This is the
+   *      standard approach for initial location on mobile + desktop.
+   *   2. Fallback — IP geolocation if the browser has no GPS hardware or
+   *      the user denied permission.
+   *
+   * GPS (enableHighAccuracy: true) is only used by watchGPSLocation for
+   * active en-route tracking where meter-level precision matters.
    */
   requestGPSLocation: () => {
     if (typeof window === "undefined" || !navigator.geolocation) {
       set({ gpsStatus: "unavailable" });
+      get()._fallbackIPGeolocation();
       return;
     }
 
@@ -39,9 +70,13 @@ export const useTrackingStore = create((set, get) => ({
         get().fetchNearbyProviders();
       },
       (error) => {
+        console.warn(`Geolocation error (code ${error.code}): ${error.message}`);
         set({ gpsStatus: error.code === 1 ? "denied" : "unavailable" });
+        // Best-effort IP fallback when GPS fails
+        get()._fallbackIPGeolocation();
       },
-      { enableHighAccuracy: true, timeout: 10000, maximumAge: 60000 }
+      // WiFi/cell positioning: fast, works indoors, ~50m accuracy
+      { enableHighAccuracy: false, timeout: 15000, maximumAge: 120000 }
     );
   },
 

@@ -95,7 +95,7 @@ const nextConfig = {
                 //                                backend API calls from SDK
                 //   wss:                        — WebSocket connections
                 //                                (dynamic WS_URL per env)
-                `connect-src 'self' https://nominatim.openstreetmap.org https://router.project-osrm.org https://api.razorpay.com wss:`,
+                `connect-src 'self' http://localhost:8001 https://nominatim.openstreetmap.org https://router.project-osrm.org https://*.tile.openstreetmap.org https://api.razorpay.com https://ip-api.com wss:`,
 
                 // ── font-src ────────────────────────────────────────────
                 `font-src 'self' data:`,
