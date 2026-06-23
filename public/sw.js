@@ -1,6 +1,13 @@
 const CACHE_NAME = "clutchd-v1";
 const STATIC_ASSETS = ["/", "/favicon.svg"];
 
+// Only cache same-origin GET requests, skip third-party (tiles, APIs, etc.)
+function shouldCache(request) {
+  if (request.method !== "GET") return false;
+  const url = new URL(request.url);
+  return url.origin === self.location.origin;
+}
+
 self.addEventListener("install", (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => cache.addAll(STATIC_ASSETS))
@@ -8,6 +15,8 @@ self.addEventListener("install", (event) => {
 });
 
 self.addEventListener("fetch", (event) => {
+  if (!shouldCache(event.request)) return;
+
   event.respondWith(
     (async () => {
       try {
@@ -18,7 +27,8 @@ self.addEventListener("fetch", (event) => {
         }
         return response;
       } catch {
-        return caches.match(event.request);
+        const cached = await caches.match(event.request);
+        return cached ?? new Response("", { status: 504 });
       }
     })()
   );
