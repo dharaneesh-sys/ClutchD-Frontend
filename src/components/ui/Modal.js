@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useId, useRef } from "react";
 import { X } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -16,9 +16,8 @@ export function Modal({
 }) {
   const modalRef = useRef(null);
   const previousActiveElement = useRef(null);
-  const titleId = useRef(
-    `modal-title-${Math.random().toString(36).slice(2, 9)}`
-  ).current;
+  const reactId = useId();
+  const titleId = `modal-title-${reactId}`;
 
   // Lock body scroll
   useEffect(() => {

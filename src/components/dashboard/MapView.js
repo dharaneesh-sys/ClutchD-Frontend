@@ -19,9 +19,16 @@ import {
   createTargetIcon,
 } from "@/lib/mapMarkers";
 
-// Import cluster CSS — required for MarkerClusterGroup styling
-import "react-leaflet-cluster/dist/assets/MarkerCluster.css";
-import "react-leaflet-cluster/dist/assets/MarkerCluster.Default.css";
+import L from "leaflet";
+
+// Fix default marker icon paths for bundlers
+delete L.Icon.Default.prototype._getIconUrl;
+L.Icon.Default.mergeOptions({
+  iconRetinaUrl:
+    "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png",
+  iconUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png",
+  shadowUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png",
+});
 
 // ─── Map updater — recenters when userLocation changes ─────────────────────
 function MapUpdater({ center }) {
@@ -154,10 +161,6 @@ function MechanicPopupContent({ name, rating, subtitle }) {
 // ═══════════════════════════════════════════════════════════════════════════
 
 export default function MapView() {
-  useEffect(() => {
-    import("leaflet/dist/leaflet.css");
-  }, []);
-
   const {
     userLocation,
     mechanicLocation,
@@ -165,6 +168,7 @@ export default function MapView() {
     nearbyMechanics,
     nearbyGarages,
     fetchNearbyProviders,
+    requestGPSLocation,
   } = useTrackingStore();
 
   const [mounted, setMounted] = useState(false);
@@ -172,10 +176,11 @@ export default function MapView() {
   useEffect(() => {
     const timer = setTimeout(() => {
       setMounted(true);
+      requestGPSLocation();
       fetchNearbyProviders();
     }, 0);
     return () => clearTimeout(timer);
-  }, [fetchNearbyProviders]);
+  }, [fetchNearbyProviders, requestGPSLocation]);
 
   const [routePath, setRoutePath] = useState(null);
 
@@ -226,8 +231,10 @@ export default function MapView() {
       >
         <TileLayer
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-          className="map-tiles"
+          url="https://a.tile.openstreetmap.org/{z}/{x}/{y}.png"
+          eventHandlers={{
+            tileerror: (e) => console.warn("Tile failed:", e.tile?.src),
+          }}
         />
 
         <MapUpdater center={userLocation} />

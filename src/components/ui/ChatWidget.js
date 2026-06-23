@@ -54,28 +54,36 @@ export function ChatWidget() {
 
   /* ── WebSocket connection polling ──────────────────────────────── */
   useEffect(() => {
-    setWsConnected(getConnectionState() === "connected");
+    const raf = requestAnimationFrame(() => {
+      setWsConnected(getConnectionState() === "connected");
+    });
     const id = setInterval(() => {
       setWsConnected(getConnectionState() === "connected");
     }, 3000);
-    return () => clearInterval(id);
+    return () => {
+      cancelAnimationFrame(raf);
+      clearInterval(id);
+    };
   }, []);
 
   /* ── Seed demo / welcome message ───────────────────────────────── */
   useEffect(() => {
-    setMessages(
-      DEMO_MODE
-        ? DEMO_MESSAGES
-        : [
-            {
-              id: nextId(),
-              role: "system",
-              text: wsConnected
-                ? "🛠️ Live Assist connected"
-                : "🛠️ Live Assist — reconnecting...",
-            },
-          ]
-    );
+    const raf = requestAnimationFrame(() => {
+      setMessages(
+        DEMO_MODE
+          ? DEMO_MESSAGES
+          : [
+              {
+                id: nextId(),
+                role: "system",
+                text: wsConnected
+                  ? "🛠️ Live Assist connected"
+                  : "🛠️ Live Assist — reconnecting...",
+              },
+            ]
+      );
+    });
+    return () => cancelAnimationFrame(raf);
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   /* ── Subscribe to STATUS_UPDATE via serviceStore ───────────────── */

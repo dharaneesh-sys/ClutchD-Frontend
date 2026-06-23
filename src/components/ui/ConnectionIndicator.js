@@ -32,13 +32,18 @@ export function ConnectionIndicator() {
 
   useEffect(() => {
     // Poll immediately on mount
-    setState(getConnectionState());
+    const raf = requestAnimationFrame(() => {
+      setState(getConnectionState());
+    });
 
     const id = setInterval(() => {
       setState(getConnectionState());
     }, POLL_INTERVAL);
 
-    return () => clearInterval(id);
+    return () => {
+      cancelAnimationFrame(raf);
+      clearInterval(id);
+    };
   }, []);
 
   const config = STATE_CONFIG[state] ?? STATE_CONFIG.disconnected;

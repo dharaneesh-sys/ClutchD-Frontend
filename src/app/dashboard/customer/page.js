@@ -3,6 +3,9 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import dynamic from "next/dynamic";
 import { useRouter } from "next/navigation";
+import "leaflet/dist/leaflet.css";
+import "react-leaflet-cluster/dist/assets/MarkerCluster.css";
+import "react-leaflet-cluster/dist/assets/MarkerCluster.Default.css";
 import { useServiceStore } from "@/store/serviceStore";
 import { useAuthStore } from "@/store/authStore";
 import { useTrackingStore } from "@/store/trackingStore";
@@ -13,15 +16,14 @@ import { ProviderList } from "@/components/dashboard/ProviderList";
 import { PaymentModal } from "@/components/dashboard/PaymentModal";
 import { ReviewModal } from "@/components/dashboard/ReviewModal";
 import { NotificationBell } from "@/components/ui/NotificationBell";
-import { ConnectionIndicator } from "@/components/ui/ConnectionIndicator";
 import { SOSButton } from "@/components/ui/SOSButton";
 import { DashboardShell } from "@/components/ui/DashboardShell";
-import { LogOut, User, History, Wrench, Calendar } from "lucide-react";
+import { History, Wrench, Calendar, ShoppingBag } from "lucide-react";
 import { SERVICE_STATUS } from "@/lib/constants";
 import { ScheduleBookingModal } from "@/components/dashboard/ScheduleBookingModal";
 import api from "@/lib/api";
-import { Logo } from "@/components/ui/Logo";
 import { NAVIGATION_EVENT } from "@/lib/navigation";
+import { Button } from "@/components/ui/Button";
 
 const MapView = dynamic(
   () => import("../../../components/dashboard/MapView"),
@@ -105,7 +107,7 @@ export default function CustomerDashboard() {
     if (activeRequest?.status !== "payment_pending") {
       paymentTriggeredRef.current = false;
     }
-  }, [isDemoMode, isTourActive, activeRequest?.status, isPaymentOpen]);
+  }, [isDemoMode, isTourActive, activeRequest?.status, isPaymentOpen]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Polling fallback: if WebSocket is unavailable, poll job status every 15s
   useEffect(() => {
@@ -133,7 +135,7 @@ export default function CustomerDashboard() {
       clearInterval(interval);
       document.removeEventListener("visibilitychange", onVisibility);
     };
-  }, [activeRequest?.id, activeRequest?.status, updateRequestStatus]);
+  }, [activeRequest?.id, activeRequest?.status, updateRequestStatus]); // eslint-disable-line react-hooks/exhaustive-deps
 
   if (!_hydrated || !isAuthenticated) {
     return (
@@ -193,6 +195,7 @@ export default function CustomerDashboard() {
   const sidebarItems = [
     { icon: Wrench, label: "Service", onClick: () => setActiveTab("request") },
     { icon: Calendar, label: "Schedule", onClick: () => setActiveTab("schedule") },
+    { icon: ShoppingBag, label: "Parts Store", onClick: () => router.push("/marketplace") },
     { icon: History, label: "History", onClick: () => setActiveTab("history") },
   ];
 

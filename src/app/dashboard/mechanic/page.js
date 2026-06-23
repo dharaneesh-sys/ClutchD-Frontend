@@ -4,6 +4,9 @@ import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 
 import dynamic from "next/dynamic";
+import "leaflet/dist/leaflet.css";
+import "react-leaflet-cluster/dist/assets/MarkerCluster.css";
+import "react-leaflet-cluster/dist/assets/MarkerCluster.Default.css";
 import { ProfileEditor } from "@/components/mechanic/ProfileEditor";
 import { AvailabilityToggle } from "@/components/mechanic/AvailabilityToggle";
 import { IncomingJobs } from "@/components/mechanic/IncomingJobs";
@@ -41,7 +44,7 @@ export default function MechanicDashboard() {
     useTrackingStore.getState().requestGPSLocation();
     const stopWatching = useTrackingStore.getState().watchGPSLocation();
     return () => stopWatching();
-  }, [isAuthenticated]);
+  }, [isAuthenticated]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Listen for navigation events from non-React contexts (e.g., axios interceptors)
   useEffect(() => {

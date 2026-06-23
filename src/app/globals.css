@@ -476,10 +476,10 @@ h1, h2, h3, h4 { letter-spacing: -0.02em; }
 
 /* Leaflet map overrides */
 .leaflet-container {
-  background: #121214 !important;
+  background: #2a2a3a !important;
   border-radius: 1rem;
 }
-.leaflet-tile-pane { filter: brightness(0.6) contrast(1.2) saturate(0.5); }
+.leaflet-tile-pane { filter: brightness(0.8) contrast(1.1) saturate(0.7); }
 .leaflet-popup-content-wrapper {
   background: rgba(24, 24, 27, 0.95) !important;
   backdrop-filter: blur(10px);

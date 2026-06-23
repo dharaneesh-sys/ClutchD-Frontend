@@ -37,11 +37,14 @@ export function MultiSelect({ options = [], value = [], onChange, label, error, 
   }, [isOpen]);
 
   useEffect(() => {
-    if (isOpen) {
-      setActiveIndex(0);
-    } else {
-      setActiveIndex(-1);
-    }
+    const raf = requestAnimationFrame(() => {
+      if (isOpen) {
+        setActiveIndex(0);
+      } else {
+        setActiveIndex(-1);
+      }
+    });
+    return () => cancelAnimationFrame(raf);
   }, [isOpen]);
 
   useEffect(() => {

@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from "react";
+import Image from "next/image";
 import { Modal } from "@/components/ui/Modal";
 import { Button } from "@/components/ui/Button";
 import { CreditCard, Smartphone, QrCode, Banknote, CheckCircle2, XCircle, Loader2, ChevronDown, ChevronUp } from "lucide-react";
@@ -28,7 +29,12 @@ function loadRazorpayScript() {
   });
 }
 
-export function PaymentModal({ isOpen, onClose, amount, pricing, jobId, onSuccess }) {
+// Wrapper remounts content on open/close → fresh state, no reset effect needed
+export function PaymentModal(props) {
+  return <PaymentModalContent key={String(props.isOpen)} {...props} />;
+}
+
+function PaymentModalContent({ isOpen, onClose, amount, pricing, jobId, onSuccess }) {
   const [method, setMethod] = useState("upi");
   const [payState, setPayState] = useState("idle"); // idle | processing | success | failed
   const [qrData, setQrData] = useState(null);
@@ -51,16 +57,6 @@ export function PaymentModal({ isOpen, onClose, amount, pricing, jobId, onSucces
       showSuccess(`₹${displayAmount.toFixed(2)} paid successfully`);
     }
   }, [payState, displayAmount, showSuccess]);
-
-  // Reset state when modal opens
-  useEffect(() => {
-    if (isOpen) {
-      setPayState("idle");
-      setQrData(null);
-      setShowBreakdown(false);
-      if (qrPollRef.current) clearInterval(qrPollRef.current);
-    }
-  }, [isOpen]);
 
   // Demo mode: auto-process payment after showing the modal briefly
   useEffect(() => {
@@ -327,7 +323,7 @@ export function PaymentModal({ isOpen, onClose, amount, pricing, jobId, onSucces
       {method === "qr" && qrData && (
         <div className="p-4 rounded-xl border text-center mb-6 animate-in slide-in-from-top-2 bg-bg-card border-border-subtle">
           <div className="w-44 h-44 bg-white p-2 rounded-lg mx-auto mb-3 border-2 border-border-subtle">
-            <img src={qrData.image_url} alt={`QR code for ₹${displayAmount.toFixed(2)}`} className="w-full h-full object-contain" />
+            <Image src={qrData.image_url} alt={`QR code for ₹${displayAmount.toFixed(2)}`} width={176} height={176} className="w-full h-full object-contain" unoptimized />
           </div>
           <p className="text-sm font-medium mb-1 text-text-primary">Scan to Pay ₹{displayAmount.toFixed(2)}</p>
           <p className="text-xs text-text-muted">Waiting for payment...</p>
