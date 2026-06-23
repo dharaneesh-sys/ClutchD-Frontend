@@ -12,9 +12,12 @@ export default function I18nProvider({ children }) {
   const [locale, setLocale] = useState(defaultLocale);
 
   useEffect(() => {
-    const detected = detectLocale();
-    setLocale(detected);
-    document.documentElement.lang = detected;
+    const raf = requestAnimationFrame(() => {
+      const detected = detectLocale();
+      setLocale(detected);
+      document.documentElement.lang = detected;
+    });
+    return () => cancelAnimationFrame(raf);
   }, []);
 
   return (

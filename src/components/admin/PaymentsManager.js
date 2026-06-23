@@ -37,7 +37,7 @@ export function PaymentsManager() {
     }
   };
 
-  useEffect(() => { loadData(); }, [statusFilter]);
+  useEffect(() => { loadData(); }, [statusFilter]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const filtered = payments.filter(p =>
     p.userName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
