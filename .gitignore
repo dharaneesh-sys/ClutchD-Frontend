@@ -46,7 +46,7 @@ next-env.d.ts
 .env.production
 
 # Login attempt logs
-data/
+/data/
 
 # Docker volumes
 pgdata/

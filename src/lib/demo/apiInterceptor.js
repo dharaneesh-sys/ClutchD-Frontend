@@ -10,6 +10,15 @@ import {
   DEMO_SERVICE_STATUSES,
   MOCK_PRICE_ESTIMATES,
 } from "@/lib/demo/mockData";
+import {
+  PRODUCT_CATEGORIES,
+  BRANDS,
+} from "@/lib/constants";
+import { products } from "@/lib/demo/data/products";
+import { vendors } from "@/lib/demo/data/vendors";
+import { productVendors } from "@/lib/demo/data/productVendors";
+import { offers } from "@/lib/demo/data/offers";
+import { reviews as productReviews } from "@/lib/demo/data/reviews";
 
 // In-memory mutable state for demo progression
 let demoState = {
@@ -17,6 +26,7 @@ let demoState = {
   history: [...MOCK_BOOKINGS],
   notificationCount: 2,
   jobStatuses: {},
+  marketplaceOrders: [],
 };
 
 export function resetDemoState() {
@@ -25,6 +35,7 @@ export function resetDemoState() {
     history: [...MOCK_BOOKINGS],
     notificationCount: 2,
     jobStatuses: {},
+    marketplaceOrders: [],
   };
 }
 
@@ -90,6 +101,55 @@ function matchRoute(url, method) {
 
   if (path.includes("/profile") && m === "get") return "profile";
   if (path.includes("/profile") && m === "patch") return "profile_update";
+
+  // ═══════════════════════════════════════════
+  // Marketplace routes (ordered: specific → generic)
+  // ═══════════════════════════════════════════
+
+  // Product reviews (must match before single product)
+  if (/\/marketplace\/products\/([\w-]+)\/reviews/.test(path) && m === "get") {
+    const match = path.match(/\/marketplace\/products\/([\w-]+)\/reviews/);
+    return { route: "product_reviews", productId: match ? match[1] : null };
+  }
+  if (/\/marketplace\/products\/([\w-]+)\/reviews/.test(path) && m === "post") {
+    const match = path.match(/\/marketplace\/products\/([\w-]+)\/reviews/);
+    return { route: "product_review_add", productId: match ? match[1] : null };
+  }
+  // Single product detail
+  if (/\/marketplace\/products\/([\w-]+)/.test(path) && m === "get") {
+    const match = path.match(/\/marketplace\/products\/([\w-]+)/);
+    return { route: "product_detail", productId: match ? match[1] : null };
+  }
+  // Product list
+  if (path.includes("/marketplace/products") && m === "get") return "products_list";
+
+  // Single vendor detail (must match before vendor list)
+  if (/\/marketplace\/vendors\/([\w-]+)/.test(path) && m === "get") {
+    const match = path.match(/\/marketplace\/vendors\/([\w-]+)/);
+    return { route: "vendor_detail", vendorId: match ? match[1] : null };
+  }
+  // Vendor list
+  if (path.includes("/marketplace/vendors") && m === "get") return "vendors_list";
+
+  // Categories and brands
+  if (path.includes("/marketplace/categories") && m === "get") return "categories_list";
+  if (path.includes("/marketplace/brands") && m === "get") return "brands_list";
+
+  // Offers (validate must match before generic offers)
+  if (path.includes("/marketplace/offers/validate") && m === "post") return "offer_validate";
+  if (path.includes("/marketplace/offers") && m === "get") return "offers_list";
+
+  // Orders (detail must match before generic orders)
+  if (/\/marketplace\/orders\/([\w-]+)/.test(path) && m === "get") {
+    const match = path.match(/\/marketplace\/orders\/([\w-]+)/);
+    return { route: "order_detail", orderId: match ? match[1] : null };
+  }
+  if (path.includes("/marketplace/orders") && m === "post") return "order_create";
+  if (path.includes("/marketplace/orders") && m === "get") return "orders_list";
+
+  // ═══════════════════════════════════════════
+  // End marketplace routes
+  // ═══════════════════════════════════════════
 
   return null;
 }
@@ -284,6 +344,254 @@ function handleRoute(routeDef, reqData) {
 
     case "profile_update":
       return { data: { ...MOCK_USERS.customer, ...data } };
+
+    // ═══════════════════════════════════════════
+    // Marketplace handlers
+    // ═══════════════════════════════════════════
+
+    case "products_list": {
+      // Filtering helpers: params come from data (reqData / config.params)
+      const {
+        categoryId,
+        priceRange,
+        minPrice,
+        maxPrice,
+        brand,
+        rating,
+        search,
+      } = data || {};
+
+      // Compute effective min price per product from vendor offerings
+      const getMinVendorPrice = (prodId) => {
+        const pvs = productVendors.filter((pv) => pv.productId === prodId);
+        return pvs.length > 0 ? Math.min(...pvs.map((pv) => pv.price)) : null;
+      };
+
+      let filtered = products.filter((p) => {
+        // Category filter
+        if (categoryId && p.categoryId !== categoryId) return false;
+
+        // Brand filter
+        if (brand && p.brand !== brand) return false;
+
+        // Rating filter (minimum average review rating)
+        if (rating) {
+          const productRatings = productReviews.filter((r) => r.productId === p.id);
+          const avgRating =
+            productRatings.length > 0
+              ? productRatings.reduce((sum, r) => sum + r.rating, 0) / productRatings.length
+              : 0;
+          if (avgRating < Number(rating)) return false;
+        }
+
+        // Search query across name, description, brand, partNumber
+        if (search) {
+          const q = search.toLowerCase();
+          const matchSearch =
+            p.name.toLowerCase().includes(q) ||
+            p.description.toLowerCase().includes(q) ||
+            p.brand.toLowerCase().includes(q) ||
+            (p.partNumber && p.partNumber.toLowerCase().includes(q));
+          if (!matchSearch) return false;
+        }
+
+        return true;
+      });
+
+      // Price range filter (applied after initial filtering, using vendor prices)
+      if (priceRange || minPrice || maxPrice) {
+        const min = Number(minPrice) || 0;
+        const max = Number(maxPrice) || Infinity;
+
+        // Handle predefined price range string
+        if (priceRange) {
+          if (priceRange === "2000+") {
+            filtered = filtered.filter((p) => {
+              const vp = getMinVendorPrice(p.id);
+              return vp !== null && vp >= 2000;
+            });
+          } else {
+            const [rMin, rMax] = priceRange.split("-").map(Number);
+            filtered = filtered.filter((p) => {
+              const vp = getMinVendorPrice(p.id);
+              return vp !== null && vp >= rMin && vp <= rMax;
+            });
+          }
+        } else {
+          filtered = filtered.filter((p) => {
+            const vp = getMinVendorPrice(p.id);
+            return vp !== null && vp >= min && vp <= max;
+          });
+        }
+      }
+
+      // Annotate each product with its lowest vendor price for display
+      const annotated = filtered.map((p) => ({
+        ...p,
+        displayPrice: getMinVendorPrice(p.id),
+        vendorCount: productVendors.filter((pv) => pv.productId === p.id).length,
+      }));
+
+      return { data: { products: annotated, total: annotated.length } };
+    }
+
+    case "product_detail": {
+      const product = products.find((p) => p.id === extra.productId);
+      if (!product) {
+        return { data: null, error: { message: "Product not found" } };
+      }
+      // Attach vendor pricing info
+      const vendorPricing = productVendors
+        .filter((pv) => pv.productId === product.id)
+        .map((pv) => {
+          const vendor = vendors.find((v) => v.id === pv.vendorId);
+          return { ...pv, vendor };
+        });
+      const productRating = productReviews.filter((r) => r.productId === product.id);
+      const avgRating =
+        productRating.length > 0
+          ? productRating.reduce((sum, r) => sum + r.rating, 0) / productRating.length
+          : 0;
+      return {
+        data: {
+          ...product,
+          vendorPricing,
+          rating: avgRating,
+          reviewCount: productRating.length,
+        },
+      };
+    }
+
+    case "vendors_list": {
+      return { data: { vendors, total: vendors.length } };
+    }
+
+    case "vendor_detail": {
+      const vendor = vendors.find((v) => v.id === extra.vendorId);
+      if (!vendor) {
+        return { data: null, error: { message: "Vendor not found" } };
+      }
+      // Products this vendor sells
+      const vendorProducts = productVendors
+        .filter((pv) => pv.vendorId === vendor.id)
+        .map((pv) => {
+          const product = products.find((p) => p.id === pv.productId);
+          return { ...pv, product };
+        });
+      return { data: { ...vendor, products: vendorProducts } };
+    }
+
+    case "categories_list": {
+      return { data: { categories: PRODUCT_CATEGORIES } };
+    }
+
+    case "brands_list": {
+      return { data: { brands: BRANDS } };
+    }
+
+    case "product_reviews": {
+      const productReviewsForProduct = productReviews.filter(
+        (r) => r.productId === extra.productId
+      );
+      const avgRating =
+        productReviewsForProduct.length > 0
+          ? productReviewsForProduct.reduce((sum, r) => sum + r.rating, 0) /
+            productReviewsForProduct.length
+          : 0;
+      return {
+        data: {
+          reviews: productReviewsForProduct,
+          total: productReviewsForProduct.length,
+          averageRating: Math.round(avgRating * 10) / 10,
+        },
+      };
+    }
+
+    case "product_review_add": {
+      const newReview = {
+        id: "rev-demo-" + Date.now(),
+        productId: extra.productId,
+        userName: data.userName || "Demo User",
+        rating: data.rating || 5,
+        text: data.text || "Great product!",
+        date: new Date().toISOString(),
+        verified: false,
+      };
+      // Add to the reviews array (mutate for demo lifecycle)
+      productReviews.push(newReview);
+      return { data: newReview };
+    }
+
+    case "offers_list": {
+      return { data: { offers, total: offers.length } };
+    }
+
+    case "offer_validate": {
+      const { code, purchaseAmount } = data || {};
+      const offer = offers.find(
+        (o) => o.code.toLowerCase() === (code || "").toLowerCase()
+      );
+      if (!offer) {
+        return { data: { valid: false, message: "Invalid coupon code" } };
+      }
+      const now = new Date();
+      const validUntil = new Date(offer.validUntil);
+      if (now > validUntil) {
+        return { data: { valid: false, message: "Coupon has expired" } };
+      }
+      if ((purchaseAmount || 0) < offer.minPurchase) {
+        return {
+          data: {
+            valid: false,
+            message: `Minimum purchase of ₹${offer.minPurchase} required`,
+            minPurchase: offer.minPurchase,
+          },
+        };
+      }
+      const discountAmount = Math.round((purchaseAmount * offer.discountPercent) / 100);
+      return {
+        data: {
+          valid: true,
+          offerId: offer.id,
+          title: offer.title,
+          discountPercent: offer.discountPercent,
+          discountAmount,
+          code: offer.code,
+        },
+      };
+    }
+
+    case "orders_list": {
+      return { data: { orders: demoState.marketplaceOrders, total: demoState.marketplaceOrders.length } };
+    }
+
+    case "order_create": {
+      const orderId = "order-demo-" + (demoState.marketplaceOrders.length + 1);
+      const newOrder = {
+        id: orderId,
+        items: data.items || [],
+        totalAmount: data.totalAmount || 0,
+        subtotal: data.subtotal || 0,
+        shippingCharge: data.shippingCharge || 0,
+        discountAmount: data.discountAmount || 0,
+        status: "pending",
+        shippingAddress: data.shippingAddress || {},
+        paymentMethod: data.paymentMethod || "cod",
+        createdAt: new Date().toISOString(),
+      };
+      demoState.marketplaceOrders = [newOrder, ...demoState.marketplaceOrders];
+      return { data: newOrder };
+    }
+
+    case "order_detail": {
+      const order = demoState.marketplaceOrders.find(
+        (o) => o.id === extra.orderId
+      );
+      if (!order) {
+        return { data: null, error: { message: "Order not found" } };
+      }
+      return { data: order };
+    }
 
     default:
       return { data: { success: true } };

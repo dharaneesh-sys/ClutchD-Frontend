@@ -142,3 +142,73 @@ export const FEE_CONSTANTS = {
   DISTANCE_FEE_PER_KM,
   CANCELLATION_FEE,
 };
+
+/**
+ * Product categories for the marketplace.
+ * @type {Array<{value: string, label: string, icon: string, description: string}>}
+ */
+export const PRODUCT_CATEGORIES = [
+  { value: "engine-parts", label: "Engine Parts", icon: "Wrench", description: "Pistons, rings, gaskets, timing belts, and other engine components" },
+  { value: "brake-parts", label: "Brake Parts", icon: "Disc", description: "Brake pads, discs, calipers, and brake fluid" },
+  { value: "electrical", label: "Electrical Components", icon: "Zap", description: "Spark plugs, batteries, alternators, and wiring harnesses" },
+  { value: "suspension", label: "Suspension Parts", icon: "Route", description: "Shock absorbers, struts, springs, and bushings" },
+  { value: "filters", label: "Filters", icon: "Filter", description: "Oil filters, air filters, fuel filters, and cabin filters" },
+  { value: "accessories", label: "Accessories", icon: "Package", description: "Car care products, floor mats, covers, and interior accessories" },
+];
+
+/**
+ * Predefined price range filter options.
+ * @type {Array<{value: string, label: string}>}
+ */
+export const PRICE_RANGES = [
+  { value: "0-500", label: "₹0 - ₹500" },
+  { value: "500-1000", label: "₹500 - ₹1000" },
+  { value: "1000-2000", label: "₹1000 - ₹2000" },
+  { value: "2000+", label: "₹2000+" },
+];
+
+/**
+ * Auto parts brand filter options.
+ * @type {Array<{value: string, label: string}>}
+ */
+export const BRANDS = [
+  { value: "bosch", label: "Bosch" },
+  { value: "valeo", label: "Valeo" },
+  { value: "ngk", label: "NGK" },
+  { value: "denso", label: "Denso" },
+  { value: "mico", label: "MICO" },
+  { value: "tvs", label: "TVS" },
+];
+
+/**
+ * Estimated delivery time filter options.
+ * @type {Array<{value: string, label: string}>}
+ */
+export const DELIVERY_TIMES = [
+  { value: "same-day", label: "Same Day" },
+  { value: "1-day", label: "1 Day" },
+  { value: "2-3-days", label: "2-3 Days" },
+];
+
+/**
+ * Marketplace product sort options.
+ * @type {Array<{value: string, label: string}>}
+ */
+export const SORT_OPTIONS = [
+  { value: "price-asc", label: "Price: Low to High" },
+  { value: "price-desc", label: "Price: High to Low" },
+  { value: "rating", label: "Rating" },
+  { value: "popularity", label: "Popularity" },
+];
+
+/**
+ * Order status display labels for the marketplace.
+ * @type {Object<string, string>}
+ */
+export const ORDER_STATUSES = {
+  pending: "Pending",
+  confirmed: "Confirmed",
+  shipped: "Shipped",
+  delivered: "Delivered",
+  cancelled: "Cancelled",
+};

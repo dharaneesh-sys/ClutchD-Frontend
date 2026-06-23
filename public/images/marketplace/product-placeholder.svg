@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="400" height="400" viewBox="0 0 400 400">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#141417"/>
+      <stop offset="100%" stop-color="#202023"/>
+    </linearGradient>
+    <linearGradient id="glow" x1="0.3" y1="0" x2="0.7" y2="1">
+      <stop offset="0%" stop-color="#10b981" stop-opacity="0.12"/>
+      <stop offset="50%" stop-color="#10b981" stop-opacity="0.04"/>
+      <stop offset="100%" stop-color="#10b981" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
+  <rect width="400" height="400" fill="url(#bg)" rx="20"/>
+  <rect width="400" height="400" fill="url(#glow)" rx="20"/>
+  <!-- Gear-inspired geometric shape: outer ring -->
+  <circle cx="200" cy="200" r="84" fill="none" stroke="#2b2b2e" stroke-width="3"/>
+  <!-- Inner hub -->
+  <circle cx="200" cy="200" r="28" fill="none" stroke="#3c3c40" stroke-width="2.5"/>
+  <!-- Hub center dot -->
+  <circle cx="200" cy="200" r="6" fill="#10b981" opacity="0.5"/>
+  <!-- Gear teeth (8 spokes) -->
+  <g stroke="#3c3c40" stroke-width="2.5" stroke-linecap="round">
+    <line x1="200" y1="108" x2="200" y2="138"/>
+    <line x1="200" y1="262" x2="200" y2="292"/>
+    <line x1="108" y1="200" x2="138" y2="200"/>
+    <line x1="262" y1="200" x2="292" y2="200"/>
+    <line x1="135" y1="135" x2="156" y2="156"/>
+    <line x1="244" y1="244" x2="265" y2="265"/>
+    <line x1="135" y1="265" x2="156" y2="244"/>
+    <line x1="244" y1="156" x2="265" y2="135"/>
+  </g>
+  <!-- Piston-like vertical element -->
+  <rect x="194" y="144" width="12" height="56" rx="3" fill="#2b2b2e" opacity="0.8"/>
+  <rect x="192" y="192" width="16" height="6" rx="2" fill="#3c3c40"/>
+  <!-- Subtle accent dots -->
+  <circle cx="140" cy="290" r="2" fill="#10b981" opacity="0.2"/>
+  <circle cx="260" cy="290" r="2" fill="#10b981" opacity="0.2"/>
+  <circle cx="140" cy="110" r="2" fill="#10b981" opacity="0.15"/>
+  <circle cx="260" cy="110" r="2" fill="#10b981" opacity="0.15"/>
+  <!-- Border stroke -->
+  <rect width="400" height="400" fill="none" stroke="#2b2b2e" stroke-width="1" rx="20"/>
+</svg>
