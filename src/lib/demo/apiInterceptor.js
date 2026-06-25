@@ -9,6 +9,7 @@ import {
   MOCK_VEHICLES,
   DEMO_SERVICE_STATUSES,
   MOCK_PRICE_ESTIMATES,
+  createMockServiceRequest,
 } from "@/lib/demo/mockData";
 import {
   PRODUCT_CATEGORIES,
@@ -19,6 +20,31 @@ import { vendors } from "@/lib/demo/data/vendors";
 import { productVendors } from "@/lib/demo/data/productVendors";
 import { offers } from "@/lib/demo/data/offers";
 import { reviews as productReviews } from "@/lib/demo/data/reviews";
+
+// Seed jobs that always appear in demo mode (so mechanic/garage dashboards are never empty)
+const SEEDED_JOBS = [
+  createMockServiceRequest({
+    id: "demo-req-seeded-1",
+    issueTag: "engine_failure",
+    description: "Engine making a knocking sound when accelerating. Started this morning on the way to work.",
+    requestType: "mechanic",
+    createdAt: new Date(Date.now() - 600000).toISOString(),
+  }),
+  createMockServiceRequest({
+    id: "demo-req-seeded-2",
+    issueTag: "ac_not_working",
+    description: "AC stopped blowing cold air. Hot air only from vents.",
+    requestType: "garage",
+    createdAt: new Date(Date.now() - 300000).toISOString(),
+  }),
+  createMockServiceRequest({
+    id: "demo-req-seeded-3",
+    issueTag: "flat_tire",
+    description: "Rear left tyre is completely flat. Need roadside assistance.",
+    requestType: "auto",
+    createdAt: new Date(Date.now() - 900000).toISOString(),
+  }),
+];
 
 // In-memory mutable state for demo progression
 let demoState = {
@@ -60,6 +86,10 @@ function matchRoute(url, method) {
   if (/\/service\/request\/[^/]+\/status/.test(path) && m === "patch") return "update_status";
   if (/\/service\/request\/[^/]+\/complete/.test(path) && m === "post") return "complete_request";
   if (/\/service\/request\/[^/]+\/cancel/.test(path) && m === "post") return "cancel_request";
+  if (/\/service\/request\/([\w-]+)\/finalize-price/.test(path) && m === "post") {
+    const match = path.match(/\/service\/request\/([\w-]+)\/finalize-price/);
+    return { route: "finalize_price", jobId: match ? match[1] : null };
+  }
 
   if (path.includes("/jobs/incoming") && m === "get") return "jobs_incoming";
   if (/\/jobs\/status\/[\w-]+/.test(path) && m === "get") {
@@ -82,6 +112,11 @@ function matchRoute(url, method) {
 
   if (path.includes("/uploads") && m === "post") return "upload";
 
+  if (/\/jobs\/[\w-]+/.test(path) && m === "delete") {
+    const match = path.match(/\/jobs\/([\w-]+)/);
+    return { route: "job_delete", jobId: match ? match[1] : null };
+  }
+
   if (path.includes("/admin/stats") && m === "get") return "admin_stats";
   if (path.includes("/admin/users") && m === "get") return "admin_users";
   if (path.includes("/admin/mechanics") && m === "get") return "admin_mechanics";
@@ -101,6 +136,10 @@ function matchRoute(url, method) {
 
   if (path.includes("/profile") && m === "get") return "profile";
   if (path.includes("/profile") && m === "patch") return "profile_update";
+
+  if (path.includes("/providers/earnings") && m === "get") return "providers_earnings";
+  if (path.includes("/providers/availability") && m === "patch") return "providers_availability";
+  if (path.includes("/providers/profile") && m === "patch") return "providers_profile";
 
   // ═══════════════════════════════════════════
   // Marketplace routes (ordered: specific → generic)
@@ -248,8 +287,18 @@ function handleRoute(routeDef, reqData) {
       return { data: { success: true } };
     }
 
+    case "finalize_price":
+      return { data: { success: true, invoice: { id: "inv-" + Date.now(), amount: data?.serviceAmount || 0 } } };
+
+    case "job_delete":
+      return { data: { success: true } };
+
     case "jobs_incoming": {
-      return { data: { jobs: demoState.activeRequest ? [demoState.activeRequest] : [] } };
+      const jobs = [...SEEDED_JOBS];
+      if (demoState.activeRequest) {
+        jobs.push(demoState.activeRequest);
+      }
+      return { data: { jobs } };
     }
 
     case "job_status": {
@@ -344,6 +393,39 @@ function handleRoute(routeDef, reqData) {
 
     case "profile_update":
       return { data: { ...MOCK_USERS.customer, ...data } };
+
+    case "providers_availability":
+      return { data: { success: true, available: data?.available ?? true } };
+
+    case "providers_profile":
+      return { data: { success: true, user: { ...MOCK_USERS.mechanic, ...data } } };
+
+    case "providers_earnings": {
+      const period = data?.period || "week";
+      const mockEarnings = {
+        week: [
+          { day: "Mon", amount: 120 },
+          { day: "Tue", amount: 350 },
+          { day: "Wed", amount: 200 },
+          { day: "Thu", amount: 480 },
+          { day: "Fri", amount: 150 },
+          { day: "Sat", amount: 620 },
+          { day: "Sun", amount: 290 },
+        ],
+        month: [
+          { week: "W1", amount: 1850 },
+          { week: "W2", amount: 2210 },
+          { week: "W3", amount: 1680 },
+          { week: "W4", amount: 2540 },
+        ],
+      };
+      return {
+        data: {
+          earnings: mockEarnings[period] || mockEarnings.week,
+          total: (mockEarnings[period] || mockEarnings.week).reduce((s, e) => s + e.amount, 0),
+        },
+      };
+    }
 
     // ═══════════════════════════════════════════
     // Marketplace handlers
