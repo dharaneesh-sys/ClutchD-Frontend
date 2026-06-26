@@ -23,7 +23,14 @@ api.interceptors.request.use(
     const isRuntimeDemo = typeof window !== "undefined" && (
       window.__DEMO_USER__ || sessionStorage.getItem("demo_token")
     );
-    if (DEMO_MODE || isRuntimeDemo) {
+    // Also intercept login/signup for demo email addresses so Demo123456 works
+    // even when the demo toolbar hasn't been toggled yet
+    const isAuthRequest = config.method === "post" && (
+      config.url?.includes("/auth/login") || config.url?.includes("/auth/signup")
+    );
+    const reqData = typeof config.data === "string" ? (() => { try { return JSON.parse(config.data); } catch { return {}; } })() : (config.data || {});
+    const isDemoEmailLogin = isAuthRequest && reqData.email?.endsWith?.("@demo.com");
+    if (DEMO_MODE || isRuntimeDemo || isDemoEmailLogin) {
       if (!_demoApiModule) {
         _demoApiModule = await import("./demo/apiInterceptor");
       }

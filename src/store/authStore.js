@@ -79,7 +79,7 @@ export const useAuthStore = create(
         set({ isLoading: true, error: null });
         
         try {
-          const response = await api.post("/auth/login", { email, password });
+          const response = await api.post("/auth/login", { email, password, role });
           
           if (response.data.token && typeof window !== "undefined") {
             setAccessToken(response.data.token);
