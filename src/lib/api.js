@@ -8,7 +8,7 @@ let _demoApiModule = null;
 
 const api = axios.create({
   baseURL: API_BASE_URL,
-  timeout: 15000,
+  timeout: 30000,
   headers: {
     "Content-Type": "application/json",
   },
@@ -19,7 +19,11 @@ const api = axios.create({
 
 api.interceptors.request.use(
   async (config) => {
-    if (DEMO_MODE) {
+    // Check runtime demo mode (toggled via toolbar) in addition to static DEMO_MODE flag
+    const isRuntimeDemo = typeof window !== "undefined" && (
+      window.__DEMO_USER__ || sessionStorage.getItem("demo_token")
+    );
+    if (DEMO_MODE || isRuntimeDemo) {
       if (!_demoApiModule) {
         _demoApiModule = await import("./demo/apiInterceptor");
       }

@@ -71,7 +71,7 @@ function resetCategoryStore() {
 // Sample data helpers
 // ---------------------------------------------------------------------------
 const sampleProduct = {
-  id: "prod-1",
+  id: "prod-001",
   name: "Engine Oil 5W-30 (4L)",
   brand: "Shell",
   vendorId: "v-1",
@@ -85,7 +85,7 @@ const sampleProduct = {
 };
 
 const sampleProduct2 = {
-  id: "prod-2",
+  id: "prod-002",
   name: "Brake Pad Set (Front)",
   brand: "Bosch",
   vendorId: "v-2",
@@ -136,7 +136,7 @@ describe("marketplaceStore", () => {
         const products = useProductStore.getState().products;
         expect(products.length).toBeGreaterThan(0);
         // Verify it's demo data by checking specific known products
-        expect(products.find((p) => p.id === "prod-1")).toBeDefined();
+        expect(products.find((p) => p.id === "prod-001")).toBeDefined();
         expect(useProductStore.getState().isLoading).toBe(false);
       });
 
@@ -149,7 +149,7 @@ describe("marketplaceStore", () => {
 
         const products = useProductStore.getState().products;
         expect(products.length).toBeGreaterThan(0);
-        expect(products.find((p) => p.id === "prod-1")).toBeDefined();
+        expect(products.find((p) => p.id === "prod-001")).toBeDefined();
         expect(useProductStore.getState().isLoading).toBe(false);
         expect(useProductStore.getState().error).toBe("Server error");
       });
@@ -248,7 +248,7 @@ describe("marketplaceStore", () => {
           products: [sampleProduct, sampleProduct2],
         });
 
-        const result = useProductStore.getState().getProductById("prod-1");
+        const result = useProductStore.getState().getProductById("prod-001");
 
         expect(result).toEqual(sampleProduct);
       });
@@ -266,7 +266,7 @@ describe("marketplaceStore", () => {
       it("returns null when products array is empty", () => {
         const result = useProductStore
           .getState()
-          .getProductById("prod-1");
+          .getProductById("prod-001");
 
         expect(result).toBeNull();
       });
@@ -299,13 +299,13 @@ describe("marketplaceStore", () => {
         useCartStore
           .getState()
           .addItem(
-            { id: "prod-1", price: 2199, name: "Engine Oil", image: "/img.jpg" },
+            { id: "prod-001", price: 2199, name: "Engine Oil", image: "/img.jpg" },
             { id: "v-1", name: "Auto Parts Co." },
           );
 
         const items = useCartStore.getState().items;
         expect(items).toHaveLength(1);
-        expect(items[0].productId).toBe("prod-1");
+        expect(items[0].productId).toBe("prod-001");
         expect(items[0].vendorId).toBe("v-1");
         expect(items[0].quantity).toBe(1);
         expect(items[0].price).toBe(2199);
@@ -315,7 +315,7 @@ describe("marketplaceStore", () => {
 
       it("increments quantity for same product+vendor combination", () => {
         const product = {
-          id: "prod-1",
+          id: "prod-001",
           price: 2199,
           name: "Engine Oil",
           image: "/img.jpg",
@@ -331,7 +331,7 @@ describe("marketplaceStore", () => {
 
       it("adds separate entries for same product from different vendors", () => {
         const product = {
-          id: "prod-1",
+          id: "prod-001",
           price: 2199,
           name: "Engine Oil",
           image: "/img.jpg",
@@ -349,7 +349,7 @@ describe("marketplaceStore", () => {
         useCartStore
           .getState()
           .addItem(
-            { id: "prod-1", price: 2199, name: "Engine Oil" },
+            { id: "prod-001", price: 2199, name: "Engine Oil" },
             null,
           );
 
@@ -360,7 +360,7 @@ describe("marketplaceStore", () => {
         useCartStore
           .getState()
           .addItem(
-            { id: "prod-1", price: 2199, name: "Engine Oil" },
+            { id: "prod-001", price: 2199, name: "Engine Oil" },
             { id: "v-1" },
           );
 
@@ -374,14 +374,14 @@ describe("marketplaceStore", () => {
         useCartStore.setState({
           items: [
             {
-              productId: "prod-1",
+              productId: "prod-001",
               vendorId: "v-1",
               quantity: 1,
               price: 2199,
               name: "Engine Oil",
             },
             {
-              productId: "prod-2",
+              productId: "prod-002",
               vendorId: "v-2",
               quantity: 1,
               price: 1249,
@@ -390,17 +390,17 @@ describe("marketplaceStore", () => {
           ],
         });
 
-        useCartStore.getState().removeItem("prod-1");
+        useCartStore.getState().removeItem("prod-001");
 
         expect(useCartStore.getState().items).toHaveLength(1);
-        expect(useCartStore.getState().items[0].productId).toBe("prod-2");
+        expect(useCartStore.getState().items[0].productId).toBe("prod-002");
       });
 
       it("does nothing when productId not in cart", () => {
         useCartStore.setState({
           items: [
             {
-              productId: "prod-1",
+              productId: "prod-001",
               vendorId: "v-1",
               quantity: 1,
               price: 2199,
@@ -416,7 +416,7 @@ describe("marketplaceStore", () => {
 
       it("does not throw when cart is empty", () => {
         expect(() => {
-          useCartStore.getState().removeItem("prod-1");
+          useCartStore.getState().removeItem("prod-001");
         }).not.toThrow();
       });
     });
@@ -427,7 +427,7 @@ describe("marketplaceStore", () => {
         useCartStore.setState({
           items: [
             {
-              productId: "prod-1",
+              productId: "prod-001",
               vendorId: "v-1",
               quantity: 1,
               price: 2199,
@@ -436,7 +436,7 @@ describe("marketplaceStore", () => {
           ],
         });
 
-        useCartStore.getState().updateQuantity("prod-1", 3);
+        useCartStore.getState().updateQuantity("prod-001", 3);
 
         expect(useCartStore.getState().items[0].quantity).toBe(3);
       });
@@ -445,7 +445,7 @@ describe("marketplaceStore", () => {
         useCartStore.setState({
           items: [
             {
-              productId: "prod-1",
+              productId: "prod-001",
               vendorId: "v-1",
               quantity: 1,
               price: 2199,
@@ -454,7 +454,7 @@ describe("marketplaceStore", () => {
           ],
         });
 
-        useCartStore.getState().updateQuantity("prod-1", 0);
+        useCartStore.getState().updateQuantity("prod-001", 0);
 
         expect(useCartStore.getState().items).toHaveLength(0);
       });
@@ -463,7 +463,7 @@ describe("marketplaceStore", () => {
         useCartStore.setState({
           items: [
             {
-              productId: "prod-1",
+              productId: "prod-001",
               vendorId: "v-1",
               quantity: 1,
               price: 2199,
@@ -472,7 +472,7 @@ describe("marketplaceStore", () => {
           ],
         });
 
-        useCartStore.getState().updateQuantity("prod-1", -1);
+        useCartStore.getState().updateQuantity("prod-001", -1);
 
         expect(useCartStore.getState().items).toHaveLength(0);
       });
@@ -481,14 +481,14 @@ describe("marketplaceStore", () => {
         useCartStore.setState({
           items: [
             {
-              productId: "prod-1",
+              productId: "prod-001",
               vendorId: "v-1",
               quantity: 1,
               price: 2199,
               name: "Engine Oil",
             },
             {
-              productId: "prod-2",
+              productId: "prod-002",
               vendorId: "v-2",
               quantity: 2,
               price: 1249,
@@ -497,27 +497,33 @@ describe("marketplaceStore", () => {
           ],
         });
 
-        useCartStore.getState().updateQuantity("prod-1", 5);
+        useCartStore.getState().updateQuantity("prod-001", 5);
 
         const items = useCartStore.getState().items;
         expect(items).toHaveLength(2);
-        expect(items.find((i) => i.productId === "prod-1").quantity).toBe(5);
-        expect(items.find((i) => i.productId === "prod-2").quantity).toBe(2);
+        expect(items.find((i) => i.productId === "prod-001").quantity).toBe(5);
+        expect(items.find((i) => i.productId === "prod-002").quantity).toBe(2);
       });
     });
 
     // ── applyCoupon ─────────────────────────────────────
     describe("applyCoupon", () => {
-      it("stores the coupon code and resets discount to 0", () => {
-        useCartStore.getState().applyCoupon("SAVE10");
+      it("stores the coupon code and resets discount to 0", async () => {
+        mockPost.mockResolvedValueOnce({
+          data: { valid: true, code: "SAVE10", discountAmount: 0 },
+        });
+        await useCartStore.getState().applyCoupon("SAVE10");
 
         expect(useCartStore.getState().couponCode).toBe("SAVE10");
         expect(useCartStore.getState().discount).toBe(0);
       });
 
-      it("overwrites previous coupon code", () => {
-        useCartStore.getState().applyCoupon("SAVE10");
-        useCartStore.getState().applyCoupon("NEWCODE");
+      it("overwrites previous coupon code", async () => {
+        mockPost.mockResolvedValue({
+          data: { valid: true, code: "NEWCODE", discountAmount: 0 },
+        });
+        await useCartStore.getState().applyCoupon("SAVE10");
+        await useCartStore.getState().applyCoupon("NEWCODE");
 
         expect(useCartStore.getState().couponCode).toBe("NEWCODE");
       });
@@ -534,8 +540,8 @@ describe("marketplaceStore", () => {
       it("returns correct sum of all items", () => {
         useCartStore.setState({
           items: [
-            { productId: "prod-1", price: 2199, quantity: 2 },
-            { productId: "prod-2", price: 1249, quantity: 1 },
+            { productId: "prod-001", price: 2199, quantity: 2 },
+            { productId: "prod-002", price: 1249, quantity: 1 },
           ],
         });
 
@@ -546,7 +552,7 @@ describe("marketplaceStore", () => {
 
       it("accounts for discount in total", () => {
         useCartStore.setState({
-          items: [{ productId: "prod-1", price: 1000, quantity: 1 }],
+          items: [{ productId: "prod-001", price: 1000, quantity: 1 }],
           discount: 100,
         });
 
@@ -557,7 +563,7 @@ describe("marketplaceStore", () => {
 
       it("returns 0 when discount exceeds subtotal", () => {
         useCartStore.setState({
-          items: [{ productId: "prod-1", price: 1000, quantity: 1 }],
+          items: [{ productId: "prod-001", price: 1000, quantity: 1 }],
           discount: 2000,
         });
 
@@ -572,8 +578,8 @@ describe("marketplaceStore", () => {
       it("returns total quantity of all items", () => {
         useCartStore.setState({
           items: [
-            { productId: "prod-1", quantity: 2 },
-            { productId: "prod-2", quantity: 3 },
+            { productId: "prod-001", quantity: 2 },
+            { productId: "prod-002", quantity: 3 },
           ],
         });
 
@@ -588,7 +594,7 @@ describe("marketplaceStore", () => {
 
       it("handles single item correctly", () => {
         useCartStore.setState({
-          items: [{ productId: "prod-1", quantity: 1 }],
+          items: [{ productId: "prod-001", quantity: 1 }],
         });
 
         expect(useCartStore.getState().getItemCount()).toBe(1);
@@ -601,7 +607,7 @@ describe("marketplaceStore", () => {
         useCartStore.setState({
           items: [
             {
-              productId: "prod-1",
+              productId: "prod-001",
               vendorId: "v-1",
               quantity: 1,
               price: 2199,
@@ -637,7 +643,7 @@ describe("marketplaceStore", () => {
 
     const sampleCartItems = [
       {
-        productId: "prod-1",
+        productId: "prod-001",
         vendorId: "v-1",
         quantity: 1,
         price: 2199,
@@ -653,7 +659,7 @@ describe("marketplaceStore", () => {
 
         // Pre-populate cart to verify it gets cleared
         useCartStore.getState().addItem(
-          { id: "prod-1", price: 2199, name: "Engine Oil", image: "/img.jpg" },
+          { id: "prod-001", price: 2199, name: "Engine Oil", image: "/img.jpg" },
           { id: "v-1" },
         );
 
@@ -667,7 +673,7 @@ describe("marketplaceStore", () => {
           "/orders",
           expect.objectContaining({
             items: [
-              { productId: "prod-1", name: "Engine Oil", quantity: 1, price: 2199 },
+              { productId: "prod-001", name: "Engine Oil", quantity: 1, price: 2199 },
             ],
             total: 2199,
             status: "confirmed",
@@ -696,7 +702,7 @@ describe("marketplaceStore", () => {
 
         // Pre-populate cart
         useCartStore.getState().addItem(
-          { id: "prod-1", price: 2199, name: "Engine Oil" },
+          { id: "prod-001", price: 2199, name: "Engine Oil" },
           { id: "v-1" },
         );
 
@@ -730,8 +736,8 @@ describe("marketplaceStore", () => {
         mockPost.mockResolvedValueOnce({ data: {} });
 
         const multiItems = [
-          { productId: "prod-1", name: "Engine Oil", quantity: 2, price: 2199 },
-          { productId: "prod-2", name: "Brake Pads", quantity: 1, price: 1249 },
+          { productId: "prod-001", name: "Engine Oil", quantity: 2, price: 2199 },
+          { productId: "prod-002", name: "Brake Pads", quantity: 1, price: 1249 },
         ];
 
         const result = await useOrderStore.getState().placeOrder(

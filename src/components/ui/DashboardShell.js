@@ -42,6 +42,9 @@ export function DashboardShell({
   sidebar,
   onReferral,
   className,
+  hideMobileMenu = false,
+  hasBottomNav = false,
+  desktopSidebar = false,
 }) {
   const { logout } = useAuthStore();
   const router = useRouter();
@@ -105,7 +108,9 @@ export function DashboardShell({
           </div>
 
           {/* Connection & Notifications */}
-          <ConnectionIndicator />
+          <div className="hidden lg:block">
+            <ConnectionIndicator />
+          </div>
           <NotificationBell />
 
           {/* User avatar */}
@@ -116,32 +121,34 @@ export function DashboardShell({
             <ModeIcon size={16} />
           </div>
 
-          {/* Logout button */}
+          {/* Logout button — always visible */}
           <button
             onClick={handleLogout}
             aria-label="Logout"
             className={cn(
-              "w-9 h-9 lg:w-10 lg:h-10 rounded-full flex items-center justify-center transition-colors",
+              "flex w-9 h-9 lg:w-10 lg:h-10 rounded-full items-center justify-center transition-colors",
               "bg-surface-soft hover:bg-red-50 dark:hover:bg-red-500/20 border border-border-subtle hover:border-red-200 dark:hover:border-red-500/30 text-text-muted hover:text-red-500 dark:hover:text-red-400"
             )}
           >
             <LogOut size={15} />
           </button>
 
-          {/* Mobile menu button */}
-          <button
-            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="lg:hidden p-2 rounded-lg text-white/70 hover:text-white hover:bg-white/10"
-            aria-label={mobileMenuOpen ? "Close menu" : "Open menu"}
-            aria-expanded={mobileMenuOpen}
-          >
-            {mobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
-          </button>
+          {/* Mobile menu button — only when sidebar nav is used */}
+          {!hideMobileMenu && (
+            <button
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              className="lg:hidden p-2 rounded-lg text-white/70 hover:text-white hover:bg-white/10"
+              aria-label={mobileMenuOpen ? "Close menu" : "Open menu"}
+              aria-expanded={mobileMenuOpen}
+            >
+              {mobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
+            </button>
+          )}
         </div>
       </header>
 
-      {/* Mobile sidebar overlay */}
-      {mobileMenuOpen && (
+      {/* Mobile sidebar overlay — only when sidebar nav is used */}
+      {!hideMobileMenu && mobileMenuOpen && (
         <div
           className="lg:hidden fixed inset-0 z-40 bg-black/50"
           onClick={() => setMobileMenuOpen(false)}
@@ -149,8 +156,8 @@ export function DashboardShell({
         />
       )}
 
-      {/* Mobile sidebar */}
-      {mobileMenuOpen && (
+      {/* Mobile sidebar — only when sidebar nav is used */}
+      {!hideMobileMenu && mobileMenuOpen && (
         <aside className={cn(
           "lg:hidden fixed top-0 right-0 h-full w-64 z-50 glass-strong flex flex-col",
           "bg-bg-card border-l border-border-subtle"
@@ -215,7 +222,11 @@ export function DashboardShell({
       )}
 
       {/* Main content */}
-      <main className="flex-1 pb-4 lg:pb-6">
+      <main className={cn(
+        "flex-1",
+        hasBottomNav ? "pb-20" : "pb-4 lg:pb-6",
+        desktopSidebar && "lg:ml-16"
+      )}>
         <div className="p-3 sm:p-4 lg:p-6">
           {children}
         </div>

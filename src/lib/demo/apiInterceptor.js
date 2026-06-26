@@ -10,6 +10,8 @@ import {
   DEMO_SERVICE_STATUSES,
   MOCK_PRICE_ESTIMATES,
   createMockServiceRequest,
+  MOCK_KYC_APPLICATIONS,
+  MOCK_DISPUTES,
 } from "@/lib/demo/mockData";
 import {
   PRODUCT_CATEGORIES,
@@ -117,6 +119,7 @@ function matchRoute(url, method) {
     return { route: "job_delete", jobId: match ? match[1] : null };
   }
 
+  if (path.includes("/admin/analytics") && m === "get") return "admin_stats";
   if (path.includes("/admin/stats") && m === "get") return "admin_stats";
   if (path.includes("/admin/users") && m === "get") return "admin_users";
   if (path.includes("/admin/mechanics") && m === "get") return "admin_mechanics";
@@ -373,10 +376,10 @@ function handleRoute(routeDef, reqData) {
       return { data: { ok: true, status: "captured" } };
 
     case "admin_disputes":
-      return { data: { disputes: [], total: 0 } };
+      return { data: { disputes: MOCK_DISPUTES, total: MOCK_DISPUTES.length } };
 
     case "admin_kyc":
-      return { data: { pending: [], total: 0 } };
+      return { data: { applications: [...MOCK_KYC_APPLICATIONS], total: MOCK_KYC_APPLICATIONS.length } };
 
     case "vehicles_list":
       return { data: MOCK_VEHICLES };

@@ -100,7 +100,83 @@ export const MOCK_ADMIN_STATS = {
   revenue: 2894500,
   growthPercent: 12.5,
   recentTransactions: MOCK_PAYMENTS,
+  // Fields expected by AdminOverview component
+  activeProviders: 847 + 312,  // mechanics + garages
+  jobsCompleted: 28943,
+  totalRevenue: 2894500,
 };
+
+export const MOCK_KYC_APPLICATIONS = [
+  {
+    id: "kyc-demo-1",
+    name: "Sathish Kumar",
+    email: "sathish@example.com",
+    phone: "+91 98765 43230",
+    profileType: "mechanic",
+    type: "Mechanic Verification",
+    status: "pending_review",
+    submitted: "2026-06-24T10:30:00Z",
+    documents: ["Aadhaar Card", "Driving License", "Certification - Engine Repair", "Address Proof"],
+  },
+  {
+    id: "kyc-demo-2",
+    name: "Kavitha Auto Works",
+    email: "kavitha@example.com",
+    phone: "+91 98765 43231",
+    profileType: "garage",
+    type: "Garage Verification",
+    status: "pending_review",
+    submitted: "2026-06-23T14:15:00Z",
+    documents: ["GST Registration", "Trade License", "Property Tax Receipt", "Insurance Certificate"],
+  },
+  {
+    id: "kyc-demo-3",
+    name: "Venkatesh R.",
+    email: "venkatesh@example.com",
+    phone: "+91 98765 43232",
+    profileType: "mechanic",
+    type: "Mechanic Verification",
+    status: "pending_review",
+    submitted: "2026-06-22T09:00:00Z",
+    documents: ["Aadhaar Card", "PAN Card", "Certification - AC Repair", "Bank Statement"],
+  },
+];
+
+export const MOCK_DISPUTES = [
+  {
+    id: "disp-demo-1",
+    jobId: "bk-demo-1",
+    customer: "Arun Kumar",
+    provider: "Rajesh M.",
+    reason: "Charged for service not completed - mechanic marked job complete but issue persists",
+    desc: "I requested a brake pad replacement. The mechanic said the job was done, but my brakes are still making the same noise. I paid ₹1,200 but the issue wasn't fixed. I want a refund or the work properly completed.",
+    amount: "₹1,200",
+    status: "Open",
+    date: "2026-06-25",
+  },
+  {
+    id: "disp-demo-2",
+    jobId: "bk-demo-2",
+    customer: "Priya S.",
+    provider: "Kumar's Garage",
+    reason: "Parts damaged during repair, garage refusing to take responsibility",
+    desc: "I took my car to Kumar's Garage for AC servicing. They damaged the condenser while working and now the AC doesn't work at all. They're saying it was already damaged. I have photos from before showing it was fine. They quoted ₹8,000 for a new condenser.",
+    amount: "₹8,000",
+    status: "Open",
+    date: "2026-06-24",
+  },
+  {
+    id: "disp-demo-3",
+    jobId: "bk-demo-3",
+    customer: "Manoj K.",
+    provider: "Green Drive Service",
+    reason: "Arrived 45 minutes late causing me to miss an appointment",
+    desc: "I booked a 9AM roadside assistance appointment. The mechanic showed up at 9:45 AM without any prior notice or apology. I missed an important client meeting because of this. Expect compensation for the delay and missed meeting.",
+    amount: "₹500",
+    status: "Open",
+    date: "2026-06-23",
+  },
+];
 
 export function createMockServiceRequest(overrides = {}) {
   return {

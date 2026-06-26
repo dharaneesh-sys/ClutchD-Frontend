@@ -351,7 +351,33 @@ export const products = [
     basePrice: 549,
   },
 
-  // ── Accessories (1 product, total = 15) ──
+  // ── Suspension (3rd product) ──
+  {
+    id: "prod-016",
+    name: "Suspension Control Arm (Front Lower)",
+    description: "Complete front lower control arm with pre-installed ball joint and bushings. Restores steering precision and wheel alignment.",
+    categoryId: "suspension",
+    brand: "bosch",
+    partNumber: "BCH-CA-1601",
+    images: [],
+    specs: {
+      material: "Cast Steel with Powder Coating",
+      position: "Front Lower (Left)",
+      compatibility: "Hyundai i20, Grand i10, Aura",
+      includes: "Control Arm, Ball Joint, Bushings",
+      weight: "3.2 kg",
+    },
+    features: [
+      "Pre-assembled ball joint saves labor time",
+      "Hydraulic bushings for vibration damping",
+      "Corrosion resistant powder coating",
+      "OEM-grade fitment guaranteed",
+    ],
+    warranty: "2 Years",
+    basePrice: 4299,
+  },
+
+  // ── Accessories (3 products) ──
   {
     id: "prod-015",
     name: "Car Floor Mat Set (TPE)",
@@ -375,5 +401,53 @@ export const products = [
     ],
     warranty: "1 Year",
     basePrice: 1199,
+  },
+  {
+    id: "prod-017",
+    name: "Car Seat Cover Set (Leatherette)",
+    description: "Premium leatherette seat cover set for front and rear seats. Breathable, easy to install with elastic hooks and adjustable straps.",
+    categoryId: "accessories",
+    brand: "tvs",
+    partNumber: "TVS-SCV-1701",
+    images: [],
+    specs: {
+      material: "PU Leatherette with Mesh Backing",
+      compatibility: "Universal fit (most hatchbacks and sedans)",
+      pieces: "5 (2 Front + 3 Rear)",
+      color: "Black with Grey Accents",
+      installation: "Elastic hook system, no tools required",
+    },
+    features: [
+      "Breathable mesh backing for comfort",
+      "Side airbag compatible (stitched seams)",
+      "Water-resistant surface",
+      "Easy to wipe clean",
+    ],
+    warranty: "2 Years",
+    basePrice: 2499,
+  },
+  {
+    id: "prod-018",
+    name: "Windshield Sun Shade (Foldable)",
+    description: "Reflective aluminum foil sun shade for front windshield. Blocks UV rays and keeps cabin temperature 15°C cooler in summer heat.",
+    categoryId: "accessories",
+    brand: "tvs",
+    partNumber: "TVS-SSH-1801",
+    images: [],
+    specs: {
+      material: "Aluminum Foil + Foam Core",
+      compatibility: "Universal (adjusts to fit most windshields)",
+      size: "130cm x 70cm",
+      foldableSize: "30cm x 30cm",
+      includes: "Storage pouch, 2 suction cups",
+    },
+    features: [
+      "Blocks 99% of UV rays",
+      "Folds into compact storage pouch",
+      "Dual-layer insulation",
+      "Protects dashboard from sun damage",
+    ],
+    warranty: "6 Months",
+    basePrice: 449,
   },
 ];
