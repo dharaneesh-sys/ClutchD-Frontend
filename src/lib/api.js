@@ -6,6 +6,11 @@ import { DEMO_MODE } from "@/lib/demo/demoFlag";
 
 let _demoApiModule = null;
 
+// Public API path prefixes that should NOT trigger auth redirect on 401.
+// For these endpoints, the 401 is simply passed through so calling code
+// can fall back to demo data instead of redirecting to /auth.
+const PUBLIC_API_PATHS = ['/products', '/categories', '/health'];
+
 const api = axios.create({
   baseURL: API_BASE_URL,
   timeout: 30000,
@@ -32,22 +37,29 @@ api.interceptors.request.use(
     const isDemoEmailLogin = isAuthRequest && reqData.email?.endsWith?.("@demo.com");
     if (DEMO_MODE || isRuntimeDemo || isDemoEmailLogin) {
       if (!_demoApiModule) {
-        _demoApiModule = await import("./demo/apiInterceptor");
+        try {
+          _demoApiModule = await import("./demo/apiInterceptor");
+        } catch (e) {
+          // Dynamic import can fail in Capacitor WebView if chunk isn't bundled;
+          // fall through to real API call instead of breaking everything.
+        }
       }
-      const result = _demoApiModule.handleDemoApiRequest(
-        config.method || "get",
-        config.url,
-        config.data,
-        { params: config.params }
-      );
-      if (result) {
-        config.adapter = () => Promise.resolve({
-          data: result.data,
-          status: 200,
-          statusText: "OK",
-          headers: {},
-          config,
-        });
+      if (_demoApiModule) {
+        const result = _demoApiModule.handleDemoApiRequest(
+          config.method || "get",
+          config.url,
+          config.data,
+          { params: config.params }
+        );
+        if (result) {
+          config.adapter = () => Promise.resolve({
+            data: result.data,
+            status: 200,
+            statusText: "OK",
+            headers: {},
+            config,
+          });
+        }
       }
     }
 
@@ -84,9 +96,10 @@ api.interceptors.response.use(
       const isAuthPage = typeof window !== "undefined" && window.location.pathname.startsWith("/auth");
       const isAuthRequest = originalRequest?.url?.includes("/auth/");
       const isRefreshRequest = originalRequest?.url?.includes("/auth/refresh");
+      const isPublicEndpoint = PUBLIC_API_PATHS.some(path => originalRequest?.url?.startsWith(path));
 
-      // Don't retry refresh requests or auth page requests
-      if (isAuthPage || isAuthRequest || isRefreshRequest) {
+      // Don't retry refresh requests, auth page requests, or public endpoints
+      if (isAuthPage || isAuthRequest || isRefreshRequest || isPublicEndpoint) {
         return Promise.reject(error);
       }
 

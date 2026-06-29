@@ -35,7 +35,7 @@ import { Shimmer, ShimmerCard } from '@/components/ui/Shimmer';
  * ────────────────────────────────────────────────────────────── */
 
 const PRODUCT_DETAILS = {
-  'prod-1': {
+  'prod-001': {
     partNumber: 'SHELL-5W30-4L',
     description:
       'High-performance synthetic engine oil engineered for modern petrol and diesel engines. Provides exceptional protection against wear, sludge, and thermal breakdown while optimizing fuel efficiency across all driving conditions.',
@@ -58,7 +58,7 @@ const PRODUCT_DETAILS = {
     warranty: '5 Years / 50,000 km',
     images: ['/images/products/engine-oil.jpg'],
   },
-  'prod-2': {
+  'prod-002': {
     partNumber: 'BOSCH-BP-F-001',
     description:
       'Premium ceramic brake pad set for the front axle. Delivers consistent stopping power with minimal dust and noise. Engineered for both daily commuting and spirited driving.',
@@ -81,7 +81,7 @@ const PRODUCT_DETAILS = {
     warranty: '3 Years / 30,000 km',
     images: ['/images/products/brake-pads.jpg'],
   },
-  'prod-3': {
+  'prod-003': {
     partNumber: 'KN-AF-101',
     description:
       'High-flow performance air filter designed to increase horsepower and acceleration. Washable and reusable, this filter provides superior filtration while allowing more airflow than standard disposable filters.',
@@ -104,7 +104,7 @@ const PRODUCT_DETAILS = {
     warranty: '10 Years / 1,60,000 km',
     images: ['/images/products/air-filter.jpg'],
   },
-  'prod-4': {
+  'prod-004': {
     partNumber: 'NGK-SP-4PACK',
     description:
       'Premium iridium spark plug set engineered for maximum performance and longevity. Iridium centre electrode provides superior durability and a more focused spark for complete combustion.',
@@ -127,7 +127,7 @@ const PRODUCT_DETAILS = {
     warranty: '4 Years / 80,000 km',
     images: ['/images/products/spark-plugs.jpg'],
   },
-  'prod-5': {
+  'prod-005': {
     partNumber: 'EXIDE-60AH',
     description:
       'Maintenance-free automotive battery with 60 Ah capacity. Delivers reliable cold-cranking power and vibration resistance for demanding Indian road conditions. Backed by industry-leading warranty.',
@@ -150,7 +150,7 @@ const PRODUCT_DETAILS = {
     warranty: '3 Years (2+1)',
     images: ['/images/products/car-battery.jpg'],
   },
-  'prod-6': {
+  'prod-006': {
     partNumber: 'CASTROL-COOL-5L',
     description:
       'Ready-to-use coolant concentrate formulated for modern aluminium engines. Provides superior protection against freezing, boiling, and corrosion while maintaining optimal engine temperature.',
@@ -173,7 +173,7 @@ const PRODUCT_DETAILS = {
     warranty: '2 Years',
     images: ['/images/products/coolant.jpg'],
   },
-  'prod-7': {
+  'prod-007': {
     partNumber: 'MICHELIN-WW-PAIR',
     description:
       'Premium beam-type windshield wipers with integrated spoiler. Deliver streak-free wiping performance in all weather conditions. The aerodynamic design reduces lift at high speeds.',
@@ -196,7 +196,7 @@ const PRODUCT_DETAILS = {
     warranty: '1 Year',
     images: ['/images/products/wipers.jpg'],
   },
-  'prod-8': {
+  'prod-008': {
     partNumber: 'PHILIPS-LED-PAIR',
     description:
       'Ultra-bright LED headlight bulbs that deliver a crisp white beam with three times the output of standard halogen bulbs. Fanless passive cooling ensures silent and reliable operation.',
@@ -224,14 +224,6 @@ const PRODUCT_DETAILS = {
 /* ──────────────────────────────────────────────────────────────
  *  Helpers
  * ────────────────────────────────────────────────────────────── */
-
-/**
- * Convert a store product ID (prod-1) to the vendor data ID format (prod-001).
- */
-function toVendorProductId(storeId) {
-  const num = storeId.replace('prod-', '');
-  return `prod-${String(Number(num)).padStart(3, '0')}`;
-}
 
 /**
  * Convert delivery days to a human-friendly string.
@@ -402,11 +394,9 @@ export default function ProductDetailClient({ id }) {
   );
 
   // Vendor pricing for this product
-  const vendorProductId = useMemo(() => toVendorProductId(id), [id]);
-
   const vendorPricing = useMemo(
-    () => allProductVendors.filter((pv) => pv.productId === vendorProductId),
-    [vendorProductId],
+    () => allProductVendors.filter((pv) => pv.productId === id),
+    [id],
   );
 
   // Merge vendor pricing with vendor info
@@ -520,7 +510,7 @@ export default function ProductDetailClient({ id }) {
   /* ── Main Render ───────────────────────────────────────── */
 
   return (
-    <div className="mx-auto max-w-7xl animate-fade-in-up space-y-10 p-4 pb-24">
+    <div className="mx-auto max-w-7xl animate-fade-in-up space-y-10 p-4">
       {/* ── Back Link ─────────────────────────────────────── */}
       <Link
         href="/marketplace"
@@ -707,7 +697,7 @@ export default function ProductDetailClient({ id }) {
       </div>
 
       {/* ── Vendor Comparison Table ───────────────────────── */}
-      <GlassCard variant="glass-lux" className="overflow-hidden p-6">
+      <GlassCard variant="glass-lux" className="overflow-x-auto p-6">
         <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
           <h2 className="text-lg font-semibold text-text-primary">
             Compare Vendors

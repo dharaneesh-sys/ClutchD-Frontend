@@ -153,7 +153,7 @@ export default function MarketplaceHome() {
   const featuredProducts = products.slice(0, 6);
 
   return (
-    <div className="space-y-7 p-4 pb-8 page-enter">
+    <div className="space-y-7 p-4 page-enter">
       {/* ── Header ── */}
       <div className="space-y-1">
         <h1 className="type-headline-3 text-foreground">Marketplace</h1>
@@ -215,7 +215,7 @@ export default function MarketplaceHome() {
           <ProductRowSkeleton />
         ) : featuredProducts.length > 0 ? (
           <div
-            className="flex gap-4 overflow-x-auto pb-2 -mx-4 px-4 snap-x snap-mandatory"
+            className="flex gap-4 overflow-x-auto pb-4 -mx-4 px-4 snap-x snap-mandatory"
             style={{ scrollbarWidth: "thin" }}
           >
             {featuredProducts.map((product) => (

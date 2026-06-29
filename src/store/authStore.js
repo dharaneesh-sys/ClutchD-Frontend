@@ -178,7 +178,6 @@ export const useAuthStore = create(
       updateUserData: (userData) => set((state) => ({ user: { ...state.user, ...userData } })),
       setDemoUser: (user) => {
         if (typeof window !== "undefined") {
-          const { setAccessToken } = require("../lib/tokenStore");
           setAccessToken("demo-jwt-token-12345");
         }
         set({ user, isAuthenticated: !!user, _hydrated: true, isLoading: false, error: null });
