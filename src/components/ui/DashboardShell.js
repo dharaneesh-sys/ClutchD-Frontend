@@ -113,13 +113,17 @@ export function DashboardShell({
           </div>
           <NotificationBell />
 
-          {/* User avatar */}
-          <div className={cn(
-            "w-9 h-9 lg:w-10 lg:h-10 rounded-full flex items-center justify-center",
-            config.avatarClass
-          )}>
+          {/* User avatar — clickable to profile */}
+          <button
+            onClick={() => router.push("/marketplace/profile")}
+            aria-label="View profile"
+            className={cn(
+              "w-9 h-9 lg:w-10 lg:h-10 rounded-full flex items-center justify-center transition-transform hover:scale-105",
+              config.avatarClass
+            )}
+          >
             <ModeIcon size={16} />
-          </div>
+          </button>
 
           {/* Logout button — always visible */}
           <button
@@ -189,6 +193,21 @@ export function DashboardShell({
                 <span>{item.label}</span>
               </button>
             ))}
+
+            {/* Profile Link */}
+            <button
+              onClick={() => {
+                router.push("/marketplace/profile");
+                setMobileMenuOpen(false);
+              }}
+              className={cn(
+                "w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-colors mb-2",
+                "text-text-muted hover:bg-surface-soft hover:text-text-primary"
+              )}
+            >
+              <User size={18} />
+              <span>Profile</span>
+            </button>
 
             {/* Referral Link */}
             {onReferral && (
