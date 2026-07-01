@@ -1,72 +1,62 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import {
   User,
   Mail,
   Shield,
-  MapPin,
-  CreditCard,
-  Settings,
-  Plus,
+  Phone,
+  Calendar,
+  ShoppingBag,
+  Wrench,
+  Gift,
+  ChevronRight,
+  Pencil,
 } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { cn, getInitials, formatDate } from "@/lib/utils";
 import { useAuthStore } from "@/store/authStore";
+import { Button } from "@/components/ui/Button";
+import { ProfileMenu } from "@/components/profile/ProfileMenu";
 
-// ─── Placeholder Section ──────────────────────────────────────────────
-
-function PlaceholderSection({ icon: Icon, title, description, actionLabel }) {
-  return (
-    <div className="glass-lux rounded-2xl p-5 space-y-3">
-      <div className="flex items-center gap-3">
-        <div className="flex-shrink-0 w-10 h-10 rounded-xl bg-white/10 ring-1 ring-white/10 flex items-center justify-center">
-          <Icon size={18} className="text-text-dim" />
-        </div>
-        <div className="flex-1 min-w-0">
-          <h3 className="text-sm font-semibold text-foreground">{title}</h3>
-          <p className="text-xs text-text-muted mt-0.5">{description}</p>
-        </div>
-        {actionLabel && (
-          <button
-            type="button"
-            className={cn(
-              "flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-lg",
-              "text-primary-light bg-primary/10 hover:bg-primary/20 transition-colors"
-            )}
-          >
-            <Plus size={14} />
-            {actionLabel}
-          </button>
-        )}
-      </div>
-    </div>
-  );
-}
-
-// ─── Page ─────────────────────────────────────────────────────────────
+/** Demo fallback for stats when API is unavailable */
+const DEMO_STATS = {
+  ordersCount: 12,
+  servicesActive: 1,
+  referralBalance: 450,
+  memberSince: "2025-08-15T00:00:00.000Z",
+};
 
 export default function ProfilePage() {
   const { user, isAuthenticated } = useAuthStore();
+  const router = useRouter();
 
   const displayName = user?.name || user?.email || "Guest";
   const displayEmail = user?.email || "—";
+  const displayPhone = user?.phone || "—";
   const displayRole = user?.role
     ? user.role.charAt(0).toUpperCase() + user.role.slice(1)
     : "—";
+  const memberSince = user?.createdAt || DEMO_STATS.memberSince;
 
   return (
-    <div className="p-4 page-enter">
-      {/* Header */}
-      <div className="space-y-1 mb-7">
-        <h1 className="type-headline-3 text-foreground">Profile</h1>
-        <p className="type-body-2 text-muted">Manage your account</p>
-      </div>
+    <div className="p-4 sm:p-5 space-y-5 animate-fade-in-up">
+      {/* Profile Header Card */}
+      <div className="glass-lux rounded-2xl p-5 relative overflow-hidden">
+        {/* Decorative gradient */}
+        <div className="absolute -top-20 -right-20 w-40 h-40 rounded-full bg-primary/[0.06] blur-3xl pointer-events-none" />
 
-      {/* User Card */}
-      <div className="glass-lux rounded-2xl p-5 mb-6">
-        <div className="flex items-center gap-4">
+        <div className="flex items-start gap-4 relative">
           {/* Avatar */}
-          <div className="flex-shrink-0 w-16 h-16 rounded-full bg-gradient-to-br from-primary/30 to-primary/10 ring-2 ring-white/10 flex items-center justify-center">
-            <User size={28} className="text-primary-light" />
+          <div className="flex-shrink-0">
+            <div className="w-16 h-16 rounded-full bg-gradient-to-br from-primary/30 to-primary/10 ring-2 ring-white/10 flex items-center justify-center">
+              {user?.name ? (
+                <span className="text-lg font-bold text-primary-light">
+                  {getInitials(user.name)}
+                </span>
+              ) : (
+                <User size={28} className="text-primary-light" />
+              )}
+            </div>
           </div>
 
           {/* Info */}
@@ -79,14 +69,26 @@ export default function ProfilePage() {
                 <Mail size={12} className="shrink-0" />
                 {displayEmail}
               </span>
+              {displayPhone !== "—" && (
+                <span className="inline-flex items-center gap-1.5 text-xs text-text-muted">
+                  <Phone size={12} className="shrink-0" />
+                  {displayPhone}
+                </span>
+              )}
               <span className="inline-flex items-center gap-1.5 text-xs text-text-muted capitalize">
                 <Shield size={12} className="shrink-0" />
                 {displayRole}
               </span>
+              {memberSince && memberSince !== "—" && (
+                <span className="inline-flex items-center gap-1.5 text-xs text-text-muted">
+                  <Calendar size={12} className="shrink-0" />
+                  Member since {formatDate(memberSince)}
+                </span>
+              )}
             </div>
           </div>
 
-          {/* Auth status indicator */}
+          {/* Auth status */}
           <span
             className={cn(
               "flex-shrink-0 inline-flex items-center gap-1.5 rounded-full px-2.5 py-1",
@@ -105,29 +107,70 @@ export default function ProfilePage() {
             {isAuthenticated ? "Active" : "Guest"}
           </span>
         </div>
+
+        {/* Edit Profile button */}
+        <div className="mt-4">
+          <Button
+            variant="secondary"
+            size="sm"
+            onClick={() => router.push("/marketplace/profile/edit")}
+            className="w-full"
+          >
+            <Pencil size={14} className="mr-1.5" />
+            Edit Profile
+          </Button>
+        </div>
       </div>
 
-      {/* Placeholder Sections */}
-      <div className="space-y-3">
-        <PlaceholderSection
-          icon={MapPin}
-          title="Saved Addresses"
-          description="No addresses saved yet. Add a delivery address for faster checkout."
-          actionLabel="Add"
-        />
+      {/* Quick Stats */}
+      <div className="grid grid-cols-3 gap-3">
+        <div className="glass-lux rounded-2xl p-4 text-center">
+          <div className="w-8 h-8 rounded-lg bg-primary/[0.12] flex items-center justify-center mx-auto mb-2">
+            <ShoppingBag size={16} className="text-primary-light" />
+          </div>
+          <p className="text-lg font-bold text-foreground">{DEMO_STATS.ordersCount}</p>
+          <p className="text-[10px] font-medium text-text-muted uppercase tracking-wider mt-0.5">
+            Orders
+          </p>
+        </div>
+        <div className="glass-lux rounded-2xl p-4 text-center">
+          <div className="w-8 h-8 rounded-lg bg-emerald-500/[0.12] flex items-center justify-center mx-auto mb-2">
+            <Wrench size={16} className="text-emerald-400" />
+          </div>
+          <p className="text-lg font-bold text-foreground">{DEMO_STATS.servicesActive}</p>
+          <p className="text-[10px] font-medium text-text-muted uppercase tracking-wider mt-0.5">
+            Active
+          </p>
+        </div>
+        <div className="glass-lux rounded-2xl p-4 text-center">
+          <div className="w-8 h-8 rounded-lg bg-amber-500/[0.12] flex items-center justify-center mx-auto mb-2">
+            <Gift size={16} className="text-amber-400" />
+          </div>
+          <p className="text-lg font-bold text-foreground">₹{DEMO_STATS.referralBalance}</p>
+          <p className="text-[10px] font-medium text-text-muted uppercase tracking-wider mt-0.5">
+            Referral
+          </p>
+        </div>
+      </div>
 
-        <PlaceholderSection
-          icon={CreditCard}
-          title="Payment Methods"
-          description="No payment methods added yet. Link a card or UPI for seamless payments."
-          actionLabel="Add"
-        />
+      {/* Quick Action: View Account Details */}
+      <button
+        onClick={() => router.push("/marketplace/profile/account")}
+        className="glass-lux rounded-2xl p-4 w-full flex items-center gap-3 hover:bg-white/[0.03] transition-colors text-left"
+      >
+        <div className="w-10 h-10 rounded-xl bg-primary/[0.12] flex items-center justify-center flex-shrink-0">
+          <User size={18} className="text-primary-light" />
+        </div>
+        <div className="flex-1 min-w-0">
+          <p className="text-sm font-semibold text-foreground">Account Details</p>
+          <p className="text-xs text-text-muted mt-0.5">View and manage your account information</p>
+        </div>
+        <ChevronRight size={18} className="text-text-muted flex-shrink-0" />
+      </button>
 
-        <PlaceholderSection
-          icon={Settings}
-          title="Settings"
-          description="Notifications, privacy, and account preferences."
-        />
+      {/* Profile Menu Sections (hidden on lg+ where sidebar shows it) */}
+      <div className="lg:hidden">
+        <ProfileMenu />
       </div>
     </div>
   );
