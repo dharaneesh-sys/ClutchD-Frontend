@@ -6,6 +6,7 @@ import { AuthInit } from "@/components/ui/AuthInit";
 import { ErrorBoundary } from "@/components/ui/ErrorBoundary";
 import { DEMO_MODE } from "@/lib/demo/demoFlag";
 import { ToastProvider } from "@/components/ui/ToastProvider";
+import { ProfileFAB } from "@/components/ui/ProfileFAB";
 import DemoModeClient from "@/components/ui/DemoModeClient";
 import DynamicI18nProvider from "@/lib/i18n/DynamicI18nProvider";
 
@@ -58,6 +59,22 @@ export default function RootLayout({ children }) {
           }}
         />
         <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              (function() {
+                try {
+                  var a = JSON.parse(localStorage.getItem('auth-storage') || '{}');
+                  var u = a && a.state ? (a.state.user || null) : null;
+                  document.documentElement.setAttribute('data-auth', u && u.id ? 'true' : 'false');
+                  if (u && u.id) document.documentElement.setAttribute('data-user-id', u.id);
+                } catch(e) {
+                  document.documentElement.setAttribute('data-auth', 'false');
+                }
+              })();
+            `,
+          }}
+        />
+        <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
             __html: JSON.stringify({
@@ -81,6 +98,7 @@ export default function RootLayout({ children }) {
           <ErrorBoundary>
             <div id="main-content">{children}</div>
           </ErrorBoundary>
+          <ProfileFAB />
           <ThemeToggle />
           <DemoModeClient show={DEMO_MODE} />
           <ToastProvider />
