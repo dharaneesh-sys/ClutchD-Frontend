@@ -4,6 +4,27 @@ import api from "@/lib/api";
 import { connectWebSocket, disconnectWebSocket } from "@/lib/socket";
 import { setAccessToken, getAccessToken, clearAccessToken } from "@/lib/tokenStore";
 
+/**
+ * Clear ALL client-side storage — localStorage, sessionStorage, and cookies
+ * related to auth. Called on full logout or session teardown.
+ */
+function clearAllStorage() {
+  if (typeof window === "undefined") return;
+  try {
+    localStorage.removeItem("auth-storage");
+    sessionStorage.removeItem("demo_token");
+    // Clear cookies that may contain lingering session markers
+    document.cookie.split(";").forEach((c) => {
+      const [name] = c.trim().split("=");
+      if (name && (name.includes("auth") || name.includes("token") || name.includes("session"))) {
+        document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
+      }
+    });
+  } catch (e) {
+    // Silently fail — storage clearing is best-effort
+  }
+}
+
 // Proactive refresh: refresh the access token at 80% of its TTL.
 // Default access token TTL is 15 min (from backend config); override via env.
 const ACCESS_TTL_MS =
@@ -42,8 +63,66 @@ export const useAuthStore = create(
       user: null,
       isAuthenticated: false,
       _hydrated: false,
+      _isRestoring: true,
       isLoading: false,
       error: null,
+
+      /**
+       * Attempt to restore the session on app startup using the httpOnly
+       * refresh cookie. The refresh cookie is set server-side on login and
+       * survives page reloads. This runs once in AuthInit.
+       *
+       * Sets _isRestoring = false when done so page guards can proceed.
+       * Does NOT redirect on failure — the page guard handles that.
+       */
+      restoreSession: async () => {
+        const { user, isAuthenticated } = get();
+        if (!isAuthenticated || !user?.id) {
+          set({ _isRestoring: false });
+          return;
+        }
+        // Demo users have fake tokens — skip refresh against real backend
+        if (typeof user.id === "string" && user.id.startsWith("demo-")) {
+          set({ _isRestoring: false });
+          return;
+        }
+        try {
+          const res = await api.post("/auth/refresh");
+          const newToken = res.data.token;
+          if (typeof window !== "undefined" && newToken) {
+            setAccessToken(newToken);
+            connectWebSocket(newToken);
+            scheduleProactiveRefresh();
+          }
+          const userData = res.data.user || user;
+          set({ user: userData, isAuthenticated: true, _isRestoring: false });
+        } catch (error) {
+          const status = error.response?.status;
+          if (status === 401 || status === 403) {
+            if (typeof window !== "undefined") {
+              clearAccessToken();
+              disconnectWebSocket();
+            }
+            set({ user: null, isAuthenticated: false, error: null, _isRestoring: false });
+          } else {
+            // Network error — allow the user to stay logged in
+            // with their cached data; the 401 interceptor handles real failures
+            set({ _isRestoring: false });
+          }
+        }
+      },
+
+      /**
+       * Clear everything — memory state AND all client-side storage.
+       * Used for a hard logout that removes every trace of auth.
+       */
+      clearSession: () => {
+        clearProactiveRefresh();
+        disconnectWebSocket();
+        clearAccessToken();
+        clearAllStorage();
+        set({ user: null, isAuthenticated: false, _hydrated: false, _isRestoring: false, error: null, isLoading: false });
+      },
 
       /**
        * Validate the current session on app startup.
@@ -190,14 +269,16 @@ export const useAuthStore = create(
         userRole: state.user?.role,
         isAuthenticated: state.isAuthenticated,
         _hydrated: state._hydrated,
+        user: state.user?.name ? { id: state.user.id, role: state.user.role, name: state.user.name, email: state.user.email, phone: state.user.phone } : undefined,
       }),
       onRehydrateStorage: () => (state) => {
-        // Reconstruct minimal user from persisted fields; full user fetched via checkAuth()
-        if (state?.userId) {
+        // Reconstruct minimal user from persisted fields; full user fetched via restoreSession()
+        if (state?.userId && !state?.user) {
           state.user = { id: state.userId, role: state.userRole };
         }
         // Mark hydration complete so redirect guards don't fire before state is restored
-        useAuthStore.setState({ _hydrated: true });
+        // _isRestoring remains true so AuthInit can call restoreSession()
+        useAuthStore.setState({ _hydrated: true, _isRestoring: true });
       },
     }
   )
