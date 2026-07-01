@@ -23,7 +23,7 @@ export default function Home() {
         </div>
         <Link
           href="/auth"
-          className="glass-lux-interactive px-5 py-2.5 rounded-xl text-sm font-semibold text-white hover:text-primary-light transition-colors"
+          className="glass-lux-interactive px-5 py-2.5 rounded-xl text-sm font-semibold text-foreground hover:text-primary-light transition-colors"
         >
           {t('nav.signIn')}
         </Link>
@@ -39,7 +39,7 @@ export default function Home() {
               </span>
             </div>
 
-            <h1 className="text-5xl sm:text-6xl lg:text-7xl font-extrabold tracking-tight leading-[1.08] text-white mb-6">
+            <h1 className="text-5xl sm:text-6xl lg:text-7xl font-extrabold tracking-tight leading-[1.08] text-foreground mb-6">
               {t('hero.headline')}
             </h1>
 
@@ -57,7 +57,7 @@ export default function Home() {
               </Link>
               <Link
                 href="/auth"
-                className="glass-lux-interactive inline-flex items-center justify-center gap-2 px-8 py-4 rounded-2xl text-white font-semibold text-lg"
+                className="glass-lux-interactive inline-flex items-center justify-center gap-2 px-8 py-4 rounded-2xl text-foreground font-semibold text-lg"
               >
                 {t('hero.signIn')}
               </Link>
@@ -70,7 +70,7 @@ export default function Home() {
                 <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-primary-light to-primary flex items-center justify-center mb-4 shadow-lg shadow-[0_0_20px_rgba(var(--color-primary-rgb),0.3)]">
                   <Zap size={28} className="text-white" />
                 </div>
-                <h3 className="text-2xl font-bold text-white mb-2">
+                <h3 className="text-2xl font-bold text-foreground mb-2">
                   {t('howItWorks.title')}
                 </h3>
                 <p className="text-primary-light/60 text-sm">
@@ -114,7 +114,7 @@ export default function Home() {
                  <div className="w-11 h-11 rounded-xl bg-primary/15 flex items-center justify-center mx-auto mb-3 group-hover:bg-primary/25 transition-colors">
                    <Icon size={20} className="text-primary-light" />
                  </div>
-                 <h4 className="text-white font-semibold mb-1.5">{t(`features.${feat.key}.title`)}</h4>
+                 <h4 className="text-foreground font-semibold mb-1.5">{t(`features.${feat.key}.title`)}</h4>
                   <p className="text-primary-light/50 text-sm leading-relaxed">
                    {t(`features.${feat.key}.desc`)}
                 </p>

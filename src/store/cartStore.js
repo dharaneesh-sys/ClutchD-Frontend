@@ -1,8 +1,30 @@
 import { create } from "zustand";
 import { devtools } from "zustand/middleware";
+import api from "@/lib/api";
+
+const STORAGE_KEY = "clutchd_cart";
+
+function loadPersistedItems() {
+  if (typeof window === "undefined") return [];
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      return Array.isArray(parsed) ? parsed : [];
+    }
+  } catch (e) {
+  }
+  return [];
+}
+
+function persistItems(items) {
+  if (typeof window !== "undefined") {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
+  }
+}
 
 const initialState = {
-  items: [],
+  items: loadPersistedItems(),
   couponCode: "",
   discount: 0,
   isLoading: false,
@@ -13,14 +35,6 @@ export const useCartStore = create(
     (set, get) => ({
       ...initialState,
 
-      /**
-       * Add a product to the cart.
-       * If the product already exists (same productId + vendorId), increment the quantity.
-       * Otherwise, append a new item entry.
-       *
-       * @param {Object} product - { id, price, name, image }
-       * @param {Object} vendor  - { id, name }
-       */
       addItem: (product, vendor) => {
         const existing = get().items.find(
           (item) => item.productId === product.id && item.vendorId === vendor?.id,
@@ -49,21 +63,17 @@ export const useCartStore = create(
             ],
           }));
         }
+        persistItems(get().items);
       },
 
-      /**
-       * Remove an item from the cart by productId.
-       */
-      removeItem: (productId) =>
+      removeItem: (productId) => {
         set((state) => ({
           items: state.items.filter((item) => item.productId !== productId),
-        })),
+        }));
+        persistItems(get().items);
+      },
 
-      /**
-       * Update the quantity of a cart item.
-       * If qty is 0 or negative, the item is removed.
-       */
-      updateQuantity: (productId, qty) =>
+      updateQuantity: (productId, qty) => {
         set((state) => {
           if (qty <= 0) {
             return { items: state.items.filter((item) => item.productId !== productId) };
@@ -73,21 +83,46 @@ export const useCartStore = create(
               item.productId === productId ? { ...item, quantity: qty } : item,
             ),
           };
-        }),
-
-      /**
-       * Apply a coupon code.
-       * In demo mode this is a no-op placeholder; real coupon validation
-       * would happen against the backend.
-       */
-      applyCoupon: (code) => {
-        set({ couponCode: code, discount: 0 });
+        });
+        persistItems(get().items);
       },
 
-      /**
-       * Clear all cart items, coupon, and discount.
-       */
-      clearCart: () => set({ ...initialState }),
+      applyCoupon: async (code) => {
+        set({ isLoading: true, couponCode: "", discount: 0 });
+        try {
+          const { items } = get();
+          const subtotal = items.reduce(
+            (sum, item) => sum + item.price * item.quantity,
+            0,
+          );
+          const { data } = await api.post("/marketplace/offers/validate", {
+            code,
+            purchaseAmount: subtotal,
+          });
+          if (data.valid) {
+            set({
+              couponCode: data.code || code,
+              discount: data.discountAmount || 0,
+              isLoading: false,
+            });
+          } else {
+            set({ isLoading: false });
+            throw new Error(data.message || "Invalid coupon code");
+          }
+        } catch (error) {
+          set({ couponCode: "", discount: 0, isLoading: false });
+          throw error;
+        }
+      },
+
+      removeCoupon: () => {
+        set({ couponCode: "", discount: 0 });
+      },
+
+      clearCart: () => {
+        set({ items: [], couponCode: "", discount: 0, isLoading: false });
+        persistItems([]);
+      },
 
       /**
        * Compute the total cart value including discounts.

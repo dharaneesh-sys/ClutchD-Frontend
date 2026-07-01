@@ -68,7 +68,7 @@ export const connectWebSocket = (token) => {
             true, // fromServer — skip backend PATCH
             data.payload.pricing // pricing breakdown for payment_pending
           );
-        });
+        }).catch(() => {}); // Silently ignore — primary data flow is WebSocket/PATCH
       }
 
       // Handle notification count updates

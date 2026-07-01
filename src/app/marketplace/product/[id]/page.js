@@ -2,14 +2,14 @@ import ProductDetailClient from './client';
 
 export function generateStaticParams() {
   return [
-    { id: 'prod-1' },
-    { id: 'prod-2' },
-    { id: 'prod-3' },
-    { id: 'prod-4' },
-    { id: 'prod-5' },
-    { id: 'prod-6' },
-    { id: 'prod-7' },
-    { id: 'prod-8' },
+    { id: 'prod-001' },
+    { id: 'prod-002' },
+    { id: 'prod-003' },
+    { id: 'prod-004' },
+    { id: 'prod-005' },
+    { id: 'prod-006' },
+    { id: 'prod-007' },
+    { id: 'prod-008' },
   ];
 }
 

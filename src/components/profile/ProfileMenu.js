@@ -10,6 +10,8 @@ import {
   ShieldCheck,
   Gift,
   HeartHandshake,
+  Heart,
+  CreditCard as CardIcon,
   Settings,
   ChevronRight,
 } from "lucide-react";
@@ -29,6 +31,14 @@ const MENU_SECTIONS = [
       { icon: ShoppingBag, label: "Orders", path: "/marketplace/profile/orders" },
       { icon: CreditCard, label: "Payments & Bills", path: "/marketplace/profile/payments" },
       { icon: Wrench, label: "My Services", path: "/marketplace/profile/services" },
+      { icon: Heart, label: "Favorites", path: "/marketplace/profile/favorites" },
+    ],
+  },
+  {
+    label: "Rewards",
+    items: [
+      { icon: CardIcon, label: "ClutchD Card", path: "/marketplace/profile/clutchd-card" },
+      { icon: Gift, label: "Refer & Earn", path: "/marketplace/profile/refer" },
     ],
   },
   {
@@ -41,7 +51,6 @@ const MENU_SECTIONS = [
   {
     label: "Community",
     items: [
-      { icon: Gift, label: "Refer & Earn", path: "/marketplace/profile/refer" },
       { icon: HeartHandshake, label: "ClutchD Care", path: "/marketplace/profile/care" },
     ],
   },

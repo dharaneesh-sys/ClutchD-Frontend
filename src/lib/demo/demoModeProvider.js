@@ -41,6 +41,40 @@ const ROLE_TOURS = {
   ],
 };
 
+const DEMO_USERS = {
+  customer: {
+    id: "demo-cust-1",
+    email: "demo@clutchd.in",
+    name: "Arun Kumar",
+    phone: "+91 98765 43210",
+    role: "customer",
+    isVerified: true,
+  },
+  mechanic: {
+    id: "demo-mech-1",
+    email: "mechanic@clutchd.in",
+    name: "Rajesh M.",
+    phone: "+91 98765 43211",
+    role: "mechanic",
+    isVerified: true,
+  },
+  garage: {
+    id: "demo-garage-1",
+    email: "garage@clutchd.in",
+    name: "Priya Auto Works",
+    phone: "+91 98765 43212",
+    role: "garage",
+    businessName: "Priya Auto Works",
+    isVerified: true,
+  },
+  admin: {
+    id: "demo-admin-1",
+    email: "admin@clutchd.in",
+    name: "Admin",
+    role: "admin",
+  },
+};
+
 let _mockPromise = null;
 let _mock = {};
 
@@ -79,16 +113,7 @@ export function DemoModeProvider({ children }) {
   const getM = () => _mock;
 
   const enableDemo = useCallback((role = "customer") => {
-    const m = getM();
-    if (!m.MOCK_USERS) return;
-    const user =
-      role === "mechanic"
-        ? m.MOCK_USERS.mechanic
-        : role === "garage"
-          ? m.MOCK_USERS.garage
-          : role === "admin"
-            ? m.MOCK_USERS.admin
-            : m.MOCK_USERS.customer;
+    const user = DEMO_USERS[role] || DEMO_USERS.customer;
     setDemoUser(user);
     setIsDemoMode(true);
     useAuthStore.getState().setDemoUser(user);
@@ -223,16 +248,7 @@ export function DemoModeProvider({ children }) {
   }, [tourStep, isTourActive, demoUser]);
 
   const setDemoRole = useCallback((role) => {
-    const m = getM();
-    if (!m.MOCK_USERS) return;
-    const user =
-      role === "mechanic"
-        ? m.MOCK_USERS.mechanic
-        : role === "garage"
-          ? m.MOCK_USERS.garage
-          : role === "admin"
-            ? m.MOCK_USERS.admin
-            : m.MOCK_USERS.customer;
+    const user = DEMO_USERS[role] || DEMO_USERS.customer;
     setDemoUser(user);
     useAuthStore.getState().setDemoUser(user);
     if (typeof window !== "undefined") {

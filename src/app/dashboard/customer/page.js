@@ -24,6 +24,8 @@ import { ScheduleBookingModal } from "@/components/dashboard/ScheduleBookingModa
 import api from "@/lib/api";
 import { NAVIGATION_EVENT } from "@/lib/navigation";
 import { Button } from "@/components/ui/Button";
+import { cn } from "@/lib/utils";
+import { Logo } from "@/components/ui/Logo";
 
 const MapView = dynamic(
   () => import("../../../components/dashboard/MapView"),
@@ -39,6 +41,18 @@ const ServiceHistory = dynamic(
   () => import("../../../components/dashboard/ServiceHistory").then(m => ({ default: m.ServiceHistory })),
   { ssr: false, loading: () => <div className="flex-1 flex items-center justify-center"><div className="w-8 h-8 border-2 border-t-transparent rounded-full animate-spin border-amber-500 dark:border-primary" /></div> }
 );
+
+const MarketplaceHome = dynamic(
+  () => import("@/app/marketplace/page"),
+  { ssr: false, loading: () => <div className="w-full h-64 animate-pulse bg-surface-container-low rounded-2xl" /> }
+);
+
+const TABS = [
+  { key: "request", icon: Wrench, label: "Service" },
+  { key: "schedule", icon: Calendar, label: "Schedule" },
+  { key: "store", icon: ShoppingBag, label: "Parts Store" },
+  { key: "history", icon: History, label: "History" },
+];
 
 export default function CustomerDashboard() {
   const { user, logout, isAuthenticated, _hydrated } = useAuthStore();
@@ -56,7 +70,7 @@ export default function CustomerDashboard() {
   const [isReviewOpen, setIsReviewOpen] = useState(false);
   const [reviewProviderName, setReviewProviderName] = useState("the professional");
   const [paymentAmount, setPaymentAmount] = useState(1200);
-  const [activeTab, setActiveTab] = useState("request"); // "request" | "history"
+  const [activeTab, setActiveTab] = useState("request"); // "request" | "history" | "schedule" | "store"
   const [isScheduleModalOpen, setIsScheduleModalOpen] = useState(false);
   const [isScheduleLoading, setIsScheduleLoading] = useState(false);
   const paymentTriggeredRef = useRef(false);
@@ -192,21 +206,17 @@ export default function CustomerDashboard() {
     cancelRequest();
   };
 
-  const sidebarItems = [
-    { icon: Wrench, label: "Service", onClick: () => setActiveTab("request") },
-    { icon: Calendar, label: "Schedule", onClick: () => setActiveTab("schedule") },
-    { icon: ShoppingBag, label: "Parts Store", onClick: () => router.push("/marketplace") },
-    { icon: History, label: "History", onClick: () => setActiveTab("history") },
-  ];
-
   return (
+    <>
     <DashboardShell
       title="Customer Dashboard"
       subtitle="Customer Mode"
       user={user}
       mode="customer"
-      sidebar={sidebarItems}
+      hideMobileMenu
+      hasBottomNav
     >
+
       {activeTab === "schedule" ? (
         <div className="flex-1 pb-4 lg:pb-6">
           <div className="max-w-lg mx-auto">
@@ -231,6 +241,10 @@ export default function CustomerDashboard() {
               </Button>
             </div>
           </div>
+        </div>
+      ) : activeTab === "store" ? (
+        <div className="flex-1 overflow-y-auto page-enter">
+          <MarketplaceHome />
         </div>
       ) : activeTab === "request" ? (
         <div className="flex-1 grid grid-cols-1 lg:grid-cols-12 gap-4 lg:gap-6 pb-4 lg:pb-6">
@@ -286,7 +300,59 @@ export default function CustomerDashboard() {
         providerName={reviewProviderName}
         onSubmit={handleReviewSubmit}
       />
-      <SOSButton />
     </DashboardShell>
-  );
+
+    {/* ─── Bottom Tab Bar — All Sizes ────────────────────────────────── */}
+    <nav className="flex fixed bottom-0 left-0 right-0 z-40 bg-bg-card/85 backdrop-blur-2xl border-t border-border-subtle pb-[env(safe-area-inset-bottom)] shadow-[0_-4px_20px_rgba(0,0,0,0.12)]">
+      <div className="flex items-center justify-around h-14 px-1 max-w-lg mx-auto w-full">
+        {TABS.map(({ key, icon: Icon, label }) => {
+          const isActive = activeTab === key;
+          const isStore = key === "store";
+          return (
+            <button
+              key={key}
+              onClick={() => setActiveTab(key)}
+              className={cn(
+                "relative flex flex-col items-center justify-center gap-0.5 flex-1 h-full py-1 rounded-xl transition-all duration-200",
+                "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50",
+                isActive && !isStore && "bg-surface-soft"
+              )}
+              aria-label={label}
+              aria-current={isActive ? "page" : undefined}
+            >
+              <div className={cn(
+                "relative flex items-center justify-center w-7 h-7 rounded-lg transition-colors duration-200",
+                isActive && !isStore && "text-primary",
+                !isActive && !isStore && "text-text-muted",
+                isStore && "text-emerald-400"
+              )}>
+                <Icon size={isStore ? 20 : 22} />
+                {isStore && (
+                  <span className="absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full bg-emerald-400 shadow-[0_0_6px_rgba(52,211,153,0.6)]" />
+                )}
+              </div>
+              <span className={cn(
+                "text-[10px] font-semibold leading-none transition-colors duration-200",
+                isActive && !isStore && "text-primary",
+                !isActive && !isStore && "text-text-muted",
+                isStore && "text-emerald-400/90"
+              )}>
+                {label}
+              </span>
+              {/* Active indicator line */}
+              {isActive && !isStore && (
+                <span className="absolute -top-0.5 left-1/2 -translate-x-1/2 w-6 h-0.5 rounded-full bg-primary" />
+              )}
+              {/* Store badge dot */}
+              {isStore && (
+                <span className="absolute -top-0.5 right-1/4 w-1.5 h-1.5 rounded-full bg-emerald-400" />
+              )}
+            </button>
+          );
+        })}
+      </div>
+    </nav>
+    <SOSButton />
+  </>
+);
 }

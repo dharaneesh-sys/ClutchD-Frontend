@@ -1,13 +1,14 @@
 import "./globals.css";
 
 import { ThemeProvider } from "@/components/ui/ThemeProvider";
-import { ThemeToggle } from "@/components/ui/ThemeToggle";
 import { AuthInit } from "@/components/ui/AuthInit";
 import { ErrorBoundary } from "@/components/ui/ErrorBoundary";
 import { DEMO_MODE } from "@/lib/demo/demoFlag";
 import { ToastProvider } from "@/components/ui/ToastProvider";
 import { ProfileFAB } from "@/components/ui/ProfileFAB";
 import DemoModeClient from "@/components/ui/DemoModeClient";
+import { DemoModeProvider } from "@/lib/demo/demoModeProvider";
+import { SettingsButton } from "@/components/ui/SettingsButton";
 import DynamicI18nProvider from "@/lib/i18n/DynamicI18nProvider";
 
 export const metadata = {
@@ -90,19 +91,21 @@ export default function RootLayout({ children }) {
       </head>
       <body className="min-h-full flex flex-col">
         <DynamicI18nProvider>
-        <a href="#main-content" className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-[9999] focus:px-4 focus:py-2 focus:rounded-lg focus:bg-[var(--surface)] focus:text-[var(--foreground)] focus:shadow-lg focus:outline-none">
-          Skip to main content
-        </a>
-        <ThemeProvider>
-          <AuthInit />
-          <ErrorBoundary>
-            <div id="main-content">{children}</div>
-          </ErrorBoundary>
-          <ProfileFAB />
-          <ThemeToggle />
-          <DemoModeClient show={DEMO_MODE} />
-          <ToastProvider />
-        </ThemeProvider>
+          <DemoModeProvider>
+            <a href="#main-content" className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-[9999] focus:px-4 focus:py-2 focus:rounded-lg focus:bg-[var(--surface)] focus:text-[var(--foreground)] focus:shadow-lg focus:outline-none">
+              Skip to main content
+            </a>
+            <ThemeProvider>
+              <AuthInit />
+              <ErrorBoundary>
+                <div id="main-content">{children}</div>
+              </ErrorBoundary>
+              <ProfileFAB />
+              <SettingsButton />
+              <DemoModeClient show={DEMO_MODE} />
+              <ToastProvider />
+            </ThemeProvider>
+          </DemoModeProvider>
         </DynamicI18nProvider>
       </body>
     </html>

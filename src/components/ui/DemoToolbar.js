@@ -103,42 +103,53 @@ export function DemoToolbar() {
 
   if (collapsed) {
     return (
-      <button
-        onClick={() => setCollapsed(false)}
-        className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 glass-lux-interactive hover-glow active-press px-4 py-2.5 flex items-center gap-2.5 rounded-full"
-        title="Expand Demo Toolbar"
-      >
-        {isDemoMode && (
-          <span className="inline-block w-2 h-2 rounded-full bg-[var(--primary)]" />
-        )}
-        <span
-          className={`type-label-1 uppercase tracking-widest ${
-            isDemoMode
-              ? "text-[var(--primary)]"
-              : "text-[var(--on-surface-variant)]"
-          }`}
+      <>
+        <style>{`
+          @keyframes demoPillPulse {
+            0%, 100% { box-shadow: 0 0 4px rgba(255,255,255,0.06); }
+            50% { box-shadow: 0 0 14px rgba(255,255,255,0.2); }
+          }
+          .demo-pill-pulse {
+            animation: demoPillPulse 3s ease-in-out infinite;
+          }
+        `}</style>
+        <button
+          onClick={() => setCollapsed(false)}
+          className="fixed bottom-24 right-4 z-[9999] glass-lux-interactive hover-glow active-press px-2.5 py-1.5 flex items-center gap-1.5 rounded-full demo-pill-pulse"
+          title="Expand Demo Toolbar"
         >
-          Demo
-        </span>
-        <svg
-          width="14"
-          height="14"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2.5"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          className="text-[var(--on-surface-variant)]"
-        >
-          <polyline points="18 15 12 9 6 15" />
-        </svg>
-      </button>
+          {isDemoMode && (
+            <span className="inline-block w-2 h-2 rounded-full bg-[var(--primary)]" />
+          )}
+          <span
+            className={`type-label-1 uppercase tracking-widest text-[11px] ${
+              isDemoMode
+                ? "text-[var(--primary)]"
+                : "text-[var(--on-surface-variant)]"
+            }`}
+          >
+            Demo
+          </span>
+          <svg
+            width="12"
+            height="12"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2.5"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            className="text-[var(--on-surface-variant)]"
+          >
+            <polyline points="18 15 12 9 6 15" />
+          </svg>
+        </button>
+      </>
     );
   }
 
   return (
-    <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 w-[min(92vw,540px)]">
+    <div className="fixed bottom-24 right-4 z-[9999] w-[min(92vw,420px)]">
       <div className="glass-lux-strong p-0 overflow-visible">
         <div className="flex items-center justify-between px-4 py-3 border-b border-[var(--glass-lux-border)]">
           <DemoToggle isDemoMode={isDemoMode} onToggle={handleToggle} />

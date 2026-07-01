@@ -283,7 +283,7 @@ function SearchPageContent() {
             {/* Results area */}
             <div className="flex-1 min-w-0">
               {/* Sort & results count bar */}
-              <div className="flex items-center justify-between mb-5 gap-4">
+              <div className="flex items-center justify-between mb-5 gap-4 flex-wrap">
                 <p className="text-sm text-text-muted shrink-0">
                   <span className="text-foreground font-semibold">
                     {results.length}

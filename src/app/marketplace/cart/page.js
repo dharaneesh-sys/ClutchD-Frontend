@@ -193,7 +193,7 @@ export default function CartPage() {
 
           {/* ── Summary Sidebar ────────────────────────────────────────── */}
           <div className="w-full lg:w-80 xl:w-96">
-            <div className="glass-lux-strong sticky top-4 space-y-5 rounded-2xl p-6">
+            <div className="glass-lux-strong lg:sticky lg:top-4 space-y-5 rounded-2xl p-6">
               <h2 className="text-lg font-semibold text-foreground">
                 Order Summary
               </h2>
