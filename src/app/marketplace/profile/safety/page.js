@@ -17,9 +17,9 @@ import { useToastStore } from "@/store/toastStore";
 import { useRouter } from "next/navigation";
 import api from "@/lib/api";
 
-// ─── Demo content ────────────────────────────────────────────────────
+// ─── Legal content ──────────────────────────────────────────────────
 
-const DEMO_PRIVACY_POLICY = `Privacy Policy for ClutchD
+const PRIVACY_POLICY = `Privacy Policy for ClutchD
 
 Last updated: January 1, 2025
 
@@ -38,7 +38,7 @@ We implement industry-standard encryption and security measures to protect your 
 5. Your Rights
 You have the right to access, update, or delete your personal information at any time through your account settings.`;
 
-const DEMO_TERMS = `Terms & Conditions for ClutchD
+const TERMS = `Terms & Conditions for ClutchD
 
 Last updated: January 1, 2025
 
@@ -57,7 +57,7 @@ Cancellations made before a mechanic is assigned are free. A ₹30 cancellation 
 5. Limitation of Liability
 ClutchD's liability is limited to the value of the service fee paid. We are not liable for any indirect damages arising from service delivery.`;
 
-const DEMO_DATA_PROTECTION = `Data Protection at ClutchD
+const DATA_PROTECTION = `Data Protection at ClutchD
 
 Our Commitment to Your Privacy
 
@@ -138,16 +138,16 @@ export default function SafetyPage() {
     setIsLoading(true);
     try {
       const { data } = await api.get("/safety/privacy-policy");
-      setPrivacyPolicy(data?.content || DEMO_PRIVACY_POLICY);
+      setPrivacyPolicy(data?.content || PRIVACY_POLICY);
     } catch {
-      setPrivacyPolicy(DEMO_PRIVACY_POLICY);
+      setPrivacyPolicy(PRIVACY_POLICY);
     }
 
     try {
-      const { data } = await api.get("/safety/terms");
-      setTerms(data?.content || DEMO_TERMS);
+      const { data } = await api.get("/safety/terms-conditions");
+      setTerms(data?.content || TERMS);
     } catch {
-      setTerms(DEMO_TERMS);
+      setTerms(TERMS);
     }
     setIsLoading(false);
   }, []);
@@ -192,7 +192,7 @@ export default function SafetyPage() {
         <ExpandableSection
           icon={FileText}
           title="Privacy Policy"
-          content={privacyPolicy || DEMO_PRIVACY_POLICY}
+          content={privacyPolicy || PRIVACY_POLICY}
         />
       </section>
 
@@ -201,7 +201,7 @@ export default function SafetyPage() {
         <ExpandableSection
           icon={FileText}
           title="Terms & Conditions"
-          content={terms || DEMO_TERMS}
+          content={terms || TERMS}
         />
       </section>
 
@@ -210,7 +210,7 @@ export default function SafetyPage() {
         <ExpandableSection
           icon={Lock}
           title="Data Protection"
-          content={DEMO_DATA_PROTECTION}
+          content={DATA_PROTECTION}
         />
       </section>
 

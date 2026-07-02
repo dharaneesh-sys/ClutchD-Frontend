@@ -3,41 +3,18 @@ import { devtools } from "zustand/middleware";
 import api from "@/lib/api";
 import { useCartStore } from "@/store/cartStore";
 
-const DEMO_ORDERS = [
-  {
-    id: "ord-1",
-    items: [
-      { productId: "prod-1", name: "Engine Oil 5W-30 (4L)", quantity: 1, price: 2199 },
-      { productId: "prod-2", name: "Brake Pad Set (Front)", quantity: 1, price: 1249 },
-    ],
-    total: 3448,
-    status: "delivered",
-    address: {
-      street: "12, Cross Cut Road",
-      city: "Coimbatore",
-      state: "Tamil Nadu",
-      pincode: "641012",
-    },
-    payment: { method: "upi", transactionId: "TXN-DEMO-001" },
-    createdAt: "2025-06-01T10:30:00Z",
-  },
-  {
-    id: "ord-2",
-    items: [
-      { productId: "prod-5", name: "Car Battery (60Ah)", quantity: 1, price: 5499 },
-    ],
-    total: 5499,
-    status: "shipped",
-    address: {
-      street: "45, Sathyamangalam Road",
-      city: "Coimbatore",
-      state: "Tamil Nadu",
-      pincode: "641035",
-    },
-    payment: { method: "card", transactionId: "TXN-DEMO-002" },
-    createdAt: "2025-06-10T14:00:00Z",
-  },
-];
+function toCamelCase(obj) {
+  if (Array.isArray(obj)) return obj.map(toCamelCase);
+  if (obj !== null && typeof obj === "object" && !(obj instanceof Date)) {
+    return Object.fromEntries(
+      Object.entries(obj).map(([k, v]) => [
+        k.replace(/_([a-z])/g, (_, c) => c.toUpperCase()),
+        toCamelCase(v),
+      ])
+    );
+  }
+  return obj;
+}
 
 const initialState = {
   orders: [],
@@ -107,16 +84,12 @@ export const useOrderStore = create(
         return newOrder;
       },
 
-      /**
-       * Fetch order history from the API.
-       * Falls back to demo orders on failure or empty response.
-       */
       fetchOrderHistory: async () => {
         set({ isLoading: true, error: null });
 
         try {
           const { data } = await api.get("/orders");
-          const orders = data?.orders?.length ? data.orders : DEMO_ORDERS;
+          const orders = toCamelCase(data?.orders ?? []);
           set({ orders, isLoading: false });
         } catch (error) {
           const msg =
@@ -124,7 +97,7 @@ export const useOrderStore = create(
             (error.response
               ? "Failed to load orders."
               : "Server unreachable.");
-          set({ orders: DEMO_ORDERS, isLoading: false, error: msg });
+          set({ orders: [], isLoading: false, error: msg });
         }
       },
 

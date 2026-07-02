@@ -18,6 +18,19 @@ import { Badge } from "@/components/ui/Badge";
 import { useAuthStore } from "@/store/authStore";
 import api from "@/lib/api";
 
+function toCamelCase(obj) {
+  if (Array.isArray(obj)) return obj.map(toCamelCase);
+  if (obj !== null && typeof obj === "object" && !(obj instanceof Date)) {
+    return Object.fromEntries(
+      Object.entries(obj).map(([k, v]) => [
+        k.replace(/_([a-z])/g, (_, c) => c.toUpperCase()),
+        toCamelCase(v),
+      ])
+    );
+  }
+  return obj;
+}
+
 // ─── Tab definitions ─────────────────────────────────────────────────
 
 const TABS = [
@@ -49,47 +62,6 @@ const STATUS_BADGE_VARIANT = {
 };
 
 const ACTIVE_STATUSES = ["searching", "assigned", "en_route", "in_progress", "pending"];
-
-// ─── Demo fallback data ──────────────────────────────────────────────
-
-const DEMO_ORDERS = [
-  {
-    id: "job-demo-1",
-    status: "in_progress",
-    issue_tag: "engine_failure",
-    description: "Engine making a knocking sound when accelerating.",
-    total_amount: 2850,
-    created_at: new Date(Date.now() - 3600000).toISOString(),
-    assigned_mechanic: { name: "Rajesh M.", phone: "+919876543211" },
-  },
-  {
-    id: "job-demo-2",
-    status: "completed",
-    issue_tag: "ac_not_working",
-    description: "AC stopped blowing cold air. Regular service needed.",
-    total_amount: 1200,
-    created_at: new Date(Date.now() - 86400000 * 3).toISOString(),
-    assigned_mechanic: { name: "Suresh K.", phone: "+919876543212" },
-  },
-  {
-    id: "job-demo-3",
-    status: "completed",
-    issue_tag: "flat_tire",
-    description: "Rear left tyre puncture repair.",
-    total_amount: 450,
-    created_at: new Date(Date.now() - 86400000 * 7).toISOString(),
-    assigned_mechanic: { name: "Dinesh R.", phone: "+919876543213" },
-  },
-  {
-    id: "job-demo-4",
-    status: "cancelled",
-    issue_tag: "battery_dead",
-    description: "Battery replacement required.",
-    total_amount: 0,
-    created_at: new Date(Date.now() - 86400000 * 2).toISOString(),
-    assigned_mechanic: null,
-  },
-];
 
 const ISSUE_LABELS = {
   flat_tire: "Flat Tire",
@@ -312,10 +284,10 @@ export default function OrdersPage() {
 
     try {
       const { data } = await api.get("/jobs/history");
-      const fetched = data?.orders || data || [];
-      setOrders(fetched.length > 0 ? fetched : DEMO_ORDERS);
+      const fetched = data?.jobs || data?.orders || data || [];
+      setOrders(toCamelCase(fetched || []));
     } catch {
-      setOrders(DEMO_ORDERS);
+      setOrders([]);
     } finally {
       setIsLoading(false);
     }

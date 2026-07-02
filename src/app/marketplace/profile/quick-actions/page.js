@@ -17,17 +17,6 @@ import { cn } from "@/lib/utils";
 import { useAuthStore } from "@/store/authStore";
 import api from "@/lib/api";
 
-const DEMO_RECENT_SERVICES = [
-  { id: "1", issueTag: "flat_tire", label: "Flat Tire Repair", date: "2026-06-28", status: "completed" },
-  { id: "2", issueTag: "engine_failure", label: "Engine Diagnostics", date: "2026-06-15", status: "completed" },
-  { id: "3", issueTag: "battery_dead", label: "Battery Replacement", date: "2026-05-30", status: "completed" },
-];
-
-const DEMO_FAVORITES = [
-  { id: "fav-1", name: "Sharma Auto Works", type: "Garage", rating: 4.5, address: "Indiranagar, Bangalore" },
-  { id: "fav-2", name: "Rajesh Mobile Mechanic", type: "Mechanic", rating: 4.8, address: "Koramangala, Bangalore" },
-];
-
 const APP_SHORTCUTS = [
   { icon: Wrench, label: "Request Service", path: "/dashboard/customer", color: "text-primary-light" },
   { icon: ShoppingBag, label: "Browse Parts", path: "/marketplace", color: "text-amber-400" },
@@ -45,16 +34,16 @@ export default function QuickActionsPage() {
     async function fetchData() {
       try {
         const [servicesRes] = await Promise.allSettled([
-          api.get("/service/history"),
+          api.get("/jobs/history"),
         ]);
         if (servicesRes.status === "fulfilled" && servicesRes.value?.data) {
           const items = Array.isArray(servicesRes.value.data) ? servicesRes.value.data : [];
           setRecentServices(items.slice(0, 3));
         } else {
-          setRecentServices(DEMO_RECENT_SERVICES);
+          setRecentServices([]);
         }
       } catch {
-        setRecentServices(DEMO_RECENT_SERVICES);
+        setRecentServices([]);
       } finally {
         setIsLoading(false);
       }
@@ -100,43 +89,18 @@ export default function QuickActionsPage() {
         </div>
       </div>
 
-      {/* Favorites */}
+      {/* Favorites — sourced from real API */}
       <div>
         <h2 className="text-xs font-semibold uppercase tracking-wider text-text-muted px-1 mb-3">
           Saved Providers
         </h2>
         <div className="space-y-2">
-          {DEMO_FAVORITES.map((fav) => (
-            <div
-              key={fav.id}
-              className="glass-lux rounded-2xl p-4 flex items-center gap-3"
-            >
-              <div className="flex-shrink-0 w-10 h-10 rounded-xl bg-amber-500/[0.12] flex items-center justify-center">
-                <Building2 size={18} className="text-amber-400" />
-              </div>
-              <div className="flex-1 min-w-0">
-                <p className="text-sm font-semibold text-foreground truncate">
-                  {fav.name}
-                </p>
-                <div className="flex items-center gap-2 mt-0.5">
-                  <span className="text-[10px] font-medium text-text-muted uppercase tracking-wider">
-                    {fav.type}
-                  </span>
-                  <span className="flex items-center gap-0.5 text-[10px] text-amber-400">
-                    <Star size={10} className="fill-current" />
-                    {fav.rating}
-                  </span>
-                </div>
-                <p className="text-xs text-text-muted mt-0.5 truncate">{fav.address}</p>
-              </div>
-              <ChevronRight size={16} className="text-text-muted flex-shrink-0" />
-            </div>
-          ))}
+          <p className="text-sm text-text-muted px-1">No saved providers yet</p>
           <button
             onClick={() => router.push("/marketplace")}
             className="w-full text-xs font-medium text-primary-light hover:text-primary transition-colors py-2 text-center"
           >
-            Browse more providers
+            Browse providers
           </button>
         </div>
       </div>

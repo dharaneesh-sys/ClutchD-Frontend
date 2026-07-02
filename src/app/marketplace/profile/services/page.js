@@ -19,6 +19,19 @@ import { ConfirmModal } from "@/components/ui/ConfirmModal";
 import { useToastStore } from "@/store/toastStore";
 import api from "@/lib/api";
 
+function toCamelCase(obj) {
+  if (Array.isArray(obj)) return obj.map(toCamelCase);
+  if (obj !== null && typeof obj === "object" && !(obj instanceof Date)) {
+    return Object.fromEntries(
+      Object.entries(obj).map(([k, v]) => [
+        k.replace(/_([a-z])/g, (_, c) => c.toUpperCase()),
+        toCamelCase(v),
+      ])
+    );
+  }
+  return obj;
+}
+
 // ─── Tab definitions ─────────────────────────────────────────────────
 
 const TABS = [
@@ -73,56 +86,6 @@ const ISSUE_LABELS = {
 function getIssueLabel(tag) {
   return ISSUE_LABELS[tag] || tag || "Service";
 }
-
-// ─── Demo fallback data ──────────────────────────────────────────────
-
-const DEMO_SERVICES = [
-  {
-    id: "svc-demo-1",
-    status: "in_progress",
-    issue_tag: "engine_failure",
-    description: "Engine making a knocking sound when accelerating. Started this morning.",
-    total_amount: 2850,
-    created_at: new Date(Date.now() - 3600000).toISOString(),
-    assigned_mechanic: { name: "Rajesh M.", phone: "+919876543211" },
-  },
-  {
-    id: "svc-demo-2",
-    status: "searching",
-    issue_tag: "battery_dead",
-    description: "Car won't start, battery needs jump or replacement.",
-    total_amount: null,
-    created_at: new Date(Date.now() - 1800000).toISOString(),
-    assigned_mechanic: null,
-  },
-  {
-    id: "svc-demo-3",
-    status: "completed",
-    issue_tag: "ac_not_working",
-    description: "AC stopped blowing cold air. Gas recharge and service.",
-    total_amount: 1200,
-    created_at: new Date(Date.now() - 86400000 * 3).toISOString(),
-    assigned_mechanic: { name: "Suresh K.", phone: "+919876543212" },
-  },
-  {
-    id: "svc-demo-4",
-    status: "completed",
-    issue_tag: "flat_tire",
-    description: "Rear left tyre puncture repair and air fill.",
-    total_amount: 450,
-    created_at: new Date(Date.now() - 86400000 * 7).toISOString(),
-    assigned_mechanic: { name: "Dinesh R.", phone: "+919876543213" },
-  },
-  {
-    id: "svc-demo-5",
-    status: "cancelled",
-    issue_tag: "brake_issue",
-    description: "Brake pads making squeaking noise.",
-    total_amount: 0,
-    created_at: new Date(Date.now() - 86400000 * 2).toISOString(),
-    assigned_mechanic: null,
-  },
-];
 
 function getTabKey(status) {
   if (UPCOMING_STATUSES.includes(status)) return "upcoming";
@@ -326,10 +289,10 @@ export default function ServicesPage() {
 
     try {
       const { data } = await api.get("/jobs/history");
-      const fetched = data?.orders || data || [];
-      setServices(fetched.length > 0 ? fetched : DEMO_SERVICES);
+      const fetched = data?.jobs || data?.orders || data || [];
+      setServices(toCamelCase(fetched || []));
     } catch {
-      setServices(DEMO_SERVICES);
+      setServices([]);
     } finally {
       setIsLoading(false);
     }
