@@ -4,9 +4,10 @@ import { useState, useEffect } from "react";
 import { GlassCard } from "@/components/ui/GlassCard";
 import { Badge } from "@/components/ui/Badge";
 import { ConfirmModal } from "@/components/ui/ConfirmModal";
-import { Calendar, Download, MapPin, Loader2, Wrench, ChevronDown, ChevronUp, Receipt } from "lucide-react";
+import { Calendar, Download, MapPin, Loader2, Wrench, ChevronDown, ChevronUp, Receipt, RefreshCw } from "lucide-react";
 import api, { extractApiError } from "@/lib/api";
 import { GST_RATE } from "@/lib/constants";
+import { useToast } from "@/hooks/useToast";
 import { format } from "date-fns";
 import { PaymentModal } from "@/components/dashboard/PaymentModal";
 
@@ -18,6 +19,7 @@ export function ServiceHistory() {
   const [deleteJob, setDeleteJob] = useState(null);
   const [deleteLoading, setDeleteLoading] = useState(false);
   const [errorToast, setErrorToast] = useState(null);
+  const { toast } = useToast();
 
   const fetchHistory = async () => {
     try {
@@ -58,8 +60,18 @@ export function ServiceHistory() {
       link.click();
       link.parentNode.removeChild(link);
     } catch (e) {
-      setErrorToast(extractApiError(e, "Failed to download invoice."));
-      setTimeout(() => setErrorToast(null), 4000);
+      const status = e.response?.status;
+      if (status === 503) {
+        toast.error("Invoice unavailable — try again later", {
+          persistent: true,
+          action: { label: "Retry", onClick: () => downloadInvoice(jobId) },
+        });
+      } else if (status === 501) {
+        toast.error("Invoice generation not available");
+      } else {
+        setErrorToast(extractApiError(e, "Failed to download invoice."));
+        setTimeout(() => setErrorToast(null), 4000);
+      }
     }
   };
 

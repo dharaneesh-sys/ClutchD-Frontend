@@ -7,13 +7,13 @@ import { Badge } from "@/components/ui/Badge";
 import { Modal } from "@/components/ui/Modal";
 import { ConfirmModal } from "@/components/ui/ConfirmModal";
 import { Input } from "@/components/ui/Input";
-import { Navigation, CheckCircle2, AlertTriangle, MapPin, Clock, IndianRupee, Loader2 } from "lucide-react";
+import { Navigation, CheckCircle2, AlertTriangle, MapPin, Clock, IndianRupee, Loader2, MessageSquare } from "lucide-react";
 import { FEE_CONSTANTS } from "@/lib/constants";
 import { useTrackingStore } from "@/store/trackingStore";
 import { useToast } from "@/components/ui/ToastProvider";
 import api from "@/lib/api";
 
-export function IncomingJobs() {
+export function IncomingJobs({ onChat }) {
   const [jobs, setJobs] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -192,6 +192,11 @@ export function IncomingJobs() {
                       }}>
                         <Navigation size={14} className="mr-1.5" /> Navigate
                       </Button>
+                      {onChat && (
+                        <Button variant="ghost" size="sm" onClick={() => onChat(job.id, job.customer)}>
+                          <MessageSquare size={14} className="mr-1" /> Chat
+                        </Button>
+                      )}
                       <Button size="sm" onClick={() => openCompletionModal(job.id)}>
                         <IndianRupee size={14} className="mr-1" /> Bill Customer
                       </Button>

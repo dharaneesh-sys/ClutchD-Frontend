@@ -5,14 +5,14 @@ import { Badge } from "@/components/ui/Badge";
 import { Modal } from "@/components/ui/Modal";
 import { ConfirmModal } from "@/components/ui/ConfirmModal";
 import { Input } from "@/components/ui/Input";
-import { Clock, MapPin, Settings, Loader2, IndianRupee, AlertTriangle } from "lucide-react";
+import { Clock, MapPin, Settings, Loader2, IndianRupee, AlertTriangle, MessageSquare } from "lucide-react";
 import { AssignMechanicModal } from "@/components/garage/AssignMechanicModal";
 import api from "@/lib/api";
 import { FEE_CONSTANTS } from "@/lib/constants";
 import { useToast } from "@/components/ui/ToastProvider";
 import { formatDistanceToNow } from "date-fns";
 
-export function GarageJobQueue() {
+export function GarageJobQueue({ onChat }) {
   const [jobs, setJobs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [assignModalOpen, setAssignModalOpen] = useState(false);
@@ -172,24 +172,38 @@ export function GarageJobQueue() {
                     </p>
                   </div>
                   
-                  <div className="flex gap-2">
-                    {isUnassigned ? (
-                      <Button size="sm" onClick={() => openAssignModal(job)}>
-                         Dispatch
-                      </Button>
-                    ) : isActive ? (
-                      <Button size="sm" onClick={() => openCompletionModal(job.id)}>
-                        <IndianRupee size={14} className="mr-1" /> Bill Customer
-                      </Button>
-                    ) : (
-                       <div className="text-right">
-                          <p className="text-[10px] uppercase tracking-wider mb-0.5 text-text-dim">Assigned To</p>
-                          <p className="font-bold text-sm flex items-center justify-end text-text-primary">
-                            <Settings size={12} className="mr-1 text-icon-highlight" /> 
-                            {job.mechanic?.name || "Mechanic"}
-                          </p>
-                       </div>
-                    )}
+<div className="flex gap-2">
+                     {isUnassigned ? (
+                       <Button size="sm" onClick={() => openAssignModal(job)}>
+                          Dispatch
+                       </Button>
+                     ) : isActive ? (
+                       <>
+                         {onChat && (
+                           <Button variant="ghost" size="sm" onClick={() => onChat(job.id, job.customer)}>
+                             <MessageSquare size={14} className="mr-1" /> Chat
+                           </Button>
+                         )}
+                         <Button size="sm" onClick={() => openCompletionModal(job.id)}>
+                           <IndianRupee size={14} className="mr-1" /> Bill Customer
+                         </Button>
+                       </>
+                     ) : (
+                        <div className="flex items-center gap-2">
+                          {onChat && (
+                            <Button variant="ghost" size="sm" onClick={() => onChat(job.id, job.customer)}>
+                              <MessageSquare size={14} className="mr-1" /> Chat
+                            </Button>
+                          )}
+                          <div className="text-right">
+                             <p className="text-[10px] uppercase tracking-wider mb-0.5 text-text-dim">Assigned To</p>
+                             <p className="font-bold text-sm flex items-center justify-end text-text-primary">
+                               <Settings size={12} className="mr-1 text-icon-highlight" /> 
+                               {job.mechanic?.name || "Mechanic"}
+                             </p>
+                          </div>
+                        </div>
+                     )}
                     <button
                       onClick={() => setDeleteJob(job)}
                       className={`ml-2 flex items-center justify-center p-1.5 rounded-lg transition-colors text-red-500 hover:bg-red-50 hover:text-red-600 border border-transparent hover:border-red-200`}

@@ -208,9 +208,75 @@ export const useAuthStore = create(
           cacheUserProfile(response.data.user);
           return response.data.user;
         } catch (error) {
+          const status = error.response?.status;
+
+          // Backend unavailable — fall through to Firebase Auth popup
+          if (status === 503) {
+            return get().firebaseSignIn(safeRole);
+          }
+
           const msg =
             error.response?.data?.detail ||
             (error.response ? "Google login failed." : "Server unreachable. Please check your connection.");
+          set({ isLoading: false, error: msg });
+          return null;
+        }
+      },
+
+      /**
+       * Sign in with Google via Firebase Auth popup.
+       * Used as a fallback when the backend is unavailable (503),
+       * or as a standalone Firebase-first sign-in path.
+       *
+       * Opens a Firebase Auth popup, creates a local user from the
+       * Firebase user data, and sets a local JWT-like token so API
+       * interceptors can recognise the session.
+       *
+       * Returns the user object on success, or null if the popup was
+       * closed or sign-in failed.
+       */
+      firebaseSignIn: async (role = null) => {
+        set({ isLoading: true, error: null });
+
+        try {
+          const { signInWithGoogle } = await import(
+            "@/lib/auth/firebaseAuth"
+          );
+          const firebaseUser = await signInWithGoogle();
+
+          if (!firebaseUser) {
+            // User closed the popup — quiet exit, no error
+            set({ isLoading: false, error: null });
+            return null;
+          }
+
+          // Build a local user from Firebase profile data
+          const localUser = {
+            id: `firebase-${firebaseUser.uid}`,
+            name: firebaseUser.displayName || "Google User",
+            email: firebaseUser.email || "",
+            avatar: firebaseUser.photoURL || null,
+            role: role || "customer",
+            provider: "firebase",
+          };
+
+          if (typeof window !== "undefined") {
+            setAccessToken("firebase-local-jwt-token");
+          }
+
+          set({
+            user: localUser,
+            isAuthenticated: true,
+            _hydrated: true,
+            isLoading: false,
+          });
+          cacheUserProfile(localUser);
+          return localUser;
+        } catch (error) {
+          const msg =
+            error.code === "auth/popup-closed-by-user"
+              ? null
+              : "Google sign-in via Firebase failed. Please try again.";
           set({ isLoading: false, error: msg });
           return null;
         }

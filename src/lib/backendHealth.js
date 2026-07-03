@@ -21,41 +21,56 @@ function stopPolling() {
   }
 }
 
+/**
+ * Ping a single URL with a timeout. Returns true for any reachable response
+ * (even 4xx/5xx — the server is up), false on network error or timeout.
+ */
+async function pingUrl(url, timeoutMs = 5000) {
+  try {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
+
+    const res = await fetch(url, {
+      method: "GET",
+      signal: controller.signal,
+    });
+
+    clearTimeout(timeoutId);
+    // Any response (including 405, 503) means the server is reachable.
+    // Only network errors / timeouts mean unavailable.
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 export const BackendHealth = {
   /** Current known backend availability. null = unchecked, true/false = known. */
   isAvailable: () => _isAvailable,
 
   /**
-   * Ping the backend health endpoint with a 5s timeout.
-   * Returns true for any 2xx response, false otherwise.
+   * Ping backend health endpoints with a 5s timeout per endpoint.
+   * Checks both the general /health endpoint and the payments endpoint
+   * (via a GET — expects any response as proof of reachability).
+   * All endpoints must be reachable for the backend to be considered healthy.
    * Notifies listeners when the status changes from the previous value.
    */
   check: async () => {
-    try {
-      const healthUrl = `${API_BASE_URL.replace("/api", "")}/health`;
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 5000);
+    const baseUrl = API_BASE_URL.replace("/api", "");
+    const healthUrl = `${baseUrl}/health`;
+    const paymentsUrl = `${baseUrl}/payments/create`;
 
-      const res = await fetch(healthUrl, {
-        method: "GET",
-        signal: controller.signal,
-      });
+    const [healthReachable, paymentsReachable] = await Promise.all([
+      pingUrl(healthUrl),
+      pingUrl(paymentsUrl),
+    ]);
 
-      clearTimeout(timeoutId);
-
-      const newStatus = res.ok;
-      if (_isAvailable !== newStatus) {
-        _isAvailable = newStatus;
-        notifyListeners(newStatus);
-      }
-      return newStatus;
-    } catch {
-      if (_isAvailable !== false) {
-        _isAvailable = false;
-        notifyListeners(false);
-      }
-      return false;
+    const newStatus = healthReachable && paymentsReachable;
+    if (_isAvailable !== newStatus) {
+      _isAvailable = newStatus;
+      notifyListeners(newStatus);
     }
+    return newStatus;
   },
 
   /** Start polling the health endpoint at the given interval (default 30s). */

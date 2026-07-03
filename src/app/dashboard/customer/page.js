@@ -19,7 +19,8 @@ import { ReviewModal } from "@/components/dashboard/ReviewModal";
 import { NotificationBell } from "@/components/ui/NotificationBell";
 import { SOSButton } from "@/components/ui/SOSButton";
 import { DashboardShell } from "@/components/ui/DashboardShell";
-import { History, Wrench, Calendar, ShoppingBag } from "lucide-react";
+import { ChatPanel } from "@/components/ui/ChatPanel";
+import { History, Wrench, Calendar, ShoppingBag, MessageSquare } from "lucide-react";
 import { SERVICE_STATUS } from "@/lib/constants";
 import { ScheduleBookingModal } from "@/components/dashboard/ScheduleBookingModal";
 import api from "@/lib/api";
@@ -208,6 +209,18 @@ export default function CustomerDashboard() {
     cancelRequest();
   };
 
+  /* ── Chat state ────────────────────────────────────────────────── */
+  const [chatOpen, setChatOpen] = useState(false);
+  const chatJobId = activeRequest?.id;
+  const chatOtherName = activeRequest?.mechanic?.name || "Mechanic";
+  const chatOtherRole = "mechanic";
+  const hasMechanic =
+    activeRequest &&
+    (activeRequest.status === "assigned" ||
+     activeRequest.status === "en_route" ||
+     activeRequest.status === "in_progress" ||
+     activeRequest.status === "payment_pending");
+
   return (
     <>
     <DashboardShell
@@ -362,6 +375,37 @@ export default function CustomerDashboard() {
       </div>
     </nav>
     <SOSButton />
+
+    {/* ── Chat button (appears when mechanic is assigned) ──────────── */}
+    {hasMechanic && chatJobId && (
+      <div className="fixed bottom-24 right-6 z-[800] flex flex-col items-end gap-3">
+        {chatOpen && (
+          <ChatPanel
+            jobId={chatJobId}
+            otherUserName={chatOtherName}
+            otherUserRole={chatOtherRole}
+            onClose={() => setChatOpen(false)}
+          />
+        )}
+        <button
+          onClick={() => setChatOpen((o) => !o)}
+          className={cn(
+            "w-14 h-14 rounded-full flex items-center justify-center transition-all active-press",
+            "shadow-[0_8px_32px_rgba(var(--color-primary-rgb),0.3)]",
+            chatOpen
+              ? "bg-red-500/20 border border-red-400/30 text-red-400 rotate-45"
+              : "bg-primary text-white hover:shadow-[0_12px_40px_rgba(var(--color-primary-rgb),0.4)] hover-lift"
+          )}
+          aria-label={chatOpen ? "Close chat" : "Chat with mechanic"}
+        >
+          {chatOpen ? (
+            <X size={22} />
+          ) : (
+            <MessageSquare size={22} />
+          )}
+        </button>
+      </div>
+    )}
   </>
 );
 }

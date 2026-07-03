@@ -22,14 +22,14 @@ export function sendChatMessage(jobId, text, imageUrl) {
   };
 
   // Optimistic local update
-  import("../store/chatStore")
+  import("../../store/chatStore")
     .then(({ useChatStore }) => {
       useChatStore.getState().receiveMessage(jobId, message);
     })
     .catch(() => {});
 
   // Send over WebSocket (lazy import to avoid circular dependency with socket.js)
-  import("../socket")
+  import("../../lib/socket")
     .then(({ sendWSMessage }) => {
       sendWSMessage({ type: "CHAT_MESSAGE", payload: message });
     })
@@ -42,14 +42,14 @@ export function sendChatMessage(jobId, text, imageUrl) {
  */
 export function markConversationRead(jobId) {
   // Local state update
-  import("../store/chatStore")
+  import("../../store/chatStore")
     .then(({ useChatStore }) => {
       useChatStore.getState().markRead(jobId);
     })
     .catch(() => {});
 
   // Notify server
-  import("../socket")
+  import("../../lib/socket")
     .then(({ sendWSMessage }) => {
       sendWSMessage({ type: "CHAT_READ", payload: { jobId } });
     })

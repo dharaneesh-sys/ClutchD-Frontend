@@ -10,13 +10,16 @@ import {
   Wrench,
   Eye,
   Package,
+  Download,
+  Receipt,
 } from "lucide-react";
 import { cn, formatCurrency, formatDate, formatTime } from "@/lib/utils";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { ShimmerList } from "@/components/ui/Shimmer";
 import { Badge } from "@/components/ui/Badge";
 import { useAuthStore } from "@/store/authStore";
-import api from "@/lib/api";
+import api, { extractApiError } from "@/lib/api";
+import { useToast } from "@/hooks/useToast";
 
 function toCamelCase(obj) {
   if (Array.isArray(obj)) return obj.map(toCamelCase);
@@ -91,7 +94,7 @@ function getStatusTab(status) {
 
 // ─── Order Card ──────────────────────────────────────────────────────
 
-function OrderCard({ order, onViewDetails }) {
+function OrderCard({ order, onViewDetails, onDownloadReceipt }) {
   return (
     <div
       className="glass-lux rounded-2xl p-4 sm:p-5 space-y-3 animate-fade-in-up"
@@ -146,12 +149,24 @@ function OrderCard({ order, onViewDetails }) {
       )}
 
       {/* Actions */}
-      <div className="flex justify-end pt-1">
+      <div className="flex justify-end pt-1 gap-2">
+        {order.status === "completed" && (
+          <button
+            onClick={() => onDownloadReceipt(order)}
+            className={cn(
+              "inline-flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-lg",
+              "bg-primary/10 text-primary-light hover:bg-primary/20 transition-colors"
+            )}
+          >
+            <Download size={13} />
+            Receipt
+          </button>
+        )}
         <button
           onClick={() => onViewDetails(order)}
           className={cn(
             "inline-flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-lg",
-            "bg-primary/10 text-primary-light hover:bg-primary/20 transition-colors"
+            "bg-white/5 text-text-muted hover:bg-white/10 hover:text-foreground transition-colors"
           )}
         >
           <Eye size={13} />
@@ -260,6 +275,46 @@ function DetailModal({ order, onClose }) {
                 <p className="text-sm text-text-secondary">{order.description}</p>
               </div>
             )}
+
+            {/* Pricing Breakdown (fallback when receipt unavailable) */}
+            {order.status === "completed" && order.pricing && (
+              <div className="pt-3 border-t border-border-subtle/50 space-y-2">
+                <div className="flex items-center gap-2 mb-2">
+                  <Receipt size={14} className="text-icon-highlight" />
+                  <span className="text-sm font-semibold text-text-primary">Payment Breakdown</span>
+                </div>
+                <div className="flex justify-between text-sm text-text-primary">
+                  <span>Service Fee</span>
+                  <span className="font-medium">{formatCurrency(order.pricing.serviceAmount || 0)}</span>
+                </div>
+                <div className="flex justify-between text-sm text-text-primary">
+                  <span>Convenience Fee</span>
+                  <span className="font-medium">{formatCurrency(order.pricing.convenienceFee || 0)}</span>
+                </div>
+                {order.pricing.cancellationFee > 0 && (
+                  <div className="flex justify-between text-sm text-text-primary">
+                    <span>Cancellation Fee</span>
+                    <span className="font-medium">{formatCurrency(order.pricing.cancellationFee)}</span>
+                  </div>
+                )}
+                {order.pricing.distanceFee > 0 && (
+                  <div className="flex justify-between text-sm text-text-primary">
+                    <span>Distance ({order.pricing.distanceKm?.toFixed(1) || "0.0"} km)</span>
+                    <span className="font-medium">{formatCurrency(order.pricing.distanceFee)}</span>
+                  </div>
+                )}
+                {order.pricing.gstAmount > 0 && (
+                  <div className="flex justify-between text-sm text-text-primary">
+                    <span>GST</span>
+                    <span className="font-medium">{formatCurrency(order.pricing.gstAmount)}</span>
+                  </div>
+                )}
+                <div className="flex justify-between text-sm font-bold text-text-primary border-t border-border-subtle/50 pt-2">
+                  <span>Total</span>
+                  <span className="text-icon-highlight">{formatCurrency(order.pricing.totalAmount || order.total_amount || 0)}</span>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </div>
@@ -272,11 +327,40 @@ function DetailModal({ order, onClose }) {
 export default function OrdersPage() {
   const router = useRouter();
   const { user } = useAuthStore();
+  const { toast } = useToast();
   const [activeTab, setActiveTab] = useState("current");
   const [orders, setOrders] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   const [selectedOrder, setSelectedOrder] = useState(null);
+
+  const downloadReceipt = async (order) => {
+    try {
+      const res = await api.get(`/jobs/history/${order.id}/invoice`, { responseType: "blob" });
+      const url = window.URL.createObjectURL(new Blob([res.data]));
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', `receipt_${order.id.substring(0, 8)}.pdf`);
+      document.body.appendChild(link);
+      link.click();
+      link.parentNode.removeChild(link);
+    } catch (e) {
+      const status = e.response?.status;
+      if (status === 503) {
+        toast.error("Invoice unavailable — try again later", {
+          persistent: true,
+          action: { label: "Retry", onClick: () => downloadReceipt(order) },
+        });
+      } else if (status === 501) {
+        toast.error("Invoice generation not available");
+      } else if (status === 404) {
+        // Receipt endpoint not available — show inline breakdown
+        setSelectedOrder(order);
+      } else {
+        toast.error(extractApiError(e, "Failed to download receipt."));
+      }
+    }
+  };
 
   const fetchOrders = useCallback(async () => {
     setIsLoading(true);
@@ -361,6 +445,7 @@ export default function OrdersPage() {
               <OrderCard
                 order={order}
                 onViewDetails={setSelectedOrder}
+                onDownloadReceipt={downloadReceipt}
               />
             </div>
           ))}

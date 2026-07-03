@@ -8,6 +8,8 @@ import { ToastProvider } from "@/components/ui/ToastProvider";
 import DemoModeClient from "@/components/ui/DemoModeClient";
 import { DemoModeProvider } from "@/lib/demo/demoModeProvider";
 import { BackButtonHandler } from "@/components/ui/BackButtonHandler";
+import { PushInit } from "@/components/ui/PushInit";
+import { PushPermissionBanner } from "@/components/ui/PushPermissionBanner";
 import DynamicI18nProvider from "@/lib/i18n/DynamicI18nProvider";
 
 export const metadata = {
@@ -96,6 +98,8 @@ export default function RootLayout({ children }) {
             </a>
             <ThemeProvider>
               <AuthInit />
+              <PushInit />
+              <PushPermissionBanner />
               <ErrorBoundary>
                 <div id="main-content">{children}</div>
               </ErrorBoundary>

@@ -26,6 +26,7 @@ import {
 import api, { extractApiError } from "@/lib/api";
 import { cn } from "@/lib/utils";
 import { useAuthStore } from "@/store/authStore";
+import { useNotificationStore } from "@/store/notificationStore";
 import { useThemeStore } from "@/store/themeStore";
 import { useToastStore } from "@/store/toastStore";
 import { useDemoMode } from "@/lib/demo/demoContext";
@@ -165,6 +166,7 @@ export default function SettingsPage() {
   const { setTheme: applyTheme } = useThemeStore();
   const toast = useToastStore();
   const { isDemoMode, enableDemo, disableDemo } = useDemoMode();
+  const storeSetPushEnabled = useNotificationStore((s) => s.setPushEnabled);
 
   // ── State ────────────────────────────────────────────────────────────
   const [loading, setLoading] = useState(true);
@@ -498,13 +500,12 @@ export default function SettingsPage() {
             </div>
             <ToggleSwitch
               enabled={pushEnabled}
-              onChange={() =>
-                handleToggleNotification(
-                  "push_notifications",
-                  pushEnabled,
-                  setPushEnabled
-                )
-              }
+              onChange={async () => {
+                const next = !pushEnabled;
+                setPushEnabled(next);
+                saveSettings({ push_notifications: next });
+                storeSetPushEnabled(next);
+              }}
             />
           </div>
 

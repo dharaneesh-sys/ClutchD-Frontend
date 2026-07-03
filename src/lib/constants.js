@@ -191,6 +191,54 @@ export const DELIVERY_TIMES = [
 ];
 
 /**
+ * Subscription plan definitions.
+ * @type {Array<{id: string, name: string, price: number, period: string, features: string[], badge: string|null}>}
+ */
+export const SUBSCRIPTION_PLANS = [
+  {
+    id: "free",
+    name: "Free",
+    price: 0,
+    period: "month",
+    features: [
+      "Basic service requests",
+      "Standard support",
+      "Real-time mechanic tracking",
+      "Service history access",
+    ],
+    badge: null,
+  },
+  {
+    id: "plus",
+    name: "Plus",
+    price: 499,
+    period: "month",
+    features: [
+      "Priority dispatch",
+      "24/7 customer support",
+      "5% service discount",
+      "All Free features",
+    ],
+    badge: "Popular",
+  },
+  {
+    id: "pro",
+    name: "Pro",
+    price: 999,
+    period: "month",
+    features: [
+      "Free annual vehicle inspection",
+      "30% parts discount",
+      "Priority dispatch",
+      "24/7 customer support",
+      "5% service discount",
+      "All Plus features",
+    ],
+    badge: "Best Value",
+  },
+];
+
+/**
  * Marketplace product sort options.
  * @type {Array<{value: string, label: string}>}
  */

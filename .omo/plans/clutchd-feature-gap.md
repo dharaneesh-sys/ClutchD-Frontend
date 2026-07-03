@@ -216,7 +216,7 @@ Final Verification (4 parallel reviews):
 
 ### Wave 1 — Safety & Engagement Foundation
 
-- [ ] 1. **Install FCM dependencies for Capacitor web + mobile**
+- [x] 1. **Install FCM dependencies for Capacitor web + mobile**
 
   **What to do**:
   1. Install Firebase JS SDK (modular — only messaging): `npm install firebase` then use `import { getMessaging, getToken, onMessage } from 'firebase/messaging'` (NOT the full `firebase` package — tree-shaking avoids ~300KB bundle bloat)
@@ -268,7 +268,7 @@ Final Verification (4 parallel reviews):
   - Message: `feat(push): add FCM and Capacitor push dependencies`
   - Files: `package.json`, `src/lib/push/firebase.js`, `src/lib/push/pushService.js`, `public/firebase-messaging-sw.js`, `env.local.example`, `render.yaml`
 
-- [ ] 2. **FCM — Push notification integration with notificationStore + settings**
+- [x] 2. **FCM — Push notification integration with notificationStore + settings**
 
   **What to do**:
   1. Update `src/store/notificationStore.js`:
@@ -369,7 +369,7 @@ Final Verification (4 parallel reviews):
   - Message: `feat(push): foreground and background push handling`
   - Files: `src/lib/push/pushService.js`, `public/firebase-messaging-sw.js`, `src/store/toastStore.js`
 
-- [ ] 4. **Firebase Auth — Google sign-in for signup + login (backend-independent)**
+- [x] 4. **Firebase Auth — Google sign-in for signup + login (backend-independent)**
 
   **Context**: Google OAuth is already implemented in both `LoginCard.js` and `SignUpCard.js` using Google Identity Services (`accounts.google.com/gsi/client`). But it calls `POST /auth/oauth/google` on the backend which returns 503. This task adds a Firebase Auth-based fallback path that works without the backend.
 
@@ -481,7 +481,7 @@ Final Verification (4 parallel reviews):
   - Message: `feat(auth): add Firebase Auth Google sign-in with backend-independent fallback`
   - Files: `src/lib/auth/firebaseAuth.js`, `src/store/authStore.js`
 
-- [ ] 5. **Mechanic-customer chat — Create chatStore with WebSocket integration**
+- [x] 5. **Mechanic-customer chat — Create chatStore with WebSocket integration**
 
   **What to do**:
   1. Create `src/store/chatStore.js`:
@@ -536,7 +536,7 @@ Final Verification (4 parallel reviews):
   - Message: `feat(chat): add job-scoped mechanic-customer chat store and WS integration`
   - Files: `src/store/chatStore.js`, `src/lib/socket.js`, `src/lib/chat/chatService.js`
 
-- [ ] 6. **Mechanic-customer chat — UI components with photo sharing**
+- [x] 6. **Mechanic-customer chat — UI components with photo sharing**
 
   **What to do**:
   1. Create `src/components/ui/ChatPanel.js`:
@@ -592,7 +592,7 @@ Final Verification (4 parallel reviews):
   - Message: `feat(chat): add chat UI components with photo sharing`
   - Files: `src/components/ui/ChatPanel.js`, `src/components/ui/ChatBubble.js`
 
-- [ ] 7. **Offline SOS — Cache essential data in IndexedDB**
+- [x] 7. **Offline SOS — Cache essential data in IndexedDB**
 
   **What to do**:
   1. Create `src/lib/offline/offlineCache.js`:
@@ -647,7 +647,7 @@ Final Verification (4 parallel reviews):
   - Message: `feat(offline): add IndexedDB cache for essential data`
   - Files: `package.json`, `src/lib/offline/offlineCache.js`
 
-- [ ] 8. **Offline SOS — Queue requests when offline**
+- [x] 8. **Offline SOS — Queue requests when offline**
 
   **What to do**:
   1. Create `src/lib/offline/requestQueue.js`:
@@ -701,7 +701,7 @@ Final Verification (4 parallel reviews):
   - Message: `feat(offline): queue SOS requests when offline, flush on reconnect`
   - Files: `src/lib/offline/requestQueue.js`, `src/components/ui/SOSButton.js`
 
-- [ ] 9. **Real-time mechanic ETA on customer dashboard**
+- [x] 9. **Real-time mechanic ETA on customer dashboard**
 
   **What to do**:
   1. Create `src/components/dashboard/ETAIndicator.js`:
@@ -758,7 +758,7 @@ Final Verification (4 parallel reviews):
 
 ### Wave 2 — Revenue Engine
 
-- [ ] 10. **Razorpay — Configure env vars + health gate on existing integration**
+- [x] 10. **Razorpay — Configure env vars + health gate on existing integration**
 
   **Context**: `PaymentModal.js` **already has full Razorpay integration** — it loads `https://checkout.razorpay.com/v1/checkout.js`, calls `POST /api/payments/create` to create a Razorpay order, opens Razorpay Checkout, then verifies via `POST /api/payments/verify`. No Stripe SDK install needed. The work here is env config + gating only.
 
@@ -958,7 +958,7 @@ Final Verification (4 parallel reviews):
   - Message: `feat(payment): add escrow state machine for service bookings`
   - Files: `src/store/serviceStore.js`, `src/components/dashboard/EscrowStatus.js`
 
-- [ ] 13. **Subscription plans — Tier UI + pricing display**
+- [x] 13. **Subscription plans — Tier UI + pricing display**
 
   **What to do**:
   1. Create subscription constants in `src/lib/constants.js`:
@@ -1054,7 +1054,7 @@ Final Verification (4 parallel reviews):
   - Message: `feat(subscription): add subscription purchase flow with localStorage mock`
   - Files: `src/lib/payment/subscriptionService.js`, `src/store/authStore.js`, `src/components/subscription/SubscriptionManager.js`
 
-- [ ] 15. **Invoice PDF — Add fallback for backend invoice download endpoint**
+- [x] 15. **Invoice PDF — Add fallback for backend invoice download endpoint**
 
   **Context**: `ServiceHistory.js` **already calls** `GET /api/jobs/history/{job_id}/invoice` (line 50) and downloads the PDF as a blob. The backend generates the PDF server-side using reportlab with full itemized pricing (labor, parts, GST, distance fees, service details). No `jspdf` or client-side PDF generation exists. The only work needed is a fallback for when the backend is 503.
 

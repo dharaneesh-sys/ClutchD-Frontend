@@ -14,6 +14,7 @@ import {
   CreditCard as CardIcon,
   Settings,
   ChevronRight,
+  Crown,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -23,6 +24,7 @@ const MENU_SECTIONS = [
     items: [
       { icon: User, label: "Account Details", path: "/marketplace/profile/account" },
       { icon: Settings, label: "Edit Profile", path: "/marketplace/profile/edit" },
+      { icon: Crown, label: "Subscription", path: "/marketplace/profile/subscription" },
     ],
   },
   {

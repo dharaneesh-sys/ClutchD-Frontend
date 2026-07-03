@@ -4,10 +4,11 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 
 import { useAuthStore } from "@/store/authStore";
-import { LogOut, Building2, LayoutDashboard, Users, BarChart3, ShoppingBag } from "lucide-react";
+import { LogOut, Building2, LayoutDashboard, Users, BarChart3, ShoppingBag, MessageSquare } from "lucide-react";
 import { ConnectionIndicator } from "@/components/ui/ConnectionIndicator";
 import { NotificationBell } from "@/components/ui/NotificationBell";
 import { DashboardShell } from "@/components/ui/DashboardShell";
+import { ChatPanel } from "@/components/ui/ChatPanel";
 import { GarageProfile } from "@/components/garage/GarageProfile";
 import { GarageJobQueue } from "@/components/garage/GarageJobQueue";
 import { GarageAnalytics } from "@/components/garage/GarageAnalytics";
@@ -48,6 +49,17 @@ export default function GarageDashboard() {
     { icon: ShoppingBag, label: "Parts Store", onClick: () => router.push("/marketplace") },
   ];
 
+  /* ── Chat state ────────────────────────────────────────────────── */
+  const [chatOpen, setChatOpen] = useState(false);
+  const [chatJobId, setChatJobId] = useState(null);
+  const [chatOtherName, setChatOtherName] = useState("Customer");
+
+  const openChat = (jobId, customerName) => {
+    setChatJobId(jobId);
+    setChatOtherName(customerName || "Customer");
+    setChatOpen(true);
+  };
+
   return (
     <DashboardShell
       title="Garage Dashboard"
@@ -69,7 +81,7 @@ export default function GarageDashboard() {
             </div>
             <div className="lg:col-span-7 xl:col-span-8 flex flex-col gap-4 lg:gap-6">
               <div>
-                <GarageJobQueue />
+                <GarageJobQueue onChat={openChat} />
               </div>
             </div>
           </div>
@@ -94,6 +106,29 @@ export default function GarageDashboard() {
           </div>
         )}
       </div>
+
+      {/* ── Chat button (appears when a job is active) ──────────────── */}
+      {chatJobId && (
+        <div className="fixed bottom-6 right-6 z-[800] flex flex-col items-end gap-3">
+          {chatOpen && (
+            <ChatPanel
+              jobId={chatJobId}
+              otherUserName={chatOtherName}
+              otherUserRole="customer"
+              onClose={() => setChatOpen(false)}
+            />
+          )}
+          <button
+            onClick={() => setChatOpen((o) => !o)}
+            className="w-14 h-14 rounded-full flex items-center justify-center transition-all active-press
+                       shadow-[0_8px_32px_rgba(var(--color-primary-rgb),0.3)]
+                       bg-primary text-white hover:shadow-[0_12px_40px_rgba(var(--color-primary-rgb),0.4)] hover-lift"
+            aria-label={chatOpen ? "Close chat" : "Chat with customer"}
+          >
+            <MessageSquare size={22} />
+          </button>
+        </div>
+      )}
     </DashboardShell>
   );
 }
