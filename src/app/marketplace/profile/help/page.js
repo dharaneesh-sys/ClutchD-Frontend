@@ -18,67 +18,6 @@ import { Button } from "@/components/ui/Button";
 import { useToastStore } from "@/store/toastStore";
 import api from "@/lib/api";
 
-// ─── Demo FAQ data ───────────────────────────────────────────────────
-
-const DEMO_FAQS = [
-  {
-    id: 1,
-    question: "How do I request a mechanic?",
-    answer:
-      "Open the app, select your issue from the dashboard, and we'll find the nearest available mechanic for you. You'll be able to track their location in real-time.",
-    category: "general",
-  },
-  {
-    id: 2,
-    question: "How are prices calculated?",
-    answer:
-      "Prices include base service charge + distance fee (₹30/km) + convenience fee (₹40) + 18% GST. You'll see the full breakdown before confirming the service.",
-    category: "pricing",
-  },
-  {
-    id: 3,
-    question: "Can I cancel a service?",
-    answer:
-      "Yes, but a ₹30 cancellation fee may apply depending on the stage of service. No fee is charged if cancelled before a mechanic is assigned.",
-    category: "general",
-  },
-  {
-    id: 4,
-    question: "How do I make payments?",
-    answer:
-      "We support UPI (Google Pay, PhonePe, Paytm), Credit/Debit cards, and cash payments. All online payments are processed securely through Razorpay.",
-    category: "payment",
-  },
-  {
-    id: 5,
-    question: "What if I have an issue with the service?",
-    answer:
-      "You can report a problem through the Help section or contact our support team directly. We'll review your case and resolve it within 24-48 hours.",
-    category: "support",
-  },
-  {
-    id: 6,
-    question: "How do I track my mechanic?",
-    answer:
-      "Once a mechanic is assigned, you can track their live location on the map in your dashboard. You'll receive notifications at each stage — assigned, en route, arrived, and in progress.",
-    category: "general",
-  },
-  {
-    id: 7,
-    question: "What areas do you serve?",
-    answer:
-      "We currently serve Coimbatore and surrounding areas. We're expanding to more cities soon. Check the app for the latest coverage map.",
-    category: "general",
-  },
-  {
-    id: 8,
-    question: "Is my data secure?",
-    answer:
-      "Yes, we take data security seriously. All transactions are encrypted, and your personal information is stored securely. We never share your data with third parties without your consent.",
-    category: "account",
-  },
-];
-
 const CATEGORIES = [
   { value: "", label: "Select a category" },
   { value: "general", label: "General" },
@@ -357,9 +296,9 @@ export default function HelpPage() {
     try {
       const { data } = await api.get("/faq");
       const fetched = data?.faqs || data || [];
-      setFaqs(fetched.length > 0 ? fetched : DEMO_FAQS);
+      setFaqs(fetched || []);
     } catch {
-      setFaqs(DEMO_FAQS);
+      setFaqs([]);
     } finally {
       setIsLoadingFaqs(false);
     }

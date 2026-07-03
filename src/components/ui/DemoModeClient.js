@@ -1,5 +1,6 @@
 "use client";
 
+import { useDemoMode } from "@/lib/demo/demoContext";
 import dynamic from "next/dynamic";
 
 const DemoModeWrapper = dynamic(() => import("./DemoModeWrapper"), {
@@ -7,8 +8,11 @@ const DemoModeWrapper = dynamic(() => import("./DemoModeWrapper"), {
 });
 
 export default function DemoModeClient({ show }) {
-  // Always render the toolbar (collapsed pill at top-right) regardless of DEMO_MODE flag.
-  // The built-in toggle inside the toolbar lets you enable/disable demo features.
-  // When demo mode is off, the toolbar stays as a small "Demo" pill.
+  const { isDemoMode } = useDemoMode();
+
+  // Only render the demo toolbar when demo mode is actively enabled.
+  // Once disabled from settings, the toolbar is fully removed from the DOM.
+  if (!isDemoMode) return null;
+
   return <DemoModeWrapper />;
 }

@@ -74,7 +74,8 @@ const nextConfig = {
                 //     - checkout.razorpay.com     — Razorpay payment SDK
                 //     - raw.githubusercontent.com — Leaflet marker icons
                 //       loaded by react-leaflet
-                `script-src 'self' https://accounts.google.com https://checkout.razorpay.com https://raw.githubusercontent.com 'unsafe-inline' 'unsafe-eval'`,
+                //     - www.gstatic.com           — Firebase FCM SW scripts
+                `script-src 'self' https://accounts.google.com https://checkout.razorpay.com https://raw.githubusercontent.com https://www.gstatic.com 'unsafe-inline' 'unsafe-eval'`,
 
                 // ── style-src ───────────────────────────────────────────
                 //   'unsafe-inline' — Next.js injects inline styles for
@@ -93,9 +94,11 @@ const nextConfig = {
                 //   router.project-osrm.org     — route/path calculations
                 //   api.razorpay.com            — Razorpay payment gateway
                 //                                backend API calls from SDK
+                //   fcm.googleapis.com          — Firebase Cloud Messaging
+                //   www.gstatic.com             — Firebase SW CDN scripts
                 //   wss:                        — WebSocket connections
                 //                                (dynamic WS_URL per env)
-                `connect-src 'self' http://localhost:8001 https://nominatim.openstreetmap.org https://router.project-osrm.org https://*.tile.openstreetmap.org https://api.razorpay.com https://ip-api.com wss:`,
+                `connect-src 'self' http://localhost:8001 https://nominatim.openstreetmap.org https://router.project-osrm.org https://*.tile.openstreetmap.org https://api.razorpay.com https://ip-api.com https://fcm.googleapis.com https://www.gstatic.com wss:`,
 
                 // ── font-src ────────────────────────────────────────────
                 `font-src 'self' data:`,

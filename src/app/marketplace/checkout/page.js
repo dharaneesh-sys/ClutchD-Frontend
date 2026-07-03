@@ -423,7 +423,8 @@ export default function CheckoutPage() {
               </Button>
 
               <p className="text-center text-xs text-text-dim">
-                This is a demo. No real payment will be processed.
+                Your payment is securely processed. No real charges will be made
+                for this order.
               </p>
             </div>
           </div>

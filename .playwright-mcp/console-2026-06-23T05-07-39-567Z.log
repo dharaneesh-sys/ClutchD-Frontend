@@ -1,0 +1,5 @@
+[     192ms] [ERROR] Loading the stylesheet 'https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap' violates the following Content Security Policy directive: "style-src 'self' 'unsafe-inline' https://unpkg.com". Note that 'style-src-elem' was not explicitly set, so 'style-src' is used as a fallback. The action has been blocked. @ http://localhost:3000/auth:0
+[     356ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ http://localhost:3000/_next/static/chunks/0m.-_next_dist_0joglub._.js:1074
+[     396ms] [LOG] [HMR] connected @ http://localhost:3000/_next/static/chunks/0m.-_next_dist_0joglub._.js:1074
+[     607ms] [ERROR] Failed to load resource: net::ERR_FAILED @ https://accounts.google.com/gsi/client:0
+[     670ms] [VERBOSE] [DOM] Input elements should have autocomplete attributes (suggested: "current-password"): (More info: https://goo.gl/9p2vKq) %o @ http://localhost:3000/auth:0

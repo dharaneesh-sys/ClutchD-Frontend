@@ -20,53 +20,6 @@ import { useAuthStore } from "@/store/authStore";
 import { useToastStore } from "@/store/toastStore";
 import api from "@/lib/api";
 
-// ─── Demo fallback data ──────────────────────────────────────────────
-
-const DEMO_REFERRAL = {
-  code: "CLUTCHD-A1B2C3",
-  reward_balance: 500,
-  total_referrals: 3,
-  share_link: "https://clutchd.app/auth?ref=CLUTCHD-A1B2C3",
-};
-
-const DEMO_REWARDS = [
-  {
-    id: 1,
-    referred_email: "ravi@example.com",
-    amount: 100,
-    status: "credited",
-    created_at: new Date(Date.now() - 86400000 * 5).toISOString(),
-  },
-  {
-    id: 2,
-    referred_email: "priya@example.com",
-    amount: 100,
-    status: "credited",
-    created_at: new Date(Date.now() - 86400000 * 12).toISOString(),
-  },
-  {
-    id: 3,
-    referred_email: "suresh@example.com",
-    amount: 100,
-    status: "credited",
-    created_at: new Date(Date.now() - 86400000 * 20).toISOString(),
-  },
-  {
-    id: 4,
-    referred_email: "anita@example.com",
-    amount: 100,
-    status: "pending",
-    created_at: new Date(Date.now() - 1800000).toISOString(),
-  },
-  {
-    id: 5,
-    referred_email: "vikram@example.com",
-    amount: 100,
-    status: "pending",
-    created_at: new Date(Date.now() - 86400000 * 2).toISOString(),
-  },
-];
-
 const REWARD_STATUS_CONFIG = {
   credited: { variant: "success", label: "Credited" },
   pending: { variant: "warning", label: "Pending" },
@@ -318,39 +271,42 @@ export default function ReferPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [copied, setCopied] = useState(false);
 
-  const fetchData = useCallback(async () => {
-    setIsLoading(true);
-
-    try {
-      const { data } = await api.get("/referral/my-code");
-      setReferral(data || DEMO_REFERRAL);
-    } catch {
-      // Generate code from user ID
-      const snippet = user?.id
-        ? user.id.replace(/[^a-zA-Z0-9]/g, "").slice(0, 6).toUpperCase()
-        : "USER";
-      setReferral({
-        code: `CLUTCHD-${snippet}`,
-        reward_balance: 500,
-        total_referrals: 3,
-        share_link: `https://clutchd.app/auth?ref=CLUTCHD-${snippet}`,
-      });
-    }
-
-    try {
-      const { data } = await api.get("/referral/history");
-      const fetched = data?.rewards || data || [];
-      setRewards(fetched.length > 0 ? fetched : DEMO_REWARDS);
-    } catch {
-      setRewards(DEMO_REWARDS);
-    }
-
-    setIsLoading(false);
-  }, [user]);
-
   useEffect(() => {
-    fetchData();
-  }, [fetchData]);
+    let cancelled = false;
+    (async () => {
+      setIsLoading(true);
+
+      try {
+        const { data } = await api.get("/referral/my-code");
+        if (cancelled) return;
+        setReferral(data || null);
+      } catch {
+        if (cancelled) return;
+        // Generate code from user ID
+        const snippet = user?.id
+          ? user.id.replace(/[^a-zA-Z0-9]/g, "").slice(0, 6).toUpperCase()
+          : "USER";
+        setReferral({
+          code: `CLUTCHD-${snippet}`,
+          reward_balance: 0,
+          total_referrals: 0,
+          share_link: `https://clutchd.app/auth?ref=CLUTCHD-${snippet}`,
+        });
+      }
+
+      if (cancelled) return;
+      try {
+        const { data } = await api.get("/referral/history");
+        const fetched = data?.rewards || data || [];
+        setRewards(fetched || []);
+      } catch {
+        setRewards([]);
+      }
+
+      if (!cancelled) setIsLoading(false);
+    })();
+    return () => { cancelled = true; };
+  }, [user]);
 
   const handleCopy = useCallback(async () => {
     if (!referral?.share_link) return;

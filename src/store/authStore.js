@@ -3,6 +3,7 @@ import { persist } from "zustand/middleware";
 import api from "@/lib/api";
 import { connectWebSocket, disconnectWebSocket } from "@/lib/socket";
 import { setAccessToken, getAccessToken, clearAccessToken } from "@/lib/tokenStore";
+import { cacheUserProfile } from "@/lib/offline/offlineCache";
 
 /**
  * Clear ALL client-side storage — localStorage, sessionStorage, and cookies
@@ -167,6 +168,7 @@ export const useAuthStore = create(
           }
           
           set({ user: response.data.user, isAuthenticated: true, _hydrated: true, isLoading: false });
+          cacheUserProfile(response.data.user);
           return response.data.user;
           
         } catch (error) {
@@ -203,6 +205,7 @@ export const useAuthStore = create(
             _hydrated: true,
             isLoading: false,
           });
+          cacheUserProfile(response.data.user);
           return response.data.user;
         } catch (error) {
           const msg =
@@ -227,6 +230,7 @@ export const useAuthStore = create(
           }
           
           set({ user: response.data.user, isAuthenticated: true, _hydrated: true, isLoading: false });
+          cacheUserProfile(response.data.user);
           return response.data.user;
           
         } catch (error) {
@@ -253,8 +257,16 @@ export const useAuthStore = create(
       },
 
       clearError: () => set({ error: null }),
-      setUser: (user) => set({ user, isAuthenticated: !!user, _hydrated: true }),
-      updateUserData: (userData) => set((state) => ({ user: { ...state.user, ...userData } })),
+      setUser: (user) => {
+        set({ user, isAuthenticated: !!user, _hydrated: true });
+        if (user) cacheUserProfile(user);
+      },
+      updateUserData: (userData) =>
+        set((state) => {
+          const updated = { ...state.user, ...userData };
+          cacheUserProfile(updated);
+          return { user: updated };
+        }),
       setDemoUser: (user) => {
         if (typeof window !== "undefined") {
           setAccessToken("demo-jwt-token-12345");

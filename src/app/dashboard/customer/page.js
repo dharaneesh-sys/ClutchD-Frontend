@@ -12,6 +12,7 @@ import { useTrackingStore } from "@/store/trackingStore";
 import { useDemoMode } from "@/lib/demo/demoMode";
 import { ServiceRequestPanel } from "@/components/dashboard/ServiceRequestPanel";
 import { ServiceStatusTracker } from "@/components/dashboard/ServiceStatusTracker";
+import { ETAIndicator } from "@/components/dashboard/ETAIndicator";
 import { ProviderList } from "@/components/dashboard/ProviderList";
 import { PaymentModal } from "@/components/dashboard/PaymentModal";
 import { ReviewModal } from "@/components/dashboard/ReviewModal";
@@ -57,6 +58,7 @@ const TABS = [
 export default function CustomerDashboard() {
   const { user, logout, isAuthenticated, _hydrated } = useAuthStore();
   const { activeRequest, createRequest, cancelRequest, restoreActiveRequest } = useServiceStore();
+  const { mechanicLocation, userLocation } = useTrackingStore();
   const updateRequestStatus = useCallback(
     (...args) => useServiceStore.getState().updateRequestStatus(...args),
     []
@@ -264,11 +266,18 @@ export default function CustomerDashboard() {
                 <ProviderList />
               </>
             ) : (
-              <ServiceStatusTracker
-                request={activeRequest}
-                onComplete={handlePaymentInitiate}
-                onCancel={handleCancelRequest}
-              />
+              <>
+                <ServiceStatusTracker
+                  request={activeRequest}
+                  onComplete={handlePaymentInitiate}
+                  onCancel={handleCancelRequest}
+                />
+                <ETAIndicator
+                  mechanicLocation={mechanicLocation}
+                  userLocation={userLocation}
+                  status={activeRequest.status}
+                />
+              </>
             )}
           </div>
         </div>

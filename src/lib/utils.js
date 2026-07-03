@@ -68,3 +68,20 @@ export function estimatePrice(issueTag) {
 export function generateId() {
   return Math.random().toString(36).substring(2, 11);
 }
+
+/**
+ * Check whether the app is running inside a specific platform context.
+ *
+ * @param {"capacitor" | "web"} platform
+ * @returns {boolean}
+ */
+export function isPlatform(platform) {
+  if (typeof window === "undefined") return false;
+
+  if (platform === "capacitor") {
+    return !!(window.Capacitor || window.__CAPACITOR__);
+  }
+
+  // web is the default / fallback
+  return true;
+}

@@ -43,7 +43,7 @@ function PaymentModalContent({ isOpen, onClose, amount, pricing, jobId, onSucces
   const { error: showError, success: showSuccess } = useToast();
 
   // Use the finalized total if available, else fall back to passed amount
-  const displayAmount = pricing?.totalAmount ?? amount ?? 0;
+  const displayAmount = Number(pricing?.totalAmount ?? amount ?? 0);
 
   // Cleanup QR poll on unmount
   useEffect(() => {
@@ -54,7 +54,7 @@ function PaymentModalContent({ isOpen, onClose, amount, pricing, jobId, onSucces
 
   useEffect(() => {
     if (payState === "success") {
-      showSuccess(`₹${displayAmount.toFixed(2)} paid successfully`);
+      showSuccess(`₹${Number(displayAmount).toFixed(2)} paid successfully`);
     }
   }, [payState, displayAmount, showSuccess]);
 
@@ -232,7 +232,7 @@ function PaymentModalContent({ isOpen, onClose, amount, pricing, jobId, onSucces
             <CheckCircle2 size={40} className="text-icon-highlight" />
           </div>
           <h3 className="text-xl font-bold mb-2 text-text-primary">Payment Complete!</h3>
-          <p className="text-sm text-text-muted">₹{displayAmount.toFixed(2)} paid successfully</p>
+          <p className="text-sm text-text-muted">₹{Number(displayAmount).toFixed(2)} paid successfully</p>
         </div>
       </Modal>
     );
@@ -242,7 +242,7 @@ function PaymentModalContent({ isOpen, onClose, amount, pricing, jobId, onSucces
     <Modal isOpen={isOpen} onClose={onClose} title="Complete Payment">
       <div className="text-center mb-4">
         <p className="text-sm mb-1 text-text-muted">Total Amount Due</p>
-        <p className="text-4xl font-bold tracking-tight text-text-primary">₹{displayAmount.toFixed(2)}</p>
+        <p className="text-4xl font-bold tracking-tight text-text-primary">₹{Number(displayAmount).toFixed(2)}</p>
       </div>
 
       {/* Itemized breakdown toggle */}
@@ -325,7 +325,7 @@ function PaymentModalContent({ isOpen, onClose, amount, pricing, jobId, onSucces
           <div className="w-44 h-44 bg-white p-2 rounded-lg mx-auto mb-3 border-2 border-border-subtle">
             <Image src={qrData.image_url} alt={`QR code for ₹${displayAmount.toFixed(2)}`} width={176} height={176} className="w-full h-full object-contain" unoptimized />
           </div>
-          <p className="text-sm font-medium mb-1 text-text-primary">Scan to Pay ₹{displayAmount.toFixed(2)}</p>
+          <p className="text-sm font-medium mb-1 text-text-primary">Scan to Pay ₹{Number(displayAmount).toFixed(2)}</p>
           <p className="text-xs text-text-muted">Waiting for payment...</p>
           <div className="flex items-center justify-center gap-2 mt-2">
             <Loader2 size={14} className="animate-spin text-icon-highlight" />

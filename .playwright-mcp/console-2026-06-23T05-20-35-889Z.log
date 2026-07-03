@@ -1,0 +1,28 @@
+[     194ms] [ERROR] Loading the stylesheet 'https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap' violates the following Content Security Policy directive: "style-src 'self' 'unsafe-inline' https://unpkg.com". Note that 'style-src-elem' was not explicitly set, so 'style-src' is used as a fallback. The action has been blocked. @ http://localhost:3000/dashboard/customer:0
+[     474ms] [LOG] [Client Instrumentation Hook] Slow execution detected: 38ms (Note: Code download overhead is not included in this measurement) @ http://localhost:3000/_next/static/chunks/0m.-_next_dist_0joglub._.js:703
+[     546ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ http://localhost:3000/_next/static/chunks/0m.-_next_dist_0joglub._.js:1074
+[     920ms] [LOG] [HMR] connected @ http://localhost:3000/_next/static/chunks/0m.-_next_dist_0joglub._.js:1074
+[    1285ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/0m.-_next_dist_0joglub._.js:1074
+[    1343ms] [LOG] [Fast Refresh] done in 168ms @ http://localhost:3000/_next/static/chunks/0m.-_next_dist_0joglub._.js:1074
+[    7454ms] [ERROR] Loading the stylesheet 'https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap' violates the following Content Security Policy directive: "style-src 'self' 'unsafe-inline' https://unpkg.com". Note that 'style-src-elem' was not explicitly set, so 'style-src' is used as a fallback. The action has been blocked. @ http://localhost:3000/dashboard/customer:0
+[    7702ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ http://localhost:3000/_next/static/chunks/0m.-_next_dist_0joglub._.js:1074
+[    7778ms] [LOG] [HMR] connected @ http://localhost:3000/_next/static/chunks/0m.-_next_dist_0joglub._.js:1074
+[    8958ms] [WARNING] GPS error (code 1): User denied Geolocation @ http://localhost:3000/_next/static/chunks/0m.-_next_dist_0joglub._.js:1074
+[    8971ms] [WARNING] GPS error (code 1): User denied Geolocation @ http://localhost:3000/_next/static/chunks/0m.-_next_dist_0joglub._.js:1074
+[    9052ms] [ERROR] Failed to load resource: net::ERR_FAILED @ https://a.tile.openstreetmap.org/13/5846/3843.png:0
+[    9052ms] [ERROR] Failed to load resource: net::ERR_FAILED @ https://a.tile.openstreetmap.org/13/5847/3843.png:0
+[    9052ms] [ERROR] Failed to load resource: net::ERR_FAILED @ https://a.tile.openstreetmap.org/13/5846/3844.png:0
+[    9052ms] [ERROR] Failed to load resource: net::ERR_FAILED @ https://a.tile.openstreetmap.org/13/5847/3844.png:0
+[    9053ms] [ERROR] Failed to load resource: net::ERR_FAILED @ https://a.tile.openstreetmap.org/13/5845/3843.png:0
+[    9053ms] [ERROR] Failed to load resource: net::ERR_FAILED @ https://a.tile.openstreetmap.org/13/5848/3843.png:0
+[    9057ms] [ERROR] Failed to load resource: net::ERR_FAILED @ https://a.tile.openstreetmap.org/13/5845/3844.png:0
+[    9057ms] [ERROR] Failed to load resource: net::ERR_FAILED @ https://a.tile.openstreetmap.org/13/5848/3844.png:0
+[    9057ms] [WARNING] GPS error (code 1): User denied Geolocation @ http://localhost:3000/_next/static/chunks/0m.-_next_dist_0joglub._.js:1074
+[    9092ms] [WARNING] Tile failed: https://a.tile.openstreetmap.org/13/5846/3843.png @ http://localhost:3000/_next/static/chunks/0m.-_next_dist_0joglub._.js:1074
+[    9093ms] [WARNING] Tile failed: https://a.tile.openstreetmap.org/13/5847/3843.png @ http://localhost:3000/_next/static/chunks/0m.-_next_dist_0joglub._.js:1074
+[    9093ms] [WARNING] Tile failed: https://a.tile.openstreetmap.org/13/5846/3844.png @ http://localhost:3000/_next/static/chunks/0m.-_next_dist_0joglub._.js:1074
+[    9094ms] [WARNING] Tile failed: https://a.tile.openstreetmap.org/13/5847/3844.png @ http://localhost:3000/_next/static/chunks/0m.-_next_dist_0joglub._.js:1074
+[    9094ms] [WARNING] Tile failed: https://a.tile.openstreetmap.org/13/5845/3843.png @ http://localhost:3000/_next/static/chunks/0m.-_next_dist_0joglub._.js:1074
+[    9095ms] [WARNING] Tile failed: https://a.tile.openstreetmap.org/13/5848/3843.png @ http://localhost:3000/_next/static/chunks/0m.-_next_dist_0joglub._.js:1074
+[    9104ms] [WARNING] Tile failed: https://a.tile.openstreetmap.org/13/5845/3844.png @ http://localhost:3000/_next/static/chunks/0m.-_next_dist_0joglub._.js:1074
+[    9104ms] [WARNING] Tile failed: https://a.tile.openstreetmap.org/13/5848/3844.png @ http://localhost:3000/_next/static/chunks/0m.-_next_dist_0joglub._.js:1074

@@ -17,50 +17,6 @@ import { useRouter } from "next/navigation";
 import { useToastStore } from "@/store/toastStore";
 import api from "@/lib/api";
 
-// ─── Demo fallback data ──────────────────────────────────────────────
-
-const DEMO_FAVORITES = [
-  {
-    id: "fav-demo-1",
-    product_id: "prod-demo-1",
-    created_at: new Date(Date.now() - 86400000 * 3).toISOString(),
-    product: {
-      id: "prod-demo-1",
-      name: "Premium Engine Oil - 5W30",
-      price: 2499,
-      image_url: null,
-      rating: 4.5,
-      category_name: "Engine & Performance",
-    },
-  },
-  {
-    id: "fav-demo-2",
-    product_id: "prod-demo-2",
-    created_at: new Date(Date.now() - 86400000 * 7).toISOString(),
-    product: {
-      id: "prod-demo-2",
-      name: "LED Headlight Bulbs (Pair)",
-      price: 1899,
-      image_url: null,
-      rating: 4.2,
-      category_name: "Lighting",
-    },
-  },
-  {
-    id: "fav-demo-3",
-    product_id: "prod-demo-3",
-    created_at: new Date(Date.now() - 86400000 * 14).toISOString(),
-    product: {
-      id: "prod-demo-3",
-      name: "Car Air Freshener - Ocean Breeze (Pack of 3)",
-      price: 399,
-      image_url: null,
-      rating: 4.8,
-      category_name: "Interior Accessories",
-    },
-  },
-];
-
 // ─── Star Rating ─────────────────────────────────────────────────────
 
 function StarRating({ rating }) {
@@ -74,7 +30,7 @@ function StarRating({ rating }) {
         <Star key={`full-${i}`} size={12} className="fill-amber-400 text-amber-400" />
       ))}
       {half && <StarHalf size={12} className="fill-amber-400 text-amber-400" />}
-      <span className="text-[11px] text-text-muted ml-1">{rating.toFixed(1)}</span>
+      <span className="text-[11px] text-text-muted ml-1">{Number(rating).toFixed(1)}</span>
     </div>
   );
 }
@@ -173,7 +129,7 @@ export default function FavoritesPage() {
       setFavorites(res.data.favorites || []);
     } catch (err) {
       setError("Could not load favorites. Showing saved items.");
-      setFavorites(DEMO_FAVORITES);
+      setFavorites([]);
     } finally {
       setIsLoading(false);
     }

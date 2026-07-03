@@ -6,6 +6,7 @@ import { ConfirmModal } from "@/components/ui/ConfirmModal";
 import { Trash2, Plus, Car, Loader2, AlertTriangle } from "lucide-react";
 import api from "@/lib/api";
 import { extractApiError } from "@/lib/api";
+import { cacheVehicleData } from "@/lib/offline/offlineCache";
 
 export function VehicleManagerModal({ isOpen, onClose, onVehiclesChanged }) {
   const [vehicles, setVehicles] = useState([]);
@@ -29,6 +30,7 @@ export function VehicleManagerModal({ isOpen, onClose, onVehiclesChanged }) {
     try {
       const res = await api.get("/vehicles");
       setVehicles(res.data);
+      await cacheVehicleData(res.data);
     } catch (e) {
       console.warn("Failed to fetch vehicles", e);
     } finally {
@@ -70,7 +72,9 @@ export function VehicleManagerModal({ isOpen, onClose, onVehiclesChanged }) {
     setDeletingId(id);
     try {
       await api.delete(`/vehicles/${id}`);
-      setVehicles(prev => prev.filter(v => v.id !== id));
+      const updated = vehicles.filter(v => v.id !== id);
+      setVehicles(updated);
+      await cacheVehicleData(updated);
       if (onVehiclesChanged) onVehiclesChanged();
       setDeleteConfirmId(null);
     } catch (e) {

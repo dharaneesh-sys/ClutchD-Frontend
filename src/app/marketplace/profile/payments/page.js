@@ -43,56 +43,6 @@ const METHOD_LABELS = {
   net_banking: "Net Banking",
 };
 
-// ─── Demo fallback data ──────────────────────────────────────────────
-
-const DEMO_PAYMENTS = [
-  {
-    id: "pay-demo-1",
-    amount: 2850,
-    currency: "INR",
-    provider: "razorpay",
-    status: "completed",
-    method: "upi",
-    created_at: new Date(Date.now() - 3600000 * 2).toISOString(),
-  },
-  {
-    id: "pay-demo-2",
-    amount: 1200,
-    currency: "INR",
-    provider: "razorpay",
-    status: "completed",
-    method: "card",
-    created_at: new Date(Date.now() - 86400000 * 3).toISOString(),
-  },
-  {
-    id: "pay-demo-3",
-    amount: 450,
-    currency: "INR",
-    provider: "cash",
-    status: "completed",
-    method: "cash",
-    created_at: new Date(Date.now() - 86400000 * 7).toISOString(),
-  },
-  {
-    id: "pay-demo-4",
-    amount: 3200,
-    currency: "INR",
-    provider: "razorpay",
-    status: "pending",
-    method: "upi",
-    created_at: new Date(Date.now() - 1800000).toISOString(),
-  },
-  {
-    id: "pay-demo-5",
-    amount: 1500,
-    currency: "INR",
-    provider: "razorpay",
-    status: "failed",
-    method: "card",
-    created_at: new Date(Date.now() - 86400000).toISOString(),
-  },
-];
-
 // ─── Payment Card ────────────────────────────────────────────────────
 
 function PaymentCard({ payment, onDownload }) {
@@ -175,9 +125,9 @@ export default function PaymentsPage() {
     try {
       const { data } = await api.get("/payments/history");
       const fetched = data?.payments || data || [];
-      setPayments(fetched.length > 0 ? fetched : DEMO_PAYMENTS);
+      setPayments(fetched || []);
     } catch {
-      setPayments(DEMO_PAYMENTS);
+      setPayments([]);
     } finally {
       setIsLoading(false);
     }

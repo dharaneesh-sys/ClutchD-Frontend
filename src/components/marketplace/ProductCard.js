@@ -135,7 +135,7 @@ export function ProductCard({ product, className }) {
         <div className="flex items-center gap-1.5">
           <Star size={12} className="fill-amber-400 text-amber-400" />
           <span className="text-xs font-medium text-text-muted">
-            {rating.toFixed(1)}
+            {Number(rating).toFixed(1)}
           </span>
         </div>
 

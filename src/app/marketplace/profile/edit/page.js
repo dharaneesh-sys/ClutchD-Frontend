@@ -10,13 +10,7 @@ import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import api from "@/lib/api";
 
-const DEMO_PROFILE = {
-  name: "Rahul Sharma",
-  email: "rahul.sharma@example.com",
-  phone: "+91 98765 43210",
-  address: "42, MG Road, Indiranagar, Bangalore - 560038",
-  photo: null,
-};
+
 
 function validateForm({ name, phone, address }) {
   const errors = {};
@@ -63,12 +57,11 @@ export default function EditProfilePage() {
         });
         if (p.photo) setPhotoPreview(p.photo);
       } catch {
-        // Demo fallback
         setForm({
-          name: user?.name || DEMO_PROFILE.name,
-          phone: user?.phone || DEMO_PROFILE.phone,
-          email: user?.email || DEMO_PROFILE.email,
-          address: user?.address || DEMO_PROFILE.address,
+          name: user?.name || "",
+          phone: user?.phone || "",
+          email: user?.email || "",
+          address: "",
         });
       } finally {
         setIsLoading(false);

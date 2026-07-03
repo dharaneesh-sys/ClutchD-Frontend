@@ -16,7 +16,7 @@ import {
   ChevronRight,
 } from "lucide-react";
 
-const MOCK_STATS = {
+const DEFAULT_STATS = {
   totalReferrals: 0,
   rewardsEarned: 0,
   referralBonus: 250,
@@ -112,7 +112,7 @@ export function ReferralPanel({ className, onNavigateBack }) {
     }
   }, [referralCode, referralLink, handleCopyLink, toast]);
 
-  const stats = MOCK_STATS;
+  const stats = DEFAULT_STATS;
   const remaining = Math.max(0, stats.maxRewards - stats.rewardsEarned);
 
   return (

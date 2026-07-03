@@ -79,6 +79,20 @@ export const connectWebSocket = (token) => {
           }
         }).catch(() => {});
       }
+
+      // Handle real-time chat messages
+      if (data.type === "CHAT_MESSAGE" && data.payload) {
+        import("../store/chatStore").then((m) => {
+          m.useChatStore.getState().receiveMessage(data.payload.jobId, data.payload);
+        }).catch(() => {});
+      }
+
+      // Handle chat read receipts
+      if (data.type === "CHAT_READ" && data.payload?.jobId) {
+        import("../store/chatStore").then((m) => {
+          m.useChatStore.getState().markRead(data.payload.jobId);
+        }).catch(() => {});
+      }
     } catch (err) {
       console.warn("[WebSocket] Failed to parse message", err);
     }
@@ -142,6 +156,19 @@ export const sendMechanicLocation = (lat, lon) => {
   if (wsInstance && wsInstance.readyState === WebSocket.OPEN) {
     wsInstance.send(JSON.stringify({ type: "MECHANIC_LOCATION", lat, lon }));
   }
+};
+
+/**
+ * Send an arbitrary JSON message over the WebSocket.
+ * Returns true if sent, false if the socket is not connected.
+ * Used by chatService and any other module that needs to push WS messages.
+ */
+export const sendWSMessage = (data) => {
+  if (wsInstance && wsInstance.readyState === WebSocket.OPEN) {
+    wsInstance.send(JSON.stringify(data));
+    return true;
+  }
+  return false;
 };
 
 /**

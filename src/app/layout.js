@@ -5,10 +5,9 @@ import { AuthInit } from "@/components/ui/AuthInit";
 import { ErrorBoundary } from "@/components/ui/ErrorBoundary";
 import { DEMO_MODE } from "@/lib/demo/demoFlag";
 import { ToastProvider } from "@/components/ui/ToastProvider";
-import { ProfileFAB } from "@/components/ui/ProfileFAB";
 import DemoModeClient from "@/components/ui/DemoModeClient";
 import { DemoModeProvider } from "@/lib/demo/demoModeProvider";
-import { SettingsButton } from "@/components/ui/SettingsButton";
+import { BackButtonHandler } from "@/components/ui/BackButtonHandler";
 import DynamicI18nProvider from "@/lib/i18n/DynamicI18nProvider";
 
 export const metadata = {
@@ -100,8 +99,7 @@ export default function RootLayout({ children }) {
               <ErrorBoundary>
                 <div id="main-content">{children}</div>
               </ErrorBoundary>
-              <ProfileFAB />
-              <SettingsButton />
+              <BackButtonHandler />
               <DemoModeClient show={DEMO_MODE} />
               <ToastProvider />
             </ThemeProvider>

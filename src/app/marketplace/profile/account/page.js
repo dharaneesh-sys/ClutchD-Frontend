@@ -17,15 +17,7 @@ import { useAuthStore } from "@/store/authStore";
 import { Button } from "@/components/ui/Button";
 import api from "@/lib/api";
 
-const DEMO_PROFILE = {
-  name: "Rahul Sharma",
-  email: "rahul.sharma@example.com",
-  phone: "+91 98765 43210",
-  address: "42, MG Road, Indiranagar, Bangalore – 560038",
-  role: "customer",
-  createdAt: "2025-08-15T00:00:00.000Z",
-  photo: null,
-};
+
 
 export default function AccountDetailsPage() {
   const { user } = useAuthStore();
@@ -47,14 +39,14 @@ export default function AccountDetailsPage() {
         }
       } catch (err) {
         if (!cancelled) {
-          // Fall back to demo data
           setProfile({
-            ...DEMO_PROFILE,
-            email: user?.email || DEMO_PROFILE.email,
-            name: user?.name || DEMO_PROFILE.name,
-            phone: user?.phone || DEMO_PROFILE.phone,
-            role: user?.role || DEMO_PROFILE.role,
-            createdAt: user?.createdAt || DEMO_PROFILE.createdAt,
+            name: user?.name || null,
+            email: user?.email || null,
+            phone: user?.phone || null,
+            address: null,
+            role: user?.role || "customer",
+            createdAt: user?.createdAt || null,
+            photo: null,
           });
         }
       } finally {

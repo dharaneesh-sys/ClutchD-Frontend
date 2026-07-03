@@ -1,0 +1,31 @@
+[     220ms] [ERROR] Loading the stylesheet 'https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap' violates the following Content Security Policy directive: "style-src 'self' 'unsafe-inline' https://unpkg.com". Note that 'style-src-elem' was not explicitly set, so 'style-src' is used as a fallback. The action has been blocked. @ http://localhost:3000/dashboard/customer:0
+[     507ms] [LOG] [Client Instrumentation Hook] Slow execution detected: 38ms (Note: Code download overhead is not included in this measurement) @ http://localhost:3000/_next/static/chunks/0m.-_next_dist_0joglub._.js:703
+[     572ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ http://localhost:3000/_next/static/chunks/0m.-_next_dist_0joglub._.js:1074
+[     926ms] [LOG] [HMR] connected @ http://localhost:3000/_next/static/chunks/0m.-_next_dist_0joglub._.js:1074
+[    1303ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/0m.-_next_dist_0joglub._.js:1074
+[    1370ms] [LOG] [Fast Refresh] done in 196ms @ http://localhost:3000/_next/static/chunks/0m.-_next_dist_0joglub._.js:1074
+[    7833ms] [ERROR] Loading the stylesheet 'https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap' violates the following Content Security Policy directive: "style-src 'self' 'unsafe-inline' https://unpkg.com". Note that 'style-src-elem' was not explicitly set, so 'style-src' is used as a fallback. The action has been blocked. @ http://localhost:3000/dashboard/customer:0
+[    8096ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ http://localhost:3000/_next/static/chunks/0m.-_next_dist_0joglub._.js:1074
+[    8160ms] [LOG] [HMR] connected @ http://localhost:3000/_next/static/chunks/0m.-_next_dist_0joglub._.js:1074
+[    8906ms] [WARNING] GPS error (code 1): User denied Geolocation @ http://localhost:3000/_next/static/chunks/0m.-_next_dist_0joglub._.js:1074
+[    8917ms] [WARNING] GPS error (code 1): User denied Geolocation @ http://localhost:3000/_next/static/chunks/0m.-_next_dist_0joglub._.js:1074
+[    9017ms] [ERROR] Failed to load resource: net::ERR_FAILED @ https://a.tile.openstreetmap.org/13/5846/3843.png:0
+[    9017ms] [ERROR] Failed to load resource: net::ERR_FAILED @ https://a.tile.openstreetmap.org/13/5847/3843.png:0
+[    9017ms] [ERROR] Failed to load resource: net::ERR_FAILED @ https://a.tile.openstreetmap.org/13/5846/3844.png:0
+[    9017ms] [ERROR] Failed to load resource: net::ERR_FAILED @ https://a.tile.openstreetmap.org/13/5847/3844.png:0
+[    9017ms] [ERROR] Failed to load resource: net::ERR_FAILED @ https://a.tile.openstreetmap.org/13/5845/3843.png:0
+[    9018ms] [ERROR] Failed to load resource: net::ERR_FAILED @ https://a.tile.openstreetmap.org/13/5848/3843.png:0
+[    9018ms] [ERROR] Failed to load resource: net::ERR_FAILED @ https://a.tile.openstreetmap.org/13/5845/3844.png:0
+[    9019ms] [ERROR] Failed to load resource: net::ERR_FAILED @ https://a.tile.openstreetmap.org/13/5848/3844.png:0
+[    9027ms] [WARNING] GPS error (code 1): User denied Geolocation @ http://localhost:3000/_next/static/chunks/0m.-_next_dist_0joglub._.js:1074
+[    9051ms] [WARNING] Tile failed: https://a.tile.openstreetmap.org/13/5846/3843.png @ http://localhost:3000/_next/static/chunks/0m.-_next_dist_0joglub._.js:1074
+[    9052ms] [WARNING] Tile failed: https://a.tile.openstreetmap.org/13/5847/3843.png @ http://localhost:3000/_next/static/chunks/0m.-_next_dist_0joglub._.js:1074
+[    9052ms] [WARNING] Tile failed: https://a.tile.openstreetmap.org/13/5846/3844.png @ http://localhost:3000/_next/static/chunks/0m.-_next_dist_0joglub._.js:1074
+[    9053ms] [WARNING] Tile failed: https://a.tile.openstreetmap.org/13/5847/3844.png @ http://localhost:3000/_next/static/chunks/0m.-_next_dist_0joglub._.js:1074
+[    9053ms] [WARNING] Tile failed: https://a.tile.openstreetmap.org/13/5845/3843.png @ http://localhost:3000/_next/static/chunks/0m.-_next_dist_0joglub._.js:1074
+[    9054ms] [WARNING] Tile failed: https://a.tile.openstreetmap.org/13/5848/3843.png @ http://localhost:3000/_next/static/chunks/0m.-_next_dist_0joglub._.js:1074
+[    9055ms] [WARNING] Tile failed: https://a.tile.openstreetmap.org/13/5845/3844.png @ http://localhost:3000/_next/static/chunks/0m.-_next_dist_0joglub._.js:1074
+[    9056ms] [WARNING] Tile failed: https://a.tile.openstreetmap.org/13/5848/3844.png @ http://localhost:3000/_next/static/chunks/0m.-_next_dist_0joglub._.js:1074
+[   40098ms] [ERROR] Loading the image 'http://a.tile.openstreetmap.org/13/5846/3843.png?_t=1782192133737' violates the following Content Security Policy directive: "img-src 'self' data: https: blob:". The action has been blocked. @ http://localhost:3000/dashboard/customer:0
+[   59130ms] [ERROR] Connecting to 'https://httpbin.org/get' violates the following Content Security Policy directive: "connect-src 'self' http://localhost:8001 https://nominatim.openstreetmap.org https://router.project-osrm.org https://api.razorpay.com wss:". The action has been blocked. @ :0
+[   59130ms] [ERROR] Fetch API cannot load https://httpbin.org/get. Refused to connect because it violates the document's Content Security Policy. @ :0

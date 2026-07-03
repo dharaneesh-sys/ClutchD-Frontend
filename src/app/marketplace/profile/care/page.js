@@ -23,9 +23,9 @@ import { useToastStore } from "@/store/toastStore";
 import { useAuthStore } from "@/store/authStore";
 import api from "@/lib/api";
 
-// ─── Demo contact data ───────────────────────────────────────────────
+// ─── Contact information ─────────────────────────────────────────────
 
-const DEMO_CONTACT = {
+const CONTACT_INFO = {
   phone: "+91 98765 43210",
   whatsapp: "+919876543210",
   email: "support@clutchd.app",
@@ -47,25 +47,6 @@ const TICKET_STATUS_CONFIG = {
   resolved: { variant: "success", label: "Resolved" },
   closed: { variant: "default", label: "Closed" },
 };
-
-const DEMO_TICKETS = [
-  {
-    id: "TKT-001",
-    subject: "Payment not reflecting",
-    category: "payment",
-    status: "in_progress",
-    message: "I made a payment but it's not showing in my history.",
-    created_at: new Date(Date.now() - 86400000 * 2).toISOString(),
-  },
-  {
-    id: "TKT-002",
-    subject: "App crashing on startup",
-    category: "technical",
-    status: "resolved",
-    message: "App crashes immediately after opening.",
-    created_at: new Date(Date.now() - 86400000 * 5).toISOString(),
-  },
-];
 
 // ─── Live Chat Modal ─────────────────────────────────────────────────
 
@@ -98,7 +79,7 @@ function LiveChatModal({ isOpen, onClose }) {
             hours and we&apos;ll get back to you within 24 hours.
           </p>
           <p className="text-xs text-text-dim mb-4">
-            Business hours: {DEMO_CONTACT.hours}
+            Business hours: {CONTACT_INFO.hours}
           </p>
           <div className="flex gap-3">
             <Button variant="ghost" className="flex-1" onClick={onClose}>
@@ -107,7 +88,7 @@ function LiveChatModal({ isOpen, onClose }) {
             <Button
               className="flex-1"
               onClick={() => {
-                window.location.href = `mailto:${DEMO_CONTACT.email}`;
+                window.location.href = `mailto:${CONTACT_INFO.email}`;
                 onClose();
               }}
             >
@@ -339,9 +320,9 @@ export default function CarePage() {
     try {
       const { data } = await api.get("/tickets");
       const fetched = data?.tickets || data || [];
-      setTickets(fetched.length > 0 ? fetched : DEMO_TICKETS);
+      setTickets(fetched || []);
     } catch {
-      setTickets(DEMO_TICKETS);
+      setTickets([]);
     } finally {
       setIsLoadingTickets(false);
     }
@@ -368,14 +349,8 @@ export default function CarePage() {
         setTicketSearchResult(null);
       }
     } catch {
-      // Check demo tickets
-      const found = DEMO_TICKETS.find((t) => t.id === id || t.id.toLowerCase() === id.toLowerCase());
-      if (found) {
-        setTicketSearchResult(found);
-      } else {
-        toast.error("Ticket not found. Please check the ticket number.");
-        setTicketSearchResult(null);
-      }
+      toast.error("Ticket not found. Please check the ticket number.");
+      setTicketSearchResult(null);
     } finally {
       setSearchingTicket(false);
     }
@@ -385,22 +360,22 @@ export default function CarePage() {
     {
       icon: MessageCircle,
       label: "WhatsApp",
-      description: `Chat on WhatsApp (${DEMO_CONTACT.whatsapp})`,
-      href: `https://wa.me/${DEMO_CONTACT.whatsapp}`,
+      description: `Chat on WhatsApp (${CONTACT_INFO.whatsapp})`,
+      href: `https://wa.me/${CONTACT_INFO.whatsapp}`,
       color: "bg-emerald-500/15 text-emerald-400",
     },
     {
       icon: Phone,
       label: "Call Us",
-      description: `${DEMO_CONTACT.phone} | ${DEMO_CONTACT.hours}`,
-      href: `tel:${DEMO_CONTACT.phone.replace(/\s/g, "")}`,
+      description: `${CONTACT_INFO.phone} | ${CONTACT_INFO.hours}`,
+      href: `tel:${CONTACT_INFO.phone.replace(/\s/g, "")}`,
       color: "bg-blue-500/15 text-blue-400",
     },
     {
       icon: Mail,
       label: "Email Support",
-      description: DEMO_CONTACT.email,
-      href: `mailto:${DEMO_CONTACT.email}`,
+      description: CONTACT_INFO.email,
+      href: `mailto:${CONTACT_INFO.email}`,
       color: "bg-primary/15 text-primary-light",
     },
   ];
@@ -536,7 +511,7 @@ export default function CarePage() {
       <div className="glass-lux rounded-2xl p-4 text-center">
         <p className="text-xs text-text-muted">
           Business hours:{" "}
-          <span className="text-foreground font-medium">{DEMO_CONTACT.hours}</span>
+          <span className="text-foreground font-medium">{CONTACT_INFO.hours}</span>
         </p>
         <p className="text-[10px] text-text-dim mt-1">
           We typically respond within 24 hours during business days

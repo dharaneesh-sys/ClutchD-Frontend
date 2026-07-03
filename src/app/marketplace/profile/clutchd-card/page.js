@@ -61,56 +61,6 @@ const TIER_CONFIG = {
   },
 };
 
-const DEMO_CARD = {
-  card_number: "CDC-A1B2C3D4",
-  membership_tier: "silver",
-  reward_points: 1250,
-  lifetime_points: 1250,
-  total_orders: 8,
-  total_spent: 28450,
-  created_at: new Date(Date.now() - 86400000 * 90).toISOString(),
-  updated_at: new Date().toISOString(),
-};
-
-const DEMO_OFFERS = [
-  {
-    id: "offer-1",
-    title: "Free Oil Change",
-    description: "Get a complimentary oil change on your next service booking",
-    min_tier: "bronze",
-    discount_percent: 100,
-    discount_cap: 1500,
-    is_active: true,
-  },
-  {
-    id: "offer-2",
-    title: "15% Off Parts",
-    description: "Discount on all engine and performance parts",
-    min_tier: "silver",
-    discount_percent: 15,
-    discount_cap: 2000,
-    is_active: true,
-  },
-  {
-    id: "offer-3",
-    title: "Free Pickup & Drop",
-    description: "Complimentary vehicle pickup and delivery for service",
-    min_tier: "gold",
-    discount_percent: 100,
-    discount_cap: 500,
-    is_active: true,
-  },
-  {
-    id: "offer-4",
-    title: "Priority Support",
-    description: "24/7 priority customer support with dedicated manager",
-    min_tier: "platinum",
-    discount_percent: 0,
-    discount_cap: 0,
-    is_active: true,
-  },
-];
-
 // ─── Helper ─────────────────────────────────────────────────────────
 
 function getTierConfig(tier) {
@@ -253,8 +203,8 @@ export default function ClutchDCardPage() {
       setOffers(offersRes.data.offers || []);
     } catch {
       setError("Could not load card data. Showing preview.");
-      setCard(DEMO_CARD);
-      setOffers(DEMO_OFFERS);
+      setCard(null);
+      setOffers([]);
     } finally {
       setIsLoading(false);
     }

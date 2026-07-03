@@ -21,12 +21,14 @@ import {
   Loader2,
   AlertTriangle,
   Smartphone,
+  Beaker,
 } from "lucide-react";
 import api, { extractApiError } from "@/lib/api";
 import { cn } from "@/lib/utils";
 import { useAuthStore } from "@/store/authStore";
 import { useThemeStore } from "@/store/themeStore";
 import { useToastStore } from "@/store/toastStore";
+import { useDemoMode } from "@/lib/demo/demoContext";
 import { navigateToAuth } from "@/lib/navigation";
 import { Button } from "@/components/ui/Button";
 import { Modal } from "@/components/ui/Modal";
@@ -36,10 +38,10 @@ import { Skeleton } from "@/components/ui/Skeleton";
 
 // ─── Constants ──────────────────────────────────────────────────────────
 
-const DEMO_SETTINGS = {
-  push_notifications: true,
-  sms_notifications: true,
-  email_notifications: true,
+const DEFAULT_SETTINGS = {
+  push_notifications: false,
+  sms_notifications: false,
+  email_notifications: false,
   theme: "system",
   language: "en",
 };
@@ -138,22 +140,22 @@ function SectionHeader({ icon: Icon, title, danger }) {
  * Returns the resolved theme string.
  */
 function useResolvedTheme(preference) {
-  const [resolved, setResolved] = useState("dark");
+  const [systemPrefersDark, setSystemPrefersDark] = useState(
+    typeof window !== "undefined"
+      ? window.matchMedia("(prefers-color-scheme: dark)").matches
+      : false
+  );
 
   useEffect(() => {
-    if (preference !== "system") {
-      setResolved(preference);
-      return;
-    }
-
     const mq = window.matchMedia("(prefers-color-scheme: dark)");
-    const update = () => setResolved(mq.matches ? "dark" : "light");
+    const update = () => setSystemPrefersDark(mq.matches);
     update();
     mq.addEventListener("change", update);
     return () => mq.removeEventListener("change", update);
-  }, [preference]);
+  }, []);
 
-  return resolved;
+  if (preference !== "system") return preference;
+  return systemPrefersDark ? "dark" : "light";
 }
 
 // ─── Page ────────────────────────────────────────────────────────────────
@@ -162,6 +164,7 @@ export default function SettingsPage() {
   const { logout } = useAuthStore();
   const { setTheme: applyTheme } = useThemeStore();
   const toast = useToastStore();
+  const { isDemoMode, enableDemo, disableDemo } = useDemoMode();
 
   // ── State ────────────────────────────────────────────────────────────
   const [loading, setLoading] = useState(true);
@@ -169,11 +172,11 @@ export default function SettingsPage() {
   const [error, setError] = useState(null);
 
   // Settings state
-  const [pushEnabled, setPushEnabled] = useState(DEMO_SETTINGS.push_notifications);
-  const [smsEnabled, setSmsEnabled] = useState(DEMO_SETTINGS.sms_notifications);
-  const [emailEnabled, setEmailEnabled] = useState(DEMO_SETTINGS.email_notifications);
-  const [themePref, setThemePref] = useState(DEMO_SETTINGS.theme);
-  const [language, setLanguage] = useState(DEMO_SETTINGS.language);
+  const [pushEnabled, setPushEnabled] = useState(DEFAULT_SETTINGS.push_notifications);
+  const [smsEnabled, setSmsEnabled] = useState(DEFAULT_SETTINGS.sms_notifications);
+  const [emailEnabled, setEmailEnabled] = useState(DEFAULT_SETTINGS.email_notifications);
+  const [themePref, setThemePref] = useState(DEFAULT_SETTINGS.theme);
+  const [language, setLanguage] = useState(DEFAULT_SETTINGS.language);
 
   // Password change modal
   const [pwModalOpen, setPwModalOpen] = useState(false);
@@ -199,11 +202,11 @@ export default function SettingsPage() {
       const res = await api.get("/settings");
       const data = res.data;
 
-      const push = data.push_notifications ?? DEMO_SETTINGS.push_notifications;
-      const sms = data.sms_notifications ?? DEMO_SETTINGS.sms_notifications;
-      const email = data.email_notifications ?? DEMO_SETTINGS.email_notifications;
-      const theme = data.theme || DEMO_SETTINGS.theme;
-      const lang = data.language || DEMO_SETTINGS.language;
+      const push = data.push_notifications ?? DEFAULT_SETTINGS.push_notifications;
+      const sms = data.sms_notifications ?? DEFAULT_SETTINGS.sms_notifications;
+      const email = data.email_notifications ?? DEFAULT_SETTINGS.email_notifications;
+      const theme = data.theme || DEFAULT_SETTINGS.theme;
+      const lang = data.language || DEFAULT_SETTINGS.language;
 
       setPushEnabled(push);
       setSmsEnabled(sms);
@@ -214,11 +217,11 @@ export default function SettingsPage() {
       // Use demo defaults on failure — no error state for first load,
       // user can still interact with local state
       setError(extractApiError(err, "Could not load settings. Using defaults."));
-      setPushEnabled(DEMO_SETTINGS.push_notifications);
-      setSmsEnabled(DEMO_SETTINGS.sms_notifications);
-      setEmailEnabled(DEMO_SETTINGS.email_notifications);
-      setThemePref(DEMO_SETTINGS.theme);
-      setLanguage(DEMO_SETTINGS.language);
+      setPushEnabled(DEFAULT_SETTINGS.push_notifications);
+      setSmsEnabled(DEFAULT_SETTINGS.sms_notifications);
+      setEmailEnabled(DEFAULT_SETTINGS.email_notifications);
+      setThemePref(DEFAULT_SETTINGS.theme);
+      setLanguage(DEFAULT_SETTINGS.language);
     } finally {
       setLoading(false);
     }
@@ -340,6 +343,16 @@ export default function SettingsPage() {
   const handleDataDownload = useCallback(() => {
     toast.success("Data download request submitted");
   }, [toast]);
+
+  const handleDemoModeToggle = useCallback(() => {
+    if (isDemoMode) {
+      disableDemo();
+      toast.success("Demo mode disabled");
+    } else {
+      enableDemo("customer");
+      toast.success("Demo mode enabled");
+    }
+  }, [isDemoMode, enableDemo, disableDemo, toast]);
 
   // ── Render ───────────────────────────────────────────────────────────
   if (loading) return <SettingsSkeleton />;
@@ -635,6 +648,36 @@ export default function SettingsPage() {
               )}
             </button>
           ))}
+        </div>
+      </section>
+
+      {/* ══════════════════════════════════════════════════════════════════
+          DEMO MODE SECTION
+          ══════════════════════════════════════════════════════════════════ */}
+      <section className="glass-lux rounded-2xl p-6 space-y-4">
+        <SectionHeader icon={Beaker} title="Demo Mode" />
+
+        <div className="rounded-xl border border-white/10 bg-white/[0.02] p-4 space-y-3">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm font-medium text-foreground">
+                Enable Demo Mode
+              </p>
+              <p className="text-xs text-text-muted mt-0.5">
+                Browse the app with mock data and simulated workflows
+              </p>
+            </div>
+            <ToggleSwitch
+              enabled={isDemoMode}
+              onChange={handleDemoModeToggle}
+            />
+          </div>
+          {isDemoMode && (
+            <p className="text-xs text-primary-light flex items-center gap-1.5">
+              <span className="inline-block w-1.5 h-1.5 rounded-full bg-primary" />
+              Demo mode is active — you can access the demo toolbar from the floating pill at the bottom of the screen.
+            </p>
+          )}
         </div>
       </section>
 

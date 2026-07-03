@@ -1,6 +1,37 @@
 import { create } from "zustand";
 import api from "@/lib/api";
 import { MAP_DEFAULT_CENTER } from "@/lib/constants";
+import { cacheLastLocation } from "@/lib/offline/offlineCache";
+
+/**
+ * Haversine formula to calculate distance between two GPS coordinates.
+ * @returns {number} Distance in kilometers.
+ */
+function haversineDistance(lat1, lng1, lat2, lng2) {
+  const R = 6371; // Earth's mean radius in km
+  const dLat = ((lat2 - lat1) * Math.PI) / 180;
+  const dLng = ((lng2 - lng1) * Math.PI) / 180;
+  const a =
+    Math.sin(dLat / 2) ** 2 +
+    Math.cos((lat1 * Math.PI) / 180) *
+      Math.cos((lat2 * Math.PI) / 180) *
+      Math.sin(dLng / 2) ** 2;
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  return R * c;
+}
+
+/**
+ * Calculate estimated time of arrival in seconds based on distance
+ * and an assumed average speed of 30 km/h.
+ * @returns {number} ETA in seconds.
+ */
+function calculateETA(userLat, userLng, mechLat, mechLng) {
+  const distanceKm = haversineDistance(userLat, userLng, mechLat, mechLng);
+  const speedKmh = 30; // Average urban speed assumption
+  return Math.round((distanceKm / speedKmh) * 3600);
+}
+
+export { calculateETA, haversineDistance };
 
 export const useTrackingStore = create((set, get) => ({
   userLocation: MAP_DEFAULT_CENTER,
@@ -11,14 +42,30 @@ export const useTrackingStore = create((set, get) => ({
   isLoading: false,
   error: null,
   gpsStatus: "idle", // "idle" | "requesting" | "granted" | "denied" | "unavailable"
-  
+  estimatedArrival: null, // seconds | null
+
   setUserLocation: (coords) => {
     set({ userLocation: coords });
+    cacheLastLocation(coords[0], coords[1]);
     // Automatically refresh providers when location changes
     get().fetchNearbyProviders();
   },
-  setMechanicLocation: (coords) => set({ mechanicLocation: coords }),
+    setMechanicLocation: (coords) => {
+    set({ mechanicLocation: coords });
+    const { userLocation } = get();
+    if (userLocation && coords) {
+      set({
+        estimatedArrival: calculateETA(
+          userLocation[0],
+          userLocation[1],
+          coords[0],
+          coords[1]
+        ),
+      });
+    }
+  },
   setNavigationTarget: (coords) => set({ navigationTarget: coords }),
+  setEstimatedArrival: (seconds) => set({ estimatedArrival: seconds }),
 
   /**
    * Fallback to IP-based geolocation when GPS is unavailable/denied.
@@ -32,6 +79,7 @@ export const useTrackingStore = create((set, get) => ({
       if (data.status === "success" && data.lat && data.lon) {
         const coords = [data.lat, data.lon];
         set({ userLocation: coords, gpsStatus: "granted" });
+        cacheLastLocation(coords[0], coords[1]);
         get().fetchNearbyProviders();
         return true;
       }
@@ -67,6 +115,7 @@ export const useTrackingStore = create((set, get) => ({
       (position) => {
         const coords = [position.coords.latitude, position.coords.longitude];
         set({ userLocation: coords, gpsStatus: "granted" });
+        cacheLastLocation(coords[0], coords[1]);
         get().fetchNearbyProviders();
       },
       (error) => {
@@ -93,6 +142,7 @@ export const useTrackingStore = create((set, get) => ({
       (position) => {
         const coords = [position.coords.latitude, position.coords.longitude];
         set({ userLocation: coords, gpsStatus: "granted" });
+        cacheLastLocation(coords[0], coords[1]);
       },
       (error) => {
       },

@@ -2,27 +2,7 @@
 
 import { GlassCard } from "@/components/ui/GlassCard";
 import { AreaChart, Area, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
-import { AlertTriangle } from "lucide-react";
-
-const revenueData = [
-  { name: 'Mon', revenue: 15000 },
-  { name: 'Tue', revenue: 22000 },
-  { name: 'Wed', revenue: 18000 },
-  { name: 'Thu', revenue: 35000 },
-  { name: 'Fri', revenue: 42000 },
-  { name: 'Sat', revenue: 58000 },
-  { name: 'Sun', revenue: 45000 },
-];
-
-const jobsData = [
-  { name: 'Mon', jobs: 8 },
-  { name: 'Tue', jobs: 12 },
-  { name: 'Wed', jobs: 10 },
-  { name: 'Thu', jobs: 18 },
-  { name: 'Fri', jobs: 24 },
-  { name: 'Sat', jobs: 32 },
-  { name: 'Sun', jobs: 25 },
-];
+import { BarChart3 } from "lucide-react";
 
 export function GarageAnalytics() {
   const getCSSVar = (name, fallback) => {
@@ -40,10 +20,6 @@ export function GarageAnalytics() {
 
   return (
     <GlassCard variant="strong" className="p-4 sm:p-6 h-full flex flex-col">
-      <div className="mb-4 flex items-center gap-2 px-3 py-2 rounded-lg border text-xs bg-amber-500/10 border-amber-500/20 text-amber-300">
-        <AlertTriangle size={12} className="shrink-0" />
-        Showing sample data — live analytics coming soon.
-      </div>
       <div className="mb-6 flex justify-between items-end">
         <div>
           <h2 className="text-xl font-bold tracking-tight text-text-primary">Garage Performance</h2>
@@ -51,68 +27,14 @@ export function GarageAnalytics() {
         </div>
       </div>
 
-      <div className="grid grid-cols-2 gap-4 mb-8">
-        <div className="p-4 rounded-xl border bg-surface-soft border-border-subtle">
-          <p className="text-xs uppercase tracking-wider mb-1 text-text-muted">Total Revenue</p>
-          <p className="text-3xl font-bold text-icon-highlight">₹2.35L</p>
-          <p className="text-xs mt-2 font-medium text-green-400">↑ 12% vs last week</p>
+      <div className="flex flex-col items-center justify-center flex-1 py-10 text-center">
+        <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-surface-soft">
+          <BarChart3 size={28} className="text-text-dim" />
         </div>
-        <div className="p-4 rounded-xl border bg-surface-soft border-border-subtle">
-          <p className="text-xs uppercase tracking-wider mb-1 text-text-muted">Completed Jobs</p>
-          <p className="text-3xl font-bold text-text-primary">129</p>
-          <p className="text-xs mt-2 font-medium text-green-400">↑ 5% vs last week</p>
-        </div>
-      </div>
-      
-      <h3 className="text-sm font-medium mb-4 text-text-primary">Revenue Trends</h3>
-      <div className="flex-1 min-h-[150px] w-full mb-6 relative">
-        <ResponsiveContainer width="100%" height="100%">
-          <AreaChart data={revenueData} margin={{ top: 0, right: 0, left: -20, bottom: 0 }}>
-            <defs>
-              <linearGradient id="garageColorRev" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor={primaryColor} stopOpacity={0.25}/>
-                <stop offset="95%" stopColor={primaryColor} stopOpacity={0}/>
-              </linearGradient>
-            </defs>
-            <CartesianGrid strokeDasharray="3 3" stroke={gridColor} vertical={false} />
-            <XAxis dataKey="name" tick={{fill: tickColor, fontSize: 10}} axisLine={false} tickLine={false} />
-            <YAxis tick={{fill: tickColor, fontSize: 10}} axisLine={false} tickLine={false} tickFormatter={(val) => `₹${val/1000}k`} />
-            <Tooltip 
-              contentStyle={{ 
-                backgroundColor: tooltipBg,
-                borderColor: tooltipBorder,
-                borderRadius: '10px', 
-                color: tooltipColor,
-                boxShadow: boxShadow,
-              }}
-              itemStyle={{ color: primaryColor }}
-            />
-            <Area type="monotone" dataKey="revenue" stroke={primaryColor} strokeWidth={2} fillOpacity={1} fill="url(#garageColorRev)" />
-          </AreaChart>
-        </ResponsiveContainer>
-      </div>
-
-      <h3 className="text-sm font-medium mb-4 text-text-primary">Daily Job Volume</h3>
-      <div className="flex-1 min-h-[150px] w-full">
-        <ResponsiveContainer width="100%" height="100%">
-          <BarChart data={jobsData} margin={{ top: 0, right: 0, left: -20, bottom: 0 }}>
-            <CartesianGrid strokeDasharray="3 3" stroke={gridColor} vertical={false} />
-            <XAxis dataKey="name" tick={{fill: tickColor, fontSize: 10}} axisLine={false} tickLine={false} />
-            <YAxis tick={{fill: tickColor, fontSize: 10}} axisLine={false} tickLine={false} />
-            <Tooltip 
-              cursor={{fill: 'rgba(128,128,128,0.04)'}}
-              contentStyle={{ 
-                backgroundColor: tooltipBg,
-                borderColor: tooltipBorder,
-                borderRadius: '10px', 
-                color: tooltipColor,
-                boxShadow: boxShadow,
-              }}
-              itemStyle={{ color: barColor }}
-            />
-            <Bar dataKey="jobs" fill={barColor} radius={[4, 4, 0, 0]} />
-          </BarChart>
-        </ResponsiveContainer>
+        <p className="text-base font-medium text-text-primary">No Analytics Yet</p>
+        <p className="mt-1 max-w-xs text-sm text-text-muted">
+          Complete garage jobs to see your weekly performance and revenue trends here.
+        </p>
       </div>
     </GlassCard>
   );

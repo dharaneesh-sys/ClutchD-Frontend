@@ -133,28 +133,30 @@ export default function SafetyPage() {
   const [privacyPolicy, setPrivacyPolicy] = useState(null);
   const [terms, setTerms] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
-
-  const fetchContent = useCallback(async () => {
-    setIsLoading(true);
-    try {
-      const { data } = await api.get("/safety/privacy-policy");
-      setPrivacyPolicy(data?.content || PRIVACY_POLICY);
-    } catch {
-      setPrivacyPolicy(PRIVACY_POLICY);
-    }
-
-    try {
-      const { data } = await api.get("/safety/terms-conditions");
-      setTerms(data?.content || TERMS);
-    } catch {
-      setTerms(TERMS);
-    }
-    setIsLoading(false);
-  }, []);
-
   useEffect(() => {
-    fetchContent();
-  }, [fetchContent]);
+    let cancelled = false;
+    (async () => {
+      setIsLoading(true);
+
+      try {
+        const { data } = await api.get("/safety/privacy-policy");
+        if (!cancelled) setPrivacyPolicy(data?.content || PRIVACY_POLICY);
+      } catch {
+        if (!cancelled) setPrivacyPolicy(PRIVACY_POLICY);
+      }
+
+      if (cancelled) return;
+      try {
+        const { data } = await api.get("/safety/terms-conditions");
+        if (!cancelled) setTerms(data?.content || TERMS);
+      } catch {
+        if (!cancelled) setTerms(TERMS);
+      }
+
+      if (!cancelled) setIsLoading(false);
+    })();
+    return () => { cancelled = true; };
+  }, []);
 
   const handleReportSafetyIssue = () => {
     toast.info("Redirecting to support...");

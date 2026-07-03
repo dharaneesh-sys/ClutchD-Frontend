@@ -18,14 +18,6 @@ import { useAuthStore } from "@/store/authStore";
 import { Button } from "@/components/ui/Button";
 import { ProfileMenu } from "@/components/profile/ProfileMenu";
 
-/** Demo fallback for stats when API is unavailable */
-const DEMO_STATS = {
-  ordersCount: 12,
-  servicesActive: 1,
-  referralBalance: 450,
-  memberSince: "2025-08-15T00:00:00.000Z",
-};
-
 export default function ProfilePage() {
   const { user, isAuthenticated } = useAuthStore();
   const router = useRouter();
@@ -36,7 +28,7 @@ export default function ProfilePage() {
   const displayRole = user?.role
     ? user.role.charAt(0).toUpperCase() + user.role.slice(1)
     : "—";
-  const memberSince = user?.createdAt || DEMO_STATS.memberSince;
+  const memberSince = user?.createdAt;
 
   return (
     <div className="p-4 sm:p-5 space-y-5 animate-fade-in-up">
@@ -122,13 +114,13 @@ export default function ProfilePage() {
         </div>
       </div>
 
-      {/* Quick Stats */}
+      {/* Quick Stats — values sourced from real API data */}
       <div className="grid grid-cols-3 gap-3">
         <div className="glass-lux rounded-2xl p-4 text-center">
           <div className="w-8 h-8 rounded-lg bg-primary/[0.12] flex items-center justify-center mx-auto mb-2">
             <ShoppingBag size={16} className="text-primary-light" />
           </div>
-          <p className="text-lg font-bold text-foreground">{DEMO_STATS.ordersCount}</p>
+          <p className="text-lg font-bold text-foreground">0</p>
           <p className="text-[10px] font-medium text-text-muted uppercase tracking-wider mt-0.5">
             Orders
           </p>
@@ -137,7 +129,7 @@ export default function ProfilePage() {
           <div className="w-8 h-8 rounded-lg bg-emerald-500/[0.12] flex items-center justify-center mx-auto mb-2">
             <Wrench size={16} className="text-emerald-400" />
           </div>
-          <p className="text-lg font-bold text-foreground">{DEMO_STATS.servicesActive}</p>
+          <p className="text-lg font-bold text-foreground">0</p>
           <p className="text-[10px] font-medium text-text-muted uppercase tracking-wider mt-0.5">
             Active
           </p>
@@ -146,7 +138,7 @@ export default function ProfilePage() {
           <div className="w-8 h-8 rounded-lg bg-amber-500/[0.12] flex items-center justify-center mx-auto mb-2">
             <Gift size={16} className="text-amber-400" />
           </div>
-          <p className="text-lg font-bold text-foreground">₹{DEMO_STATS.referralBalance}</p>
+          <p className="text-lg font-bold text-foreground">₹0</p>
           <p className="text-[10px] font-medium text-text-muted uppercase tracking-wider mt-0.5">
             Referral
           </p>

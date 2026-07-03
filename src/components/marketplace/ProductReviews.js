@@ -471,7 +471,7 @@ export function ProductReviews({ productId }) {
               {/* Big average number */}
               <div className="flex flex-col items-center shrink-0">
                 <span className="text-4xl font-bold tracking-tight text-text-primary tabular-nums">
-                  {avgRating.toFixed(1)}
+                  {Number(avgRating).toFixed(1)}
                 </span>
                 <ReadOnlyStars rating={Math.round(avgRating)} size={16} />
                 <span className="text-xs text-text-dim mt-1">

@@ -17,6 +17,14 @@ services:
         value: your-google-client-id
       - key: NEXT_PUBLIC_WS_URL
         value: wss://clutchd-api.onrender.com/ws
+      - key: NEXT_PUBLIC_FIREBASE_API_KEY
+        value: your-firebase-api-key
+      - key: NEXT_PUBLIC_FIREBASE_PROJECT_ID
+        value: your-firebase-project-id
+      - key: NEXT_PUBLIC_FIREBASE_SENDER_ID
+        value: your-firebase-sender-id
+      - key: NEXT_PUBLIC_FIREBASE_APP_ID
+        value: your-firebase-app-id
       - key: NODE_OPTIONS
         value: --max-old-space-size=2048
       - key: NEXT_TELEMETRY_DISABLED

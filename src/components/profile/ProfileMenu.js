@@ -44,6 +44,7 @@ const MENU_SECTIONS = [
   {
     label: "Support & Safety",
     items: [
+      { icon: Settings, label: "Settings", path: "/marketplace/profile/settings" },
       { icon: ShieldCheck, label: "Safety", path: "/marketplace/profile/safety" },
       { icon: HelpCircle, label: "Help", path: "/marketplace/profile/help" },
     ],
