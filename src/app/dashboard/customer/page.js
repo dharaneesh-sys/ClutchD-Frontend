@@ -14,13 +14,14 @@ import { ServiceRequestPanel } from "@/components/dashboard/ServiceRequestPanel"
 import { ServiceStatusTracker } from "@/components/dashboard/ServiceStatusTracker";
 import { ETAIndicator } from "@/components/dashboard/ETAIndicator";
 import { ProviderList } from "@/components/dashboard/ProviderList";
+import { MaintenanceAlertBanner } from "@/components/dashboard/MaintenanceAlertBanner";
 import { PaymentModal } from "@/components/dashboard/PaymentModal";
 import { ReviewModal } from "@/components/dashboard/ReviewModal";
 import { NotificationBell } from "@/components/ui/NotificationBell";
 import { SOSButton } from "@/components/ui/SOSButton";
 import { DashboardShell } from "@/components/ui/DashboardShell";
 import { ChatPanel } from "@/components/ui/ChatPanel";
-import { History, Wrench, Calendar, ShoppingBag, MessageSquare } from "lucide-react";
+import { History, Wrench, Calendar, ShoppingBag, MessageSquare, Car } from "lucide-react";
 import { SERVICE_STATUS } from "@/lib/constants";
 import { ScheduleBookingModal } from "@/components/dashboard/ScheduleBookingModal";
 import api from "@/lib/api";
@@ -49,9 +50,15 @@ const MarketplaceHome = dynamic(
   { ssr: false, loading: () => <div className="w-full h-64 animate-pulse bg-surface-container-low rounded-2xl" /> }
 );
 
+const VehicleList = dynamic(
+  () => import("../../../components/dashboard/VehicleList").then(m => ({ default: m.VehicleList })),
+  { ssr: false, loading: () => <div className="flex-1 flex items-center justify-center"><div className="w-8 h-8 border-2 border-t-transparent rounded-full animate-spin border-amber-500 dark:border-primary" /></div> }
+);
+
 const TABS = [
   { key: "request", icon: Wrench, label: "Service" },
   { key: "schedule", icon: Calendar, label: "Schedule" },
+  { key: "vehicles", icon: Car, label: "Vehicles" },
   { key: "store", icon: ShoppingBag, label: "Parts Store" },
   { key: "history", icon: History, label: "History" },
 ];
@@ -231,6 +238,10 @@ export default function CustomerDashboard() {
     cancelRequest();
   };
 
+  const handleVehicleChange = (vehicleId, vehicle) => {
+    useServiceStore.getState().updateVehicle(vehicleId, vehicle);
+  };
+
   /* ── Chat state ────────────────────────────────────────────────── */
   const [chatOpen, setChatOpen] = useState(false);
   const chatJobId = activeRequest?.id;
@@ -255,6 +266,8 @@ export default function CustomerDashboard() {
       hideMobileMenu
       hasBottomNav
     >
+
+      <MaintenanceAlertBanner />
 
       {activeTab === "schedule" ? (
         <div className="flex-1 pb-4 lg:pb-6">
@@ -310,6 +323,7 @@ export default function CustomerDashboard() {
                   onCancel={handleCancelRequest}
                   onReleasePayment={handleReleasePayment}
                   onDisputePayment={handleDisputePayment}
+                  onVehicleChange={handleVehicleChange}
                 />
                 <ETAIndicator
                   mechanicLocation={mechanicLocation}
@@ -320,11 +334,15 @@ export default function CustomerDashboard() {
             )}
           </div>
         </div>
-      ) : (
+      ) : activeTab === "vehicles" ? (
+        <div className="flex-1 pb-4 lg:pb-6">
+          <VehicleList />
+        </div>
+      ) : activeTab === "history" ? (
         <div className="flex-1 pb-4 lg:pb-6">
           <ServiceHistory />
         </div>
-      )}
+      ) : null}
 
       <PaymentModal
         isOpen={isPaymentOpen}

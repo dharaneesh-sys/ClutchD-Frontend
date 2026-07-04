@@ -227,6 +227,29 @@ export const useServiceStore = create((set, get) => ({
     set({ activeRequest: null, error: null });
   },
 
+  updateVehicle: async (vehicleId, vehicle) => {
+    const currentReq = get().activeRequest;
+    if (!currentReq) return;
+
+    set(state => {
+      if (!state.activeRequest) return state;
+      return {
+        activeRequest: {
+          ...state.activeRequest,
+          vehicleId,
+          vehicle,
+        }
+      };
+    });
+
+    // Best-effort backend call
+    try {
+      await api.patch(`/service/request/${currentReq.id}/vehicle`, { vehicleId });
+    } catch {
+      // non-critical — local state already updated
+    }
+  },
+
   /**
    * Restore active request from the server after page refresh.
    * Calls GET /jobs/incoming to find any active job for the current user.

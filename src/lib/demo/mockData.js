@@ -179,6 +179,7 @@ export const MOCK_DISPUTES = [
 ];
 
 export function createMockServiceRequest(overrides = {}) {
+  const defaultVehicle = MOCK_VEHICLES[0];
   return {
     id: overrides.id || "demo-request-1",
     issueTag: "engine_failure",
@@ -192,6 +193,8 @@ export function createMockServiceRequest(overrides = {}) {
     pricing: null,
     mediaUrl: null,
     createdAt: new Date().toISOString(),
+    vehicleId: defaultVehicle.id,
+    vehicle: defaultVehicle,
     ...overrides,
   };
 }

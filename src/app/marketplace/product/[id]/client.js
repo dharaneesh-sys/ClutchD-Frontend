@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useMemo } from 'react';
+import { useEffect, useState, useMemo, useCallback } from 'react';
 import Link from 'next/link';
 import {
   ArrowLeft,
@@ -10,11 +10,15 @@ import {
   Clock,
   Star,
   Package,
+  XCircle,
+  Car,
+  AlertTriangle,
 } from 'lucide-react';
 import { useProductStore } from '@/store/productStore';
 
 import { ProductImage } from '@/components/marketplace/ProductImage';
 import { ProductCard } from '@/components/marketplace/ProductCard';
+import { VehicleSelector } from '@/components/marketplace/VehicleSelector';
 import { Button } from '@/components/ui/Button';
 import { Badge } from '@/components/ui/Badge';
 import { StarRating } from '@/components/ui/StarRating';
@@ -22,6 +26,7 @@ import { GlassCard } from '@/components/ui/GlassCard';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { cn, formatCurrency } from '@/lib/utils';
 import { Shimmer, ShimmerCard } from '@/components/ui/Shimmer';
+import { checkFitment } from '@/lib/fitment';
 
 
 
@@ -87,6 +92,9 @@ export default function ProductDetailClient({ id }) {
 
 
   const [selectedImage, setSelectedImage] = useState(0);
+  const [selectedVehicle, setSelectedVehicle] = useState(null);
+  const [fitmentResult, setFitmentResult] = useState(null);
+  const [fitmentLoading, setFitmentLoading] = useState(false);
 
   // Fetch products on mount if not already loaded
   useEffect(() => {
@@ -120,6 +128,27 @@ export default function ProductDetailClient({ id }) {
     if (!product) return [];
     return [product.image].filter(Boolean);
   }, [product]);
+
+  // ── Fitment check handler ──────────────────────────────────
+  const handleCheckFitment = useCallback(async () => {
+    if (!selectedVehicle) return;
+
+    setFitmentLoading(true);
+    setFitmentResult(null);
+
+    try {
+      const result = await checkFitment(product, selectedVehicle);
+      setFitmentResult(result);
+    } catch {
+      setFitmentResult({
+        compatible: false,
+        nonFittingParts: ["Unable to check compatibility. Please try again."],
+        source: "error",
+      });
+    } finally {
+      setFitmentLoading(false);
+    }
+  }, [product, selectedVehicle]);
 
   /* ── Loading state ─────────────────────────────────────── */
 
@@ -267,6 +296,108 @@ export default function ProductDetailClient({ id }) {
           </div>
         </div>
       </div>
+
+      {/* ── Vehicle Fitment ───────────────────────────────── */}
+      <VehicleSelector
+        onVehicleChange={setSelectedVehicle}
+      />
+
+      {/* ── Check Compatibility ────────────────────────────── */}
+      {selectedVehicle && (
+        <div className="flex flex-col gap-4">
+          <Button
+            variant="primary"
+            size="lg"
+            isLoading={fitmentLoading}
+            disabled={fitmentLoading}
+            onClick={handleCheckFitment}
+            className="w-full sm:w-auto"
+          >
+            <Car size={18} className="mr-2" />
+            Check Compatibility
+          </Button>
+
+          {/* ── Fitment result ──────────────────────────────── */}
+          {fitmentResult && (
+            <GlassCard
+              variant="glass-lux"
+              className={cn(
+                "overflow-hidden transition-all duration-300",
+                fitmentResult.compatible
+                  ? "border-emerald-500/30 bg-emerald-500/[0.04]"
+                  : "border-red-500/30 bg-red-500/[0.04]",
+              )}
+            >
+              <div className="flex items-start gap-4 p-5">
+                {/* Icon */}
+                <div
+                  className={cn(
+                    "flex h-10 w-10 shrink-0 items-center justify-center rounded-xl",
+                    fitmentResult.compatible
+                      ? "bg-emerald-500/15 text-emerald-400"
+                      : "bg-red-500/15 text-red-400",
+                  )}
+                >
+                  {fitmentResult.compatible ? (
+                    <CheckCircle2 size={22} />
+                  ) : (
+                    <XCircle size={22} />
+                  )}
+                </div>
+
+                {/* Content */}
+                <div className="min-w-0 flex-1">
+                  <h4
+                    className={cn(
+                      "text-base font-semibold",
+                      fitmentResult.compatible
+                        ? "text-emerald-300"
+                        : "text-red-300",
+                    )}
+                  >
+                    {fitmentResult.compatible
+                      ? "Compatible"
+                      : "Not Compatible"}
+                  </h4>
+
+                  {fitmentResult.compatible ? (
+                    <p className="mt-1 text-sm text-text-muted">
+                      This part is verified to fit your{" "}
+                      <span className="font-medium text-text-primary">
+                        {selectedVehicle.makeLabel} {selectedVehicle.modelLabel}
+                      </span>
+                      .
+                    </p>
+                  ) : (
+                    <div className="mt-2 space-y-1.5">
+                      {fitmentResult.nonFittingParts.map((msg, i) => (
+                        <p
+                          key={i}
+                          className="flex items-start gap-2 text-sm text-text-muted"
+                        >
+                          <AlertTriangle
+                            size={14}
+                            className="mt-0.5 shrink-0 text-red-400"
+                          />
+                          {msg}
+                        </p>
+                      ))}
+                    </div>
+                  )}
+
+                  {/* Source badge */}
+                  {fitmentResult.source === "demo" && (
+                    <span className="mt-3 inline-flex items-center gap-1 rounded-full border border-amber-500/20 bg-amber-500/10 px-2.5 py-0.5 text-[0.6875rem] font-medium text-amber-400">
+                      <AlertTriangle size={11} />
+                      Demo check
+                    </span>
+                  )}
+                </div>
+              </div>
+            </GlassCard>
+          )}
+        </div>
+      )}
 
       {/* ── Specs & Features ──────────────────────────────── */}
       <div className="grid grid-cols-1 gap-6 md:grid-cols-2">

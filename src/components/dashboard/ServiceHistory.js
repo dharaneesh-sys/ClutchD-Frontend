@@ -4,7 +4,8 @@ import { useState, useEffect } from "react";
 import { GlassCard } from "@/components/ui/GlassCard";
 import { Badge } from "@/components/ui/Badge";
 import { ConfirmModal } from "@/components/ui/ConfirmModal";
-import { Calendar, Download, MapPin, Loader2, Wrench, ChevronDown, ChevronUp, Receipt, RefreshCw, Mail } from "lucide-react";
+import { Calendar, Download, MapPin, Loader2, Wrench, ChevronDown, ChevronUp, Receipt, RefreshCw, Mail, ShieldCheck } from "lucide-react";
+import { WarrantyTerms } from "@/components/dashboard/WarrantyTerms";
 import api, { extractApiError } from "@/lib/api";
 import { GST_RATE } from "@/lib/constants";
 import { useToast } from "@/hooks/useToast";
@@ -289,6 +290,29 @@ export function ServiceHistory() {
                       Provider UPI: {pricing.providerUpiId}
                     </p>
                   )}
+                </div>
+
+                <div className="mt-4">
+                  <WarrantyTerms variant="inline" />
+                </div>
+              </div>
+            )}
+
+            {/* Always-visible warranty reference */}
+            {job.status === "completed" && !isExpanded && (
+              <div className="mt-4 pt-3 border-t border-border-subtle">
+                <div className="flex items-center gap-2 text-[10px] text-text-muted">
+                  <ShieldCheck size={12} className="text-icon-highlight shrink-0" />
+                  <span>
+                    Covered by our{" "}
+                    <button
+                      type="button"
+                      onClick={() => toggleInvoice(job.id)}
+                      className="underline hover:text-icon-highlight transition-colors"
+                    >
+                      warranty terms
+                    </button>
+                  </span>
                 </div>
               </div>
             )}

@@ -17,6 +17,7 @@ import {
   PRODUCT_CATEGORIES,
   BRANDS,
 } from "@/lib/constants";
+import { VEHICLE_MAKES } from "@/lib/vehicleData";
 import { products } from "@/lib/demo/data/products";
 import { vendors } from "@/lib/demo/data/vendors";
 import { productVendors } from "@/lib/demo/data/productVendors";
@@ -92,6 +93,10 @@ function matchRoute(url, method) {
     const match = path.match(/\/service\/request\/([\w-]+)\/finalize-price/);
     return { route: "finalize_price", jobId: match ? match[1] : null };
   }
+  if (/\/service\/request\/([\w-]+)\/vehicle/.test(path) && m === "patch") {
+    const match = path.match(/\/service\/request\/([\w-]+)\/vehicle/);
+    return { route: "update_vehicle", jobId: match ? match[1] : null };
+  }
 
   if (path.includes("/jobs/incoming") && m === "get") return "jobs_incoming";
   if (/\/jobs\/status\/[\w-]+/.test(path) && m === "get") {
@@ -147,6 +152,12 @@ function matchRoute(url, method) {
   // ═══════════════════════════════════════════
   // Marketplace routes (ordered: specific → generic)
   // ═══════════════════════════════════════════
+
+  // Product fitment check (must match before single product)
+  if (/\/marketplace\/products\/([\w-]+)\/fitment/.test(path) && m === "get") {
+    const match = path.match(/\/marketplace\/products\/([\w-]+)\/fitment/);
+    return { route: "product_fitment", productId: match ? match[1] : null };
+  }
 
   // Product reviews (must match before single product)
   if (/\/marketplace\/products\/([\w-]+)\/reviews/.test(path) && m === "get") {
@@ -225,25 +236,29 @@ function handleRoute(routeDef, reqData) {
       return { data: { success: true, message: "Demo mode: operation simulated" } };
 
     case "create_request": {
-      const issueTag = data.issueTag || "engine_failure";
-      const estimate = MOCK_PRICE_ESTIMATES[issueTag] || { min: 200, max: 2000 };
-      const newReq = {
-        id: "demo-req-" + Date.now(),
-        issueTag,
-        description: data.description || "Service request created in demo mode.",
-        requestType: data.requestType || "mechanic",
-        status: "searching",
-        customerLat: data.customerLat || 11.0208,
-        customerLng: data.customerLng || 76.9558,
-        mechanic: null,
-        priceEstimate: estimate,
-        pricing: null,
-        mediaUrl: data.mediaUrl || null,
-        createdAt: new Date().toISOString(),
-      };
-      demoState.activeRequest = newReq;
-      return { data: newReq };
-    }
+	      const issueTag = data.issueTag || "engine_failure";
+	      const estimate = MOCK_PRICE_ESTIMATES[issueTag] || { min: 200, max: 2000 };
+	      const vehicleId = data.vehicleId || MOCK_VEHICLES[0].id;
+	      const vehicle = MOCK_VEHICLES.find(v => v.id === vehicleId) || MOCK_VEHICLES[0];
+	      const newReq = {
+	        id: "demo-req-" + Date.now(),
+	        issueTag,
+	        description: data.description || "Service request created in demo mode.",
+	        requestType: data.requestType || "mechanic",
+	        status: "searching",
+	        customerLat: data.customerLat || 11.0208,
+	        customerLng: data.customerLng || 76.9558,
+	        mechanic: null,
+	        priceEstimate: estimate,
+	        pricing: null,
+	        mediaUrl: data.mediaUrl || null,
+	        createdAt: new Date().toISOString(),
+	        vehicleId,
+	        vehicle,
+	      };
+	      demoState.activeRequest = newReq;
+	      return { data: newReq };
+	    }
 
     case "update_status": {
       if (demoState.activeRequest) {
@@ -292,6 +307,21 @@ function handleRoute(routeDef, reqData) {
 
     case "finalize_price":
       return { data: { success: true, invoice: { id: "inv-" + Date.now(), amount: data?.serviceAmount || 0 } } };
+
+    case "update_vehicle": {
+      const newVehicleId = data?.vehicleId;
+      if (demoState.activeRequest && newVehicleId) {
+        const newVehicle = MOCK_VEHICLES.find(v => v.id === newVehicleId);
+        if (newVehicle) {
+          demoState.activeRequest = {
+            ...demoState.activeRequest,
+            vehicleId: newVehicleId,
+            vehicle: newVehicle,
+          };
+        }
+      }
+      return { data: { success: true } };
+    }
 
     case "job_delete":
       return { data: { success: true } };
@@ -572,6 +602,26 @@ function handleRoute(routeDef, reqData) {
 
     case "brands_list": {
       return { data: { brands: BRANDS } };
+    }
+
+    case "product_fitment": {
+      const product = products.find((p) => p.id === extra.productId);
+      if (!product) {
+        return { data: null, error: { message: "Product not found" } };
+      }
+      const compat = (product.specs?.compatibility || "").toLowerCase();
+      const vehicleId = (data?.vehicle_id || "").toLowerCase();
+      const [makeValue] = vehicleId.split("-");
+      const makes = VEHICLE_MAKES;
+      const makeLabel = makes.find((m) => m.value === makeValue)?.label?.toLowerCase() || "";
+      const isUniversal = !compat || compat.includes("universal") || compat.includes("all vehicles");
+      const makeMatch = makeLabel && compat.includes(makeLabel);
+      return {
+        data: {
+          compatible: isUniversal || makeMatch,
+          nonFittingParts: isUniversal || makeMatch ? [] : [`${product.name} not verified for the selected vehicle`],
+        },
+      };
     }
 
     case "product_reviews": {

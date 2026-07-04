@@ -1,10 +1,31 @@
+import { useState, useEffect } from "react";
 import { SERVICE_STATUS, GST_RATE } from "@/lib/constants";
 import { GlassCard } from "@/components/ui/GlassCard";
 import { Button } from "@/components/ui/Button";
 import { EscrowStatus } from "@/components/dashboard/EscrowStatus";
-import { Search, UserCheck, Navigation, Wrench, CreditCard, CheckCircle2, Shield, CheckCheck, Phone, MessageSquare, MapPin, Star } from "lucide-react";
+import { WarrantyTerms } from "@/components/dashboard/WarrantyTerms";
+import { Search, UserCheck, Navigation, Wrench, CreditCard, CheckCircle2, Shield, CheckCheck, Phone, MessageSquare, MapPin, Star, CarFront, ChevronDown } from "lucide-react";
+import api from "@/lib/api";
+import { cn } from "@/lib/utils";
 
-export function ServiceStatusTracker({ request, onComplete, onCancel, onReleasePayment, onDisputePayment }) {
+export function ServiceStatusTracker({ request, onComplete, onCancel, onReleasePayment, onDisputePayment, onVehicleChange }) {
+  const [isVehicleSelectorOpen, setIsVehicleSelectorOpen] = useState(false);
+  const [vehicles, setVehicles] = useState([]);
+
+  const fetchVehicles = async () => {
+    try {
+      const res = await api.get("/vehicles");
+      setVehicles(res.data);
+    } catch(e) {
+      // best effort
+    }
+  };
+
+  useEffect(() => {
+    if (request?.status === SERVICE_STATUS.SEARCHING) {
+      fetchVehicles();
+    }
+  }, [request?.status]);
 
   if (!request) return null;
 
@@ -113,6 +134,7 @@ export function ServiceStatusTracker({ request, onComplete, onCancel, onReleaseP
                 <p className="text-sm text-text-muted">Loading pricing...</p>
               )}
             </div>
+            <WarrantyTerms variant="inline" className="mb-4" />
             <Button className="w-full" size="lg" onClick={() => onComplete(request)}>
               Pay ₹{pricing?.totalAmount?.toFixed(0) || "—"}
             </Button>
@@ -135,14 +157,17 @@ export function ServiceStatusTracker({ request, onComplete, onCancel, onReleaseP
 
       case SERVICE_STATUS.COMPLETED:
         return (
-          <div className="text-center py-6 mt-4">
-            <div className="w-16 h-16 mx-auto rounded-full flex items-center justify-center mb-4 bg-surface-soft text-primary">
-              <CheckCircle2 size={28} />
+          <div className="mt-4 space-y-4">
+            <div className="text-center py-6">
+              <div className="w-16 h-16 mx-auto rounded-full flex items-center justify-center mb-4 bg-surface-soft text-primary">
+                <CheckCircle2 size={28} />
+              </div>
+              <h3 className="text-lg font-bold mb-1 text-text-primary">Service Completed</h3>
+              <p className="text-sm text-text-muted">
+                ₹{request.pricing?.totalAmount?.toFixed(0) || request.payment?.amount || "—"} paid
+              </p>
             </div>
-            <h3 className="text-lg font-bold mb-1 text-text-primary">Service Completed</h3>
-            <p className="text-sm text-text-muted">
-              ₹{request.pricing?.totalAmount?.toFixed(0) || request.payment?.amount || "—"} paid
-            </p>
+            <WarrantyTerms />
           </div>
         );
 
@@ -195,6 +220,80 @@ export function ServiceStatusTracker({ request, onComplete, onCancel, onReleaseP
           })}
         </div>
       </div>
+
+      {request.vehicle && (
+        <div className="mb-4 p-3 rounded-xl border bg-bg-card border-border-subtle">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="w-9 h-9 rounded-lg flex items-center justify-center bg-surface-soft">
+                <CarFront size={18} className="text-icon-highlight" />
+              </div>
+              <div>
+                <p className="text-sm font-medium text-text-primary">
+                  {request.vehicle.year} {request.vehicle.make} {request.vehicle.model}
+                </p>
+                <p className="text-xs text-text-muted">
+                  {request.vehicle.color}
+                  {request.vehicle.plate ? ` · ${request.vehicle.plate}` : ""}
+                </p>
+              </div>
+            </div>
+            {request.status === SERVICE_STATUS.SEARCHING && onVehicleChange && (
+              <button
+                type="button"
+                onClick={() => setIsVehicleSelectorOpen((o) => !o)}
+                className="text-xs font-medium flex items-center gap-1 px-2.5 py-1.5 rounded-lg transition-colors text-icon-highlight hover:bg-surface-soft"
+              >
+                Change
+                <ChevronDown size={14} className={cn("transition-transform", isVehicleSelectorOpen && "rotate-180")} />
+              </button>
+            )}
+          </div>
+
+          {isVehicleSelectorOpen && (
+            <div className="mt-3 pt-3 border-t border-border-subtle space-y-1.5">
+              {vehicles.length === 0 ? (
+                <p className="text-xs text-text-muted py-2 text-center">No vehicles available</p>
+              ) : (
+                vehicles.map((v) => {
+                  const isSelected = request.vehicleId === v.id;
+                  return (
+                    <button
+                      key={v.id}
+                      type="button"
+                      onClick={() => {
+                        onVehicleChange(v.id, v);
+                        setIsVehicleSelectorOpen(false);
+                      }}
+                      className={cn(
+                        "w-full flex items-center gap-3 p-2.5 rounded-lg border transition-all text-left",
+                        isSelected
+                          ? "bg-surface-soft border-border-subtle text-text-primary"
+                          : "bg-transparent border-transparent text-text-muted hover:bg-surface-soft hover:border-border-subtle hover:text-text-primary"
+                      )}
+                    >
+                      <CarFront size={16} className={isSelected ? "text-icon-highlight" : "opacity-50"} />
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-medium truncate">
+                          {v.year} {v.make} {v.model}
+                        </p>
+                        {v.plate && (
+                          <p className="text-xs text-text-muted truncate">{v.plate}</p>
+                        )}
+                      </div>
+                      {isSelected && (
+                        <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-primary/10 text-primary">
+                          Active
+                        </span>
+                      )}
+                    </button>
+                  );
+                })
+              )}
+            </div>
+          )}
+        </div>
+      )}
 
       <div className="flex-1 flex flex-col justify-center">
         {renderStatusCard()}

@@ -1152,7 +1152,7 @@ Final Verification (4 parallel reviews):
 
 ### Wave 3 — User Retention
 
-- [ ] 17. **VIN fitment — Vehicle selector on product pages**
+- [x] 17. **VIN fitment — Vehicle selector on product pages**
 
   **What to do**:
   1. Create `src/components/marketplace/VehicleFitmentSelector.js`:
@@ -1201,7 +1201,7 @@ Final Verification (4 parallel reviews):
   - Message: `feat(marketplace): add VIN fitment check on product pages`
   - Files: `src/components/marketplace/VehicleFitmentSelector.js`, `src/lib/marketplace/fitmentService.js`
 
-- [ ] 18. **VIN fitment — "Check compatibility" API integration**
+- [x] 18. **VIN fitment — "Check compatibility" API integration**
 
   **What to do**:
   1. If backend endpoint exists: wire fitmentService.js to real API
@@ -1235,7 +1235,7 @@ Final Verification (4 parallel reviews):
   - Message: `feat(marketplace): add fitment API integration and product card badge`
   - Files: `src/lib/marketplace/fitmentService.js`, `src/components/marketplace/ProductCard.js`, `src/components/marketplace/SearchFilters.js`, `src/data/fitmentData.js`
 
-- [ ] 19. **Maintenance reminders — Service interval engine**
+- [x] 19. **Maintenance reminders — Service interval engine**
 
   **What to do**:
   1. Create `src/lib/maintenance/maintenanceScheduler.js`:
@@ -1288,7 +1288,7 @@ Final Verification (4 parallel reviews):
   - Message: `feat(maintenance): add service interval engine and reminder scheduling`
   - Files: `src/lib/maintenance/maintenanceScheduler.js`, `src/lib/maintenance/maintenanceConstants.js`
 
-- [ ] 20. **Maintenance reminders — Dashboard alert banner**
+- [x] 20. **Maintenance reminders — Dashboard alert banner**
 
   **What to do**:
   1. Create `src/components/dashboard/MaintenanceBanner.js`:
@@ -1336,7 +1336,7 @@ Final Verification (4 parallel reviews):
   - Message: `feat(maintenance): add maintenance reminder banner to dashboard`
   - Files: `src/components/dashboard/MaintenanceBanner.js`, `src/app/dashboard/customer/page.js`
 
-- [ ] 21. **Multi-vehicle dashboard — Vehicle list with per-vehicle history**
+- [x] 21. **Multi-vehicle dashboard — Vehicle list with per-vehicle history**
 
   **What to do**:
   1. Create `src/app/dashboard/customer/vehicles/page.js`:
@@ -1387,7 +1387,7 @@ Final Verification (4 parallel reviews):
   - Message: `feat(vehicles): add multi-vehicle dashboard with per-vehicle history`
   - Files: `src/app/dashboard/customer/vehicles/page.js`, `src/components/dashboard/VehicleCard.js`, `src/components/dashboard/VehicleHistory.js`
 
-- [ ] 22. **Multi-vehicle dashboard — Vehicle switching on service request**
+- [x] 22. **Multi-vehicle dashboard — Vehicle switching on service request**
 
   **What to do**:
   1. Update `src/components/dashboard/ServiceRequestPanel.js`:
@@ -1418,7 +1418,7 @@ Final Verification (4 parallel reviews):
   - Message: `feat(vehicles): add vehicle selector to service request flow`
   - Files: `src/components/dashboard/ServiceRequestPanel.js`, `src/app/dashboard/customer/page.js`
 
-- [ ] 23. **Warranty — Display warranty terms on booking confirmation**
+- [x] 23. **Warranty — Display warranty terms on booking confirmation**
 
   **What to do**:
   1. Create `src/lib/warranty/warrantyConstants.js`:
@@ -1468,7 +1468,7 @@ Final Verification (4 parallel reviews):
   - Message: `feat(warranty): add warranty terms display on booking and order confirmations`
   - Files: `src/lib/warranty/warrantyConstants.js`, `src/components/dashboard/WarrantyDisplay.js`
 
-- [ ] 24. **Warranty — Claims management UI**
+- [x] 24. **Warranty — Claims management UI**
 
   **What to do**:
   1. Create `src/app/marketplace/profile/warranty/page.js`:
@@ -1509,7 +1509,7 @@ Final Verification (4 parallel reviews):
   - Message: `feat(warranty): add warranty claims management UI and admin panel`
   - Files: `src/app/marketplace/profile/warranty/page.js`, `src/components/warranty/WarrantyClaimForm.js`, `src/app/admin/warranty/page.js`
 
-- [ ] 25. **Warranty — Expiry tracking + renewal reminders**
+- [x] 25. **Warranty — Expiry tracking + renewal reminders**
 
   **What to do**:
   1. Create warranty expiry tracking in `src/lib/warranty/warrantyTracker.js`:

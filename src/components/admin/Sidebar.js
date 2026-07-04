@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { UserCircle, Briefcase, AlertTriangle, BarChart3, Users, FileCheck, Wrench, Building2, CreditCard, X } from "lucide-react";
+import { UserCircle, Briefcase, AlertTriangle, BarChart3, Users, FileCheck, Wrench, Building2, CreditCard, ShieldCheck, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAuthStore } from "@/store/authStore";
 import api from "@/lib/api";
@@ -17,6 +17,7 @@ const NAV_ITEMS = [
   { name: "Payments", icon: CreditCard, path: "/admin/payments" },
   { name: "KYC Verifications", icon: FileCheck, path: "/admin/kyc", badgeKey: "kyc" },
   { name: "Disputes", icon: AlertTriangle, path: "/admin/disputes", badgeKey: "disputes" },
+  { name: "Warranty Claims", icon: ShieldCheck, path: "/admin/warranty" },
 ];
 
 export function Sidebar({ currentPath = "/admin", onClose }) {

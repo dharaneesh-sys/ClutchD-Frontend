@@ -15,6 +15,7 @@ import {
   Settings,
   ChevronRight,
   Crown,
+  ShieldAlert,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -33,6 +34,7 @@ const MENU_SECTIONS = [
       { icon: ShoppingBag, label: "Orders", path: "/marketplace/profile/orders" },
       { icon: CreditCard, label: "Payments & Bills", path: "/marketplace/profile/payments" },
       { icon: Wrench, label: "My Services", path: "/marketplace/profile/services" },
+      { icon: ShieldAlert, label: "Warranty Claims", path: "/marketplace/profile/warranty" },
       { icon: Heart, label: "Favorites", path: "/marketplace/profile/favorites" },
     ],
   },
