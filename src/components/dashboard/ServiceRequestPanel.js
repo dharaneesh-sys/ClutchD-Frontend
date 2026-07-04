@@ -15,6 +15,7 @@ import { useTrackingStore } from "@/store/trackingStore";
 import { cn } from "@/lib/utils";
 import api from "@/lib/api";
 import { VehicleManagerModal } from "@/components/dashboard/VehicleManagerModal";
+import { SubscriptionBadge } from "@/components/subscription/SubscriptionBadge";
 
 function LocationIndicator() {
   const { userLocation, gpsStatus, requestGPSLocation } = useTrackingStore();
@@ -216,7 +217,10 @@ export function ServiceRequestPanel({ onSubmit, isLoading }) {
   return (
     <GlassCard variant="strong" className="w-full p-6 flex flex-col relative flex-shrink-0">
       <div className="mb-6">
-        <h2 className="text-2xl font-bold mb-1 text-text-primary">Request Service</h2>
+        <div className="flex items-center gap-2 mb-1">
+          <h2 className="text-2xl font-bold text-text-primary">Request Service</h2>
+          <SubscriptionBadge variant="pill" />
+        </div>
         <p className="text-sm text-text-muted">Tell us what&apos;s wrong with your vehicle</p>
       </div>
 

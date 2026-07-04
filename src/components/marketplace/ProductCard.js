@@ -2,11 +2,12 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { Star, Truck, Clock, ShoppingCart, Check } from "lucide-react";
+import { Star, Truck, Clock, ShoppingCart, Check, Crown } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { formatCurrency } from "@/lib/utils";
 import { ProductImage } from "@/components/marketplace/ProductImage";
 import { useCartStore } from "@/store/cartStore";
+import { useSubscriptionStore } from "@/store/subscriptionStore";
 
 /**
  * Product card for marketplace search results.
@@ -28,6 +29,9 @@ import { useCartStore } from "@/store/cartStore";
 export function ProductCard({ product, className }) {
   const [adding, setAdding] = useState(false);
   const addItem = useCartStore((s) => s.addItem);
+  const subscriptionPlanId = useSubscriptionStore((s) => s.planId);
+  const subscriptionStatus = useSubscriptionStore((s) => s.status);
+  const isProUser = subscriptionPlanId === "pro" && subscriptionStatus === "active";
 
   if (!product) return null;
 
@@ -140,10 +144,25 @@ export function ProductCard({ product, className }) {
         </div>
 
         {/* Price + Add to Cart */}
-        <div className="flex items-center justify-between pt-1">
-          <span className="text-lg font-bold tracking-tight text-foreground">
-            {formatCurrency(price)}
-          </span>
+        <div className="flex items-center justify-between pt-1 gap-2">
+          <div className="flex items-center gap-3 min-w-0">
+            <div className="flex flex-col shrink-0">
+              <span className="text-lg font-bold tracking-tight text-foreground">
+                {isProUser ? formatCurrency(Math.round(price * 0.7)) : formatCurrency(price)}
+              </span>
+              {isProUser && price > 0 && (
+                <span className="text-[0.625rem] font-medium text-text-dim line-through">
+                  {formatCurrency(price)}
+                </span>
+              )}
+            </div>
+            {isProUser && price > 0 && (
+              <span className="inline-flex items-center gap-1 rounded-full bg-purple-500/15 px-2 py-0.5 text-[0.5rem] font-semibold uppercase tracking-wider text-purple-300 whitespace-nowrap">
+                <Crown size={8} />
+                Pro -30%
+              </span>
+            )}
+          </div>
           <button
             type="button"
             onClick={handleAddToCart}

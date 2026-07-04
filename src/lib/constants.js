@@ -14,7 +14,20 @@ export const SERVICE_STATUS = {
   EN_ROUTE: "en_route",
   IN_PROGRESS: "in_progress",
   PAYMENT_PENDING: "payment_pending",
+  PAYMENT_ESCROW: "payment_escrow",
+  PAYMENT_RELEASED: "payment_released",
+  PAYMENT_DISPUTE: "payment_dispute",
   COMPLETED: "completed",
+};
+
+/**
+ * Escrow-specific sub-states for the payment escrow lifecycle.
+ * @type {Object<string, string>}
+ */
+export const ESCROW_STATUS = {
+  PAYMENT_ESCROW: "payment_escrow",
+  PAYMENT_RELEASED: "payment_released",
+  PAYMENT_DISPUTE: "payment_dispute",
 };
 
 export const EXPERTISE_OPTIONS = [

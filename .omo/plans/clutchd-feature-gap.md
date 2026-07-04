@@ -320,7 +320,7 @@ Final Verification (4 parallel reviews):
   - Message: `feat(push): integrate FCM with notificationStore and settings`
   - Files: `src/store/notificationStore.js`, `src/app/marketplace/profile/settings/page.js`, `src/app/layout.js`, `src/components/ui/PushPermissionBanner.js`
 
-- [ ] 3. **FCM — Handle push notifications (foreground + background)**
+- [x] 3. **FCM — Handle push notifications (foreground + background)**
 
   **What to do**:
   1. In `src/lib/push/pushService.js`:
@@ -823,7 +823,7 @@ Final Verification (4 parallel reviews):
   - Message: `feat(payment): configure Razorpay env vars and health gating`
   - Files: `env.local.example`, `render.yaml`, `src/components/dashboard/PaymentModal.js`, `src/lib/backendHealth.js`
 
-- [ ] 11. **Razorpay — Health-gate existing payment flow + demo fallback**
+- [x] 11. **Razorpay — Health-gate existing payment flow + demo fallback**
 
   **Context**: `PaymentModal.js` already has the complete Razorpay flow (lines 88-160):
   1. Script load → Razorpay Checkout
@@ -897,7 +897,7 @@ Final Verification (4 parallel reviews):
   - Message: `feat(payment): health-gate Razorpay flow with demo fallback`
   - Files: `src/components/dashboard/PaymentModal.js`
 
-- [ ] 12. **Payment escrow — State machine for service bookings** (requires backend)
+- [x] 12. **Payment escrow — State machine for service bookings** (requires backend)
 
   **Context**: Backend uses Razorpay for payment capture. Escrow (hold payment until service completion) is not a built-in Razorpay feature — it requires the backend to delay the transfer. This task builds the UI state machine only; the actual fund release requires `POST /api/payments/transfer` (a backend endpoint).
 
@@ -1014,7 +1014,7 @@ Final Verification (4 parallel reviews):
   - Message: `feat(subscription): add subscription plan UI and page`
   - Files: `src/lib/constants.js`, `src/components/subscription/PlanCard.js`, `src/components/subscription/SubscriptionManager.js`, `src/app/marketplace/profile/subscription/page.js`
 
-- [ ] 14. **Subscription plans — Purchase flow** ⚠️ (requires backend — no subscription API exists yet)
+- [x] 14. **Subscription plans — Purchase flow** ⚠️ (requires backend — no subscription API exists yet)
 
   **What to do**:
   1. Create `src/lib/payment/subscriptionService.js`:
@@ -1111,7 +1111,7 @@ Final Verification (4 parallel reviews):
   - Message: `feat(invoice): add fallback handling for backend invoice endpoint`
   - Files: `src/components/dashboard/ServiceHistory.js`, `src/components/marketplace/OrderHistory.js`
 
-- [ ] 16. **Invoice PDF — Email via client-side mailto: link**
+- [x] 16. **Invoice PDF — Email via client-side mailto: link**
 
   **Context**: The backend has **no email sending service** — no `smtplib`, SendGrid, or Mailgun integration found. Sending invoices via email requires backend changes that are out of scope. Instead, use a `mailto:` link that opens the user's email client with the invoice data attached or linked.
 

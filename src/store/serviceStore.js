@@ -1,12 +1,14 @@
 import { create } from "zustand";
 import api from "@/lib/api";
 import { SERVICE_STATUS } from "@/lib/constants";
+import { BackendHealth } from "@/lib/backendHealth";
 
 export const useServiceStore = create((set, get) => ({
   activeRequest: null,
   history: [],
   isLoading: false,
   error: null,
+  paymentId: null,
   
   createRequest: async (data) => {
     set({ isLoading: true, error: null });
@@ -109,6 +111,110 @@ export const useServiceStore = create((set, get) => ({
     });
   },
   
+  /**
+   * Move the request into escrow after payment is collected.
+   * Payment is held until the customer explicitly releases it.
+   */
+  holdPayment: async (paymentDetails) => {
+    const currentReq = get().activeRequest;
+    if (!currentReq) return;
+
+    const paymentId = paymentDetails?.transactionId || paymentDetails?.razorpay_payment_id || `pay_${Date.now()}`;
+
+    // Best-effort backend call — works with or without the backend
+    const backendUp = BackendHealth.isAvailable();
+    if (backendUp) {
+      try {
+        await api.post(`/service/request/${currentReq.id}/hold`, paymentDetails);
+      } catch {
+        // non-critical — local state already updated
+      }
+    }
+
+    set((state) => ({
+      activeRequest: state.activeRequest
+        ? {
+            ...state.activeRequest,
+            status: SERVICE_STATUS.PAYMENT_ESCROW,
+            payment: paymentDetails,
+            paymentId,
+          }
+        : null,
+      paymentId,
+    }));
+  },
+
+  /**
+   * Release the escrowed payment to the mechanic and complete the service.
+   * Called when the customer confirms satisfaction.
+   */
+  releasePayment: async () => {
+    const currentReq = get().activeRequest;
+    if (!currentReq) return;
+
+    // First update to PAYMENT_RELEASED for visual feedback
+    set((state) => ({
+      activeRequest: state.activeRequest
+        ? { ...state.activeRequest, status: SERVICE_STATUS.PAYMENT_RELEASED }
+        : null,
+    }));
+
+    // Best-effort backend call
+    const backendUp = BackendHealth.isAvailable();
+    if (backendUp) {
+      try {
+        await api.post(`/service/request/${currentReq.id}/release`, {
+          paymentId: currentReq.paymentId,
+        });
+      } catch {
+        // non-critical
+      }
+    }
+
+    // Transition to COMPLETED and move to history
+    set((state) => {
+      if (!state.activeRequest) return state;
+      const completed = {
+        ...state.activeRequest,
+        status: SERVICE_STATUS.COMPLETED,
+        payment: { ...state.activeRequest.payment, released: true },
+        completedAt: new Date().toISOString(),
+      };
+      return {
+        activeRequest: null,
+        history: [completed, ...state.history],
+      };
+    });
+  },
+
+  /**
+   * Flag the payment as disputed. Moves the request out of the
+   * normal completion flow until the dispute is resolved.
+   */
+  disputePayment: async (reason) => {
+    const currentReq = get().activeRequest;
+    if (!currentReq) return;
+
+    const backendUp = BackendHealth.isAvailable();
+    if (backendUp) {
+      try {
+        await api.post(`/service/request/${currentReq.id}/dispute`, { reason });
+      } catch {
+        // non-critical
+      }
+    }
+
+    set((state) => ({
+      activeRequest: state.activeRequest
+        ? {
+            ...state.activeRequest,
+            status: SERVICE_STATUS.PAYMENT_DISPUTE,
+            disputeReason: reason,
+          }
+        : null,
+    }));
+  },
+
   cancelRequest: async () => {
     const currentReq = get().activeRequest;
     if (currentReq) {

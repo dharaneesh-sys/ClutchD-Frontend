@@ -4,10 +4,11 @@ import { useState, useEffect } from "react";
 import { GlassCard } from "@/components/ui/GlassCard";
 import { Badge } from "@/components/ui/Badge";
 import { ConfirmModal } from "@/components/ui/ConfirmModal";
-import { Calendar, Download, MapPin, Loader2, Wrench, ChevronDown, ChevronUp, Receipt, RefreshCw } from "lucide-react";
+import { Calendar, Download, MapPin, Loader2, Wrench, ChevronDown, ChevronUp, Receipt, RefreshCw, Mail } from "lucide-react";
 import api, { extractApiError } from "@/lib/api";
 import { GST_RATE } from "@/lib/constants";
 import { useToast } from "@/hooks/useToast";
+import { useAuthStore } from "@/store/authStore";
 import { format } from "date-fns";
 import { PaymentModal } from "@/components/dashboard/PaymentModal";
 
@@ -73,6 +74,53 @@ export function ServiceHistory() {
         setTimeout(() => setErrorToast(null), 4000);
       }
     }
+  };
+
+  const emailInvoice = async (job) => {
+    const pricing = job.pricing;
+    if (!pricing) return;
+
+    const userEmail = useAuthStore.getState().user?.email || "";
+    const email = window.prompt("Send invoice to email:", userEmail);
+    if (!email) return;
+
+    const invoiceId = job.id.substring(0, 8).toUpperCase();
+    const subject = `Invoice from ClutchD - ${invoiceId}`;
+
+    const bodyLines = [
+      `Invoice #${invoiceId}`,
+      `Service: ${job.issueTag}`,
+      `Date: ${job.createdAt ? format(new Date(job.createdAt), "MMM d, yyyy") : "N/A"}`,
+      `Description: ${job.description}`,
+      "",
+      "--- Pricing Breakdown ---",
+      `Service Fee: ₹${(pricing.serviceAmount ?? 0).toFixed(2)}`,
+      `Convenience Fee: ₹${(pricing.convenienceFee ?? 0).toFixed(2)}`,
+      `Cancellation Fee: ₹${(pricing.cancellationFee ?? 0).toFixed(2)}`,
+      `Distance (${(pricing.distanceKm ?? 0).toFixed(1)} km): ₹${(pricing.distanceFee ?? 0).toFixed(2)}`,
+      `GST (${GST_RATE * 100}%): ₹${(pricing.gstAmount ?? 0).toFixed(2)}`,
+      `Grand Total: ₹${(pricing.totalAmount ?? 0).toFixed(2)}`,
+      "",
+      `Download your invoice PDF here:`,
+      `${window.location.origin}/api/jobs/history/${job.id}/invoice`,
+      "",
+      "Thank you for choosing ClutchD!",
+    ];
+
+    const mailtoLink =
+      `mailto:${encodeURIComponent(email)}` +
+      `?subject=${encodeURIComponent(subject)}` +
+      `&body=${encodeURIComponent(bodyLines.join("\n"))}`;
+
+    window.location.href = mailtoLink;
+
+    toast.info("Email client opened — send from your device");
+
+    try {
+      const downloadUrl = `${window.location.origin}/api/jobs/history/${job.id}/invoice`;
+      await navigator.clipboard.writeText(downloadUrl);
+      toast.success("Invoice download URL copied to clipboard");
+    } catch {} // clipboard unavailable
   };
 
   const toggleInvoice = (jobId) => {
@@ -176,6 +224,13 @@ export function ServiceHistory() {
                         >
                           <Download size={14} />
                           PDF
+                        </button>
+                        <button 
+                          onClick={() => emailInvoice(job)}
+                          className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors bg-bg-card text-text-primary hover:bg-surface-soft hover:text-icon-highlight active:bg-surface-soft"
+                        >
+                          <Mail size={14} />
+                          Email
                         </button>
                       </>
                     )}

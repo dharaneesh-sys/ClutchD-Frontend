@@ -1,9 +1,10 @@
 import { SERVICE_STATUS, GST_RATE } from "@/lib/constants";
 import { GlassCard } from "@/components/ui/GlassCard";
 import { Button } from "@/components/ui/Button";
-import { Search, UserCheck, Navigation, Wrench, CreditCard, CheckCircle2, Phone, MessageSquare, MapPin, Star } from "lucide-react";
+import { EscrowStatus } from "@/components/dashboard/EscrowStatus";
+import { Search, UserCheck, Navigation, Wrench, CreditCard, CheckCircle2, Shield, CheckCheck, Phone, MessageSquare, MapPin, Star } from "lucide-react";
 
-export function ServiceStatusTracker({ request, onComplete, onCancel }) {
+export function ServiceStatusTracker({ request, onComplete, onCancel, onReleasePayment, onDisputePayment }) {
 
   if (!request) return null;
 
@@ -13,6 +14,8 @@ export function ServiceStatusTracker({ request, onComplete, onCancel }) {
     { id: SERVICE_STATUS.EN_ROUTE, label: "En Route", icon: Navigation },
     { id: SERVICE_STATUS.IN_PROGRESS, label: "Fixing Vehicle", icon: Wrench },
     { id: SERVICE_STATUS.PAYMENT_PENDING, label: "Invoice", icon: CreditCard },
+    { id: SERVICE_STATUS.PAYMENT_ESCROW, label: "Payment Held", icon: Shield },
+    { id: SERVICE_STATUS.PAYMENT_RELEASED, label: "Released", icon: CheckCheck },
     { id: SERVICE_STATUS.COMPLETED, label: "Completed", icon: CheckCircle2 },
   ];
 
@@ -111,24 +114,35 @@ export function ServiceStatusTracker({ request, onComplete, onCancel }) {
               )}
             </div>
             <Button className="w-full" size="lg" onClick={() => onComplete(request)}>
-              Pay ₹{pricing?.totalAmount?.toFixed(0) || "—"} & Review
+              Pay ₹{pricing?.totalAmount?.toFixed(0) || "—"}
             </Button>
+          </div>
+        );
+
+      case SERVICE_STATUS.PAYMENT_ESCROW:
+      case SERVICE_STATUS.PAYMENT_RELEASED:
+      case SERVICE_STATUS.PAYMENT_DISPUTE:
+        return (
+          <div className="mt-4">
+            <EscrowStatus
+              status={request.status}
+              paymentAmount={request.pricing?.totalAmount}
+              onRelease={onReleasePayment}
+              onDispute={onDisputePayment}
+            />
           </div>
         );
 
       case SERVICE_STATUS.COMPLETED:
         return (
           <div className="text-center py-6 mt-4">
-            <div className="inline-flex flex-col gap-4">
-               <div>
-                 <p className="text-sm mb-1 text-text-muted">Estimated Amount</p>
-                 <p className="text-3xl font-bold tracking-tight text-text-primary">
-                   ₹{request.priceEstimate?.min || "—"} – ₹{request.priceEstimate?.max || "—"}
-                 </p>
-                 <p className="text-xs mt-1 text-text-dim">Final amount confirmed after review</p>
-               </div>
-               <Button onClick={() => onComplete(request)}>Pay & Review</Button>
+            <div className="w-16 h-16 mx-auto rounded-full flex items-center justify-center mb-4 bg-surface-soft text-primary">
+              <CheckCircle2 size={28} />
             </div>
+            <h3 className="text-lg font-bold mb-1 text-text-primary">Service Completed</h3>
+            <p className="text-sm text-text-muted">
+              ₹{request.pricing?.totalAmount?.toFixed(0) || request.payment?.amount || "—"} paid
+            </p>
           </div>
         );
 
@@ -186,9 +200,12 @@ export function ServiceStatusTracker({ request, onComplete, onCancel }) {
         {renderStatusCard()}
       </div>
 
-      {request.status !== SERVICE_STATUS.COMPLETED && (
+      {request.status !== SERVICE_STATUS.COMPLETED &&
+       request.status !== SERVICE_STATUS.PAYMENT_ESCROW &&
+       request.status !== SERVICE_STATUS.PAYMENT_RELEASED &&
+       request.status !== SERVICE_STATUS.PAYMENT_DISPUTE && (
          <div className="mt-4 pt-4 border-t text-center border-border-subtle">
-           <button 
+           <button
              type="button"
              onClick={onCancel}
              className="text-sm text-red-400 hover:text-red-300 transition-colors"

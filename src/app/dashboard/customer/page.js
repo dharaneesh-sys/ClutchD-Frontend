@@ -68,6 +68,18 @@ export default function CustomerDashboard() {
     (...args) => useServiceStore.getState().completeRequest(...args),
     []
   );
+  const holdPayment = useCallback(
+    (...args) => useServiceStore.getState().holdPayment(...args),
+    []
+  );
+  const releasePayment = useCallback(
+    () => useServiceStore.getState().releasePayment(),
+    []
+  );
+  const disputePayment = useCallback(
+    (reason) => useServiceStore.getState().disputePayment(reason),
+    []
+  );
 
   const [isPaymentOpen, setIsPaymentOpen] = useState(false);
   const [isReviewOpen, setIsReviewOpen] = useState(false);
@@ -196,9 +208,19 @@ export default function CustomerDashboard() {
 
   const handlePaymentSuccess = (paymentDetails) => {
     setIsPaymentOpen(false);
-    completeRequest(paymentDetails);
-    setIsReviewOpen(true);
+    // After payment is collected, money moves into escrow
+    holdPayment(paymentDetails);
+    // Review opens later, after customer releases the escrowed payment
   };
+
+  const handleReleasePayment = useCallback(() => {
+    releasePayment();
+    setIsReviewOpen(true);
+  }, [releasePayment]);
+
+  const handleDisputePayment = useCallback((reason) => {
+    disputePayment(reason);
+  }, [disputePayment]);
 
   const handleReviewSubmit = () => {
     setIsReviewOpen(false);
@@ -219,7 +241,9 @@ export default function CustomerDashboard() {
     (activeRequest.status === "assigned" ||
      activeRequest.status === "en_route" ||
      activeRequest.status === "in_progress" ||
-     activeRequest.status === "payment_pending");
+     activeRequest.status === "payment_pending" ||
+     activeRequest.status === "payment_escrow" ||
+     activeRequest.status === "payment_released");
 
   return (
     <>
@@ -284,6 +308,8 @@ export default function CustomerDashboard() {
                   request={activeRequest}
                   onComplete={handlePaymentInitiate}
                   onCancel={handleCancelRequest}
+                  onReleasePayment={handleReleasePayment}
+                  onDisputePayment={handleDisputePayment}
                 />
                 <ETAIndicator
                   mechanicLocation={mechanicLocation}

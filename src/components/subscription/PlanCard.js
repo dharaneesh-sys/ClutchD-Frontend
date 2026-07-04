@@ -1,6 +1,6 @@
 "use client";
 
-import { Check } from "lucide-react";
+import { Check, Loader2 } from "lucide-react";
 import { cn, formatCurrency } from "@/lib/utils";
 import { GlassCard } from "@/components/ui/GlassCard";
 import { Button } from "@/components/ui/Button";
@@ -14,8 +14,9 @@ import { Button } from "@/components/ui/Button";
  * @param {import("@/lib/constants").SubscriptionPlan} props.plan
  * @param {boolean} props.isCurrent - Whether this is the user's current plan
  * @param {(planId: string) => void} props.onSubscribe - Called with plan.id when CTA is clicked
+ * @param {boolean} [props.isSubscribing] - If true, the subscribe button is disabled with a spinner
  */
-export function PlanCard({ plan, isCurrent, onSubscribe }) {
+export function PlanCard({ plan, isCurrent, onSubscribe, isSubscribing }) {
   const isFree = plan.price === 0;
 
   return (
@@ -76,8 +77,20 @@ export function PlanCard({ plan, isCurrent, onSubscribe }) {
         size="md"
         className="w-full"
         onClick={() => onSubscribe(plan.id)}
+        disabled={isSubscribing || isCurrent}
       >
-        {isCurrent ? "Current Plan" : isFree ? "Get Started" : `Subscribe to ${plan.name}`}
+        {isSubscribing && !isCurrent ? (
+          <>
+            <Loader2 size={14} className="animate-spin mr-1.5" />
+            Subscribing…
+          </>
+        ) : isCurrent ? (
+          "Current Plan"
+        ) : isFree ? (
+          "Get Started"
+        ) : (
+          `Subscribe to ${plan.name}`
+        )}
       </Button>
     </GlassCard>
   );

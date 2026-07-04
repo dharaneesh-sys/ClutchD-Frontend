@@ -8,6 +8,7 @@ import { NotificationBell } from "@/components/ui/NotificationBell";
 import { useAuthStore } from "@/store/authStore";
 import { useRouter } from "next/navigation";
 import { LogOut, User, Building2, Wrench, Gift, Menu, X } from "lucide-react";
+import { SubscriptionBadge } from "@/components/subscription/SubscriptionBadge";
 
 const MODE_CONFIG = {
   customer: {
@@ -93,12 +94,15 @@ export function DashboardShell({
         <div className="flex items-center gap-2 lg:gap-4">
           {/* User info (desktop) */}
           <div className="hidden lg:flex flex-col items-end mr-2">
-            <span className={cn(
-              "text-sm font-semibold",
-              "text-text-primary"
-            )}>
-              {user?.name || config.label}
-            </span>
+            <div className="flex items-center gap-2">
+              <span className={cn(
+                "text-sm font-semibold",
+                "text-text-primary"
+              )}>
+                {user?.name || config.label}
+              </span>
+              <SubscriptionBadge variant="pill" showPlanName />
+            </div>
             <span className={cn(
               "text-[10px] uppercase tracking-wider font-medium",
               config.textClass
