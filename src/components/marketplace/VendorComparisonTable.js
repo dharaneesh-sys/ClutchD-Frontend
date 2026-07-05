@@ -452,7 +452,7 @@ export function VendorComparisonTable({ productId, product }) {
                                 : "text-text-muted",
                             )}
                           >
-                            {entry.vendor.rating.toFixed(1)}
+                            {Number(entry.vendor.rating || 0).toFixed(1)}
                           </span>
                         </div>
                         {entry.vendor.reviewCount > 0 && (
@@ -564,7 +564,7 @@ export function VendorComparisonTable({ productId, product }) {
                             "text-[0.6875rem]",
                             isBestRating ? "text-amber-400 font-medium" : "text-text-muted",
                           )}>
-                            {entry.vendor.rating.toFixed(1)}
+                            {Number(entry.vendor.rating || 0).toFixed(1)}
                           </span>
                           {entry.vendor.reviewCount > 0 && (
                             <span className="text-[0.625rem] text-text-dim">

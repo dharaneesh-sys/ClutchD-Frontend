@@ -107,27 +107,27 @@ export function ServiceStatusTracker({ request, onComplete, onCancel, onReleaseP
                 <div className="space-y-3 text-sm">
                   <div className="flex justify-between text-text-primary">
                     <span>Service Fee</span>
-                    <span className="font-semibold">₹{pricing.serviceAmount?.toFixed(2)}</span>
+                    <span className="font-semibold">₹{Number(pricing.serviceAmount ?? 0).toFixed(2)}</span>
                   </div>
                   <div className="flex justify-between text-text-primary">
                     <span>Convenience Fee</span>
-                    <span className="font-semibold">₹{pricing.convenienceFee?.toFixed(2)}</span>
+                    <span className="font-semibold">₹{Number(pricing.convenienceFee ?? 0).toFixed(2)}</span>
                   </div>
                   <div className="flex justify-between text-text-primary">
                     <span>Cancellation Fee</span>
-                    <span className="font-semibold">₹{pricing.cancellationFee?.toFixed(2)}</span>
+                    <span className="font-semibold">₹{Number(pricing.cancellationFee ?? 0).toFixed(2)}</span>
                   </div>
                   <div className="flex justify-between text-text-primary">
-                    <span>Distance ({pricing.distanceKm?.toFixed(1)} km)</span>
-                    <span className="font-semibold">₹{pricing.distanceFee?.toFixed(2)}</span>
+                    <span>Distance ({Number(pricing.distanceKm ?? 0).toFixed(1)} km)</span>
+                    <span className="font-semibold">₹{Number(pricing.distanceFee ?? 0).toFixed(2)}</span>
                   </div>
                   <div className="flex justify-between text-text-primary">
                     <span>GST ({GST_RATE * 100}%)</span>
-                    <span className="font-semibold">₹{pricing.gstAmount?.toFixed(2)}</span>
+                    <span className="font-semibold">₹{Number(pricing.gstAmount ?? 0).toFixed(2)}</span>
                   </div>
                   <div className="border-t pt-3 mt-3 flex justify-between font-bold text-base border-border-subtle text-text-primary">
                     <span>Total</span>
-                    <span className="text-icon-highlight">₹{pricing.totalAmount?.toFixed(2)}</span>
+                    <span className="text-icon-highlight">₹{Number(pricing.totalAmount ?? 0).toFixed(2)}</span>
                   </div>
                 </div>
               ) : (
@@ -136,7 +136,7 @@ export function ServiceStatusTracker({ request, onComplete, onCancel, onReleaseP
             </div>
             <WarrantyTerms variant="inline" className="mb-4" />
             <Button className="w-full" size="lg" onClick={() => onComplete(request)}>
-              Pay ₹{pricing?.totalAmount?.toFixed(0) || "—"}
+              Pay ₹{Number(pricing?.totalAmount ?? 0).toFixed(0) || "—"}
             </Button>
           </div>
         );
@@ -164,7 +164,7 @@ export function ServiceStatusTracker({ request, onComplete, onCancel, onReleaseP
               </div>
               <h3 className="text-lg font-bold mb-1 text-text-primary">Service Completed</h3>
               <p className="text-sm text-text-muted">
-                ₹{request.pricing?.totalAmount?.toFixed(0) || request.payment?.amount || "—"} paid
+                ₹{Number(request.pricing?.totalAmount ?? 0).toFixed(0) || request.payment?.amount || "—"} paid
               </p>
             </div>
             <WarrantyTerms />

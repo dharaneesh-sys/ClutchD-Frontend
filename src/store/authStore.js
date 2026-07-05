@@ -208,18 +208,45 @@ export const useAuthStore = create(
           cacheUserProfile(response.data.user);
           return response.data.user;
         } catch (error) {
-          const status = error.response?.status;
+          // Backend OAuth failed — fall through to Firebase Auth signInWithCredential
+          // (no popup needed — we already have the credential from GSI)
+          try {
+            const { signInWithGoogleCredential } = await import(
+              "@/lib/auth/firebaseAuth"
+            );
+            const firebaseUser = await signInWithGoogleCredential(credential);
 
-          // Backend unavailable — fall through to Firebase Auth popup
-          if (status === 503) {
-            return get().firebaseSignIn(safeRole);
+            if (!firebaseUser) {
+              set({ isLoading: false, error: null });
+              return null;
+            }
+
+            const localUser = {
+              id: firebaseUser.uid,
+              name: firebaseUser.displayName || "Google User",
+              email: firebaseUser.email || "",
+              avatar: firebaseUser.photoURL || null,
+              role: safeRole || "customer",
+              provider: "firebase",
+            };
+
+            if (typeof window !== "undefined") {
+              setAccessToken("firebase-local-jwt-token");
+            }
+
+            set({
+              user: localUser,
+              isAuthenticated: true,
+              _hydrated: true,
+              isLoading: false,
+            });
+            cacheUserProfile(localUser);
+            return localUser;
+          } catch (fbError) {
+            const msg = "Google sign-in failed. Please try again.";
+            set({ isLoading: false, error: msg });
+            return null;
           }
-
-          const msg =
-            error.response?.data?.detail ||
-            (error.response ? "Google login failed." : "Server unreachable. Please check your connection.");
-          set({ isLoading: false, error: msg });
-          return null;
         }
       },
 

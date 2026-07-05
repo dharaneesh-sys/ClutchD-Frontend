@@ -182,7 +182,7 @@ export function ServiceHistory() {
                    {job.customerLocation && (
                      <div className="flex items-center gap-1.5">
                        <MapPin size={14} className="text-icon-highlight" />
-                       {job.customerLocation.lat?.toFixed(4)}, {job.customerLocation.lng?.toFixed(4)}
+                       {Number(job.customerLocation.lat ?? 0).toFixed(4)}, {Number(job.customerLocation.lng ?? 0).toFixed(4)}
                      </div>
                    )}
                 </div>
@@ -258,27 +258,27 @@ export function ServiceHistory() {
 
                 <div className="flex justify-between text-text-primary">
                   <span>Service Fee</span>
-                  <span className="font-medium">₹{pricing.serviceAmount?.toFixed(2) ?? "0.00"}</span>
+                  <span className="font-medium">₹{Number(pricing.serviceAmount ?? 0).toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between text-text-primary">
                   <span>Convenience Fee</span>
-                  <span className="font-medium">₹{pricing.convenienceFee?.toFixed(2) ?? "0.00"}</span>
+                  <span className="font-medium">₹{Number(pricing.convenienceFee ?? 0).toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between text-text-primary">
                   <span>Cancellation Fee</span>
-                  <span className="font-medium">₹{pricing.cancellationFee?.toFixed(2) ?? "0.00"}</span>
+                  <span className="font-medium">₹{Number(pricing.cancellationFee ?? 0).toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between text-text-primary">
-                  <span>Distance ({pricing.distanceKm?.toFixed(1) ?? "0.0"} km)</span>
-                  <span className="font-medium">₹{pricing.distanceFee?.toFixed(2) ?? "0.00"}</span>
+                  <span>Distance ({Number(pricing.distanceKm ?? 0).toFixed(1)} km)</span>
+                  <span className="font-medium">₹{Number(pricing.distanceFee ?? 0).toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between text-text-primary">
                   <span>GST ({GST_RATE * 100}%)</span>
-                  <span className="font-medium">₹{pricing.gstAmount?.toFixed(2) ?? "0.00"}</span>
+                  <span className="font-medium">₹{Number(pricing.gstAmount ?? 0).toFixed(2)}</span>
                 </div>
                 <div className="border-t pt-2 mt-2 flex justify-between font-bold border-border-subtle text-text-primary">
                   <span>Grand Total</span>
-                  <span className="text-icon-highlight">₹{pricing.totalAmount?.toFixed(2) ?? "0.00"}</span>
+                  <span className="text-icon-highlight">₹{Number(pricing.totalAmount ?? 0).toFixed(2)}</span>
                 </div>
 
                 <div className="mt-3 pt-2 border-t space-y-1 border-border-subtle">

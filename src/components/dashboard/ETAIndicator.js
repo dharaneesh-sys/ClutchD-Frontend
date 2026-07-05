@@ -96,7 +96,7 @@ export function ETAIndicator({ mechanicLocation, userLocation, status }) {
         </span>
         <span className="text-text-primary">
           Mechanic is{" "}
-          <strong>{info.distanceKm.toFixed(1)} km</strong> away (
+          <strong>{Number(info.distanceKm ?? 0).toFixed(1)} km</strong> away (
           {formatETA(info.etaSeconds)})
         </span>
       </div>

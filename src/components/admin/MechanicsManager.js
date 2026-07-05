@@ -187,7 +187,7 @@ export function MechanicsManager() {
             </div>
             <div className={`p-4 rounded-xl border ${"bg-bg-card border-border-subtle"}`}>
               <p className={`text-xs uppercase mb-1 ${"text-text-dim"}`}>Location</p>
-              <p className={`font-medium flex items-center gap-1 ${"text-text-primary"}`}><MapPin size={14} /> {profileModal.location || `${profileModal.lat?.toFixed(4)}, ${profileModal.lon?.toFixed(4)}`}</p>
+              <p className={`font-medium flex items-center gap-1 ${"text-text-primary"}`}><MapPin size={14} /> {profileModal.location || `${Number(profileModal.lat ?? 0).toFixed(4)}, ${Number(profileModal.lon ?? 0).toFixed(4)}`}</p>
             </div>
             <div className="grid grid-cols-3 gap-4">
               <div className={`p-4 rounded-xl border ${"bg-bg-card border-border-subtle"}`}>

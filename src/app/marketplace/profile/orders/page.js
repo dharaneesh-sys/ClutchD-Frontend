@@ -286,7 +286,7 @@ function DetailModal({ order, onClose }) {
                 )}
                 {order.pricing.distanceFee > 0 && (
                   <div className="flex justify-between text-sm text-text-primary">
-                    <span>Distance ({order.pricing.distanceKm?.toFixed(1) || "0.0"} km)</span>
+                    <span>Distance ({Number(order.pricing.distanceKm ?? 0).toFixed(1)} km)</span>
                     <span className="font-medium">{formatCurrency(order.pricing.distanceFee)}</span>
                   </div>
                 )}

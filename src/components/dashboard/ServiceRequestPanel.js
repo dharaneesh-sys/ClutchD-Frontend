@@ -81,7 +81,7 @@ function LocationIndicator() {
       {gpsStatus === "granted" && userLocation && (
         <p className="text-xs mt-1 text-text-muted">
           <MapPin size={10} className="inline-block mr-0.5 -mt-0.5" />
-          {userLocation[0]?.toFixed(4)}, {userLocation[1]?.toFixed(4)}
+          {Number(userLocation[0] ?? 0).toFixed(4)}, {Number(userLocation[1] ?? 0).toFixed(4)}
         </p>
       )}
 

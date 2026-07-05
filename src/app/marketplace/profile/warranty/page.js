@@ -320,7 +320,9 @@ export default function WarrantyClaimsPage() {
       const userClaims = WarrantyClaimsStore.getUserClaims(userId);
       setClaims(userClaims);
 
-      // Load completed services from localStorage or demo data
+      // Load completed services from localStorage
+      // Do NOT fall back to demo mock data — that would leak fake
+      // completed services into real user accounts.
       let services = [];
       try {
         const raw = localStorage.getItem("clutchd_services");
@@ -329,26 +331,6 @@ export default function WarrantyClaimsPage() {
         }
       } catch {
         // ignore
-      }
-
-      // If no services in localStorage, pull from demo data
-      if (services.length === 0) {
-        const { MOCK_BOOKINGS } = await import("@/lib/demo/mockData");
-        const { MOCK_ISSUE_TAGS } = await import("@/lib/demo/mockData");
-        const issueLabels = {};
-        MOCK_ISSUE_TAGS.forEach((t) => { issueLabels[t.value] = t.label; });
-
-        services = MOCK_BOOKINGS
-          .filter((b) => b.status === "completed")
-          .map((b) => ({
-            id: b.id,
-            serviceType: b.serviceType,
-            issueTag: b.serviceType,
-            serviceLabel: issueLabels[b.serviceType] || b.serviceType,
-            createdAt: b.createdAt,
-            status: b.status,
-            amount: b.amount,
-          }));
       }
 
       setCompletedServices(services);

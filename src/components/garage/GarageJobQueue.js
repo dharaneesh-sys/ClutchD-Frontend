@@ -155,7 +155,7 @@ export function GarageJobQueue({ onChat }) {
                   <div className="flex items-center justify-between text-xs text-text-muted">
                       <div className="flex items-center gap-1">
                         <MapPin size={12} className="text-icon-highlight" />
-                        {job.customerLat?.toFixed(4)}, {job.customerLng?.toFixed(4)}
+                        {Number(job.customerLat ?? 0).toFixed(4)}, {Number(job.customerLng ?? 0).toFixed(4)}
                       </div>
                      <div className="flex items-center gap-1">
                        <Clock size={12} />

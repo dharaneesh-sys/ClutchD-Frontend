@@ -286,27 +286,27 @@ function PaymentModalContent({ isOpen, onClose, amount, pricing, jobId, onSucces
             <div className="mt-2 p-4 rounded-xl border space-y-2 text-sm animate-in slide-in-from-top-1 bg-bg-card border-border-subtle">
               <div className="flex justify-between text-text-primary">
                 <span>Service Fee</span>
-                <span className="font-medium">₹{pricing.serviceAmount?.toFixed(2)}</span>
+                <span className="font-medium">₹{Number(pricing.serviceAmount ?? 0).toFixed(2)}</span>
               </div>
               <div className="flex justify-between text-text-primary">
                 <span>Convenience Fee</span>
-                <span className="font-medium">₹{pricing.convenienceFee?.toFixed(2)}</span>
+                <span className="font-medium">₹{Number(pricing.convenienceFee ?? 0).toFixed(2)}</span>
               </div>
               <div className="flex justify-between text-text-primary">
                 <span>Cancellation Fee</span>
-                <span className="font-medium">₹{pricing.cancellationFee?.toFixed(2)}</span>
+                <span className="font-medium">₹{Number(pricing.cancellationFee ?? 0).toFixed(2)}</span>
               </div>
               <div className="flex justify-between text-text-primary">
-                <span>Distance ({pricing.distanceKm?.toFixed(1)} km)</span>
-                <span className="font-medium">₹{pricing.distanceFee?.toFixed(2)}</span>
+                <span>Distance ({Number(pricing.distanceKm ?? 0).toFixed(1)} km)</span>
+                <span className="font-medium">₹{Number(pricing.distanceFee ?? 0).toFixed(2)}</span>
               </div>
               <div className="flex justify-between text-text-primary">
                 <span>GST ({GST_RATE * 100}%)</span>
-                <span className="font-medium">₹{pricing.gstAmount?.toFixed(2)}</span>
+                <span className="font-medium">₹{Number(pricing.gstAmount ?? 0).toFixed(2)}</span>
               </div>
               <div className="border-t pt-2 mt-2 flex justify-between font-bold border-border-subtle text-text-primary">
                 <span>Grand Total</span>
-                <span className="text-icon-highlight">₹{pricing.totalAmount?.toFixed(2)}</span>
+                <span className="text-icon-highlight">₹{Number(pricing.totalAmount ?? 0).toFixed(2)}</span>
               </div>
               <p className="text-[10px] mt-2 text-text-dim">
                 Platform fee goes to ClutchD • Service fee goes to your provider
@@ -349,7 +349,7 @@ function PaymentModalContent({ isOpen, onClose, amount, pricing, jobId, onSucces
       {method === "qr" && qrData && (
         <div className="p-4 rounded-xl border text-center mb-6 animate-in slide-in-from-top-2 bg-bg-card border-border-subtle">
           <div className="w-44 h-44 bg-white p-2 rounded-lg mx-auto mb-3 border-2 border-border-subtle">
-            <Image src={qrData.image_url} alt={`QR code for ₹${displayAmount.toFixed(2)}`} width={176} height={176} className="w-full h-full object-contain" unoptimized />
+            <Image src={qrData.image_url} alt={`QR code for ₹${Number(displayAmount).toFixed(2)}`} width={176} height={176} className="w-full h-full object-contain" unoptimized />
           </div>
           <p className="text-sm font-medium mb-1 text-text-primary">Scan to Pay ₹{Number(displayAmount).toFixed(2)}</p>
           <p className="text-xs text-text-muted">Waiting for payment...</p>
@@ -363,7 +363,7 @@ function PaymentModalContent({ isOpen, onClose, amount, pricing, jobId, onSucces
       {/* Pay button */}
       {!(method === "qr" && qrData) && (
         <Button className="w-full" size="lg" onClick={handlePay} isLoading={payState === "processing"}>
-          {method === "cash" ? `Confirm Cash ₹${displayAmount.toFixed(0)}` : `Pay ₹${displayAmount.toFixed(0)} Securely`}
+          {method === "cash" ? `Confirm Cash ₹${Number(displayAmount).toFixed(0)}` : `Pay ₹${Number(displayAmount).toFixed(0)} Securely`}
         </Button>
       )}
 

@@ -273,7 +273,7 @@ export function JobMonitor() {
                 <p className="text-[10px] uppercase mb-1 text-text-muted">Customer</p>
                 <p className="text-sm font-medium text-text-primary">
                   {trackMapModal.customer}<br/>
-                  <span className="text-xs opacity-70">{trackData.customerLat?.toFixed(4)}, {trackData.customerLon?.toFixed(4)}</span>
+                  <span className="text-xs opacity-70">{Number(trackData.customerLat ?? 0).toFixed(4)}, {Number(trackData.customerLon ?? 0).toFixed(4)}</span>
                 </p>
               </div>
               {trackData.providerLat && (
@@ -281,7 +281,7 @@ export function JobMonitor() {
                   <p className="text-[10px] uppercase mb-1 text-text-muted">Provider</p>
                   <p className="text-sm font-medium text-text-primary">
                     {trackMapModal.provider}<br/>
-                    <span className="text-xs opacity-70">{trackData.providerLat?.toFixed(4)}, {trackData.providerLon?.toFixed(4)}</span>
+                    <span className="text-xs opacity-70">{Number(trackData.providerLat ?? 0).toFixed(4)}, {Number(trackData.providerLon ?? 0).toFixed(4)}</span>
                   </p>
                 </div>
               )}

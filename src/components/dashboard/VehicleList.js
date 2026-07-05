@@ -70,7 +70,7 @@ function VehicleServiceJobCard({ job }) {
         {pricing?.totalAmount ? (
           <div className="text-right shrink-0">
             <p className="text-sm font-bold text-icon-highlight">
-              ₹{pricing.totalAmount.toFixed(2)}
+              ₹{Number(pricing.totalAmount || 0).toFixed(2)}
             </p>
           </div>
         ) : null}
