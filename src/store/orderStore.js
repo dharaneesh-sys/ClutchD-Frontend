@@ -2,19 +2,10 @@ import { create } from "zustand";
 import { devtools } from "zustand/middleware";
 import api from "@/lib/api";
 import { useCartStore } from "@/store/cartStore";
-
-function toCamelCase(obj) {
-  if (Array.isArray(obj)) return obj.map(toCamelCase);
-  if (obj !== null && typeof obj === "object" && !(obj instanceof Date)) {
-    return Object.fromEntries(
-      Object.entries(obj).map(([k, v]) => [
-        k.replace(/_([a-z])/g, (_, c) => c.toUpperCase()),
-        toCamelCase(v),
-      ])
-    );
-  }
-  return obj;
-}
+import { useToastStore } from "@/store/toastStore";
+import { useNotificationStore } from "@/store/notificationStore";
+import { ORDER_STATUSES } from "@/lib/constants";
+import { toCamelCase } from "@/lib/utils";
 
 const initialState = {
   orders: [],
@@ -99,6 +90,51 @@ export const useOrderStore = create(
               : "Server unreachable.");
           set({ orders: [], isLoading: false, error: msg });
         }
+      },
+
+      /**
+       * Update the status of an order locally and fire notifications.
+       *
+       * Shows a toast notification for the status transition and increments the
+       * unread badge count in the notification store. Skips no-op transitions
+       * (same status) to prevent duplicate notifications.
+       *
+       * @param {string} orderId
+       * @param {string} newStatus
+       * @returns {boolean} Whether the status was actually changed.
+       */
+      updateOrderStatus: (orderId, newStatus) => {
+        const { orders, activeOrder } = get();
+        const order = orders.find((o) => o.id === orderId);
+        if (!order) return false;
+        if (order.status === newStatus) return false;
+
+        const label = ORDER_STATUSES[newStatus] || newStatus;
+        const shortId = orderId.length > 10 ? orderId.slice(0, 8) : orderId;
+
+        set({
+          orders: orders.map((o) =>
+            o.id === orderId ? { ...o, status: newStatus } : o,
+          ),
+          activeOrder:
+            activeOrder?.id === orderId
+              ? { ...activeOrder, status: newStatus }
+              : activeOrder,
+        });
+
+        const toast = useToastStore.getState();
+        const msg = `Order #${shortId} is now ${label}`;
+        if (newStatus === "delivered") {
+          toast.success(msg);
+        } else if (newStatus === "cancelled") {
+          toast.warning(msg);
+        } else {
+          toast.info(msg);
+        }
+
+        useNotificationStore.getState().increment();
+
+        return true;
       },
 
       /**

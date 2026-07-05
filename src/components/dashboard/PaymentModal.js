@@ -73,29 +73,33 @@ function PaymentModalContent({ isOpen, onClose, amount, pricing, jobId, onSucces
     }
   }, [payState, displayAmount, showSuccess]);
 
+  const delay = (ms) => new Promise((r) => setTimeout(r, ms));
+
   // Demo mode: auto-process payment after showing the modal briefly
   useEffect(() => {
     if (!isOpen || payState !== "idle") return;
-    const isDemo = DEMO_MODE;
-    if (!isDemo) return;
+    if (!DEMO_MODE) return;
 
-    const showTimer = setTimeout(() => {
+    let cancelled = false;
+    (async () => {
+      await delay(2000);
+      if (cancelled) return;
       setPayState("processing");
-      const completeTimer = setTimeout(() => {
-        setPayState("success");
-        const callbackTimer = setTimeout(() => {
-          onSuccess({
-            method,
-            amount: displayAmount,
-            status: "success",
-            transactionId: "TXN_DEMO_" + Date.now(),
-          });
-        }, 1500);
-        return () => clearTimeout(callbackTimer);
-      }, 800);
-      return () => clearTimeout(completeTimer);
-    }, 2000);
-    return () => clearTimeout(showTimer);
+      await delay(800);
+      if (cancelled) return;
+      setPayState("success");
+      await delay(1500);
+      if (cancelled) return;
+      onSuccess({
+        method,
+        amount: displayAmount,
+        status: "success",
+        transactionId: "TXN_DEMO_" + Date.now(),
+      });
+    })();
+    return () => {
+      cancelled = true;
+    };
   }, [isOpen, payState, method, displayAmount, onSuccess]);
 
   const amountPaise = Math.round(displayAmount * 100);

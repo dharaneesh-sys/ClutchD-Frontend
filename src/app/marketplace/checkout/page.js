@@ -7,10 +7,12 @@ import {
   CheckCircle,
   ChevronLeft,
   CreditCard,
-  Wallet,
-  Banknote,
   MapPin,
   Package,
+  Store,
+  Truck,
+  Wallet,
+  Banknote,
 } from "lucide-react";
 import { useCartStore } from "@/store/cartStore";
 import { useOrderStore } from "@/store/orderStore";
@@ -27,6 +29,12 @@ const PAYMENT_METHODS = [
 ];
 
 const INITIAL_FORM = { name: "", phone: "", address: "", city: "", pincode: "" };
+
+const STORE_LOCATIONS = [
+  { id: "coimbatore", name: "Coimbatore", address: "123 Avinashi Road, Coimbatore - 641018" },
+  { id: "chennai", name: "Chennai", address: "45 Anna Salai, Chennai - 600002" },
+  { id: "bangalore", name: "Bangalore", address: "78 MG Road, Bangalore - 560001" },
+];
 
 /* ── Validation ─────────────────────────────────────────────────── */
 
@@ -62,6 +70,8 @@ export default function CheckoutPage() {
   const [form, setForm] = useState(INITIAL_FORM);
   const [errors, setErrors] = useState({});
   const [paymentMethod, setPaymentMethod] = useState("cod");
+  const [shippingMethod, setShippingMethod] = useState("delivery"); // "delivery" | "pickup"
+  const [pickupLocation, setPickupLocation] = useState("");
   const [placedOrder, setPlacedOrder] = useState(null);
 
   const subtotal = useMemo(
@@ -70,7 +80,11 @@ export default function CheckoutPage() {
   );
 
   const deliveryCharge =
-    subtotal >= DELIVERY_FREE_THRESHOLD || subtotal === 0 ? 0 : DELIVERY_CHARGE;
+    shippingMethod === "pickup"
+      ? 0
+      : subtotal >= DELIVERY_FREE_THRESHOLD || subtotal === 0
+        ? 0
+        : DELIVERY_CHARGE;
 
   const total = Math.max(0, subtotal - discount) + deliveryCharge;
 
@@ -82,6 +96,35 @@ export default function CheckoutPage() {
   /* ── Place Order ───────────────────────────────────────────────── */
 
   const handlePlaceOrder = useCallback(async () => {
+    if (shippingMethod === "pickup") {
+      const errs = {};
+      if (!form.name.trim() || form.name.trim().length < 2) errs.name = "Name is required";
+      if (!form.phone.trim() || !/^\d{10}$/.test(form.phone.trim()))
+        errs.phone = "Valid 10-digit phone required";
+      if (!pickupLocation) errs.pickupLocation = "Please select a pickup location";
+
+      if (Object.keys(errs).length > 0) {
+        setErrors(errs);
+        return;
+      }
+
+      const store = STORE_LOCATIONS.find((s) => s.id === pickupLocation);
+      const address = {
+        street: store.address,
+        city: store.name,
+        state: "",
+        pincode: "",
+        shippingMethod: "pickup",
+        pickupLocation: store.name,
+      };
+
+      const payment = { method: paymentMethod };
+      const order = await placeOrder(items, address, payment);
+      setPlacedOrder(order);
+      setStep("confirmed");
+      return;
+    }
+
     const errs = validateForm(form);
     if (Object.keys(errs).length > 0) {
       setErrors(errs);
@@ -91,8 +134,9 @@ export default function CheckoutPage() {
     const address = {
       street: form.address.trim(),
       city: form.city.trim(),
-      state: "", // simplified — backend/UI can extend
+      state: "",
       pincode: form.pincode.trim(),
+      shippingMethod: "delivery",
     };
 
     const payment = { method: paymentMethod };
@@ -100,7 +144,7 @@ export default function CheckoutPage() {
     const order = await placeOrder(items, address, payment);
     setPlacedOrder(order);
     setStep("confirmed");
-  }, [form, paymentMethod, items, placeOrder]);
+  }, [form, paymentMethod, items, placeOrder, shippingMethod, pickupLocation]);
 
   /* ── Redirect if empty cart (only on form step) ───────────────── */
 
@@ -138,7 +182,6 @@ export default function CheckoutPage() {
       <div className="animate-fade-in-up p-4">
         <div className="mx-auto max-w-lg">
           <div className="glass-lux-strong rounded-2xl p-8 text-center">
-            {/* Animated checkmark */}
             <div className="animate-scale-in mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-success/20">
               <CheckCircle size={44} className="text-success" />
             </div>
@@ -150,12 +193,10 @@ export default function CheckoutPage() {
               Thank you for your purchase. Your order has been placed.
             </p>
 
-            {/* Order ID badge */}
             <div className="mb-8 inline-block rounded-full bg-surface-soft px-5 py-2 text-sm font-mono font-medium text-text-primary">
               {placedOrder.id}
             </div>
 
-            {/* Summary */}
             <div className="glass-lux mb-8 rounded-xl p-5 text-left">
               <h3 className="mb-3 text-sm font-semibold text-text-muted uppercase tracking-wider">
                 Order Summary
@@ -189,19 +230,29 @@ export default function CheckoutPage() {
                 </div>
 
                 <div className="border-t border-white/10 pt-3">
-                  <div className="flex items-start gap-2 text-xs text-text-dim">
-                    <MapPin size={14} className="mt-0.5 shrink-0" />
-                    <span>
-                      {placedOrder.address.street}, {placedOrder.address.city}
-                      {placedOrder.address.pincode &&
-                        ` - ${placedOrder.address.pincode}`}
-                    </span>
-                  </div>
+                  {placedOrder.address?.shippingMethod === "pickup" ? (
+                    <div className="flex items-start gap-2 text-xs text-text-dim">
+                      <Store size={14} className="mt-0.5 shrink-0" />
+                      <span>
+                        Pick up from: {placedOrder.address.pickupLocation} —{" "}
+                        {placedOrder.address.street}
+                      </span>
+                    </div>
+                  ) : (
+                    <div className="flex items-start gap-2 text-xs text-text-dim">
+                      <MapPin size={14} className="mt-0.5 shrink-0" />
+                      <span>
+                        {placedOrder.address.street},{" "}
+                        {placedOrder.address.city}
+                        {placedOrder.address.pincode &&
+                          ` - ${placedOrder.address.pincode}`}
+                      </span>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
 
-            {/* Payment info */}
             <div className="mb-8 flex items-center justify-center gap-2 text-sm text-text-muted">
               <span>Payment:</span>
               <span className="font-medium capitalize text-foreground">
@@ -226,7 +277,6 @@ export default function CheckoutPage() {
   return (
     <div className="animate-fade-in-up p-4">
       <div className="mx-auto max-w-6xl">
-        {/* Back + Heading */}
         <div className="mb-6">
           <button
             onClick={() => router.push("/marketplace/cart")}
@@ -244,12 +294,74 @@ export default function CheckoutPage() {
         <div className="flex flex-col gap-6 lg:flex-row">
           {/* ── Left: Form + Payment ───────────────────────────────── */}
           <div className="flex-1 space-y-6">
-            {/* Address Form */}
+            <div className="glass-lux rounded-2xl p-6">
+              <h2 className="mb-4 text-lg font-semibold text-foreground">
+                Shipping Method
+              </h2>
+              <div className="grid gap-3 sm:grid-cols-2">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShippingMethod("delivery");
+                    setPickupLocation("");
+                  }}
+                  className={cn(
+                    "active-press flex flex-col items-center gap-2 rounded-xl border p-4 text-center transition-all",
+                    shippingMethod === "delivery"
+                      ? "border-primary/40 bg-primary/10 text-foreground ring-1 ring-primary/30"
+                      : "border-white/10 bg-white/5 text-text-muted hover:border-white/20 hover:bg-white/10 hover:text-foreground",
+                  )}
+                >
+                  <Truck
+                    size={24}
+                    className={
+                      shippingMethod === "delivery"
+                        ? "text-icon-highlight"
+                        : "text-text-dim"
+                    }
+                  />
+                  <span className="text-sm font-medium">Delivery</span>
+                  <span className="text-xs text-text-dim">
+                    Ship to your address
+                  </span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setShippingMethod("pickup")}
+                  className={cn(
+                    "active-press flex flex-col items-center gap-2 rounded-xl border p-4 text-center transition-all",
+                    shippingMethod === "pickup"
+                      ? "border-primary/40 bg-primary/10 text-foreground ring-1 ring-primary/30"
+                      : "border-white/10 bg-white/5 text-text-muted hover:border-white/20 hover:bg-white/10 hover:text-foreground",
+                  )}
+                >
+                  <Store
+                    size={24}
+                    className={
+                      shippingMethod === "pickup"
+                        ? "text-icon-highlight"
+                        : "text-text-dim"
+                    }
+                  />
+                  <span className="text-sm font-medium">Pick Up</span>
+                  <span className="text-xs text-text-dim">
+                    Collect from store
+                  </span>
+                </button>
+              </div>
+            </div>
+
             <div className="glass-lux rounded-2xl p-6">
               <div className="mb-4 flex items-center gap-2">
-                <MapPin size={18} className="text-icon-highlight" />
+                {shippingMethod === "pickup" ? (
+                  <Store size={18} className="text-icon-highlight" />
+                ) : (
+                  <MapPin size={18} className="text-icon-highlight" />
+                )}
                 <h2 className="text-lg font-semibold text-foreground">
-                  Delivery Address
+                  {shippingMethod === "pickup"
+                    ? "Pickup Details"
+                    : "Delivery Address"}
                 </h2>
               </div>
 
@@ -274,33 +386,45 @@ export default function CheckoutPage() {
                   onChange={(v) => handleChange("phone", v.replace(/\D/g, ""))}
                 />
 
-                <div className="sm:col-span-2">
-                  <FormField
-                    label="Address"
-                    value={form.address}
-                    error={errors.address}
-                    placeholder="Street, building, area"
-                    onChange={(v) => handleChange("address", v)}
-                  />
-                </div>
+                {shippingMethod === "delivery" ? (
+                  <>
+                    <div className="sm:col-span-2">
+                      <FormField
+                        label="Address"
+                        value={form.address}
+                        error={errors.address}
+                        placeholder="Street, building, area"
+                        onChange={(v) => handleChange("address", v)}
+                      />
+                    </div>
 
-                <FormField
-                  label="City"
-                  value={form.city}
-                  error={errors.city}
-                  placeholder="Mumbai"
-                  onChange={(v) => handleChange("city", v)}
-                />
+                    <FormField
+                      label="City"
+                      value={form.city}
+                      error={errors.city}
+                      placeholder="Mumbai"
+                      onChange={(v) => handleChange("city", v)}
+                    />
 
-                <FormField
-                  label="Pincode"
-                  value={form.pincode}
-                  error={errors.pincode}
-                  placeholder="400001"
-                  type="tel"
-                  maxLength={6}
-                  onChange={(v) => handleChange("pincode", v.replace(/\D/g, ""))}
-                />
+                    <FormField
+                      label="Pincode"
+                      value={form.pincode}
+                      error={errors.pincode}
+                      placeholder="400001"
+                      type="tel"
+                      maxLength={6}
+                      onChange={(v) => handleChange("pincode", v.replace(/\D/g, ""))}
+                    />
+                  </>
+                ) : (
+                  <div className="sm:col-span-2">
+                    <PickupLocationSelector
+                      selected={pickupLocation}
+                      onChange={setPickupLocation}
+                      error={errors.pickupLocation}
+                    />
+                  </div>
+                )}
               </div>
             </div>
 
@@ -350,7 +474,6 @@ export default function CheckoutPage() {
                 Order Summary
               </h2>
 
-              {/* Items */}
               <div className="space-y-3">
                 {items.map((item) => (
                   <div
@@ -371,7 +494,6 @@ export default function CheckoutPage() {
                 ))}
               </div>
 
-              {/* Totals */}
               <div className="space-y-3 border-t border-white/10 pt-3 text-sm">
                 <SummaryRow
                   label="Subtotal"
@@ -389,16 +511,30 @@ export default function CheckoutPage() {
                   />
                 )}
 
-                <SummaryRow
-                  label="Delivery"
-                  value={
-                    deliveryCharge === 0 ? (
-                      <span className="text-success">FREE</span>
-                    ) : (
-                    formatCurrency(deliveryCharge)
-                    )
-                  }
-                />
+                {shippingMethod === "pickup" ? (
+                  <SummaryRow
+                    label="Pickup"
+                    value={
+                      <span className="text-success">
+                        {pickupLocation
+                          ? STORE_LOCATIONS.find((s) => s.id === pickupLocation)
+                              ?.name
+                          : "\u2014"}
+                      </span>
+                    }
+                  />
+                ) : (
+                  <SummaryRow
+                    label="Delivery"
+                    value={
+                      deliveryCharge === 0 ? (
+                        <span className="text-success">FREE</span>
+                      ) : (
+                        formatCurrency(deliveryCharge)
+                      )
+                    }
+                  />
+                )}
 
                 <div className="border-t border-white/10 pt-3">
                   <SummaryRow
@@ -412,7 +548,6 @@ export default function CheckoutPage() {
                 </div>
               </div>
 
-              {/* Place Order */}
               <Button
                 className="w-full"
                 size="lg"
@@ -441,6 +576,50 @@ function SummaryRow({ label, value }) {
     <div className="flex items-center justify-between">
       <span className="text-text-muted">{label}</span>
       <span className="tabular-nums font-medium text-foreground">{value}</span>
+    </div>
+  );
+}
+
+function PickupLocationSelector({ selected, onChange, error }) {
+  return (
+    <div>
+      <span className="mb-1.5 block text-sm font-medium text-text-muted">
+        Pickup Location
+      </span>
+      <div className="space-y-2">
+        {STORE_LOCATIONS.map((store) => (
+          <button
+            key={store.id}
+            type="button"
+            onClick={() => onChange(store.id)}
+            className={cn(
+              "w-full flex items-start gap-3 rounded-xl border p-4 text-left transition-all",
+              selected === store.id
+                ? "border-primary/40 bg-primary/10 ring-1 ring-primary/30"
+                : "border-white/10 bg-white/5 hover:border-white/20 hover:bg-white/10",
+              error && !selected && "border-red-500/50",
+            )}
+          >
+            <div
+              className={cn(
+                "mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded-full border-2",
+                selected === store.id ? "border-primary" : "border-white/30",
+              )}
+            >
+              {selected === store.id && (
+                <div className="h-2 w-2 rounded-full bg-primary" />
+              )}
+            </div>
+            <div className="min-w-0">
+              <p className="text-sm font-medium text-foreground">
+                {store.name}
+              </p>
+              <p className="mt-0.5 text-xs text-text-dim">{store.address}</p>
+            </div>
+          </button>
+        ))}
+      </div>
+      {error && <p className="mt-1 text-xs text-red-400">{error}</p>}
     </div>
   );
 }

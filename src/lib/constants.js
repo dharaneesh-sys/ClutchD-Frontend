@@ -273,3 +273,32 @@ export const ORDER_STATUSES = {
   delivered: "Delivered",
   cancelled: "Cancelled",
 };
+
+/**
+ * Fleet/B2B service types with base pricing.
+ * @type {Array<{value: string, label: string, basePrice: number}>}
+ */
+export const FLEET_SERVICE_TYPES = [
+  { value: "general_service", label: "General Service", basePrice: 2500 },
+  { value: "oil_change", label: "Oil Change", basePrice: 1800 },
+  { value: "brake_inspection", label: "Brake Inspection", basePrice: 800 },
+  { value: "brake_repair", label: "Brake Repair", basePrice: 3500 },
+  { value: "tire_rotation", label: "Tire Rotation", basePrice: 600 },
+  { value: "engine_diagnostic", label: "Engine Diagnostic", basePrice: 1500 },
+  { value: "ac_service", label: "AC Service", basePrice: 2800 },
+  { value: "transmission_check", label: "Transmission Check", basePrice: 2000 },
+  { value: "battery_check", label: "Battery Check", basePrice: 500 },
+  { value: "full_inspection", label: "Full Inspection", basePrice: 4000 },
+];
+
+/**
+ * Bulk discount tiers for fleet/B2B volume bookings.
+ * @type {Array<{minVehicles: number, discountPercent: number, label: string}>}
+ */
+export const BULK_DISCOUNT_TIERS = [
+  { minVehicles: 0, discountPercent: 0, label: "Standard" },
+  { minVehicles: 3, discountPercent: 5, label: "3+ Fleet" },
+  { minVehicles: 5, discountPercent: 10, label: "5+ Fleet" },
+  { minVehicles: 10, discountPercent: 15, label: "10+ Fleet" },
+  { minVehicles: 20, discountPercent: 20, label: "20+ Fleet" },
+];

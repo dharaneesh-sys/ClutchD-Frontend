@@ -151,6 +151,56 @@ api.interceptors.response.use(
   }
 );
 
+// 429 rate-limit retry interceptor — exponential backoff, max 3 retries, then toast
+api.interceptors.response.use(
+  (response) => response,
+  async (error) => {
+    const originalRequest = error.config;
+
+    if (error.response?.status === 429 && originalRequest) {
+      const retryCount = originalRequest.__retryCount || 0;
+
+      if (retryCount >= 3) {
+        try {
+          const { useToastStore } = await import('@/store/toastStore');
+          useToastStore.getState().addToast(
+            'warning',
+            'Too many requests. Please slow down.',
+            { duration: 5000 },
+          );
+        } catch (_) {
+          // toastStore not available (SSR edge case) — degrade silently
+        }
+        return Promise.reject(error);
+      }
+
+      const method = (originalRequest.method || '').toLowerCase();
+      const isRetryable =
+        method === 'get' || method === 'head' || originalRequest.__isRetryable;
+      if (!isRetryable) {
+        return Promise.reject(error);
+      }
+
+      const retryAfter = parseInt(
+        error.response.headers?.['retry-after'] || '1',
+        10,
+      );
+      // Exponential backoff: retryAfter * 2^(attempt) * 1000ms
+      const delay = retryAfter * Math.pow(2, retryCount) * 1000;
+
+      originalRequest.__retryCount = retryCount + 1;
+
+      return new Promise((resolve) => {
+        setTimeout(() => {
+          resolve(api(originalRequest));
+        }, delay);
+      });
+    }
+
+    return Promise.reject(error);
+  },
+);
+
 export default api;
 
 /**

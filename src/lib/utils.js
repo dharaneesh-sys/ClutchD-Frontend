@@ -75,6 +75,23 @@ export function generateId() {
  * @param {"capacitor" | "web"} platform
  * @returns {boolean}
  */
+/**
+ * Convert snake_case keys to camelCase recursively.
+ * Works on arrays (maps each element) and plain objects.
+ */
+export function toCamelCase(obj) {
+  if (Array.isArray(obj)) return obj.map(toCamelCase);
+  if (obj !== null && typeof obj === "object" && !(obj instanceof Date)) {
+    return Object.fromEntries(
+      Object.entries(obj).map(([k, v]) => [
+        k.replace(/_([a-z])/g, (_, c) => c.toUpperCase()),
+        toCamelCase(v),
+      ])
+    );
+  }
+  return obj;
+}
+
 export function isPlatform(platform) {
   if (typeof window === "undefined") return false;
 

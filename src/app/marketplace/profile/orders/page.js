@@ -13,26 +13,13 @@ import {
   Download,
   Receipt,
 } from "lucide-react";
-import { cn, formatCurrency, formatDate, formatTime } from "@/lib/utils";
+import { cn, toCamelCase, formatCurrency, formatDate, formatTime } from "@/lib/utils";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { ShimmerList } from "@/components/ui/Shimmer";
 import { Badge } from "@/components/ui/Badge";
 import { useAuthStore } from "@/store/authStore";
 import api, { extractApiError } from "@/lib/api";
 import { useToast } from "@/hooks/useToast";
-
-function toCamelCase(obj) {
-  if (Array.isArray(obj)) return obj.map(toCamelCase);
-  if (obj !== null && typeof obj === "object" && !(obj instanceof Date)) {
-    return Object.fromEntries(
-      Object.entries(obj).map(([k, v]) => [
-        k.replace(/_([a-z])/g, (_, c) => c.toUpperCase()),
-        toCamelCase(v),
-      ])
-    );
-  }
-  return obj;
-}
 
 // ─── Tab definitions ─────────────────────────────────────────────────
 

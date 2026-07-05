@@ -13,6 +13,8 @@ export function SOSButton() {
     typeof navigator !== "undefined" ? navigator.onLine : true,
   );
   const lastSendRef = useRef(0);
+  const last429Ref = useRef(0);
+  const SOS_429_DEBOUNCE_MS = 15000;
 
   // ── Lifecycle ────────────────────────────────────────────────
 
@@ -76,10 +78,21 @@ export function SOSButton() {
   };
 
   const handleConfirm = async () => {
-    // Rate limit: backend allows 5 req/min → at least 12 s between sends
     const now = Date.now();
+
+    // Rate limit: backend allows 5 req/min → at least 12 s between sends
     if (now - lastSendRef.current < 12000) {
       setErrorMsg("Please wait before sending another SOS");
+      setTimeout(() => setErrorMsg(null), 3000);
+      setStatus("idle");
+      return;
+    }
+
+    // 429 debounce: wait 15 s after a rate-limit response
+    const msSince429 = now - last429Ref.current;
+    if (msSince429 < SOS_429_DEBOUNCE_MS) {
+      const remaining = Math.ceil((SOS_429_DEBOUNCE_MS - msSince429) / 1000);
+      setErrorMsg(`Please wait ${remaining}s before retrying`);
       setTimeout(() => setErrorMsg(null), 3000);
       setStatus("idle");
       return;
@@ -108,6 +121,11 @@ export function SOSButton() {
         setStatus("sent");
         setTimeout(() => setStatus("idle"), 10000);
       } catch (e) {
+        // 429 rate-limited → track debounce, fall through to outer handler
+        if (e?.response?.status === 429) {
+          last429Ref.current = Date.now();
+          throw e;
+        }
         // 503 / network error → queue for later delivery
         if (!e?.response || e?.response?.status === 503) {
           await queueSOS(lat, lon);

@@ -3,6 +3,7 @@ import { getMessaging, isSupported } from "firebase/messaging";
 
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
+  authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
   projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
   messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_SENDER_ID,
   appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
@@ -19,7 +20,8 @@ export function initFirebase() {
     !firebaseConfig.apiKey ||
     !firebaseConfig.projectId ||
     !firebaseConfig.messagingSenderId ||
-    !firebaseConfig.appId
+    !firebaseConfig.appId ||
+    !firebaseConfig.authDomain
   ) {
     if (process.env.NODE_ENV === "development") {
       console.warn(

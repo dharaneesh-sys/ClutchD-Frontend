@@ -39,17 +39,19 @@ export function MultiSelect({ options = [], value = [], onChange, label, error, 
   useEffect(() => {
     const raf = requestAnimationFrame(() => {
       if (isOpen) {
-        setActiveIndex(0);
+        if (options.length > 0) setActiveIndex(0);
       } else {
         setActiveIndex(-1);
       }
     });
     return () => cancelAnimationFrame(raf);
-  }, [isOpen]);
+  }, [isOpen, options]);
 
   useEffect(() => {
-    if (!isOpen || activeIndex < 0 || !options[activeIndex]) return;
-    const id = `multi-select-option-${String(options[activeIndex].value).replace(/\s/g, "-")}`;
+    if (!isOpen || activeIndex < 0 || options.length === 0) return;
+    const activeOption = options[activeIndex];
+    if (!activeOption) return;
+    const id = `multi-select-option-${String(activeOption.value).replace(/\s/g, "-")}`;
     document.getElementById(id)?.scrollIntoView({ block: "nearest" });
   }, [isOpen, activeIndex, options]);
 
@@ -65,17 +67,20 @@ export function MultiSelect({ options = [], value = [], onChange, label, error, 
     switch (e.key) {
       case "ArrowDown":
         e.preventDefault();
+        if (options.length === 0) break;
         setActiveIndex((prev) => (prev < options.length - 1 ? prev + 1 : 0));
         break;
       case "ArrowUp":
         e.preventDefault();
+        if (options.length === 0) break;
         setActiveIndex((prev) => (prev > 0 ? prev - 1 : options.length - 1));
         break;
       case "Enter":
       case " ":
         e.preventDefault();
         if (activeIndex >= 0 && activeIndex < options.length) {
-          toggleOption(options[activeIndex].value);
+          const activeOption = options[activeIndex];
+          if (activeOption) toggleOption(activeOption.value);
         }
         break;
       case "Escape":
@@ -110,7 +115,7 @@ export function MultiSelect({ options = [], value = [], onChange, label, error, 
         onClick={() => {
           const willOpen = !isOpen;
           setIsOpen(willOpen);
-          if (willOpen) setActiveIndex(0);
+          if (willOpen && options.length > 0) setActiveIndex(0);
         }}
         onKeyDown={handleKeyDown}
       >

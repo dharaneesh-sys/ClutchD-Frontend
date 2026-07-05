@@ -10,7 +10,7 @@ import {
   Clock,
   CheckCircle2,
 } from "lucide-react";
-import { cn, formatCurrency, formatDate } from "@/lib/utils";
+import { cn, toCamelCase, formatCurrency, formatDate } from "@/lib/utils";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { ShimmerList } from "@/components/ui/Shimmer";
 import { Badge } from "@/components/ui/Badge";
@@ -18,19 +18,6 @@ import { Button } from "@/components/ui/Button";
 import { ConfirmModal } from "@/components/ui/ConfirmModal";
 import { useToastStore } from "@/store/toastStore";
 import api from "@/lib/api";
-
-function toCamelCase(obj) {
-  if (Array.isArray(obj)) return obj.map(toCamelCase);
-  if (obj !== null && typeof obj === "object" && !(obj instanceof Date)) {
-    return Object.fromEntries(
-      Object.entries(obj).map(([k, v]) => [
-        k.replace(/_([a-z])/g, (_, c) => c.toUpperCase()),
-        toCamelCase(v),
-      ])
-    );
-  }
-  return obj;
-}
 
 // ─── Tab definitions ─────────────────────────────────────────────────
 

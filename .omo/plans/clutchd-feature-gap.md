@@ -1549,7 +1549,7 @@ Final Verification (4 parallel reviews):
 
 ### Wave 4 — Marketplace Depth
 
-- [ ] 26. **BOPIS — Pickup location selector on checkout**
+- [x] 26. **BOPIS — Pickup location selector on checkout**
 
   **What to do**:
   1. Add delivery method toggle to checkout page:
@@ -1601,7 +1601,7 @@ Final Verification (4 parallel reviews):
   - Message: `feat(marketplace): add BOPIS pickup location selector on checkout`
   - Files: `src/components/marketplace/PickupLocation.js`, `src/app/marketplace/checkout/page.js`, `src/store/orderStore.js`
 
-- [ ] 27. **BOPIS — Order status flow for pickup orders**
+- [x] 27. **BOPIS — Order status flow for pickup orders**
 
   **What to do**:
   1. Update `src/lib/constants.js` ORDER_STATUSES:
@@ -1646,7 +1646,7 @@ Final Verification (4 parallel reviews):
   - Message: `feat(marketplace): add BOPIS order status flow with QR pickup`
   - Files: `src/lib/constants.js`, `src/components/dashboard/OrderStatusTracker.js`
 
-- [ ] 28. **Order tracking — Real-time status timeline component**
+- [x] 28. **Order tracking — Real-time status timeline component**
 
   **What to do**:
   1. Create `src/components/marketplace/OrderTimeline.js`:
@@ -1696,7 +1696,7 @@ Final Verification (4 parallel reviews):
   - Message: `feat(orders): add real-time order status timeline component`
   - Files: `src/components/marketplace/OrderTimeline.js`, `src/lib/orders/orderTracking.js`
 
-- [ ] 29. **Order tracking — Notification hooks for status transitions**
+- [x] 29. **Order tracking — Notification hooks for status transitions**
 
   **Context**: Backend already has a full notification system:
   - `GET /api/notifications` — returns `{ notifications: [{ id, title, body, type, read, job_id, created_at }], unread_count: N }`
@@ -1750,7 +1750,7 @@ Final Verification (4 parallel reviews):
   - Message: `feat(orders): add order notification hooks via existing notification system`
   - Files: `src/store/orderStore.js`, `src/lib/socket.js`
 
-- [ ] 30. **Vendor comparison — Price comparison table on product detail**
+- [x] 30. **Vendor comparison — Price comparison table on product detail**
 
   **What to do**:
   1. Create `src/components/marketplace/VendorComparisonTable.js`:
@@ -1797,7 +1797,7 @@ Final Verification (4 parallel reviews):
   - Message: `feat(marketplace): add vendor price comparison table on product detail`
   - Files: `src/components/marketplace/VendorComparisonTable.js`, `src/lib/marketplace/vendorComparisonService.js`
 
-- [ ] 31. **Vendor comparison — Filtering and sorting**
+- [x] 31. **Vendor comparison — Filtering and sorting**
 
   **What to do**:
   1. Create `src/components/marketplace/VendorFilterBar.js`:
@@ -1828,7 +1828,7 @@ Final Verification (4 parallel reviews):
   - Message: `feat(marketplace): add vendor filtering and sorting`
   - Files: `src/components/marketplace/VendorFilterBar.js`, `src/components/marketplace/SearchFilters.js`, `src/components/marketplace/ProductCard.js`
 
-- [ ] 32. **Mechanic certification badges — Profile display**
+- [x] 32. **Mechanic certification badges — Profile display**
 
   **What to do**:
   1. Create `src/lib/mechanic/certifications.js`:
@@ -1875,7 +1875,7 @@ Final Verification (4 parallel reviews):
   - Message: `feat(mechanics): add certification badge component and profile integration`
   - Files: `src/lib/mechanic/certifications.js`, `src/components/mechanic/CertificationBadge.js`
 
-- [ ] 33. **Mechanic certification badges — Admin verification workflow**
+- [x] 33. **Mechanic certification badges — Admin verification workflow**
 
   **What to do**:
   1. Create `src/app/admin/certifications/page.js`:
@@ -1915,7 +1915,7 @@ Final Verification (4 parallel reviews):
 
 ### Wave 5 — Admin Power & Code Polish
 
-- [ ] 34. **Admin analytics — Stat cards from backend + trend charts from mock data**
+- [x] 34. **Admin analytics — Stat cards from backend + trend charts from mock data**
 
   **Context**: Backend `GET /api/admin/analytics` returns **aggregate totals only**:
   ```json
@@ -1993,7 +1993,7 @@ Final Verification (4 parallel reviews):
   - Message: `feat(admin): connect stat cards to backend analytics, keep mock chart data`
   - Files: `src/components/admin/AdminOverview.js`, `src/lib/admin/analyticsService.js`, `src/app/admin/page.js`
 
-- [ ] 35. **Admin analytics — Exportable reports**
+- [x] 35. **Admin analytics — Exportable reports**
 
   **What to do**:
   1. Add export buttons to analytics dashboard:
@@ -2022,7 +2022,7 @@ Final Verification (4 parallel reviews):
   - Message: `feat(admin): add exportable CSV and PDF reports`
   - Files: `src/lib/admin/reportExport.js`, `src/components/admin/AnalyticsDashboard.js`
 
-- [ ] 36. **Fleet/B2B — Registration form + dashboard** ⚠️ (requires backend for real submission)
+- [x] 36. **Fleet/B2B — Registration form + dashboard** ⚠️ (requires backend for real submission)
 
   **What to do**:
   1. Create `src/app/business/register/page.js`:
@@ -2059,7 +2059,7 @@ Final Verification (4 parallel reviews):
   - Message: `feat(fleet): add fleet registration and dashboard`
   - Files: `src/app/business/register/page.js`, `src/components/fleet/FleetDashboard.js`, `src/app/dashboard/fleet/page.js`
 
-- [ ] 37. **Fleet/B2B — Bulk booking scheduling** ⚠️ (requires backend)
+- [x] 37. **Fleet/B2B — Bulk booking scheduling** ⚠️ (requires backend)
 
   **What to do**:
   1. Create `src/components/fleet/BulkScheduleModal.js`:
@@ -2091,7 +2091,7 @@ Final Verification (4 parallel reviews):
   - Message: `feat(fleet): add bulk booking scheduling`
   - Files: `src/components/fleet/BulkScheduleModal.js`, `src/lib/fleet/bulkScheduling.js`
 
-- [ ] 38. **Payout management — Payout ledger from admin payments endpoint** ⚠️ (requires backend for real data)
+- [x] 38. **Payout management — Payout ledger from admin payments endpoint** ⚠️ (requires backend for real data)
 
   **Context**: There is no dedicated `GET /api/admin/payouts` endpoint. However, `GET /api/admin/payments` (backend `admin.py:311`) returns payment records with: `{ id, jobId, userId, userName, amount, currency, formattedAmount, provider, status, method, createdAt, updatedAt }`. The existing `PaymentsManager.js` already consumes this endpoint. This task creates a filtered payout view from the same data.
 
@@ -2143,7 +2143,7 @@ Final Verification (4 parallel reviews):
   - Message: `feat(admin): add payout management ledger from payments endpoint`
   - Files: `src/app/admin/payouts/page.js`, `src/components/admin/PayoutLedger.js`, `src/lib/admin/payoutService.js`
 
-- [ ] 39. **Payout management — Payout schedule + status tracking** ⚠️ (requires backend)
+- [x] 39. **Payout management — Payout schedule + status tracking** ⚠️ (requires backend)
 
   **Context**: Backend `payout_service.py` auto-processes payouts after payment capture — no manual processing is needed. This task adds the frontend display for payout schedules and provider-facing payout status. Settings like frequency and threshold are frontend-only mock until a backend endpoint is added.
 
@@ -2182,7 +2182,7 @@ Final Verification (4 parallel reviews):
   - Message: `feat(admin): add payout schedule and provider status tracking`
   - Files: `src/components/admin/PayoutScheduleForm.js`, `src/components/mechanic/EarningsChart.js`
 
-- [ ] 40. **429 rate-limit handling — Axios interceptor with exponential backoff + toast**
+- [x] 40. **429 rate-limit handling — Axios interceptor with exponential backoff + toast**
 
   **Context**: The backend uses `slowapi` (in-memory, IP-based rate limiting). Key limits discovered in the backend codebase:
   - `/payments/create`: 5 req/min
@@ -2278,7 +2278,7 @@ Final Verification (4 parallel reviews):
   - Message: `fix: add 429 rate-limit handling with exponential backoff retry and toast`
   - Files: `src/lib/api.js`, `src/components/ui/SOSButton.js`
 
-- [ ] 41. **Fix CRITICAL BUG 1 — PaymentModal timer leak**
+- [x] 41. **Fix CRITICAL BUG 1 — PaymentModal timer leak**
 
   **What to do**:
   1. Open `src/components/dashboard/PaymentModal.js`
@@ -2366,7 +2366,7 @@ Final Verification (4 parallel reviews):
   - Message: `fix: PaymentModal demo mode timer leak — replace nested setTimeout with Promise chain`
   - Files: `src/components/dashboard/PaymentModal.js`
 
-- [ ] 42. **Fix CRITICAL BUG 2 — Reconcile duplicate useToast**
+- [x] 42. **Fix CRITICAL BUG 2 — Reconcile duplicate useToast**
 
   **What to do**:
   1. Compare both files:
@@ -2422,7 +2422,7 @@ Final Verification (4 parallel reviews):
   - Message: `fix: reconcile duplicate useToast hooks — align return shapes`
   - Files: `src/hooks/useToast.js`, `src/components/ui/ToastProvider.js`
 
-- [ ] 43. **Fix CRITICAL BUG 3 — MultiSelect bounds check**
+- [x] 43. **Fix CRITICAL BUG 3 — MultiSelect bounds check**
 
   **What to do**:
   1. Open `src/components/ui/MultiSelect.js`
@@ -2474,7 +2474,7 @@ Final Verification (4 parallel reviews):
   - Message: `fix: add bounds check to MultiSelect activeIndex access`
   - Files: `src/components/ui/MultiSelect.js`
 
-- [ ] 44. **Fix CRITICAL BUG — toCamelCase deduplication**
+- [x] 44. **Fix CRITICAL BUG — toCamelCase deduplication**
 
   **What to do**:
   ⚠️ **Note**: The `backendHealth.js` `_checkInterval` typo mentioned in earlier drafts has been verified as **already fixed** — the current code (`backendHealth.js:4,18,65`) uses `_checkInterval` consistently. No action needed. Only `toCamelCase` dedup remains.

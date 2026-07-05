@@ -1,22 +1,7 @@
 import { create } from "zustand";
 import { devtools } from "zustand/middleware";
 import api from "@/lib/api";
-
-/**
- * Convert snake_case keys to camelCase recursively.
- */
-function toCamelCase(obj) {
-  if (Array.isArray(obj)) return obj.map(toCamelCase);
-  if (obj !== null && typeof obj === "object" && !(obj instanceof Date)) {
-    return Object.fromEntries(
-      Object.entries(obj).map(([k, v]) => [
-        k.replace(/_([a-z])/g, (_, c) => c.toUpperCase()),
-        toCamelCase(v),
-      ])
-    );
-  }
-  return obj;
-}
+import { toCamelCase } from "@/lib/utils";
 
 const initialState = {
   categories: [],

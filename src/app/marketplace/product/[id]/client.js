@@ -27,6 +27,7 @@ import { EmptyState } from '@/components/ui/EmptyState';
 import { cn, formatCurrency } from '@/lib/utils';
 import { Shimmer, ShimmerCard } from '@/components/ui/Shimmer';
 import { checkFitment } from '@/lib/fitment';
+import { VendorComparisonTable } from '@/components/marketplace/VendorComparisonTable';
 
 
 
