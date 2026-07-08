@@ -99,6 +99,9 @@ export function GarageFields({ register, errors, setValue, watch }) {
       )}
       <input type="hidden" {...register("latitude")} />
       <input type="hidden" {...register("longitude")} />
+      {errors.latitude && (
+        <p className="text-xs text-red-500 mt-1">{errors.latitude.message}</p>
+      )}
 
       {/* Garage details */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
