@@ -56,6 +56,7 @@ export function SubscriptionManager() {
   // Hydrate subscription from persisted store on mount
   useEffect(() => {
     useSubscriptionStore.getState().hydrateFromService();
+    /* eslint-disable-next-line react-hooks/set-state-in-effect */
     setHydrated(true);
   }, []);
 

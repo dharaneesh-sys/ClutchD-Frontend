@@ -123,16 +123,17 @@ api.interceptors.response.use(
           
            const status = refreshError.response?.status;
            // Only force logout on explicit 401/403 credentials failure.
-           if (status === 401 || status === 403) {
-             if (typeof window !== "undefined") {
-               // Don't redirect demo users — their tokens can't validate against real backend
-               try {
-                 const stored = JSON.parse(localStorage.getItem("auth-storage") || "{}");
-                 if (stored?.state?.user?.id?.startsWith?.("demo-")) return Promise.reject(refreshError);
-               } catch (e) {}
-               clearAccessToken();
-               navigateToAuth();
-             }
+               if (status === 401 || status === 403) {
+              if (typeof window !== "undefined") {
+                // Don't redirect demo / Firebase-only users — their tokens can't validate against real backend
+                try {
+                  const stored = JSON.parse(localStorage.getItem("auth-storage") || "{}");
+                  const uid = stored?.state?.user?.id || "";
+                  if (uid.startsWith("demo-") || uid.startsWith("firebase-")) return Promise.reject(refreshError);
+                } catch (e) {}
+                clearAccessToken();
+                navigateToAuth();
+              }
            }
           return Promise.reject(refreshError);
         }

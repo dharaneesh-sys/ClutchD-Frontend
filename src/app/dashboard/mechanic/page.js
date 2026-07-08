@@ -61,6 +61,11 @@ export default function MechanicDashboard() {
     return () => window.removeEventListener(NAVIGATION_EVENT, handleNavigation);
   }, [router]);
 
+  /* ── Chat state ────────────────────────────────────────────────── */
+  const [chatOpen, setChatOpen] = useState(false);
+  const [chatJobId, setChatJobId] = useState(null);
+  const [chatOtherName, setChatOtherName] = useState("Customer");
+
   if (!_hydrated || !isAuthenticated) {
     return <div className="min-h-[100dvh] w-full flex items-center justify-center bg-[var(--background)]"><div className="w-8 h-8 border-2 border-t-transparent rounded-full animate-spin border-[var(--primary)]" /></div>;
   }
@@ -71,11 +76,6 @@ export default function MechanicDashboard() {
     { icon: DollarSign, label: "Earnings", onClick: () => setActiveTab("earnings") },
     { icon: ShoppingBag, label: "Parts Store", onClick: () => router.push("/marketplace") },
   ];
-
-  /* ── Chat state ────────────────────────────────────────────────── */
-  const [chatOpen, setChatOpen] = useState(false);
-  const [chatJobId, setChatJobId] = useState(null);
-  const [chatOtherName, setChatOtherName] = useState("Customer");
 
   const openChat = (jobId, customerName) => {
     setChatJobId(jobId);
@@ -128,7 +128,7 @@ export default function MechanicDashboard() {
               <IncomingJobs />
               
               <div className="h-[250px] sm:h-[300px] rounded-2xl overflow-hidden relative shadow-2xl border">
-                <NavigationMap />
+                <NavigationMap role="mechanic" />
                 <div className="absolute top-4 left-4 z-[400] backdrop-blur-md px-3 py-1.5 rounded-full border text-xs font-semibold flex items-center gap-2 bg-white/80 dark:bg-black/60 border-slate-200 dark:border-white/10 text-slate-700 dark:text-white">
                   <span className="w-2 h-2 rounded-full bg-blue-400 animate-pulse" />
                   Navigation
@@ -148,7 +148,7 @@ export default function MechanicDashboard() {
             
             {/* Full-width map with collapsible jobs overlay */}
             <div className="relative h-[60vh] sm:h-[70vh] lg:h-[75vh] rounded-2xl overflow-hidden shadow-2xl border">
-              <NavigationMap />
+              <NavigationMap role="mechanic" />
               
               {/* Collapsible jobs panel */}
               <div className={`absolute top-4 right-4 z-[400] w-80 sm:w-96 transition-all duration-300 ${jobsPanelOpen ? "opacity-100" : "opacity-0 pointer-events-none"}`}>

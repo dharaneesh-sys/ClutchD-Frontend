@@ -43,6 +43,8 @@ export const mechanicSignupSchema = z
     experience: z.string().min(1, "Select experience"),
     expertise: z.array(z.string()).min(1, "Select at least one expertise"),
     location: z.string().min(2, "Enter your location"),
+    latitude: z.number({ required_error: "Please share your location via GPS" }),
+    longitude: z.number({ required_error: "Please share your location via GPS" }),
   })
   .refine((data) => data.password === data.confirmPassword, {
     message: "Passwords do not match",
@@ -63,6 +65,8 @@ export const garageSignupSchema = z
     ownerName: z.string().min(2, "Enter owner name"),
     phone: z.string().min(10, "Enter a valid phone number"),
     location: z.string().min(2, "Enter location"),
+    latitude: z.number({ required_error: "Please share your location via GPS" }),
+    longitude: z.number({ required_error: "Please share your location via GPS" }),
     services: z.array(z.string()).min(1, "Select at least one service"),
     mechanicCount: z.string().min(1, "Enter number of mechanics"),
     operatingHours: z.string().min(1, "Enter operating hours"),

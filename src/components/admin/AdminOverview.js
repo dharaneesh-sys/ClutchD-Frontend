@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { GlassCard } from "@/components/ui/GlassCard";
 import { Badge } from "@/components/ui/Badge";
-import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import { AreaChart, Area } from "@/components/charts/area-chart";
 import { fetchAnalytics, fetchPendingKyc } from "@/services/adminService";
 
 const chartData = [
@@ -19,22 +19,11 @@ const chartData = [
 
 export function AdminOverview() {
   const router = useRouter();
-  const getCSSVar = (name) => {
-    if (typeof window === 'undefined') return '';
-    return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
-  };
-  const primaryColor = getCSSVar('--primary') || '#10b981';
-  const foreground = getCSSVar('--foreground') || '#ffffff';
-  const tickColor = foreground ? `${foreground}66` : 'rgba(255,255,255,0.4)';
-  const gridColor = foreground ? `${foreground}0D` : 'rgba(255,255,255,0.05)';
-  const surfaceColor = getCSSVar('--surface') || '#1c1c1f';
-  const borderColor = getCSSVar('--color-border-subtle') || 'rgba(255,255,255,0.1)';
 
   const [stats, setStats] = useState(null);
   const [pendingKyc, setPendingKyc] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [chartMounted, setChartMounted] = useState(false);
 
   const fetchData = async () => {
     setLoading(true);
@@ -55,7 +44,6 @@ export function AdminOverview() {
 
   useEffect(() => {
     fetchData();
-    setChartMounted(true);
   }, []);
 
   if (loading) {
@@ -109,40 +97,13 @@ export function AdminOverview() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
          <GlassCard variant="strong" className="col-span-1 lg:col-span-2 p-6 h-[400px] flex flex-col">
             <h3 className={`font-semibold mb-6 ${"text-text-primary"}`}>Platform Growth (Revenue & Users)</h3>
-             <div className="flex-1 w-full relative min-w-0 min-h-0">
-               {chartMounted && (
-               <ResponsiveContainer width="100%" height="100%">
-                 <AreaChart data={chartData}>
-                  <defs>
-                    <linearGradient id="adminColorRev" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor={primaryColor} stopOpacity={0.2}/>
-                      <stop offset="95%" stopColor={primaryColor} stopOpacity={0}/>
-                    </linearGradient>
-                    <linearGradient id="adminColorUsr" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.2}/>
-                      <stop offset="95%" stopColor="#3b82f6" stopOpacity={0}/>
-                    </linearGradient>
-                  </defs>
-                  <CartesianGrid strokeDasharray="3 3" stroke={gridColor} vertical={false} />
-                  <XAxis dataKey="name" tick={{fill: tickColor, fontSize: 12}} axisLine={false} tickLine={false} />
-                  <YAxis yAxisId="left" tick={{fill: tickColor, fontSize: 12}} axisLine={false} tickLine={false} />
-                  <YAxis yAxisId="right" orientation="right" tick={{fill: tickColor, fontSize: 12}} axisLine={false} tickLine={false} />
-                   <Tooltip
-                      contentStyle={{
-                        backgroundColor: surfaceColor,
-                        borderColor: borderColor,
-                        borderRadius: '10px',
-                        color: foreground,
-                        boxShadow: `0 8px 30px ${foreground}14`
-                      }}
-                   />
-                  <Area yAxisId="left" type="monotone" dataKey="revenue" stroke={primaryColor} fillOpacity={1} fill="url(#adminColorRev)" />
-                  <Area yAxisId="right" type="monotone" dataKey="users" stroke="#3b82f6" fillOpacity={1} fill="url(#adminColorUsr)" />
+              <div className="flex-1 w-full relative min-w-0 min-h-0">
+                <AreaChart data={chartData} xDataKey="name" className="w-full h-full">
+                  <Area dataKey="revenue" stroke="var(--primary)" fill="var(--primary)" fillOpacity={0.15} yAxisId="left" />
+                  <Area dataKey="users" stroke="#3b82f6" fill="#3b82f6" fillOpacity={0.15} yAxisId="right" />
                 </AreaChart>
-              </ResponsiveContainer>
-              )}
-            </div>
-         </GlassCard>
+              </div>
+          </GlassCard>
 
          <GlassCard className="col-span-1 p-6 flex flex-col">
             <div className="flex justify-between items-center mb-6">

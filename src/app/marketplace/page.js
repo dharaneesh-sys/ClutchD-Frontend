@@ -119,7 +119,7 @@ export default function MarketplaceHome() {
         ) : (
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-3">
             {categories.map((cat) => (
-              <CategoryCard key={cat.id} category={cat} />
+              <CategoryCard key={cat.id || cat.value} category={{...cat, id: cat.slug || cat.value || cat.id}} />
             ))}
           </div>
         )}

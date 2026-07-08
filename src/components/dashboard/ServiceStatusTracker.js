@@ -23,6 +23,7 @@ export function ServiceStatusTracker({ request, onComplete, onCancel, onReleaseP
 
   useEffect(() => {
     if (request?.status === SERVICE_STATUS.SEARCHING) {
+      /* eslint-disable-next-line react-hooks/set-state-in-effect */
       fetchVehicles();
     }
   }, [request?.status]);

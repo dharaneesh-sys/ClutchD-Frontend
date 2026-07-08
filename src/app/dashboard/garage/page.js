@@ -38,6 +38,11 @@ export default function GarageDashboard() {
     return () => window.removeEventListener(NAVIGATION_EVENT, handleNavigation);
   }, [router]);
 
+  /* ── Chat state ────────────────────────────────────────────────── */
+  const [chatOpen, setChatOpen] = useState(false);
+  const [chatJobId, setChatJobId] = useState(null);
+  const [chatOtherName, setChatOtherName] = useState("Customer");
+
   if (!_hydrated || !isAuthenticated) {
     return <div className="min-h-[100dvh] w-full flex items-center justify-center bg-[var(--background)]"><div className="w-8 h-8 border-2 border-t-transparent rounded-full animate-spin border-[var(--primary)]" /></div>;
   }
@@ -48,11 +53,6 @@ export default function GarageDashboard() {
     { icon: BarChart3, label: "Analytics", onClick: () => setActiveTab("analytics") },
     { icon: ShoppingBag, label: "Parts Store", onClick: () => router.push("/marketplace") },
   ];
-
-  /* ── Chat state ────────────────────────────────────────────────── */
-  const [chatOpen, setChatOpen] = useState(false);
-  const [chatJobId, setChatJobId] = useState(null);
-  const [chatOtherName, setChatOtherName] = useState("Customer");
 
   const openChat = (jobId, customerName) => {
     setChatJobId(jobId);

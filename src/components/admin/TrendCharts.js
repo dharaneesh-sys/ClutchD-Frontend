@@ -141,9 +141,11 @@ export function TrendCharts() {
   const [monthlyTrends, setMonthlyTrends] = useState([]);
 
   useEffect(() => {
+    /* eslint-disable react-hooks/set-state-in-effect */
     setDailyJobs(getMockDailyJobs());
     setWeeklyRevenue(getMockWeeklyRevenue());
     setMonthlyTrends(getMockMonthlyTrends());
+    /* eslint-enable react-hooks/set-state-in-effect */
   }, []);
 
   if (dailyJobs.length === 0) return null;

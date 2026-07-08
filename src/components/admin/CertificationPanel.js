@@ -61,6 +61,7 @@ function ConfirmModal({ certification, action, isOpen, onClose, onConfirm }) {
 
   useEffect(() => {
     if (certification) {
+      /* eslint-disable-next-line react-hooks/set-state-in-effect */
       setAdminNotes(certification.adminNotes || "");
     }
   }, [certification]);

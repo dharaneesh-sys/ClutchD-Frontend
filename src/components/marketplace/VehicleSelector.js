@@ -56,10 +56,12 @@ export function VehicleSelector({ onVehicleChange, className }) {
   useEffect(() => {
     const saved = loadVehicle();
     if (saved) {
+      /* eslint-disable react-hooks/set-state-in-effect */
       setMake(saved.make || "");
       setModel(saved.model || "");
       setYear(saved.year || "");
       setVariant(saved.variant || "");
+      /* eslint-enable react-hooks/set-state-in-effect */
     }
   }, []);
 

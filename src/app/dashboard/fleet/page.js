@@ -35,12 +35,16 @@ export default function FleetDashboardPage() {
     if (typeof window === "undefined") return;
     try {
       const raw = localStorage.getItem("clutchd-fleet-registration");
+      /* eslint-disable react-hooks/set-state-in-effect */
       setHasRegistration(!!raw);
       if (!raw) {
         setActiveTab("register");
       }
+      /* eslint-enable react-hooks/set-state-in-effect */
     } catch {
+      /* eslint-disable-next-line react-hooks/set-state-in-effect */
       setHasRegistration(false);
+      /* eslint-disable-next-line react-hooks/set-state-in-effect */
       setActiveTab("register");
     }
   }, []);

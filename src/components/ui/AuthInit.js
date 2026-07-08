@@ -30,8 +30,8 @@ export function AuthInit() {
       const stored = JSON.parse(raw);
       const userId = stored?.state?.user?.id || stored?.state?.userId;
 
-      // Demo users — skip refresh against real backend
-      if (typeof userId === "string" && userId.startsWith("demo-")) {
+      // Demo & Firebase-only users — skip refresh against real backend
+      if (typeof userId === "string" && (userId.startsWith("demo-") || userId.startsWith("firebase-"))) {
         useAuthStore.setState({ _isRestoring: false });
         return;
       }

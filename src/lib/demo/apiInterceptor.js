@@ -105,6 +105,9 @@ function matchRoute(url, method) {
     return { route: "job_status", jobId: match ? match[1] : null };
   }
 
+  // Combined providers/nearby endpoint (returns both mechanics and garages)
+  if (path.includes("/providers/nearby") && m === "get") return "providers_nearby";
+
   if (path.includes("/mechanics/nearby") && m === "get") return "mechanics_nearby";
   if (path.includes("/mechanics") && m === "get") return "mechanics_list";
 
@@ -174,7 +177,7 @@ function matchRoute(url, method) {
     return { route: "product_detail", productId: match ? match[1] : null };
   }
   // Product list
-  if (path.includes("/marketplace/products") && m === "get") return "products_list";
+  if ((path === "/products" || path.includes("/marketplace/products")) && m === "get") return "products_list";
 
   // Single vendor detail (must match before vendor list)
   if (/\/marketplace\/vendors\/([\w-]+)/.test(path) && m === "get") {
@@ -343,6 +346,36 @@ function handleRoute(routeDef, reqData) {
           pricing: demoState.activeRequest?.pricing || null,
         },
       };
+    }
+
+    case "providers_nearby": {
+      // Parse user location from query params, default to Coimbatore center
+      const userLat = parseFloat(data?.lat) || 11.0208;
+      const userLng = parseFloat(data?.lng) || 76.9558;
+      const avgLat = userLat;
+      const kmPerDegLat = 111;
+      const kmPerDegLng = 111 * Math.cos(avgLat * Math.PI / 180);
+
+      const calcDistance = (lat, lon) => Math.sqrt(
+        ((lat - userLat) * kmPerDegLat) ** 2 +
+        ((lon - userLng) * kmPerDegLng) ** 2
+      );
+
+      const mechanics = MOCK_MECHANICS
+        .filter((m) => m.available)
+        .map((m) => ({
+          ...m,
+          distance_km: parseFloat(calcDistance(m.lat, m.lon).toFixed(2)),
+          name: m.full_name,
+        }));
+
+      const garages = MOCK_GARAGES.map((g) => ({
+        ...g,
+        distance_km: parseFloat(calcDistance(g.lat, g.lon).toFixed(2)),
+        name: g.business_name,
+      }));
+
+      return { data: { mechanics, garages } };
     }
 
     case "mechanics_nearby":
@@ -540,12 +573,43 @@ function handleRoute(routeDef, reqData) {
         }
       }
 
-      // Annotate each product with its lowest vendor price for display
-      const annotated = filtered.map((p) => ({
-        ...p,
-        displayPrice: getMinVendorPrice(p.id),
-        vendorCount: productVendors.filter((pv) => pv.productId === p.id).length,
-      }));
+      // Annotate each product with fields expected by ProductCard
+      const annotated = filtered.map((p) => {
+        const vendorPricing = productVendors.filter((pv) => pv.productId === p.id);
+        const firstVp = vendorPricing[0];
+        const firstVendor = firstVp ? vendors.find((v) => v.id === firstVp.vendorId) : null;
+        const displayPrice = getMinVendorPrice(p.id);
+
+        // Compute average rating from reviews, or fallback to mock
+        const productRatings = productReviews.filter((r) => r.productId === p.id);
+        const avgRating =
+          productRatings.length > 0
+            ? productRatings.reduce((sum, r) => sum + r.rating, 0) / productRatings.length
+            : 3.5 + Math.random() * 1.5;
+
+        // Derive delivery time from vendor pricing data
+        let deliveryTime = "2-3 days";
+        if (vendorPricing.length > 0) {
+          const days = vendorPricing.map((vp) => vp.deliveryDays);
+          const minDays = Math.min(...days);
+          const maxDays = Math.max(...days);
+          deliveryTime =
+            minDays === maxDays ? `${minDays} day` : `${minDays}-${maxDays} days`;
+        }
+
+        return {
+          ...p,
+          displayPrice,
+          vendorCount: vendorPricing.length,
+          price: displayPrice ?? p.basePrice ?? 0,
+          rating: Math.round(avgRating * 10) / 10,
+          image: p.images?.[0] || null,
+          availability: true,
+          deliveryTime,
+          vendor: firstVendor?.name || null,
+          vendorId: firstVp?.vendorId || null,
+        };
+      });
 
       return { data: { products: annotated, total: annotated.length } };
     }
@@ -744,7 +808,13 @@ export function createDemoApi() {
     if (!routeDef) {
       return { data: {} };
     }
-    return handleRoute(routeDef, data || config?.params);
+    // Preserve query-string params (e.g. ?lat=...&lng=...) that matchRoute strips
+    const qIdx = url.indexOf("?");
+    const queryParams = qIdx >= 0
+      ? Object.fromEntries(new URLSearchParams(url.slice(qIdx)).entries())
+      : {};
+    const mergedData = { ...queryParams, ...(data || {}), ...(config?.params || {}) };
+    return handleRoute(routeDef, Object.keys(mergedData).length ? mergedData : undefined);
   }
 
   return {

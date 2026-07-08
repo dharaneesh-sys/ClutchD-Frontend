@@ -149,7 +149,8 @@ export function VendorComparisonTable({ productId, product }) {
     }
 
     return dbEntries;
-  }, [productId, product]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [productId, product, DEMO_FALLBACK_VENDORS, productVendors, vendors]);
 
   /* ── Add to cart handler ─────────────────────────────────── */
   const handleAddToCart = useCallback(

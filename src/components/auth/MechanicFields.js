@@ -8,6 +8,8 @@ import { EXPERTISE_OPTIONS } from "@/lib/constants";
 
 export function MechanicFields({ register, errors, setValue, watch }) {
   const watchExpertise = watch("expertise") || [];
+  const [gpsLoading, setGpsLoading] = useState(false);
+  const [gpsCoords, setGpsCoords] = useState(null);
 
   const handleExpertiseChange = (val) => {
     setValue("expertise", val, { shouldValidate: true });
@@ -15,6 +17,22 @@ export function MechanicFields({ register, errors, setValue, watch }) {
 
   const handleFileChange = (file) => {
     setValue("profileImage", file);
+  };
+
+  const handleGetLocation = () => {
+    if (typeof window === "undefined" || !navigator.geolocation) return;
+    setGpsLoading(true);
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const { latitude, longitude } = position.coords;
+        setValue("latitude", latitude);
+        setValue("longitude", longitude);
+        setGpsCoords({ latitude, longitude });
+        setGpsLoading(false);
+      },
+      () => setGpsLoading(false),
+      { timeout: 10000, enableHighAccuracy: true },
+    );
   };
 
   return (
@@ -69,13 +87,33 @@ export function MechanicFields({ register, errors, setValue, watch }) {
       />
 
       {/* Location */}
-      <Input
-        label="Location"
-        icon={MapPin}
-        placeholder="e.g. RS Puram or Click icon for GPS"
-        {...register("location")}
-        error={errors.location?.message}
-      />
+      <div className="flex gap-2 items-start">
+        <div className="flex-1 min-w-0">
+          <Input
+            label="Location"
+            icon={MapPin}
+            placeholder="e.g. RS Puram or use GPS"
+            {...register("location")}
+            error={errors.location?.message}
+          />
+        </div>
+        <button
+          type="button"
+          onClick={handleGetLocation}
+          disabled={gpsLoading}
+          className="mt-6 inline-flex items-center gap-1.5 rounded-2xl border border-border-subtle bg-surface px-3 py-3 text-sm font-medium text-primary transition-colors hover:bg-primary/5 disabled:opacity-50 shrink-0"
+        >
+          <MapPin size={16} />
+          {gpsLoading ? "Detecting..." : "Use GPS"}
+        </button>
+      </div>
+      {gpsCoords && (
+        <p className="text-xs text-text-muted mt-1">
+          GPS: {gpsCoords.latitude.toFixed(4)}, {gpsCoords.longitude.toFixed(4)}
+        </p>
+      )}
+      <input type="hidden" {...register("latitude")} />
+      <input type="hidden" {...register("longitude")} />
 
       {/* Passwords */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

@@ -26,6 +26,21 @@ function clearAllStorage() {
   }
 }
 
+/**
+ * Clear lingering demo-mode state so the api.js interceptor does NOT
+ * intercept real API calls as demo ones. Must be called before any
+ * real authentication flow (login, signup, oauth) and on logout.
+ */
+function clearDemoState() {
+  if (typeof window === "undefined") return;
+  try {
+    sessionStorage.removeItem("demo_token");
+    window.__DEMO_USER__ = null;
+  } catch (e) {
+    // best-effort
+  }
+}
+
 // Proactive refresh: refresh the access token at 80% of its TTL.
 // Default access token TTL is 15 min (from backend config); override via env.
 const ACCESS_TTL_MS =
@@ -82,8 +97,8 @@ export const useAuthStore = create(
           set({ _isRestoring: false });
           return;
         }
-        // Demo users have fake tokens — skip refresh against real backend
-        if (typeof user.id === "string" && user.id.startsWith("demo-")) {
+        // Demo & Firebase-only users have fake tokens — skip refresh against real backend
+        if (typeof user.id === "string" && (user.id.startsWith("demo-") || user.id.startsWith("firebase-"))) {
           set({ _isRestoring: false });
           return;
         }
@@ -156,6 +171,7 @@ export const useAuthStore = create(
       },
 
       login: async (email, password, role) => {
+        clearDemoState();
         set({ isLoading: true, error: null });
         
         try {
@@ -181,6 +197,7 @@ export const useAuthStore = create(
       },
 
       loginWithGoogle: async (credential, role = null, state = null) => {
+        clearDemoState();
         set({ isLoading: true, error: null });
 
         const safeRole =
@@ -263,6 +280,7 @@ export const useAuthStore = create(
        * closed or sign-in failed.
        */
       firebaseSignIn: async (role = null) => {
+        clearDemoState();
         set({ isLoading: true, error: null });
 
         try {
@@ -309,7 +327,58 @@ export const useAuthStore = create(
         }
       },
 
+      /**
+       * Sign in with Google via Capacitor native Firebase Auth plugin.
+       * Opens a native Android system dialog (account picker).
+       * Only available when running inside Capacitor WebView.
+       */
+      loginWithGoogleCapacitor: async (role) => {
+        clearDemoState();
+        set({ isLoading: true, error: null });
+
+        try {
+          const { signInWithGoogleNative } = await import(
+            "@/lib/auth/capacitorAuth"
+          );
+          const firebaseUser = await signInWithGoogleNative();
+
+          if (!firebaseUser) {
+            set({ isLoading: false, error: null });
+            return null;
+          }
+
+          const localUser = {
+            id: `firebase-${firebaseUser.uid}`,
+            name: firebaseUser.displayName || "Google User",
+            email: firebaseUser.email || "",
+            avatar: firebaseUser.photoURL || null,
+            role: role || "customer",
+            provider: "firebase",
+          };
+
+          if (typeof window !== "undefined") {
+            setAccessToken("firebase-local-jwt-token");
+          }
+
+          set({
+            user: localUser,
+            isAuthenticated: true,
+            _hydrated: true,
+            isLoading: false,
+          });
+          cacheUserProfile(localUser);
+          return localUser;
+        } catch (error) {
+          console.error("[authStore] loginWithGoogleCapacitor error:", error);
+          const msg =
+            error.message || "Google sign-in failed. Please try again.";
+          set({ isLoading: false, error: msg });
+          return null;
+        }
+      },
+
       signup: async (data, role) => {
+        clearDemoState();
         set({ isLoading: true, error: null });
         
         try {
@@ -337,6 +406,7 @@ export const useAuthStore = create(
 
       logout: async () => {
         clearProactiveRefresh();
+        clearDemoState();
         try {
           await api.post("/auth/logout");
         } catch (e) {

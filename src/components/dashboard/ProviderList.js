@@ -6,7 +6,10 @@ import { GlassCard } from "@/components/ui/GlassCard";
 import { cn } from "@/lib/utils";
 
 export function ProviderList() {
-  const { nearbyMechanics, nearbyGarages, isLoading, error } = useTrackingStore();
+  const { isLoading, error } = useTrackingStore();
+  // Use the store's computed getter for reactive filtering
+  const allProviders = useTrackingStore((s) => s.getFilteredProviders());
+  const providerFilter = useTrackingStore((s) => s.providerFilter);
 
   if (isLoading) {
     return (
@@ -26,11 +29,6 @@ export function ProviderList() {
     );
   }
 
-  const allProviders = [
-    ...nearbyMechanics.map(m => ({ ...m, type: "mechanic" })),
-    ...nearbyGarages.map(g => ({ ...g, type: "garage" }))
-  ].sort((a, b) => a.distanceKm - b.distanceKm);
-
   if (allProviders.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center p-8 text-center opacity-60">
@@ -40,11 +38,20 @@ export function ProviderList() {
     );
   }
 
+  const filterLabels = { all: "All", mechanic: "Mechanics", garage: "Garages" };
+
   return (
     <div className="space-y-3 pb-4">
-      <h3 className="px-2 text-sm font-semibold uppercase tracking-wider mb-4 text-text-muted">
-        Nearby Professionals ({allProviders.length})
-      </h3>
+      <div className="flex items-center justify-between px-2 mb-4">
+        <h3 className="text-sm font-semibold uppercase tracking-wider text-text-muted">
+          Nearby Professionals ({allProviders.length})
+        </h3>
+        {providerFilter !== "all" && (
+          <span className="text-[10px] font-bold uppercase px-2 py-0.5 rounded-full bg-primary/10 text-primary border border-primary/20">
+            {filterLabels[providerFilter]}
+          </span>
+        )}
+      </div>
       
       {allProviders.map((provider) => (
         <GlassCard 

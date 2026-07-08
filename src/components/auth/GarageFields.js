@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Building, User, Mail, Phone, MapPin, Clock, Users, Lock } from "lucide-react";
 import { Input } from "@/components/ui/Input";
 import { MultiSelect } from "@/components/ui/MultiSelect";
@@ -6,6 +7,8 @@ import { EXPERTISE_OPTIONS } from "@/lib/constants";
 
 export function GarageFields({ register, errors, setValue, watch }) {
   const watchServices = watch("services") || [];
+  const [gpsLoading, setGpsLoading] = useState(false);
+  const [gpsCoords, setGpsCoords] = useState(null);
 
   const handleServicesChange = (val) => {
     setValue("services", val, { shouldValidate: true });
@@ -13,6 +16,22 @@ export function GarageFields({ register, errors, setValue, watch }) {
 
   const handleFileChange = (files) => {
     setValue("garageImages", files);
+  };
+
+  const handleGetLocation = () => {
+    if (typeof window === "undefined" || !navigator.geolocation) return;
+    setGpsLoading(true);
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const { latitude, longitude } = position.coords;
+        setValue("latitude", latitude);
+        setValue("longitude", longitude);
+        setGpsCoords({ latitude, longitude });
+        setGpsLoading(false);
+      },
+      () => setGpsLoading(false),
+      { timeout: 10000, enableHighAccuracy: true },
+    );
   };
 
   return (
@@ -53,13 +72,33 @@ export function GarageFields({ register, errors, setValue, watch }) {
         />
       </div>
 
-      <Input
-        label="Location"
-        icon={MapPin}
-        placeholder="Full address of garage"
-        {...register("location")}
-        error={errors.location?.message}
-      />
+      <div className="flex gap-2 items-start">
+        <div className="flex-1 min-w-0">
+          <Input
+            label="Location"
+            icon={MapPin}
+            placeholder="Full address of garage"
+            {...register("location")}
+            error={errors.location?.message}
+          />
+        </div>
+        <button
+          type="button"
+          onClick={handleGetLocation}
+          disabled={gpsLoading}
+          className="mt-6 inline-flex items-center gap-1.5 rounded-2xl border border-border-subtle bg-surface px-3 py-3 text-sm font-medium text-primary transition-colors hover:bg-primary/5 disabled:opacity-50 shrink-0"
+        >
+          <MapPin size={16} />
+          {gpsLoading ? "Detecting..." : "Use GPS"}
+        </button>
+      </div>
+      {gpsCoords && (
+        <p className="text-xs text-text-muted mt-1">
+          GPS: {gpsCoords.latitude.toFixed(4)}, {gpsCoords.longitude.toFixed(4)}
+        </p>
+      )}
+      <input type="hidden" {...register("latitude")} />
+      <input type="hidden" {...register("longitude")} />
 
       {/* Garage details */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

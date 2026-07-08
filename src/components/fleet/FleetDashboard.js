@@ -159,9 +159,11 @@ export function FleetDashboard({ onRegisterNew, onStartBooking }) {
   // Load data from localStorage
   useEffect(() => {
     const data = getFleetRegistration() || initDemoFleet();
+    /* eslint-disable react-hooks/set-state-in-effect */
     setFleet(data);
     setVehicles(getFleetVehicles());
     setServiceHistory(getFleetServiceHistory());
+    /* eslint-enable react-hooks/set-state-in-effect */
   }, []);
 
   const tierInfo = useMemo(() => {

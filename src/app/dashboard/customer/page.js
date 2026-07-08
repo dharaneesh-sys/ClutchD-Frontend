@@ -21,7 +21,7 @@ import { NotificationBell } from "@/components/ui/NotificationBell";
 import { SOSButton } from "@/components/ui/SOSButton";
 import { DashboardShell } from "@/components/ui/DashboardShell";
 import { ChatPanel } from "@/components/ui/ChatPanel";
-import { History, Wrench, Calendar, ShoppingBag, MessageSquare, Car } from "lucide-react";
+import { History, Wrench, Calendar, ShoppingBag, MessageSquare, Car, X } from "lucide-react";
 import { SERVICE_STATUS } from "@/lib/constants";
 import { ScheduleBookingModal } from "@/components/dashboard/ScheduleBookingModal";
 import api from "@/lib/api";
@@ -96,6 +96,29 @@ export default function CustomerDashboard() {
   const [isScheduleModalOpen, setIsScheduleModalOpen] = useState(false);
   const [isScheduleLoading, setIsScheduleLoading] = useState(false);
   const paymentTriggeredRef = useRef(false);
+
+  const handleReleasePayment = useCallback(() => {
+    releasePayment();
+    setIsReviewOpen(true);
+  }, [releasePayment]);
+
+  const handleDisputePayment = useCallback((reason) => {
+    disputePayment(reason);
+  }, [disputePayment]);
+
+  /* ── Chat state ────────────────────────────────────────────────── */
+  const [chatOpen, setChatOpen] = useState(false);
+  const chatJobId = activeRequest?.id;
+  const chatOtherName = activeRequest?.mechanic?.name || "Mechanic";
+  const chatOtherRole = "mechanic";
+  const hasMechanic =
+    activeRequest &&
+    (activeRequest.status === "assigned" ||
+     activeRequest.status === "en_route" ||
+     activeRequest.status === "in_progress" ||
+     activeRequest.status === "payment_pending" ||
+     activeRequest.status === "payment_escrow" ||
+     activeRequest.status === "payment_released");
 
   const { isDemoMode, isTourActive } = useDemoMode();
   const router = useRouter();
@@ -220,15 +243,6 @@ export default function CustomerDashboard() {
     // Review opens later, after customer releases the escrowed payment
   };
 
-  const handleReleasePayment = useCallback(() => {
-    releasePayment();
-    setIsReviewOpen(true);
-  }, [releasePayment]);
-
-  const handleDisputePayment = useCallback((reason) => {
-    disputePayment(reason);
-  }, [disputePayment]);
-
   const handleReviewSubmit = () => {
     setIsReviewOpen(false);
     setReviewProviderName("the professional");
@@ -241,20 +255,6 @@ export default function CustomerDashboard() {
   const handleVehicleChange = (vehicleId, vehicle) => {
     useServiceStore.getState().updateVehicle(vehicleId, vehicle);
   };
-
-  /* ── Chat state ────────────────────────────────────────────────── */
-  const [chatOpen, setChatOpen] = useState(false);
-  const chatJobId = activeRequest?.id;
-  const chatOtherName = activeRequest?.mechanic?.name || "Mechanic";
-  const chatOtherRole = "mechanic";
-  const hasMechanic =
-    activeRequest &&
-    (activeRequest.status === "assigned" ||
-     activeRequest.status === "en_route" ||
-     activeRequest.status === "in_progress" ||
-     activeRequest.status === "payment_pending" ||
-     activeRequest.status === "payment_escrow" ||
-     activeRequest.status === "payment_released");
 
   return (
     <>
@@ -301,7 +301,7 @@ export default function CustomerDashboard() {
       ) : activeTab === "request" ? (
         <div className="flex-1 grid grid-cols-1 lg:grid-cols-12 gap-4 lg:gap-6 pb-4 lg:pb-6">
           <div className="lg:col-span-7 xl:col-span-8 rounded-2xl overflow-hidden relative shadow-2xl min-h-[250px] sm:min-h-[350px] lg:min-h-[400px]">
-            <MapView />
+            <MapView role="customer" />
 
             <div className="absolute top-4 left-4 z-[400] glass-lux px-3 py-1.5 rounded-full text-xs font-semibold flex items-center gap-2 text-foreground">
               <span className="w-2 h-2 rounded-full bg-yellow-500 dark:bg-primary-light" />

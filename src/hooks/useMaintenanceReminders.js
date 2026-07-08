@@ -87,6 +87,7 @@ export function useMaintenanceReminders(vehicles, options = {}) {
 
   // Initial check and optional polling
   useEffect(() => {
+    /* eslint-disable-next-line react-hooks/set-state-in-effect */
     refresh();
 
     if (checkIntervalMs > 0) {

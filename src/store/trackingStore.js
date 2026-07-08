@@ -2,6 +2,8 @@ import { create } from "zustand";
 import api from "@/lib/api";
 import { MAP_DEFAULT_CENTER } from "@/lib/constants";
 import { cacheLastLocation } from "@/lib/offline/offlineCache";
+import { toCamelCase } from "@/lib/utils";
+import { MOCK_MECHANICS, MOCK_GARAGES } from "@/lib/demo/mockData";
 
 /**
  * Haversine formula to calculate distance between two GPS coordinates.
@@ -43,6 +45,7 @@ export const useTrackingStore = create((set, get) => ({
   error: null,
   gpsStatus: "idle", // "idle" | "requesting" | "granted" | "denied" | "unavailable"
   estimatedArrival: null, // seconds | null
+  providerFilter: "all", // "all" | "mechanic" | "garage"
 
   setUserLocation: (coords) => {
     set({ userLocation: coords });
@@ -87,6 +90,49 @@ export const useTrackingStore = create((set, get) => ({
       // Silent — IP geolocation is a best-effort fallback
     }
     return false;
+  },
+
+  /**
+   * Fallback: use IP geolocation + mock data when backend is unreachable.
+   * Fetches the IP-based location, then generates nearby providers from
+   * the bundled mock dataset with computed distances.
+   */
+  _fallbackWithMockData: async () => {
+    try {
+      const res = await fetch("https://ip-api.com/json/");
+      if (!res.ok) return false;
+      const ipData = await res.json();
+      if (ipData.status !== "success") return false;
+
+      const center = [ipData.lat, ipData.lon];
+
+      const nearbyM = MOCK_MECHANICS
+        .filter((m) => m.available)
+        .map((m) => toCamelCase({
+          ...m,
+          name: m.full_name,
+          distance_km: parseFloat(haversineDistance(center[0], center[1], m.lat, m.lon).toFixed(2)),
+        }));
+
+      const nearbyG = MOCK_GARAGES.map((g) => toCamelCase({
+        ...g,
+        name: g.business_name,
+        distance_km: parseFloat(haversineDistance(center[0], center[1], g.lat, g.lon).toFixed(2)),
+      }));
+
+      set({
+        userLocation: center,
+        gpsStatus: "granted",
+        nearbyMechanics: nearbyM,
+        nearbyGarages: nearbyG,
+        isLoading: false,
+        error: null,
+      });
+      cacheLastLocation(center[0], center[1]);
+      return true;
+    } catch {
+      return false;
+    }
   },
 
   /**
@@ -155,26 +201,53 @@ export const useTrackingStore = create((set, get) => ({
   fetchNearbyProviders: async () => {
     const center = get().userLocation;
     set({ isLoading: true, error: null });
-    
+
     try {
       const { data } = await api.get(`/providers/nearby?lat=${center[0]}&lng=${center[1]}`);
-      set({ 
-        nearbyMechanics: data.mechanics || [], 
-        nearbyGarages: data.garages || [],
+      // Convert snake_case from backend to camelCase for consistency
+      set({
+        nearbyMechanics: toCamelCase(data.mechanics || []),
+        nearbyGarages: toCamelCase(data.garages || []),
         isLoading: false,
       });
     } catch (error) {
-      const msg =
-        error.response?.data?.detail ||
-        (error.response ? "Failed to load nearby providers." : "Server unreachable.");
-      set({ 
-        nearbyMechanics: [], 
-        nearbyGarages: [],
-        isLoading: false,
-        error: msg,
-      });
+      // Try fallback with IP geolocation + mock data when backend is unreachable
+      const fallbackOk = await get()._fallbackWithMockData();
+      if (!fallbackOk) {
+        const msg =
+          error.response?.data?.detail ||
+          (error.response ? "Failed to load nearby providers." : "Server unreachable.");
+        set({
+          nearbyMechanics: [],
+          nearbyGarages: [],
+          isLoading: false,
+          error: msg,
+        });
+      }
     }
   },
 
   clearError: () => set({ error: null }),
+
+  /**
+   * Set the provider type filter for the nearby providers list.
+   * @param {"all"|"mechanic"|"garage"} filter
+   */
+  setProviderFilter: (filter) => set({ providerFilter: filter }),
+
+  /**
+   * Return the list of nearby providers filtered by the current providerFilter.
+   * Each provider includes a `type` field ("mechanic" | "garage").
+   * @returns {Array<{type: string, distanceKm: number, ...}>}
+   */
+  getFilteredProviders: () => {
+    const { nearbyMechanics, nearbyGarages, providerFilter } = get();
+    const all = [
+      ...nearbyMechanics.map((m) => ({ ...m, type: "mechanic" })),
+      ...nearbyGarages.map((g) => ({ ...g, type: "garage" })),
+    ].sort((a, b) => (a.distanceKm || 0) - (b.distanceKm || 0));
+
+    if (providerFilter === "all") return all;
+    return all.filter((p) => p.type === providerFilter);
+  },
 }));

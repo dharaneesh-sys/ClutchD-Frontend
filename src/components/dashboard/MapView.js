@@ -8,6 +8,7 @@ import {
   Popup,
   useMap,
   Polyline,
+  Tooltip,
 } from "react-leaflet";
 import MarkerClusterGroup from "react-leaflet-cluster";
 import { useTrackingStore } from "@/store/trackingStore";
@@ -39,15 +40,14 @@ function MapUpdater({ center }) {
   return null;
 }
 
-// ─── My Location button overlay ────────────────────────────────────────────
-function MyLocationButton() {
+// ─── Map Controls overlay (zoom + my-location, grouped in one container) ─────
+function MapControls() {
   const map = useMap();
   const { requestGPSLocation, gpsStatus } = useTrackingStore();
 
-  const handleClick = () => {
-    requestGPSLocation();
-    // The store will update userLocation which MapUpdater picks up
-  };
+  const handleZoomIn = () => map.setZoom(map.getZoom() + 1);
+  const handleZoomOut = () => map.setZoom(Math.max(1, map.getZoom() - 1));
+  const handleMyLocation = () => requestGPSLocation();
 
   const isRequesting = gpsStatus === "requesting";
   const isGranted = gpsStatus === "granted";
@@ -56,41 +56,45 @@ function MyLocationButton() {
   return (
     <div className="leaflet-bottom leaflet-right">
       <div className="leaflet-control leaflet-bar" style={{ border: "none" }}>
-        <button
-          onClick={handleClick}
-          disabled={isRequesting}
-          className="my-location-btn"
-          aria-label="My Location"
-          title={
-            isDenied
-              ? "Location access denied — check browser permissions"
-              : "Show my location"
-          }
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="20"
-            height="20"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
+        <div className="zoom-controls">
+          {/* Zoom In */}
+          <button
+            onClick={handleZoomIn}
+            className="zoom-control-btn"
+            aria-label="Zoom in"
           >
-            <circle cx="12" cy="12" r="10" />
-            <circle cx="12" cy="12" r="3" />
-            {isGranted && (
-              <>
-                <line x1="12" y1="2" x2="12" y2="6" />
-                <line x1="12" y1="18" x2="12" y2="22" />
-                <line x1="2" y1="12" x2="6" y2="12" />
-                <line x1="18" y1="12" x2="22" y2="12" />
-              </>
-            )}
-          </svg>
-          {isRequesting && <span className="my-location-spinner" />}
-        </button>
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" />
+            </svg>
+          </button>
+          <div className="zoom-control-divider" />
+          {/* Zoom Out */}
+          <button
+            onClick={handleZoomOut}
+            className="zoom-control-btn"
+            aria-label="Zoom out"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <line x1="5" y1="12" x2="19" y2="12" />
+            </svg>
+          </button>
+          <div className="zoom-control-divider" />
+          {/* My Location */}
+          <button
+            onClick={handleMyLocation}
+            disabled={isRequesting}
+            className="my-location-btn"
+            style={{ borderRadius: 0, border: "none" }}
+            aria-label="My Location"
+            title={isDenied ? "Location access denied — check browser permissions" : "Show my location"}
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <circle cx="12" cy="12" r="10" /><circle cx="12" cy="12" r="3" />
+              {isGranted && (<><line x1="12" y1="2" x2="12" y2="6" /><line x1="12" y1="18" x2="12" y2="22" /><line x1="2" y1="12" x2="6" y2="12" /><line x1="18" y1="12" x2="22" y2="12" /></>)}
+            </svg>
+            {isRequesting && <span className="my-location-spinner" />}
+          </button>
+        </div>
       </div>
     </div>
   );
@@ -160,7 +164,7 @@ function MechanicPopupContent({ name, rating, subtitle }) {
 //  Main MapView
 // ═══════════════════════════════════════════════════════════════════════════
 
-export default function MapView() {
+export default function MapView({ role = "customer" }) {
   const {
     userLocation,
     mechanicLocation,
@@ -183,6 +187,7 @@ export default function MapView() {
   }, [fetchNearbyProviders, requestGPSLocation]);
 
   const [routePath, setRoutePath] = useState(null);
+  const [routeDistance, setRouteDistance] = useState(null);
 
   useEffect(() => {
     if (navigationTarget && userLocation) {
@@ -198,6 +203,7 @@ export default function MapView() {
               coord[0],
             ]);
             setRoutePath(coords);
+            setRouteDistance(data.routes[0].distance / 1000);
           }
         } catch (err) {
           console.error("Failed to fetch route:", err);
@@ -205,7 +211,10 @@ export default function MapView() {
       };
       getRoute();
     } else {
+      /* eslint-disable-next-line react-hooks/set-state-in-effect */
       setRoutePath(null);
+      /* eslint-disable-next-line react-hooks/set-state-in-effect */
+      setRouteDistance(null);
     }
   }, [navigationTarget, userLocation]);
 
@@ -220,6 +229,16 @@ export default function MapView() {
   const nearbyMechanicIcon = createNearbyMechanicIcon();
   const garageIcon = createGarageIcon();
   const targetIcon = createTargetIcon();
+
+  const showNavigation = ["customer", "mechanic"].includes(role);
+
+  // Invisible icon to carry the route distance tooltip at the polyline midpoint
+  const distanceLabelIcon = L.divIcon({
+    className: "",
+    html: '<div class="route-distance-dot" />',
+    iconSize: [1, 1],
+    iconAnchor: [6, 6],
+  });
 
   return (
     <div className="w-full h-full rounded-2xl overflow-hidden border border-white/10 relative">
@@ -261,18 +280,66 @@ export default function MapView() {
           </Marker>
         )}
 
-        {/* ── Navigation route ────────────────────────────────────────── */}
-        {routePath && (
-          <Polyline
-            positions={routePath}
-            color="#10b981"
-            weight={5}
-            opacity={0.7}
-          />
+        {/* ── Navigation route (customer & mechanic only) ────────────── */}
+        {showNavigation && routePath && (
+          <>
+            <Polyline
+              positions={routePath}
+              color="#10b981"
+              weight={5}
+              opacity={0.7}
+              eventHandlers={{
+                click: () => {
+                  /* polyline click placeholder for future route details */
+                },
+              }}
+            >
+              <Tooltip sticky>
+                <span className="text-xs font-semibold">
+                  {routeDistance < 1
+                    ? `${Math.round(routeDistance * 1000)} m`
+                    : `${routeDistance.toFixed(1)} km`}
+                </span>
+              </Tooltip>
+            </Polyline>
+
+            {/* Midpoint distance label */}
+            {routePath.length > 0 && routeDistance != null && (
+              <Marker
+                position={routePath[Math.floor(routePath.length / 2)]}
+                icon={distanceLabelIcon}
+                interactive={false}
+              >
+                <Tooltip direction="top" offset={[0, -8]} permanent>
+                  <div className="route-distance-label">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="12"
+                      height="12"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2.5"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
+                      <path d="M5 12h14" />
+                      <path d="m12 5 7 7-7 7" />
+                    </svg>
+                    <span>
+                      {routeDistance < 1
+                        ? `${Math.round(routeDistance * 1000)} m`
+                        : `${routeDistance.toFixed(1)} km`}
+                    </span>
+                  </div>
+                </Tooltip>
+              </Marker>
+            )}
+          </>
         )}
 
         {/* ── Navigation Target (customer location) ──────────────────── */}
-        {navigationTarget && (
+        {showNavigation && navigationTarget && (
           <Marker
             position={[navigationTarget.lat, navigationTarget.lng]}
             icon={targetIcon}
@@ -332,8 +399,8 @@ export default function MapView() {
           </MarkerClusterGroup>
         )}
 
-        {/* ── Overlay controls ──────────────────────────────────────────── */}
-        <MyLocationButton />
+        {/* ── Overlay controls (zoom + my-location) ────────────────────── */}
+        <MapControls />
         <MapLegend />
       </MapContainer>
     </div>

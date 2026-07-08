@@ -184,6 +184,14 @@ export function ServiceRequestPanel({ onSubmit, isLoading }) {
     fetchVehicles();
   }, []);
 
+  // Sync requestType radio to trackingStore providerFilter so ProviderList
+  // shows only the matching provider type (auto → all, mechanic, garage).
+  const setProviderFilter = useTrackingStore((s) => s.setProviderFilter);
+  useEffect(() => {
+    const filterMap = { auto: "all", mechanic: "mechanic", garage: "garage" };
+    setProviderFilter(filterMap[requestType] || "all");
+  }, [requestType, setProviderFilter]);
+
   const handleIssueChange = (e) => {
     const value = e.target.value;
     setValue("issueTag", value, { shouldValidate: true });

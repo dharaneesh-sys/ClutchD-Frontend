@@ -49,6 +49,8 @@ export function ProductCard({ product, className }) {
     vendorId,
   } = product;
 
+  const safePrice = price ?? 0;
+
   const handleAddToCart = (e) => {
     e.stopPropagation();
     e.preventDefault();
@@ -56,8 +58,8 @@ export function ProductCard({ product, className }) {
 
     setAdding(true);
     addItem(
-      { id, price, name, image },
-      { id: vendorId, name: vendor },
+      { id, price: safePrice, name, image },
+      { id: vendorId || null, name: vendor || null },
     );
     setTimeout(() => setAdding(false), 1500);
   };
@@ -139,7 +141,7 @@ export function ProductCard({ product, className }) {
         <div className="flex items-center gap-1.5">
           <Star size={12} className="fill-amber-400 text-amber-400" />
           <span className="text-xs font-medium text-text-muted">
-            {Number(rating).toFixed(1)}
+            {Number(rating ?? 0).toFixed(1)}
           </span>
         </div>
 
@@ -148,15 +150,15 @@ export function ProductCard({ product, className }) {
           <div className="flex items-center gap-3 min-w-0">
             <div className="flex flex-col shrink-0">
               <span className="text-lg font-bold tracking-tight text-foreground">
-                {isProUser ? formatCurrency(Math.round(price * 0.7)) : formatCurrency(price)}
+                {isProUser ? formatCurrency(Math.round(safePrice * 0.7)) : formatCurrency(safePrice)}
               </span>
-              {isProUser && price > 0 && (
+              {isProUser && safePrice > 0 && (
                 <span className="text-[0.625rem] font-medium text-text-dim line-through">
-                  {formatCurrency(price)}
+                  {formatCurrency(safePrice)}
                 </span>
               )}
             </div>
-            {isProUser && price > 0 && (
+            {isProUser && safePrice > 0 && (
               <span className="inline-flex items-center gap-1 rounded-full bg-purple-500/15 px-2 py-0.5 text-[0.5rem] font-semibold uppercase tracking-wider text-purple-300 whitespace-nowrap">
                 <Crown size={8} />
                 Pro -30%
