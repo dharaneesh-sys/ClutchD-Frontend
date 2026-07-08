@@ -184,7 +184,7 @@ export function SOSButton() {
       <button
         onClick={handleSOS}
         disabled={isDisabled}
-        className={`fixed bottom-6 left-6 z-[100] transition-all flex items-center justify-center overflow-hidden ${buttonStyle}`}
+        className={`fixed bottom-20 left-6 z-[100] transition-all flex items-center justify-center overflow-hidden ${buttonStyle}`}
       >
         <div className="flex items-center justify-center gap-2 text-white font-bold whitespace-nowrap px-4">
           {loading ? (
