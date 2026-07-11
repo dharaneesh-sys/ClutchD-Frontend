@@ -5,7 +5,6 @@ import { Button } from "@/components/ui/Button";
 import { CreditCard, Smartphone, QrCode, Banknote, CheckCircle2, XCircle, Loader2, ChevronDown, ChevronUp } from "lucide-react";
 import { GST_RATE } from "@/lib/constants";
 import { useToast } from "@/components/ui/ToastProvider";
-import { DEMO_MODE } from "@/lib/demo/demoFlag";
 import { BackendHealth } from "@/lib/backendHealth";
 import api from "@/lib/api";
 
@@ -74,33 +73,6 @@ function PaymentModalContent({ isOpen, onClose, amount, pricing, jobId, onSucces
   }, [payState, displayAmount, showSuccess]);
 
   const delay = (ms) => new Promise((r) => setTimeout(r, ms));
-
-  // Demo mode: auto-process payment after showing the modal briefly
-  useEffect(() => {
-    if (!isOpen || payState !== "idle") return;
-    if (!DEMO_MODE) return;
-
-    let cancelled = false;
-    (async () => {
-      await delay(2000);
-      if (cancelled) return;
-      setPayState("processing");
-      await delay(800);
-      if (cancelled) return;
-      setPayState("success");
-      await delay(1500);
-      if (cancelled) return;
-      onSuccess({
-        method,
-        amount: displayAmount,
-        status: "success",
-        transactionId: "TXN_DEMO_" + Date.now(),
-      });
-    })();
-    return () => {
-      cancelled = true;
-    };
-  }, [isOpen, payState, method, displayAmount, onSuccess]);
 
   const amountPaise = Math.round(displayAmount * 100);
 

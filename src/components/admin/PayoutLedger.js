@@ -4,79 +4,9 @@ import { useState, useEffect, useCallback } from "react";
 import { GlassCard } from "@/components/ui/GlassCard";
 import { Badge } from "@/components/ui/Badge";
 import { Input } from "@/components/ui/Input";
-import { BackendHealth } from "@/lib/backendHealth";
 import { Search, Banknote, RefreshCw } from "lucide-react";
 
-const MOCK_PAYOUTS_KEY = "clutchd_payout_ledger";
-
 const PAYOUT_STATUSES = ["All", "Pending", "Processing", "Completed", "Failed"];
-
-const MOCK_MECHANICS = [
-  "Rajesh Auto Works",
-  "Siddharth Garage",
-  "Priya Motors",
-  "Kumar Service Center",
-  "Ananya Auto Repair",
-  "Ganesh Tyres & Service",
-  "Sharma Car Care",
-  "Venkatesh Auto Garage",
-  "Deep Auto Zone",
-  "Meera's Auto Solutions",
-  "Rahul's Pit Stop",
-  "Laxmi Auto Garage",
-  "Arun Auto Engineering",
-  "Sneha Car Clinic",
-  "Varun Motors",
-  "Pooja Auto Center",
-  "Mohan's Garage",
-  "Kavita Auto Works",
-  "Suresh Auto Service",
-  "Divya Motors Garage",
-];
-
-function generateMockPayouts() {
-  const statuses = ["pending", "processing", "completed", "failed"];
-  const payouts = [];
-
-  for (let i = 0; i < 24; i++) {
-    const status = statuses[Math.floor(Math.random() * statuses.length)];
-    const rawAmount = Math.floor(Math.random() * 15000) + 500;
-    const date = new Date();
-    date.setDate(date.getDate() - Math.floor(Math.random() * 60));
-
-    payouts.push({
-      id: `PAYOUT_${String(i + 1).padStart(4, "0")}`,
-      mechanicName: MOCK_MECHANICS[Math.floor(Math.random() * MOCK_MECHANICS.length)],
-      providerType: Math.random() > 0.5 ? "mechanic" : "garage",
-      amount: rawAmount,
-      formattedAmount: `₹${rawAmount.toLocaleString("en-IN")}`,
-      status,
-      createdAt: date.toISOString(),
-    });
-  }
-
-  return payouts.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-}
-
-function seedMockData() {
-  try {
-    const existing = localStorage.getItem(MOCK_PAYOUTS_KEY);
-    if (!existing) {
-      localStorage.setItem(MOCK_PAYOUTS_KEY, JSON.stringify(generateMockPayouts()));
-    }
-  } catch {
-    // localStorage unavailable — proceed empty
-  }
-}
-
-function loadMockData() {
-  try {
-    const raw = localStorage.getItem(MOCK_PAYOUTS_KEY);
-    return raw ? JSON.parse(raw) : [];
-  } catch {
-    return [];
-  }
-}
 
 export function PayoutLedger() {
   const [searchTerm, setSearchTerm] = useState("");
@@ -84,37 +14,20 @@ export function PayoutLedger() {
   const [payouts, setPayouts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [backendAvailable, setBackendAvailable] = useState(false);
 
   const loadData = useCallback(async () => {
     setLoading(true);
     setError(null);
 
-    const available = BackendHealth.isAvailable();
-    setBackendAvailable(available);
-
-    if (available) {
-      try {
-        const { fetchPayouts } = await import("@/services/adminService");
-        const data = await fetchPayouts({ status: statusFilter !== "All" ? statusFilter.toLowerCase() : undefined });
-        setPayouts(data);
-        return;
-      } catch (err) {
-        console.warn("Backend payout fetch failed, falling back to mock data:", err);
-        setBackendAvailable(false);
-      }
+    try {
+      const { fetchPayouts } = await import("@/services/adminService");
+      const data = await fetchPayouts({ status: statusFilter !== "All" ? statusFilter.toLowerCase() : undefined });
+      setPayouts(data);
+    } catch (err) {
+      setError(err?.response?.data?.detail || err.message || "Failed to load payouts");
+    } finally {
+      setLoading(false);
     }
-
-    // Demo / fallback mode
-    seedMockData();
-    let data = loadMockData();
-
-    if (statusFilter !== "All") {
-      data = data.filter((p) => p.status.toLowerCase() === statusFilter.toLowerCase());
-    }
-
-    setPayouts(data);
-    setLoading(false);
   }, [statusFilter]);
 
   useEffect(() => {
@@ -159,13 +72,8 @@ export function PayoutLedger() {
           Payout Ledger
         </h3>
         <div className="flex items-center gap-2">
-          <span
-            className={`inline-block w-2 h-2 rounded-full ${backendAvailable ? "bg-green-500" : "bg-amber-500"}`}
-            title={backendAvailable ? "Live data" : "Demo mode (local data)"}
-          />
-          <span className="text-xs text-text-muted">
-            {backendAvailable ? "Live" : "Demo"}
-          </span>
+          <span className="inline-block w-2 h-2 rounded-full bg-green-500" title="Live data" />
+          <span className="text-xs text-text-muted">Live</span>
           <button
             onClick={loadData}
             className="p-1.5 rounded-lg hover:bg-surface-soft text-text-muted hover:text-text-primary transition-colors"

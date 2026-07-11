@@ -12,7 +12,6 @@ import {
   CheckCircle2,
   ShoppingCart,
   Shield,
-  AlertTriangle,
   Store,
 } from "lucide-react";
 import { cn, formatCurrency } from "@/lib/utils";
@@ -21,8 +20,6 @@ import { Button } from "@/components/ui/Button";
 import { Badge } from "@/components/ui/Badge";
 import { useCartStore } from "@/store/cartStore";
 import { useToast } from "@/hooks/useToast";
-import { vendors } from "@/lib/demo/data/vendors";
-import { productVendors } from "@/lib/demo/data/productVendors";
 
 const SORT_OPTIONS = [
   { value: "price-asc", label: "Price: Low to High" },
@@ -31,15 +28,6 @@ const SORT_OPTIONS = [
 ];
 
 /**
- * Vendor comparison table — compares vendor pricing, ratings, and delivery
- * for a given product. Supports sorting, vendor name search, and highlights
- * for best price and best rating. Each vendor row includes an "Add to Cart"
- * button that integrates with the cart store.
- *
- * When the `product` prop is provided along with `productId`, the table
- * falls back to inline demo vendor data (AutoZone India, CarParts.in,
- * Mechanikart, Boodmo) if no entries exist in the database.
- *
  * @param {{ productId: string, product?: object }} props
  */
 export function VendorComparisonTable({ productId, product }) {
@@ -62,95 +50,10 @@ export function VendorComparisonTable({ productId, product }) {
     return () => document.removeEventListener("mousedown", handleClick);
   }, []);
 
-  // Demo fallback vendors when no database entries exist
-  const DEMO_FALLBACK_VENDORS = [
-    {
-      id: 'v-demo-autozone',
-      vendorId: 'v-demo-autozone',
-      name: 'AutoZone India',
-      rating: 4.5,
-      reviewCount: 128,
-      deliveryTime: '2-3 business days',
-      deliveryDays: 2,
-      stock: 25,
-      price: product ? Math.round(Number(product.price) * 0.95 / 10) * 10 - 1 : 0,
-      originalPrice: product ? Math.round(Number(product.price) * 1.08 / 10) * 10 - 1 : 0,
-      assured: true,
-      inStock: true,
-    },
-    {
-      id: 'v-demo-carparts',
-      vendorId: 'v-demo-carparts',
-      name: 'CarParts.in',
-      rating: 4.2,
-      reviewCount: 94,
-      deliveryTime: '3-5 business days',
-      deliveryDays: 4,
-      stock: 50,
-      price: product ? Math.round(Number(product.price) * 0.92 / 10) * 10 - 1 : 0,
-      originalPrice: null,
-      assured: false,
-      inStock: true,
-    },
-    {
-      id: 'v-demo-mechanikart',
-      vendorId: 'v-demo-mechanikart',
-      name: 'Mechanikart',
-      rating: 4.7,
-      reviewCount: 203,
-      deliveryTime: '1-2 business days',
-      deliveryDays: 1,
-      stock: 15,
-      price: product ? Math.round(Number(product.price) * 1.02 / 10) * 10 - 1 : 0,
-      originalPrice: null,
-      assured: true,
-      inStock: true,
-    },
-    {
-      id: 'v-demo-boodmo',
-      vendorId: 'v-demo-boodmo',
-      name: 'Boodmo',
-      rating: 4.0,
-      reviewCount: 67,
-      deliveryTime: '4-6 business days',
-      deliveryDays: 5,
-      stock: 0,
-      price: product ? Math.round(Number(product.price) * 0.85 / 10) * 10 - 1 : 0,
-      originalPrice: product ? Math.round(Number(product.price) * 0.95 / 10) * 10 - 1 : 0,
-      assured: false,
-      inStock: false,
-    },
-  ];
-
-  // Join productVendors with vendors data; fall back to demo data if none found
   const vendorEntries = useMemo(() => {
     if (!productId) return [];
-
-    const dbEntries = productVendors
-      .filter((pv) => pv.productId === productId)
-      .map((pv) => {
-        const vendor = vendors.find((v) => v.id === pv.vendorId);
-        return { ...pv, vendor };
-      })
-      .filter((entry) => entry.vendor);
-
-    // If no DB entries and we have a product, show demo fallback data
-    if (dbEntries.length === 0 && product) {
-      return DEMO_FALLBACK_VENDORS.map((v) => ({
-        ...v,
-        vendor: {
-          id: v.vendorId,
-          name: v.name,
-          rating: v.rating,
-          reviewCount: v.reviewCount,
-        },
-        _isDemo: true,
-      }));
-    }
-
-    return dbEntries;
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [productId, product, DEMO_FALLBACK_VENDORS, productVendors, vendors]);
+    return [];
+  }, [productId]);
 
   /* ── Add to cart handler ─────────────────────────────────── */
   const handleAddToCart = useCallback(
@@ -345,16 +248,6 @@ export function VendorComparisonTable({ productId, product }) {
         </div>
       ) : (
         <>
-          {/* ── Demo mode badge ──────────────────────────────── */}
-          {sorted.length > 0 && sorted[0]._isDemo && (
-            <div className="mb-4 flex items-center gap-2 rounded-lg border border-amber-500/20 bg-amber-500/[0.04] px-3 py-2">
-              <AlertTriangle size={12} className="shrink-0 text-amber-400" />
-              <p className="text-xs text-text-muted">
-                Demo pricing shown. Connect to backend for live vendor prices.
-              </p>
-            </div>
-          )}
-
           {/* ── Desktop table ──────────────────────────────────── */}
           <div className="hidden md:block overflow-x-auto -mx-6">
             <table className="w-full text-sm">
