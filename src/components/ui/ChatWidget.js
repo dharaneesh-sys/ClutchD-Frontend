@@ -2,26 +2,9 @@
 
 import { useState, useEffect, useRef, useCallback } from "react";
 import { cn } from "@/lib/utils";
-import { DEMO_MODE } from "@/lib/demo/demoFlag";
 import { useServiceStore } from "@/store/serviceStore";
 import { useNotificationStore } from "@/store/notificationStore";
 import { getConnectionState } from "@/lib/socket";
-
-/* ------------------------------------------------------------------ */
-/*  Demo-mode mock messages                                          */
-/* ------------------------------------------------------------------ */
-
-const DEMO_MESSAGES = [
-  { id: "demo-1", role: "system", text: "🛠️ Welcome to ClutchD Live Assist" },
-  { id: "demo-2", role: "system", text: "🔍 Searching for nearby mechanics..." },
-  { id: "demo-3", role: "system", text: "👨‍🔧 Mechanic Rajesh M. has been assigned" },
-  { id: "demo-4", role: "system", text: "🚗 Rajesh is en route to your location" },
-  { id: "demo-5", role: "system", text: "🔧 Service is in progress" },
-  { id: "demo-6", role: "me", text: "How long will the repair take?" },
-  { id: "demo-7", role: "them", text: "Around 30 minutes, sir. Almost done!" },
-  { id: "demo-8", role: "system", text: "💰 Payment pending — ₹850" },
-  { id: "demo-9", role: "system", text: "✅ Service completed! Thank you." },
-];
 
 const STATUS_MESSAGE_MAP = {
   searching: "🔍 Searching for nearby mechanics...",
@@ -66,22 +49,18 @@ export function ChatWidget() {
     };
   }, []);
 
-  /* ── Seed demo / welcome message ───────────────────────────────── */
+  /* ── Seed welcome message ──────────────────────────────────────── */
   useEffect(() => {
     const raf = requestAnimationFrame(() => {
-      setMessages(
-        DEMO_MODE
-          ? DEMO_MESSAGES
-          : [
-              {
-                id: nextId(),
-                role: "system",
-                text: wsConnected
-                  ? "🛠️ Live Assist connected"
-                  : "🛠️ Live Assist — reconnecting...",
-              },
-            ]
-      );
+      setMessages([
+        {
+          id: nextId(),
+          role: "system",
+          text: wsConnected
+            ? "🛠️ Live Assist connected"
+            : "🛠️ Live Assist — reconnecting...",
+        },
+      ]);
     });
     return () => cancelAnimationFrame(raf);
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
@@ -152,20 +131,6 @@ export function ChatWidget() {
       { id: nextId(), role: "me", text: trimmed },
     ]);
     setInputValue("");
-
-    // Echo a mock reply in demo mode
-    if (DEMO_MODE) {
-      setTimeout(() => {
-        setMessages((prev) => [
-          ...prev,
-          {
-            id: nextId(),
-            role: "them",
-            text: "We're on it! Our team will update you shortly.",
-          },
-        ]);
-      }, 1200);
-    }
   }, [inputValue]);
 
   const handleKeyDown = useCallback(

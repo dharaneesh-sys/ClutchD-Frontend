@@ -5,7 +5,6 @@ import { Home, Grid3X3, Search, ShoppingCart, User, Settings, Sun, Moon } from "
 import { cn } from "@/lib/utils";
 import { useCartStore } from "@/store/cartStore";
 import { useThemeStore } from "@/store/themeStore";
-import { useDemoMode } from "@/lib/demo/demoContext";
 import { useState, useEffect, useRef } from "react";
 
 const NAV_ITEMS = [
@@ -23,7 +22,6 @@ export function BottomNav() {
   const itemCount = useCartStore((state) => state.getItemCount());
   const theme = useThemeStore((s) => s.theme);
   const toggleTheme = useThemeStore((s) => s.toggleTheme);
-  const { isDemoMode, enableDemo, disableDemo } = useDemoMode();
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const settingsRef = useRef(null);
   const popoverRef = useRef(null);
@@ -68,14 +66,6 @@ export function BottomNav() {
     /* eslint-disable-next-line react-hooks/set-state-in-effect */
     setIsSettingsOpen(false);
   }, [pathname]);
-
-  const handleDemoToggle = () => {
-    if (isDemoMode) {
-      disableDemo();
-    } else {
-      enableDemo("customer");
-    }
-  };
 
   return (
     <nav
@@ -159,28 +149,6 @@ export function BottomNav() {
                       </span>
                     </button>
 
-                    <div className="h-px bg-border-subtle my-1" />
-
-                    {/* Demo row */}
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleDemoToggle();
-                      }}
-                      className="w-full flex items-center justify-between px-3 py-2.5 rounded-lg hover:bg-white/5 transition-colors"
-                    >
-                      <span className="text-sm font-medium text-foreground">Demo Mode</span>
-                      <span
-                        className={cn(
-                          "text-xs font-medium px-2 py-0.5 rounded-full",
-                          isDemoMode
-                            ? "bg-primary/20 text-primary-light"
-                            : "bg-white/10 text-text-muted"
-                        )}
-                      >
-                        {isDemoMode ? "ON" : "OFF"}
-                      </span>
-                    </button>
                   </div>
                 )}
               </div>

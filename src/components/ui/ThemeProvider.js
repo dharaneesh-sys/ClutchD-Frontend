@@ -18,9 +18,9 @@ export function ThemeProvider({ children }) {
   );
 
   useEffect(() => {
-    // Only write if the store value differs from what the inline script set
     if (storeTheme !== documentTheme) {
       document.documentElement.setAttribute("data-theme", storeTheme);
+      document.documentElement.classList.toggle("dark", storeTheme === "dark");
     }
   }, [storeTheme, documentTheme]);
 
