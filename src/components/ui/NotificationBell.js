@@ -11,7 +11,7 @@ export function NotificationBell() {
   const [loading, setLoading] = useState(false);
   const dropdownRef = useRef(null);
   
-  const { unreadCount, setUnreadCount } = useNotificationStore();
+  const unreadCount = useNotificationStore((s) => s.unreadCount); const setUnreadCount = useNotificationStore((s) => s.setUnreadCount);
   const { error: showError } = useToast();
 
   // Initial fetch of unread count

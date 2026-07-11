@@ -21,7 +21,8 @@ export function BottomNav() {
   const router = useRouter();
   const pathname = usePathname();
   const itemCount = useCartStore((state) => state.getItemCount());
-  const { theme, toggleTheme } = useThemeStore();
+  const theme = useThemeStore((s) => s.theme);
+  const toggleTheme = useThemeStore((s) => s.toggleTheme);
   const { isDemoMode, enableDemo, disableDemo } = useDemoMode();
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const settingsRef = useRef(null);

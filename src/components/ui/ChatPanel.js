@@ -19,8 +19,9 @@ const ROLE_BADGE = {
 };
 
 export function ChatPanel({ jobId, otherUserName, otherUserRole, onClose }) {
-  const { user } = useAuthStore();
-  const { conversations, fetchHistory } = useChatStore();
+  const user = useAuthStore((s) => s.user);
+  const conversations = useChatStore((s) => s.conversations);
+  const fetchHistory = useChatStore((s) => s.fetchHistory);
   const messages = conversations[jobId] || [];
 
   const [inputValue, setInputValue] = useState("");

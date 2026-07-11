@@ -43,7 +43,8 @@ function MapUpdater({ center }) {
 // ─── Map Controls overlay (zoom + my-location, grouped in one container) ─────
 function MapControls() {
   const map = useMap();
-  const { requestGPSLocation, gpsStatus } = useTrackingStore();
+  const requestGPSLocation = useTrackingStore((s) => s.requestGPSLocation);
+  const gpsStatus = useTrackingStore((s) => s.gpsStatus);
 
   const handleZoomIn = () => map.setZoom(map.getZoom() + 1);
   const handleZoomOut = () => map.setZoom(Math.max(1, map.getZoom() - 1));
@@ -165,15 +166,13 @@ function MechanicPopupContent({ name, rating, subtitle }) {
 // ═══════════════════════════════════════════════════════════════════════════
 
 export default function MapView({ role = "customer" }) {
-  const {
-    userLocation,
-    mechanicLocation,
-    navigationTarget,
-    nearbyMechanics,
-    nearbyGarages,
-    fetchNearbyProviders,
-    requestGPSLocation,
-  } = useTrackingStore();
+  const userLocation = useTrackingStore((s) => s.userLocation);
+  const mechanicLocation = useTrackingStore((s) => s.mechanicLocation);
+  const navigationTarget = useTrackingStore((s) => s.navigationTarget);
+  const nearbyMechanics = useTrackingStore((s) => s.nearbyMechanics);
+  const nearbyGarages = useTrackingStore((s) => s.nearbyGarages);
+  const fetchNearbyProviders = useTrackingStore((s) => s.fetchNearbyProviders);
+  const requestGPSLocation = useTrackingStore((s) => s.requestGPSLocation);
 
   const [mounted, setMounted] = useState(false);
 

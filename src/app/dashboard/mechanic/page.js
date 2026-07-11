@@ -30,7 +30,10 @@ const NavigationMap = dynamic(
 );
 
 export default function MechanicDashboard() {
-  const { user, logout, isAuthenticated, _hydrated } = useAuthStore();
+  const user = useAuthStore((s) => s.user);
+  const logout = useAuthStore((s) => s.logout);
+  const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
+  const _hydrated = useAuthStore((s) => s._hydrated);
   const router = useRouter();
   const [activeTab, setActiveTab] = useState("jobs");
   const [jobsPanelOpen, setJobsPanelOpen] = useState(true);
@@ -42,12 +45,21 @@ export default function MechanicDashboard() {
   }, [_hydrated, isAuthenticated, router]);
 
   // Request GPS and continuously watch position for navigation routing
+  // Deferred via setTimeout(0) to break React 19's flushSync cascade (#185)
+  // — the synchronous store mutations (setState) would otherwise trigger
+  // useSyncExternalStore → forceStoreRerender → nestedUpdateCount++
   useEffect(() => {
     if (!_hydrated || !isAuthenticated) return;
-    useTrackingStore.getState().requestGPSLocation();
-    const stopWatching = useTrackingStore.getState().watchGPSLocation();
-    return () => stopWatching();
-  }, [isAuthenticated]); // eslint-disable-line react-hooks/exhaustive-deps
+    let stopWatching = () => {};
+    const id = setTimeout(() => {
+      useTrackingStore.getState().requestGPSLocation();
+      stopWatching = useTrackingStore.getState().watchGPSLocation();
+    }, 0);
+    return () => {
+      clearTimeout(id);
+      stopWatching();
+    };
+  }, [_hydrated, isAuthenticated]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Listen for navigation events from non-React contexts (e.g., axios interceptors)
   useEffect(() => {

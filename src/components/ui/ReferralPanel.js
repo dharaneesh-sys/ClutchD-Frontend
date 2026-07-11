@@ -43,7 +43,7 @@ function getReferralLink(code) {
 }
 
 export function ReferralPanel({ className, onNavigateBack }) {
-  const { user } = useAuthStore();
+  const user = useAuthStore((s) => s.user);
   const toast = useToastStore();
 
   const [copied, setCopied] = useState(false);

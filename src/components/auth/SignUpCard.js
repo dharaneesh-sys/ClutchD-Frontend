@@ -17,7 +17,11 @@ export function SignUpCard() {
   const [selectedRole, setSelectedRole] = useState("customer");
   const selectedRoleRef = useRef(selectedRole);
   const googleButtonRef = useRef(null);
-  const { signup, loginWithGoogle, loginWithGoogleCapacitor, isLoading, error: authError } = useAuthStore();
+  const signup = useAuthStore((s) => s.signup);
+  const loginWithGoogle = useAuthStore((s) => s.loginWithGoogle);
+  const loginWithGoogleCapacitor = useAuthStore((s) => s.loginWithGoogleCapacitor);
+  const isLoading = useAuthStore((s) => s.isLoading);
+  const authError = useAuthStore((s) => s.error);
   const router = useRouter();
 
   const ROLES = [

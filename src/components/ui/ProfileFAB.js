@@ -19,7 +19,9 @@ import { getInitials } from "@/lib/utils";
 export function ProfileFAB() {
   const router = useRouter();
   const pathname = usePathname();
-  const { isAuthenticated, _isRestoring, user } = useAuthStore();
+  const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
+  const _isRestoring = useAuthStore((s) => s._isRestoring);
+  const user = useAuthStore((s) => s.user);
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {

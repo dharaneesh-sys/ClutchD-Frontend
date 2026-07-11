@@ -47,7 +47,7 @@ export function DashboardShell({
   hasBottomNav = false,
   desktopSidebar = false,
 }) {
-  const { logout } = useAuthStore();
+  const logout = useAuthStore((s) => s.logout);
   const router = useRouter();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const config = MODE_CONFIG[mode] || MODE_CONFIG.customer;

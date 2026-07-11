@@ -64,9 +64,16 @@ const TABS = [
 ];
 
 export default function CustomerDashboard() {
-  const { user, logout, isAuthenticated, _hydrated } = useAuthStore();
-  const { activeRequest, createRequest, cancelRequest, restoreActiveRequest } = useServiceStore();
-  const { mechanicLocation, userLocation } = useTrackingStore();
+  const user = useAuthStore((s) => s.user);
+  const logout = useAuthStore((s) => s.logout);
+  const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
+  const _hydrated = useAuthStore((s) => s._hydrated);
+  const activeRequest = useServiceStore((s) => s.activeRequest);
+  const createRequest = useServiceStore((s) => s.createRequest);
+  const cancelRequest = useServiceStore((s) => s.cancelRequest);
+  const restoreActiveRequest = useServiceStore((s) => s.restoreActiveRequest);
+  const mechanicLocation = useTrackingStore((s) => s.mechanicLocation);
+  const userLocation = useTrackingStore((s) => s.userLocation);
   const updateRequestStatus = useCallback(
     (...args) => useServiceStore.getState().updateRequestStatus(...args),
     []
@@ -143,14 +150,22 @@ export default function CustomerDashboard() {
 
   useEffect(() => {
     if (isAuthenticated) {
-      useTrackingStore.getState().requestGPSLocation();
+      // Defer to break React 19's flushSync cascade (error 185)
+      // Without this, the store mutation during effect flush triggers
+      // useSyncExternalStore → flushSync → nestedUpdateCount accumulation
+      const id = setTimeout(() => {
+        useTrackingStore.getState().requestGPSLocation();
+      }, 0);
+      return () => clearTimeout(id);
     }
   }, [isAuthenticated]);
 
   // Restore active request on mount (handles page refresh)
+  // Deferred via setTimeout(0) to break React 19 flushSync cascade (#185)
   useEffect(() => {
     if (isAuthenticated && !activeRequest) {
-      restoreActiveRequest();
+      const id = setTimeout(() => restoreActiveRequest(), 0);
+      return () => clearTimeout(id);
     }
   }, [isAuthenticated]); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -390,18 +405,20 @@ export default function CustomerDashboard() {
                 "relative flex items-center justify-center w-7 h-7 rounded-lg transition-colors duration-200",
                 isActive && !isStore && "text-primary",
                 !isActive && !isStore && "text-text-muted",
-                isStore && "text-emerald-400"
+                isActive && isStore && "text-emerald-600 dark:text-emerald-400",
+                !isActive && isStore && "text-emerald-600/50 dark:text-emerald-400/60"
               )}>
                 <Icon size={isStore ? 20 : 22} />
                 {isStore && (
-                  <span className="absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full bg-emerald-400 shadow-[0_0_6px_rgba(52,211,153,0.6)]" />
+                  <span className="absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full bg-emerald-500 dark:bg-emerald-400 shadow-[0_0_6px_rgba(52,211,153,0.6)]" />
                 )}
               </div>
               <span className={cn(
                 "text-[10px] font-semibold leading-none transition-colors duration-200",
                 isActive && !isStore && "text-primary",
                 !isActive && !isStore && "text-text-muted",
-                isStore && "text-emerald-400/90"
+                isActive && isStore && "text-emerald-600 dark:text-emerald-400",
+                !isActive && isStore && "text-emerald-600/50 dark:text-emerald-400/60"
               )}>
                 {label}
               </span>

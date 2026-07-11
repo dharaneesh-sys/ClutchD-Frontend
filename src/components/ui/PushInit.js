@@ -44,7 +44,10 @@ export function PushInit() {
   // ── Auth-triggered push token registration ──────────────────────────
   useEffect(() => {
     if (isAuthenticated && !prevAuth.current && !pushEnabled) {
-      registerPushToken();
+      // Defer to break React 19 flushSync cascade on login (error 185)
+      const id = setTimeout(() => registerPushToken(), 0);
+      prevAuth.current = isAuthenticated;
+      return () => clearTimeout(id);
     }
     prevAuth.current = isAuthenticated;
   }, [isAuthenticated, pushEnabled, registerPushToken]);

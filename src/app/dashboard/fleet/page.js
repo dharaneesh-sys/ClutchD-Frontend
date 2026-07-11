@@ -21,7 +21,10 @@ import { BookingConfirmation } from "@/components/dashboard/fleet/BookingConfirm
 import { NAVIGATION_EVENT } from "@/lib/navigation";
 
 export default function FleetDashboardPage() {
-  const { user, logout, isAuthenticated, _hydrated } = useAuthStore();
+  const user = useAuthStore((s) => s.user);
+  const logout = useAuthStore((s) => s.logout);
+  const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
+  const _hydrated = useAuthStore((s) => s._hydrated);
   const { initialize, initialized, lastBooking, clearLastBooking } = useFleetStore();
   const router = useRouter();
   const [activeTab, setActiveTab] = useState("dashboard");

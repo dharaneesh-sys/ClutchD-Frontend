@@ -16,7 +16,10 @@ import { Logo } from "@/components/ui/Logo";
 import { NAVIGATION_EVENT } from "@/lib/navigation";
 
 export default function GarageDashboard() {
-  const { user, logout, isAuthenticated, _hydrated } = useAuthStore();
+  const user = useAuthStore((s) => s.user);
+  const logout = useAuthStore((s) => s.logout);
+  const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
+  const _hydrated = useAuthStore((s) => s._hydrated);
   const router = useRouter();
   const [activeTab, setActiveTab] = useState("dashboard");
 

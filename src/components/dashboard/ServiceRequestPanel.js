@@ -18,7 +18,9 @@ import { VehicleManagerModal } from "@/components/dashboard/VehicleManagerModal"
 import { SubscriptionBadge } from "@/components/subscription/SubscriptionBadge";
 
 function LocationIndicator() {
-  const { userLocation, gpsStatus, requestGPSLocation } = useTrackingStore();
+  const userLocation = useTrackingStore((s) => s.userLocation);
+  const gpsStatus = useTrackingStore((s) => s.gpsStatus);
+  const requestGPSLocation = useTrackingStore((s) => s.requestGPSLocation);
   const [manualInput, setManualInput] = useState("");
   const [searching, setSearching] = useState(false);
   const [showManual, setShowManual] = useState(false);

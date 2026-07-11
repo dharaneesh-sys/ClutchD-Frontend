@@ -4,7 +4,8 @@ import { useToastStore } from "@/store/toastStore";
 import { Toast } from "@/components/ui/Toast";
 
 export function ToastProvider() {
-  const { toasts, removeToast } = useToastStore();
+  const toasts = useToastStore((s) => s.toasts);
+  const removeToast = useToastStore((s) => s.removeToast);
 
   if (toasts.length === 0) return null;
 
@@ -28,7 +29,13 @@ export function ToastProvider() {
 }
 
 export function useToast() {
-  const { addToast, removeToast, clearToasts, success, error, info, warning } = useToastStore();
+  const addToast = useToastStore((s) => s.addToast);
+  const removeToast = useToastStore((s) => s.removeToast);
+  const clearToasts = useToastStore((s) => s.clearToasts);
+  const success = useToastStore((s) => s.success);
+  const error = useToastStore((s) => s.error);
+  const info = useToastStore((s) => s.info);
+  const warning = useToastStore((s) => s.warning);
 
   return {
     toast: addToast,

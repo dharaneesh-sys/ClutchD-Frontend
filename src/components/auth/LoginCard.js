@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useCallback } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { loginSchema } from "@/lib/validators";
@@ -12,7 +12,10 @@ import api from "@/lib/api";
 import { useRouter } from "next/navigation";
 
 export function LoginCard() {
-  const { login, loginWithGoogle, loginWithGoogleCapacitor, isLoading, error: authError } = useAuthStore();
+  const login = useAuthStore((s) => s.login);
+  const loginWithGoogle = useAuthStore((s) => s.loginWithGoogle);
+  const loginWithGoogleCapacitor = useAuthStore((s) => s.loginWithGoogleCapacitor);
+  const authError = useAuthStore((s) => s.error);
   const router = useRouter();
   const [selectedRole, setSelectedRole] = useState("customer");
   const selectedRoleRef = useRef(selectedRole);
@@ -27,7 +30,7 @@ export function LoginCard() {
   const {
     register,
     handleSubmit,
-    formState: { errors },
+    formState: { errors, isSubmitting },
   } = useForm({
     resolver: zodResolver(loginSchema),
   });
@@ -36,17 +39,56 @@ export function LoginCard() {
     try {
       const user = await login(data.email, data.password, selectedRole);
       if (user) {
-        if (user.role === "admin") router.push("/admin");
-        else router.push(`/dashboard/${user.role}`);
+        // Defer navigation to break React 19's flushSync cascade
+        // Without this, router.push() can start a transition render while
+        // effects from the authStore set() calls are still flushing,
+        // causing nestedUpdateCount to accumulate beyond the 50 limit.
+        setTimeout(() => {
+          if (user.role === "admin") router.push("/admin");
+          else router.push(`/dashboard/${user.role}`);
+        }, 0);
       }
     } catch (err) {
       console.error(err);
     }
   };
 
+  const navigateAfterGoogleLogin = useCallback((user) => {
+    setTimeout(() => {
+      if (user.role === "admin") router.push("/admin");
+      else router.push(`/dashboard/${user.role}`);
+    }, 0);
+  }, [router]);
+
+  const handleGoogleCallback = useCallback(async (resp) => {
+    const credential = resp?.credential;
+    if (!credential) return;
+
+    const role = selectedRoleRef.current;
+    let oauthState;
+    try {
+      const res = await api.get("/auth/oauth/state");
+      oauthState = res.data.state;
+    } catch {
+      oauthState = crypto.randomUUID();
+    }
+    sessionStorage.setItem("oauth_state", oauthState);
+    let user;
+    try {
+      user = await loginWithGoogle(credential, role, oauthState);
+    } finally {
+      sessionStorage.removeItem("oauth_state");
+    }
+    if (!user) return;
+
+    navigateAfterGoogleLogin(user);
+  }, [loginWithGoogle, navigateAfterGoogleLogin]);
+
   const googleClientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
   const [googleReady, setGoogleReady] = useState(false);
   const googleContainerId = "google-signin-button";
+  const handleGoogleCallbackRef = useRef(handleGoogleCallback);
+  handleGoogleCallbackRef.current = handleGoogleCallback;
 
   useEffect(() => {
     selectedRoleRef.current = selectedRole;
@@ -64,29 +106,9 @@ export function LoginCard() {
 
       window.google.accounts.id.initialize({
         client_id: googleClientId,
-        callback: async (resp) => {
-          const credential = resp?.credential;
-          if (!credential) return;
-
-          const role = selectedRoleRef.current;
-          let oauthState;
-          try {
-            const res = await api.get("/auth/oauth/state");
-            oauthState = res.data.state;
-          } catch {
-            oauthState = crypto.randomUUID();
-          }
-          sessionStorage.setItem("oauth_state", oauthState);
-          let user;
-          try {
-            user = await loginWithGoogle(credential, role, oauthState);
-          } finally {
-            sessionStorage.removeItem("oauth_state");
-          }
-          if (!user) return;
-
-          if (user.role === "admin") router.push("/admin");
-          else router.push(`/dashboard/${user.role}`);
+        callback: (resp) => {
+          // Use ref to always call the latest handleGoogleCallback
+          handleGoogleCallbackRef.current(resp);
         },
       });
       setGoogleReady(true);
@@ -107,7 +129,7 @@ export function LoginCard() {
     document.body.appendChild(script);
 
     return () => {};
-  }, [googleClientId, loginWithGoogle, router]);
+  }, [googleClientId]);
 
   useEffect(() => {
     if (!googleReady) return;
@@ -128,10 +150,7 @@ export function LoginCard() {
   const handleCapacitorGoogleSignIn = async () => {
     try {
       const user = await loginWithGoogleCapacitor(selectedRole);
-      if (user) {
-        if (user.role === "admin") router.push("/admin");
-        else router.push(`/dashboard/${user.role}`);
-      }
+      if (user) navigateAfterGoogleLogin(user);
     } catch (err) {
       console.error("Capacitor Google sign-in failed:", err);
     }
@@ -339,7 +358,7 @@ export function LoginCard() {
           </div>
         )}
 
-        <Button type="submit" className="w-full mt-2" size="lg" isLoading={isLoading}>
+        <Button type="submit" className="w-full mt-2" size="lg" isLoading={isSubmitting}>
           <LogIn size={18} className="mr-2" />
           Sign In
         </Button>
