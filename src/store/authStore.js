@@ -22,7 +22,7 @@ function clearAllStorage() {
       }
     });
   } catch (e) {
-    // Silently fail — storage clearing is best-effort
+    console.warn("[authStore] clearAllStorage best-effort failed:", e);
   }
 }
 
@@ -37,7 +37,7 @@ function clearDemoState() {
     sessionStorage.removeItem("demo_token");
     window.__DEMO_USER__ = null;
   } catch (e) {
-    // best-effort
+    console.warn("[authStore] clearDemoState best-effort failed:", e);
   }
 }
 
@@ -173,20 +173,23 @@ export const useAuthStore = create(
       login: async (email, password, role) => {
         clearDemoState();
         set({ isLoading: true, error: null });
-        
+
         try {
           const response = await api.post("/auth/login", { email, password, role });
-          
+
           if (response.data.token && typeof window !== "undefined") {
             setAccessToken(response.data.token);
             connectWebSocket(response.data.token);
             scheduleProactiveRefresh();
           }
-          
-          set({ user: response.data.user, isAuthenticated: true, _hydrated: true, isLoading: false });
+
+          // Single set() call after await — no pre-await mutation to avoid
+          // React 19 flushSync cascade (#185). Both error clearing and user
+          // data are set together so useSyncExternalStore only fires once.
+          set({ user: response.data.user, isAuthenticated: true, _hydrated: true, isLoading: false, error: null });
           cacheUserProfile(response.data.user);
           return response.data.user;
-          
+
         } catch (error) {
           const msg =
             error.response?.data?.detail ||
@@ -221,6 +224,7 @@ export const useAuthStore = create(
             isAuthenticated: true,
             _hydrated: true,
             isLoading: false,
+            error: null,
           });
           cacheUserProfile(response.data.user);
           return response.data.user;
@@ -281,7 +285,6 @@ export const useAuthStore = create(
        */
       firebaseSignIn: async (role = null) => {
         clearDemoState();
-        set({ isLoading: true, error: null });
 
         try {
           const { signInWithGoogle } = await import(
@@ -314,6 +317,7 @@ export const useAuthStore = create(
             isAuthenticated: true,
             _hydrated: true,
             isLoading: false,
+            error: null,
           });
           cacheUserProfile(localUser);
           return localUser;
@@ -365,6 +369,7 @@ export const useAuthStore = create(
             isAuthenticated: true,
             _hydrated: true,
             isLoading: false,
+            error: null,
           });
           cacheUserProfile(localUser);
           return localUser;
@@ -379,19 +384,18 @@ export const useAuthStore = create(
 
       signup: async (data, role) => {
         clearDemoState();
-        set({ isLoading: true, error: null });
-        
+
         try {
           const payload = { ...data, role };
           const response = await api.post("/auth/signup", payload);
-          
+
           if (response.data.token && typeof window !== "undefined") {
             setAccessToken(response.data.token);
             connectWebSocket(response.data.token);
             scheduleProactiveRefresh();
           }
-          
-          set({ user: response.data.user, isAuthenticated: true, _hydrated: true, isLoading: false });
+
+          set({ user: response.data.user, isAuthenticated: true, _hydrated: true, isLoading: false, error: null });
           cacheUserProfile(response.data.user);
           return response.data.user;
           
@@ -410,7 +414,7 @@ export const useAuthStore = create(
         try {
           await api.post("/auth/logout");
         } catch (e) {
-          // ignore
+          console.warn("[authStore] Logout API call failed (state cleared anyway):", e);
         }
         if (typeof window !== "undefined") {
           clearAccessToken();
@@ -446,14 +450,31 @@ export const useAuthStore = create(
         _hydrated: state._hydrated,
         user: state.user?.name ? { id: state.user.id, role: state.user.role, name: state.user.name, email: state.user.email, phone: state.user.phone } : undefined,
       }),
-      onRehydrateStorage: () => (state) => {
-        // Reconstruct minimal user from persisted fields; full user fetched via restoreSession()
-        if (state?.userId && !state?.user) {
-          state.user = { id: state.userId, role: state.userRole };
+      // Merge persisted state over current state, ensuring _hydrated and _isRestoring
+      // are correct WITHOUT a separate post-hydration setState call.
+      // This avoids a redundant synchronous store update (onRehydrateStorage → setState)
+      // that can cascade into React's render cycle and trigger
+      // "Maximum update depth exceeded" (#185) in Zustand 5 + React 19.
+      merge: (persistedState, currentState) => {
+        // Reconstruct minimal user from persisted fields if full user not persisted
+        if (persistedState?.userId && !persistedState?.user) {
+          currentState = { ...currentState, user: { id: persistedState.userId, role: persistedState.userRole } };
         }
-        // Mark hydration complete so redirect guards don't fire before state is restored
-        // _isRestoring remains true so AuthInit can call restoreSession()
-        useAuthStore.setState({ _hydrated: true, _isRestoring: true });
+        const merged = { ...currentState, ...persistedState };
+        // Ensure _hydrated is true after rehydration so page guards can proceed
+        if (!merged._hydrated && (merged.user || merged.isAuthenticated)) {
+          merged._hydrated = true;
+        }
+        // _isRestoring is set to false immediately so AuthInit does NOT need
+        // to fire a second setState() — prevents React 19's flushSync cascade
+        // that triggers "Maximum update depth exceeded" (error #185) when
+        // useEffect calls setState right after the merge.
+        merged._isRestoring = false;
+        return merged;
+      },
+      onRehydrateStorage: () => () => {
+        // setState intentionally omitted — _hydrated/_isRestoring are handled
+        // by the merge function above to prevent redundant re-renders
       },
     }
   )

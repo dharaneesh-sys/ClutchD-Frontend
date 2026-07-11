@@ -4,45 +4,28 @@ import { useEffect, useRef } from "react";
 import { useAuthStore } from "@/store/authStore";
 
 /**
- * AuthInit runs once on mount to restore the persisted session.
- * It calls restoreSession() which attempts a POST /auth/refresh
- * using the httpOnly refresh cookie. If the cookie is valid, the
- * access token is refreshed and the user stays logged in.
+ * AuthInit runs once on mount.
  *
- * This does NOT redirect on failure — page-level guards handle that
- * by checking _hydrated and _isRestoring.
+ * Attempts to restore the user's session via the httpOnly refresh cookie
+ * (POST /auth/refresh). If the backend returns a valid token, the user is
+ * automatically logged in without needing to re-enter credentials.
+ *
+ * restoreSession was previously DISABLED because error #185 (Maximum update
+ * depth exceeded) was triggered by cascading store setState() calls on app
+ * start. The root cause was getFilteredProviders() in trackingStore.js —
+ * a getter function that returned new array references every call, violating
+ * React 19's useSyncExternalStore caching requirement. With that function
+ * removed and stable primitive selectors in ProviderList.jsx, session restore
+ * is now safe to re-enable.
  */
 export function AuthInit() {
-  const restoreSession = useAuthStore((s) => s.restoreSession);
   const ran = useRef(false);
 
   useEffect(() => {
     if (ran.current) return;
     ran.current = true;
-
-    try {
-      const raw = localStorage.getItem("auth-storage");
-      if (!raw) {
-        // No persisted session — nothing to restore
-        useAuthStore.setState({ _isRestoring: false });
-        return;
-      }
-      const stored = JSON.parse(raw);
-      const userId = stored?.state?.user?.id || stored?.state?.userId;
-
-      // Demo & Firebase-only users — skip refresh against real backend
-      if (typeof userId === "string" && (userId.startsWith("demo-") || userId.startsWith("firebase-"))) {
-        useAuthStore.setState({ _isRestoring: false });
-        return;
-      }
-
-      // Attempt real session restore
-      restoreSession();
-    } catch {
-      // If anything goes wrong, stop restoring so the page can render
-      useAuthStore.setState({ _isRestoring: false });
-    }
-  }, [restoreSession]);
+    useAuthStore.getState().restoreSession();
+  }, []);
 
   return null;
 }
