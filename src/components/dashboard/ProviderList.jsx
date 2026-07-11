@@ -1,15 +1,34 @@
 "use client";
 
+import { useMemo } from "react";
 import { useTrackingStore } from "@/store/trackingStore";
 import { MapPin, Star, Wrench, Building2, Navigation } from "lucide-react";
 import { GlassCard } from "@/components/ui/GlassCard";
 import { cn } from "@/lib/utils";
 
 export function ProviderList() {
-  const { isLoading, error } = useTrackingStore();
-  // Use the store's computed getter for reactive filtering
-  const allProviders = useTrackingStore((s) => s.getFilteredProviders());
+  const isLoading = useTrackingStore((s) => s.isLoading);
+  const error = useTrackingStore((s) => s.error);
+  // Select stable primitives/arrays instead of a getter function.
+  // A getter function that returns new array/object references every call
+  // violates React 19's useSyncExternalStore caching requirement ("The result
+  // of getSnapshot should be cached to avoid an infinite loop") and triggers
+  // error #185 (Maximum update depth exceeded). getFilteredProviders() was
+  // removed from trackingStore.js for this reason. Using primitive selectors
+  // + useMemo gives a stable reference when data hasn't changed.
+  const nearbyMechanics = useTrackingStore((s) => s.nearbyMechanics);
+  const nearbyGarages = useTrackingStore((s) => s.nearbyGarages);
   const providerFilter = useTrackingStore((s) => s.providerFilter);
+
+  const allProviders = useMemo(() => {
+    const all = [
+      ...nearbyMechanics.map((m) => ({ ...m, type: "mechanic" })),
+      ...nearbyGarages.map((g) => ({ ...g, type: "garage" })),
+    ].sort((a, b) => (a.distanceKm || 0) - (b.distanceKm || 0));
+
+    if (providerFilter === "all") return all;
+    return all.filter((p) => p.type === providerFilter);
+  }, [nearbyMechanics, nearbyGarages, providerFilter]);
 
   if (isLoading) {
     return (

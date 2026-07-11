@@ -13,6 +13,7 @@ function loadPersistedItems() {
       return Array.isArray(parsed) ? parsed : [];
     }
   } catch (e) {
+    console.warn("[cartStore] Failed to load persisted cart:", e);
   }
   return [];
 }
@@ -126,6 +127,14 @@ export const useCartStore = create(
 
       /**
        * Compute the total cart value including discounts.
+       *
+       * ⚠️ DANGER: Do NOT use this getter as a zustand store selector!
+       *    Getter functions call `get()` internally and return a new number
+       *    every time. Primitives (numbers) happen to compare correctly with
+       *    Object.is, so using this as `useCartStore((s) => s.getTotal())`
+       *    works today, but changing the return type to an object/array will
+       *    trigger React 19 error #185 (infinite re-render loop).
+       *    Use stable primitive selectors + useMemo instead (see ProviderList).
        */
       getTotal: () => {
         const { items, discount } = get();
@@ -138,6 +147,8 @@ export const useCartStore = create(
 
       /**
        * Return the total number of items in the cart (sum of quantities).
+       *
+       * ⚠️ Same DANGER as getTotal — see above.
        */
       getItemCount: () => {
         return get().items.reduce((count, item) => count + item.quantity, 0);

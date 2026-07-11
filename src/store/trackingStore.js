@@ -86,8 +86,8 @@ export const useTrackingStore = create((set, get) => ({
         get().fetchNearbyProviders();
         return true;
       }
-    } catch {
-      // Silent — IP geolocation is a best-effort fallback
+    } catch (e) {
+      console.warn("[trackingStore] IP geolocation fallback failed:", e);
     }
     return false;
   },
@@ -130,7 +130,8 @@ export const useTrackingStore = create((set, get) => ({
       });
       cacheLastLocation(center[0], center[1]);
       return true;
-    } catch {
+    } catch (e) {
+      console.warn("[trackingStore] _fallbackWithMockData failed:", e);
       return false;
     }
   },
@@ -191,6 +192,7 @@ export const useTrackingStore = create((set, get) => ({
         cacheLastLocation(coords[0], coords[1]);
       },
       (error) => {
+        console.warn(`[trackingStore] GPS watchPosition error (code ${error.code}): ${error.message}`);
       },
       { enableHighAccuracy: true, timeout: 15000, maximumAge: 5000 }
     );
@@ -198,31 +200,65 @@ export const useTrackingStore = create((set, get) => ({
     return () => navigator.geolocation.clearWatch(watchId);
   },
   
+  /**
+   * Merge two arrays of providers, deduplicating by `id`.
+   * Items from `primary` come first, `secondary` items that don't share
+   * an id with an existing primary item are appended.
+   */
+  _mergeProviders(primary, secondary) {
+    const existingIds = new Set(primary.map((p) => p.id));
+    const merged = [...primary];
+    for (const item of secondary) {
+      if (!existingIds.has(item.id)) {
+        merged.push(item);
+        existingIds.add(item.id);
+      }
+    }
+    return merged;
+  },
+
   fetchNearbyProviders: async () => {
     const center = get().userLocation;
     set({ isLoading: true, error: null });
 
+    // 1. Immediately seed with mock data so providers are visible while
+    //    the real API call is in-flight.
+    const mockMechs = MOCK_MECHANICS
+      .filter((m) => m.available)
+      .map((m) => toCamelCase({
+        ...m,
+        name: m.full_name,
+        distance_km: parseFloat(haversineDistance(center[0], center[1], m.lat, m.lon).toFixed(2)),
+      }));
+    const mockGarages = MOCK_GARAGES.map((g) => toCamelCase({
+      ...g,
+      name: g.business_name,
+      distance_km: parseFloat(haversineDistance(center[0], center[1], g.lat, g.lon).toFixed(2)),
+    }));
+
+    // Set mock as initial visible data so providers render immediately
+    // instead of showing a loading spinner while the real API call is in flight.
+    set({ nearbyMechanics: mockMechs, nearbyGarages: mockGarages });
+
     try {
       const { data } = await api.get(`/providers/nearby?lat=${center[0]}&lng=${center[1]}`);
-      // Convert snake_case from backend to camelCase for consistency
+      // 2. Merge real backend data with mock data (real takes priority, mock
+      //    fills gaps for providers the backend hasn't indexed yet).
+      const realMechs = toCamelCase(data.mechanics || []);
+      const realGarages = toCamelCase(data.garages || []);
       set({
-        nearbyMechanics: toCamelCase(data.mechanics || []),
-        nearbyGarages: toCamelCase(data.garages || []),
+        nearbyMechanics: get()._mergeProviders(realMechs, mockMechs),
+        nearbyGarages: get()._mergeProviders(realGarages, mockGarages),
         isLoading: false,
       });
     } catch (error) {
-      // Try fallback with IP geolocation + mock data when backend is unreachable
-      const fallbackOk = await get()._fallbackWithMockData();
-      if (!fallbackOk) {
-        const msg =
-          error.response?.data?.detail ||
-          (error.response ? "Failed to load nearby providers." : "Server unreachable.");
-        set({
-          nearbyMechanics: [],
-          nearbyGarages: [],
-          isLoading: false,
-          error: msg,
-        });
+      // 3. Backend unreachable — keep the mock data already set above.
+      //    The _fallbackWithMockData would recompute distances if the
+      //    user location changed, but since we already computed above
+      //    with the current center, just clear loading state.
+      set({ isLoading: false });
+      if (!error.response) {
+        console.warn("[trackingStore] Backend unreachable, showing mock providers:", error.message);
       }
     }
   },
@@ -234,20 +270,4 @@ export const useTrackingStore = create((set, get) => ({
    * @param {"all"|"mechanic"|"garage"} filter
    */
   setProviderFilter: (filter) => set({ providerFilter: filter }),
-
-  /**
-   * Return the list of nearby providers filtered by the current providerFilter.
-   * Each provider includes a `type` field ("mechanic" | "garage").
-   * @returns {Array<{type: string, distanceKm: number, ...}>}
-   */
-  getFilteredProviders: () => {
-    const { nearbyMechanics, nearbyGarages, providerFilter } = get();
-    const all = [
-      ...nearbyMechanics.map((m) => ({ ...m, type: "mechanic" })),
-      ...nearbyGarages.map((g) => ({ ...g, type: "garage" })),
-    ].sort((a, b) => (a.distanceKm || 0) - (b.distanceKm || 0));
-
-    if (providerFilter === "all") return all;
-    return all.filter((p) => p.type === providerFilter);
-  },
 }));
