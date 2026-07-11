@@ -3,7 +3,6 @@ import api from "@/lib/api";
 import { MAP_DEFAULT_CENTER } from "@/lib/constants";
 import { cacheLastLocation } from "@/lib/offline/offlineCache";
 import { toCamelCase } from "@/lib/utils";
-import { MOCK_MECHANICS, MOCK_GARAGES } from "@/lib/demo/mockData";
 
 /**
  * Haversine formula to calculate distance between two GPS coordinates.
@@ -93,50 +92,6 @@ export const useTrackingStore = create((set, get) => ({
   },
 
   /**
-   * Fallback: use IP geolocation + mock data when backend is unreachable.
-   * Fetches the IP-based location, then generates nearby providers from
-   * the bundled mock dataset with computed distances.
-   */
-  _fallbackWithMockData: async () => {
-    try {
-      const res = await fetch("https://ip-api.com/json/");
-      if (!res.ok) return false;
-      const ipData = await res.json();
-      if (ipData.status !== "success") return false;
-
-      const center = [ipData.lat, ipData.lon];
-
-      const nearbyM = MOCK_MECHANICS
-        .filter((m) => m.available)
-        .map((m) => toCamelCase({
-          ...m,
-          name: m.full_name,
-          distance_km: parseFloat(haversineDistance(center[0], center[1], m.lat, m.lon).toFixed(2)),
-        }));
-
-      const nearbyG = MOCK_GARAGES.map((g) => toCamelCase({
-        ...g,
-        name: g.business_name,
-        distance_km: parseFloat(haversineDistance(center[0], center[1], g.lat, g.lon).toFixed(2)),
-      }));
-
-      set({
-        userLocation: center,
-        gpsStatus: "granted",
-        nearbyMechanics: nearbyM,
-        nearbyGarages: nearbyG,
-        isLoading: false,
-        error: null,
-      });
-      cacheLastLocation(center[0], center[1]);
-      return true;
-    } catch (e) {
-      console.warn("[trackingStore] _fallbackWithMockData failed:", e);
-      return false;
-    }
-  },
-
-  /**
    * Request the user's location via the browser Geolocation API.
    *
    * Strategy:
@@ -200,65 +155,25 @@ export const useTrackingStore = create((set, get) => ({
     return () => navigator.geolocation.clearWatch(watchId);
   },
   
-  /**
-   * Merge two arrays of providers, deduplicating by `id`.
-   * Items from `primary` come first, `secondary` items that don't share
-   * an id with an existing primary item are appended.
-   */
-  _mergeProviders(primary, secondary) {
-    const existingIds = new Set(primary.map((p) => p.id));
-    const merged = [...primary];
-    for (const item of secondary) {
-      if (!existingIds.has(item.id)) {
-        merged.push(item);
-        existingIds.add(item.id);
-      }
-    }
-    return merged;
-  },
-
   fetchNearbyProviders: async () => {
     const center = get().userLocation;
     set({ isLoading: true, error: null });
 
-    // 1. Immediately seed with mock data so providers are visible while
-    //    the real API call is in-flight.
-    const mockMechs = MOCK_MECHANICS
-      .filter((m) => m.available)
-      .map((m) => toCamelCase({
-        ...m,
-        name: m.full_name,
-        distance_km: parseFloat(haversineDistance(center[0], center[1], m.lat, m.lon).toFixed(2)),
-      }));
-    const mockGarages = MOCK_GARAGES.map((g) => toCamelCase({
-      ...g,
-      name: g.business_name,
-      distance_km: parseFloat(haversineDistance(center[0], center[1], g.lat, g.lon).toFixed(2)),
-    }));
-
-    // Set mock as initial visible data so providers render immediately
-    // instead of showing a loading spinner while the real API call is in flight.
-    set({ nearbyMechanics: mockMechs, nearbyGarages: mockGarages });
-
     try {
       const { data } = await api.get(`/providers/nearby?lat=${center[0]}&lng=${center[1]}`);
-      // 2. Merge real backend data with mock data (real takes priority, mock
-      //    fills gaps for providers the backend hasn't indexed yet).
-      const realMechs = toCamelCase(data.mechanics || []);
-      const realGarages = toCamelCase(data.garages || []);
       set({
-        nearbyMechanics: get()._mergeProviders(realMechs, mockMechs),
-        nearbyGarages: get()._mergeProviders(realGarages, mockGarages),
+        nearbyMechanics: toCamelCase(data.mechanics || []),
+        nearbyGarages: toCamelCase(data.garages || []),
         isLoading: false,
       });
     } catch (error) {
-      // 3. Backend unreachable — keep the mock data already set above.
-      //    The _fallbackWithMockData would recompute distances if the
-      //    user location changed, but since we already computed above
-      //    with the current center, just clear loading state.
-      set({ isLoading: false });
+      set({
+        nearbyMechanics: [],
+        nearbyGarages: [],
+        isLoading: false,
+      });
       if (!error.response) {
-        console.warn("[trackingStore] Backend unreachable, showing mock providers:", error.message);
+        console.warn("[trackingStore] Backend unreachable:", error.message);
       }
     }
   },

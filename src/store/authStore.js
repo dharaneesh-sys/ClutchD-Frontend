@@ -26,21 +26,6 @@ function clearAllStorage() {
   }
 }
 
-/**
- * Clear lingering demo-mode state so the api.js interceptor does NOT
- * intercept real API calls as demo ones. Must be called before any
- * real authentication flow (login, signup, oauth) and on logout.
- */
-function clearDemoState() {
-  if (typeof window === "undefined") return;
-  try {
-    sessionStorage.removeItem("demo_token");
-    window.__DEMO_USER__ = null;
-  } catch (e) {
-    console.warn("[authStore] clearDemoState best-effort failed:", e);
-  }
-}
-
 // Proactive refresh: refresh the access token at 80% of its TTL.
 // Default access token TTL is 15 min (from backend config); override via env.
 const ACCESS_TTL_MS =
@@ -171,7 +156,6 @@ export const useAuthStore = create(
       },
 
       login: async (email, password, role) => {
-        clearDemoState();
         set({ isLoading: true, error: null });
 
         try {
@@ -200,7 +184,6 @@ export const useAuthStore = create(
       },
 
       loginWithGoogle: async (credential, role = null, state = null) => {
-        clearDemoState();
         set({ isLoading: true, error: null });
 
         const safeRole =
@@ -284,7 +267,6 @@ export const useAuthStore = create(
        * closed or sign-in failed.
        */
       firebaseSignIn: async (role = null) => {
-        clearDemoState();
 
         try {
           const { signInWithGoogle } = await import(
@@ -337,7 +319,6 @@ export const useAuthStore = create(
        * Only available when running inside Capacitor WebView.
        */
       loginWithGoogleCapacitor: async (role) => {
-        clearDemoState();
         set({ isLoading: true, error: null });
 
         try {
@@ -383,7 +364,6 @@ export const useAuthStore = create(
       },
 
       signup: async (data, role) => {
-        clearDemoState();
 
         try {
           const payload = { ...data, role };
@@ -410,7 +390,6 @@ export const useAuthStore = create(
 
       logout: async () => {
         clearProactiveRefresh();
-        clearDemoState();
         try {
           await api.post("/auth/logout");
         } catch (e) {
@@ -434,12 +413,6 @@ export const useAuthStore = create(
           cacheUserProfile(updated);
           return { user: updated };
         }),
-      setDemoUser: (user) => {
-        if (typeof window !== "undefined") {
-          setAccessToken("demo-jwt-token-12345");
-        }
-        set({ user, isAuthenticated: !!user, _hydrated: true, isLoading: false, error: null });
-      },
     }),
     {
       name: "auth-storage",

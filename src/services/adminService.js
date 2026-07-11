@@ -35,6 +35,11 @@ export async function fetchPayments(params = {}) {
   return res.data.payments || [];
 }
 
+export async function fetchPayouts(params = {}) {
+  const res = await api.get("/admin/payouts", { params });
+  return res.data.payouts || res.data || [];
+}
+
 export async function fetchJobs(params = {}) {
   const res = await api.get("/admin/jobs", { params });
   return res.data.jobs || [];

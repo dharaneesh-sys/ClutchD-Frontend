@@ -10,10 +10,6 @@ const mockClearAccessToken = vi.hoisted(() => vi.fn());
 const mockConnectWebSocket = vi.hoisted(() => vi.fn());
 const mockDisconnectWebSocket = vi.hoisted(() => vi.fn());
 
-vi.mock("@/lib/demo/demoFlag", () => ({
-  DEMO_MODE: true,
-}));
-
 vi.mock("@/lib/api", () => ({
   default: { post: mockPost },
 }));
