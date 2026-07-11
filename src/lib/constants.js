@@ -67,11 +67,7 @@ export const PAYMENT_METHODS = [
 
 export const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api";
 
-// Demo mode flag
-export const DEMO_MODE = process.env.NEXT_PUBLIC_DEMO_MODE !== "false";
 
-// Build output mode: "standalone" (default) or "export"
-export const BUILD_MODE = process.env.NEXT_PUBLIC_BUILD_MODE || "standalone";
 
 function getDefaultWsUrl() {
   if (typeof window === "undefined") {
@@ -126,15 +122,13 @@ export function validateEnv() {
   const optional = {
     NEXT_PUBLIC_GOOGLE_CLIENT_ID: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || null,
     NEXT_PUBLIC_ACCESS_TTL_MINUTES: process.env.NEXT_PUBLIC_ACCESS_TTL_MINUTES || null,
-    NEXT_PUBLIC_DEMO_MODE: process.env.NEXT_PUBLIC_DEMO_MODE || null,
-    NEXT_PUBLIC_BUILD_MODE: process.env.NEXT_PUBLIC_BUILD_MODE || null,
+
   };
 
   const optionalDefaults = {
     NEXT_PUBLIC_GOOGLE_CLIENT_ID: "(SSO disabled)",
     NEXT_PUBLIC_ACCESS_TTL_MINUTES: "15",
-    NEXT_PUBLIC_DEMO_MODE: "true",
-    NEXT_PUBLIC_BUILD_MODE: "standalone",
+
   };
 
   for (const [key, value] of Object.entries(optional)) {

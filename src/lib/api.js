@@ -2,9 +2,7 @@ import axios from "axios";
 import { API_BASE_URL } from "@/lib/constants";
 import { getAccessToken, setAccessToken, clearAccessToken } from "@/lib/tokenStore";
 import { navigateToAuth } from "@/lib/navigation";
-import { DEMO_MODE } from "@/lib/demo/demoFlag";
 
-let _demoApiModule = null;
 
 // Public API path prefixes that should NOT trigger auth redirect on 401.
 // For these endpoints, the 401 is simply passed through so calling code
@@ -24,44 +22,6 @@ const api = axios.create({
 
 api.interceptors.request.use(
   async (config) => {
-    // Check runtime demo mode (toggled via toolbar) in addition to static DEMO_MODE flag
-    const isRuntimeDemo = typeof window !== "undefined" && (
-      window.__DEMO_USER__ || sessionStorage.getItem("demo_token")
-    );
-    // Also intercept login/signup for demo email addresses so Demo123456 works
-    // even when the demo toolbar hasn't been toggled yet
-    const isAuthRequest = config.method === "post" && (
-      config.url?.includes("/auth/login") || config.url?.includes("/auth/signup")
-    );
-    const reqData = typeof config.data === "string" ? (() => { try { return JSON.parse(config.data); } catch { return {}; } })() : (config.data || {});
-    const isDemoEmailLogin = isAuthRequest && reqData.email?.endsWith?.("@demo.com");
-    if (DEMO_MODE || isRuntimeDemo || isDemoEmailLogin) {
-      if (!_demoApiModule) {
-        try {
-          _demoApiModule = await import("./demo/apiInterceptor");
-        } catch (e) {
-          // Dynamic import can fail in Capacitor WebView if chunk isn't bundled;
-          // fall through to real API call instead of breaking everything.
-        }
-      }
-      if (_demoApiModule) {
-        const result = _demoApiModule.handleDemoApiRequest(
-          config.method || "get",
-          config.url,
-          config.data,
-          { params: config.params }
-        );
-        if (result) {
-          config.adapter = () => Promise.resolve({
-            data: result.data,
-            status: 200,
-            statusText: "OK",
-            headers: {},
-            config,
-          });
-        }
-      }
-    }
 
     if (typeof window !== "undefined") {
       const token = getAccessToken();

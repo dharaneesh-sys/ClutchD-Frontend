@@ -7,8 +7,7 @@ import {
   PAYMENT_METHODS,
   API_BASE_URL,
   WS_URL,
-  DEMO_MODE,
-  BUILD_MODE,
+
   MAP_DEFAULT_CENTER,
   MAP_DEFAULT_ZOOM,
   PLATFORM_FEE_PERCENT,
@@ -140,22 +139,7 @@ describe("WS_URL", () => {
   });
 });
 
-// ---------------------------------------------------------------------------
-// DEMO_MODE / BUILD_MODE
-// ---------------------------------------------------------------------------
-describe("DEMO_MODE", () => {
-  it("defaults to true since NEXT_PUBLIC_DEMO_MODE is not 'false'", () => {
-    // In test env without explicit env var, DEMO_MODE = true
-    // because the code does: process.env.NEXT_PUBLIC_DEMO_MODE !== "false"
-    expect(DEMO_MODE).toBe(true);
-  });
-});
 
-describe("BUILD_MODE", () => {
-  it("defaults to 'standalone'", () => {
-    expect(BUILD_MODE).toBe("standalone");
-  });
-});
 
 // ---------------------------------------------------------------------------
 // Map defaults
