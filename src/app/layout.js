@@ -3,10 +3,7 @@ import "./globals.css";
 import { ThemeProvider } from "@/components/ui/ThemeProvider";
 import { AuthInit } from "@/components/ui/AuthInit";
 import { ErrorBoundary } from "@/components/ui/ErrorBoundary";
-import { DEMO_MODE } from "@/lib/demo/demoFlag";
 import { ToastProvider } from "@/components/ui/ToastProvider";
-import DemoModeClient from "@/components/ui/DemoModeClient";
-import { DemoModeProvider } from "@/lib/demo/demoModeProvider";
 import { BackButtonHandler } from "@/components/ui/BackButtonHandler";
 import { PushInit } from "@/components/ui/PushInit";
 import { PushPermissionBanner } from "@/components/ui/PushPermissionBanner";
@@ -55,7 +52,9 @@ export default function RootLayout({ children }) {
             __html: `
               (function() {
                 var t = localStorage.getItem('clutchd_theme');
-                document.documentElement.setAttribute('data-theme', t === 'dark' ? 'dark' : 'light');
+                var isDark = t === 'dark';
+                document.documentElement.setAttribute('data-theme', isDark ? 'dark' : 'light');
+                document.documentElement.classList.toggle('dark', isDark);
               })();
             `,
           }}
@@ -92,22 +91,19 @@ export default function RootLayout({ children }) {
       </head>
       <body className="min-h-full flex flex-col">
         <DynamicI18nProvider>
-          <DemoModeProvider>
-            <a href="#main-content" className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-[9999] focus:px-4 focus:py-2 focus:rounded-lg focus:bg-[var(--surface)] focus:text-[var(--foreground)] focus:shadow-lg focus:outline-none">
-              Skip to main content
-            </a>
-            <ThemeProvider>
-              <AuthInit />
-              <PushInit />
-              <PushPermissionBanner />
-              <ErrorBoundary>
-                <div id="main-content">{children}</div>
-              </ErrorBoundary>
-              <BackButtonHandler />
-              <DemoModeClient show={DEMO_MODE} />
-              <ToastProvider />
-            </ThemeProvider>
-          </DemoModeProvider>
+          <a href="#main-content" className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-[9999] focus:px-4 focus:py-2 focus:rounded-lg focus:bg-[var(--surface)] focus:text-[var(--foreground)] focus:shadow-lg focus:outline-none">
+            Skip to main content
+          </a>
+          <ThemeProvider>
+            <AuthInit />
+            <PushInit />
+            <PushPermissionBanner />
+            <ErrorBoundary>
+              <div id="main-content">{children}</div>
+            </ErrorBoundary>
+            <BackButtonHandler />
+            <ToastProvider />
+          </ThemeProvider>
         </DynamicI18nProvider>
       </body>
     </html>

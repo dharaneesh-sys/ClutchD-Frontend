@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useState, useEffect, useCallback } from "react";
 import dynamic from "next/dynamic";
 import { useRouter } from "next/navigation";
 import "leaflet/dist/leaflet.css";
@@ -9,7 +9,6 @@ import "react-leaflet-cluster/dist/assets/MarkerCluster.Default.css";
 import { useServiceStore } from "@/store/serviceStore";
 import { useAuthStore } from "@/store/authStore";
 import { useTrackingStore } from "@/store/trackingStore";
-import { useDemoMode } from "@/lib/demo/demoMode";
 import { ServiceRequestPanel } from "@/components/dashboard/ServiceRequestPanel";
 import { ServiceStatusTracker } from "@/components/dashboard/ServiceStatusTracker";
 import { ETAIndicator } from "@/components/dashboard/ETAIndicator";
@@ -102,7 +101,6 @@ export default function CustomerDashboard() {
   const [activeTab, setActiveTab] = useState("request"); // "request" | "history" | "schedule" | "store"
   const [isScheduleModalOpen, setIsScheduleModalOpen] = useState(false);
   const [isScheduleLoading, setIsScheduleLoading] = useState(false);
-  const paymentTriggeredRef = useRef(false);
 
   const handleReleasePayment = useCallback(() => {
     releasePayment();
@@ -127,7 +125,6 @@ export default function CustomerDashboard() {
      activeRequest.status === "payment_escrow" ||
      activeRequest.status === "payment_released");
 
-  const { isDemoMode, isTourActive } = useDemoMode();
   const router = useRouter();
 
   useEffect(() => {
@@ -168,20 +165,6 @@ export default function CustomerDashboard() {
       return () => clearTimeout(id);
     }
   }, [isAuthenticated]); // eslint-disable-line react-hooks/exhaustive-deps
-
-  useEffect(() => {
-    if (isDemoMode && isTourActive && activeRequest?.status === "payment_pending" && 
-        !isPaymentOpen && !paymentTriggeredRef.current) {
-      paymentTriggeredRef.current = true;
-      const timer = setTimeout(() => {
-        handlePaymentInitiate(activeRequest);
-      }, 600);
-      return () => clearTimeout(timer);
-    }
-    if (activeRequest?.status !== "payment_pending") {
-      paymentTriggeredRef.current = false;
-    }
-  }, [isDemoMode, isTourActive, activeRequest?.status, isPaymentOpen]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Polling fallback: if WebSocket is unavailable, poll job status every 15s
   useEffect(() => {

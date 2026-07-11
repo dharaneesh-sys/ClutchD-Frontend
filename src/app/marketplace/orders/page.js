@@ -19,7 +19,6 @@ import {
 import { cn, formatCurrency, formatDate } from "@/lib/utils";
 import { useOrderStore } from "@/store/orderStore";
 import { ORDER_STATUSES } from "@/lib/constants";
-import { useDemoMode } from "@/lib/demo/demoContext";
 import { useOrderStatusNotifications } from "@/hooks/useOrderStatusNotifications";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { Skeleton } from "@/components/ui/Skeleton";
@@ -296,10 +295,9 @@ function TimelineModal({ order, onClose }) {
 
 export default function OrdersPage() {
   const { orders, isLoading, fetchOrderHistory, updateOrderStatus } = useOrderStore();
-  const { isDemoMode } = useDemoMode();
   const [timelineOrder, setTimelineOrder] = useState(null);
 
-  useOrderStatusNotifications({ demo: isDemoMode });
+  useOrderStatusNotifications();
 
   useEffect(() => {
     fetchOrderHistory();

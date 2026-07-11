@@ -21,7 +21,7 @@ import {
   Loader2,
   AlertTriangle,
   Smartphone,
-  Beaker,
+
 } from "lucide-react";
 import api, { extractApiError } from "@/lib/api";
 import { cn } from "@/lib/utils";
@@ -29,7 +29,6 @@ import { useAuthStore } from "@/store/authStore";
 import { useNotificationStore } from "@/store/notificationStore";
 import { useThemeStore } from "@/store/themeStore";
 import { useToastStore } from "@/store/toastStore";
-import { useDemoMode } from "@/lib/demo/demoContext";
 import { navigateToAuth } from "@/lib/navigation";
 import { Button } from "@/components/ui/Button";
 import { Modal } from "@/components/ui/Modal";
@@ -165,7 +164,6 @@ export default function SettingsPage() {
   const logout = useAuthStore((s) => s.logout);
   const { setTheme: applyTheme } = useThemeStore();
   const toast = useToastStore();
-  const { isDemoMode, enableDemo, disableDemo } = useDemoMode();
   const storeSetPushEnabled = useNotificationStore((s) => s.setPushEnabled);
 
   // ── State ────────────────────────────────────────────────────────────
@@ -345,16 +343,6 @@ export default function SettingsPage() {
   const handleDataDownload = useCallback(() => {
     toast.success("Data download request submitted");
   }, [toast]);
-
-  const handleDemoModeToggle = useCallback(() => {
-    if (isDemoMode) {
-      disableDemo();
-      toast.success("Demo mode disabled");
-    } else {
-      enableDemo("customer");
-      toast.success("Demo mode enabled");
-    }
-  }, [isDemoMode, enableDemo, disableDemo, toast]);
 
   // ── Render ───────────────────────────────────────────────────────────
   if (loading) return <SettingsSkeleton />;
@@ -649,36 +637,6 @@ export default function SettingsPage() {
               )}
             </button>
           ))}
-        </div>
-      </section>
-
-      {/* ══════════════════════════════════════════════════════════════════
-          DEMO MODE SECTION
-          ══════════════════════════════════════════════════════════════════ */}
-      <section className="glass-lux rounded-2xl p-6 space-y-4">
-        <SectionHeader icon={Beaker} title="Demo Mode" />
-
-        <div className="rounded-xl border border-white/10 bg-white/[0.02] p-4 space-y-3">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-foreground">
-                Enable Demo Mode
-              </p>
-              <p className="text-xs text-text-muted mt-0.5">
-                Browse the app with mock data and simulated workflows
-              </p>
-            </div>
-            <ToggleSwitch
-              enabled={isDemoMode}
-              onChange={handleDemoModeToggle}
-            />
-          </div>
-          {isDemoMode && (
-            <p className="text-xs text-primary-light flex items-center gap-1.5">
-              <span className="inline-block w-1.5 h-1.5 rounded-full bg-primary" />
-              Demo mode is active — you can access the demo toolbar from the floating pill at the bottom of the screen.
-            </p>
-          )}
         </div>
       </section>
 
