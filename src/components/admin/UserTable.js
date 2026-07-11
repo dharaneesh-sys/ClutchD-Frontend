@@ -4,9 +4,9 @@ import { Badge } from "@/components/ui/Badge";
 import { Input } from "@/components/ui/Input";
 import { Modal } from "@/components/ui/Modal";
 import { Button } from "@/components/ui/Button";
-import { Search, MoreVertical, Eye, ShieldOff, ShieldCheck } from "lucide-react";
+import { Search, MoreVertical, Eye, ShieldOff, ShieldCheck, Trash2 } from "lucide-react";
 import { useToast } from "@/components/ui/ToastProvider";
-import { fetchUsers, toggleUserStatus } from "@/services/adminService";
+import { fetchUsers, toggleUserStatus, deleteUser } from "@/services/adminService";
 
 export function UserTable() {
   const [searchTerm, setSearchTerm] = useState("");
@@ -18,6 +18,7 @@ export function UserTable() {
   const [actionLoading, setActionLoading] = useState(null);
   const [openDropdown, setOpenDropdown] = useState(null);
   const [profileModal, setProfileModal] = useState(null);
+  const [deleteConfirm, setDeleteConfirm] = useState(null);
   const dropdownRef = useRef(null);
   const { success: showSuccess, error: showError } = useToast();
 
@@ -77,6 +78,21 @@ export function UserTable() {
       showError(err?.response?.data?.detail || "Failed to update user status");
     } finally {
       setActionLoading(null);
+    }
+  };
+
+  const handleDeleteUser = async (user) => {
+    setActionLoading(user.id);
+    try {
+      await deleteUser(user.id);
+      setUsers(prev => prev.filter(u => u.id !== user.id));
+      showSuccess(`User ${user.name} deleted.`);
+      setDeleteConfirm(null);
+    } catch (err) {
+      showError(err?.response?.data?.detail || "Failed to delete user");
+    } finally {
+      setActionLoading(null);
+      setDeleteConfirm(null);
     }
   };
 
@@ -191,6 +207,15 @@ export function UserTable() {
                               <><ShieldOff size={14} /> Suspend User</>
                             )}
                           </button>
+                          <div className={`border-t ${"border-border-subtle"}`} />
+                          <button
+                            onClick={() => { setDeleteConfirm(user); setOpenDropdown(null); }}
+                            className={`w-full flex items-center gap-2 px-4 py-2.5 text-sm transition-colors ${
+                              "text-red-500 hover:bg-surface-soft"
+                            }`}
+                          >
+                            <Trash2 size={14} /> Delete User
+                          </button>
                         </div>
                       )}
                     </td>
@@ -236,6 +261,23 @@ export function UserTable() {
             </div>
           </div>
         )}
+      </Modal>
+
+      <Modal isOpen={!!deleteConfirm} onClose={() => setDeleteConfirm(null)} title="Delete User">
+        <div className="space-y-4">
+          <p>Are you sure you want to permanently delete <strong>{deleteConfirm?.name}</strong>?</p>
+          <p className="text-sm text-red-500 mt-2">This action cannot be undone. All user data (profile, vehicles, jobs, notifications, favorites) will be permanently removed.</p>
+          <div className="flex justify-end gap-3 pt-2">
+            <Button variant="ghost" onClick={() => setDeleteConfirm(null)}>Cancel</Button>
+            <Button
+              variant="danger"
+              disabled={actionLoading === deleteConfirm?.id}
+              onClick={() => handleDeleteUser(deleteConfirm)}
+            >
+              {actionLoading === deleteConfirm?.id ? "Deleting..." : "Delete"}
+            </Button>
+          </div>
+        </div>
       </Modal>
     </>
   );

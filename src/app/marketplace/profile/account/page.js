@@ -20,7 +20,7 @@ import api from "@/lib/api";
 
 
 export default function AccountDetailsPage() {
-  const { user } = useAuthStore();
+  const user = useAuthStore((s) => s.user);
   const router = useRouter();
   const [profile, setProfile] = useState(null);
   const [isLoading, setIsLoading] = useState(true);

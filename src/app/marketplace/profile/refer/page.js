@@ -263,7 +263,7 @@ function ReferralHistory({ rewards }) {
 // ─── Page ────────────────────────────────────────────────────────────
 
 export default function ReferPage() {
-  const { user } = useAuthStore();
+  const user = useAuthStore((s) => s.user);
   const toast = useToastStore();
 
   const [referral, setReferral] = useState(null);

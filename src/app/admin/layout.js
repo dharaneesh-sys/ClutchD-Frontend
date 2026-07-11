@@ -10,7 +10,10 @@ import { NAVIGATION_EVENT } from "@/lib/navigation";
 
 export default function AdminLayout({ children }) {
   const pathname = usePathname();
-  const { isAuthenticated, user, _hydrated } = useAuthStore();
+  const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
+  const userRole = useAuthStore((s) => s.user?.role);
+  const user = useAuthStore((s) => s.user);
+  const _hydrated = useAuthStore((s) => s._hydrated);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const router = useRouter();
 
@@ -18,10 +21,10 @@ export default function AdminLayout({ children }) {
     if (!_hydrated) return;
     if (!isAuthenticated) {
       router.push("/auth");
-    } else if (user && user.role !== "admin") {
-      router.push(`/dashboard/${user.role}`);
+    } else if (userRole && userRole !== "admin") {
+      router.push(`/dashboard/${userRole}`);
     }
-  }, [_hydrated, isAuthenticated, user, router]);
+  }, [_hydrated, isAuthenticated, userRole, router]);
 
   // Listen for navigation events from non-React contexts (e.g., axios interceptors)
   useEffect(() => {

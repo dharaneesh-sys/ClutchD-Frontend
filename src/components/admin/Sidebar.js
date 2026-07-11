@@ -22,7 +22,7 @@ const NAV_ITEMS = [
 ];
 
 export function Sidebar({ currentPath = "/admin", onClose }) {
-  const { logout } = useAuthStore();
+  const logout = useAuthStore((s) => s.logout);
   const [badgeCounts, setBadgeCounts] = useState({ kyc: null, disputes: null });
 
   useEffect(() => {

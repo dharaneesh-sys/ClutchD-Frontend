@@ -259,11 +259,28 @@ All routes are mounted under `/api`:
 
 | Email | Password | Role | Notes |
 |-------|----------|------|-------|
-| `admin@21907.com` | `clutchD123` | admin | Backend admin |
-| `admin@1907.com` | `clutchD123` | admin | Backup admin |
-| `customer@demo.com` | `demo123456` | customer | Frontend intercepted → demo data |
+| `admin@21907.com` | `clutchD123` | admin | ✅ Verified — returns admin JWT |
+| `admin@1907.com` | `clutchD123` | admin | ✅ Verified — backup admin |
+| `customer@demo.com` | `demo123456` | customer | ✅ Verified — returns customer JWT |
 | `mechanic@demo.com` | `demo123456` | mechanic | Verified, near Coimbatore |
 | `garage@demo.com` | `demo123456` | garage | Verified |
+
+### 6.3a Database (Neon PostgreSQL)
+
+**Production DB** (Render backend connects via `DATABASE_URL`):
+```
+SYNC_DATABASE_URL=postgresql://neondb_owner:npg_nmbkBDWG9Vi8@ep-polished-hat-aohax5qp.c-2.ap-southeast-1.aws.neon.tech/neondb?sslmode=require
+DATABASE_URL=postgresql+asyncpg://neondb_owner:npg_nmbkBDWG9Vi8@ep-polished-hat-aohax5qp.c-2.ap-southeast-1.aws.neon.tech/neondb?ssl=require
+```
+
+**Bootstrap script:** `backend/scripts/bootstrap_db.py`  
+**Seed script:** `backend/app/seed_admin_data.py`
+
+Run bootstrap (creates tables + seeds admin/customer/mechanic/garage):
+```bash
+cd /home/dinusus/ClutchD-Backend
+python -m backend.scripts.bootstrap_db
+```
 
 ### 6.4 Known Redis-related Issues (All Fixed)
 

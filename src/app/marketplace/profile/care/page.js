@@ -303,7 +303,8 @@ function TicketCard({ ticket }) {
 // ─── Page ────────────────────────────────────────────────────────────
 
 export default function CarePage() {
-  const { user, isAuthenticated } = useAuthStore();
+  const user = useAuthStore((s) => s.user);
+  const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
   const toast = useToastStore();
 
   const [showLiveChat, setShowLiveChat] = useState(false);

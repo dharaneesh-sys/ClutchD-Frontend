@@ -10,7 +10,8 @@ import { useToast } from "@/components/ui/ToastProvider";
 import api from "@/lib/api";
 
 export function GarageProfile() {
-  const { user, updateUserData } = useAuthStore();
+  const user = useAuthStore((s) => s.user);
+  const updateUserData = useAuthStore((s) => s.updateUserData);
   const { error: showError } = useToast();
   const [isEditing, setIsEditing] = useState(false);
   const [services, setServices] = useState(user?.services || []);

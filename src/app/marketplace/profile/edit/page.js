@@ -28,7 +28,8 @@ function validateForm({ name, phone, address }) {
 }
 
 export default function EditProfilePage() {
-  const { user, updateUserData } = useAuthStore();
+  const user = useAuthStore((s) => s.user);
+  const updateUserData = useAuthStore((s) => s.updateUserData);
   const toast = useToastStore();
   const router = useRouter();
   const fileInputRef = useRef(null);

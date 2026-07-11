@@ -6,7 +6,8 @@ import api from "@/lib/api";
 import { useAuthStore } from "@/store/authStore";
 
 export function AvailabilityToggle() {
-  const { user, updateUserData } = useAuthStore();
+  const user = useAuthStore((s) => s.user);
+  const updateUserData = useAuthStore((s) => s.updateUserData);
   const [isOnline, setIsOnline] = useState(user?.isOnline ?? true);
   const [loading, setLoading] = useState(false);
   

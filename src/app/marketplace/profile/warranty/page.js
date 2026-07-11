@@ -143,7 +143,7 @@ function ClaimDetailModal({ claim, onClose }) {
 // ─── New Claim Form (Modal) ────────────────────────────────────────────────
 
 function NewClaimForm({ isOpen, onClose, onSubmitted, completedServices }) {
-  const { user } = useAuthStore();
+  const user = useAuthStore((s) => s.user);
   const toast = useToastStore();
   const [submitting, setSubmitting] = useState(false);
   const [errors, setErrors] = useState({});
@@ -304,7 +304,7 @@ const CLAIM_TABS = [
 ];
 
 export default function WarrantyClaimsPage() {
-  const { user } = useAuthStore();
+  const user = useAuthStore((s) => s.user);
   const toast = useToastStore();
   const [activeTab, setActiveTab] = useState("all");
   const [claims, setClaims] = useState([]);

@@ -15,6 +15,11 @@ export async function toggleUserStatus(userId, isActive) {
   return res.data;
 }
 
+export async function deleteUser(userId) {
+  const res = await api.delete(`/admin/users/${userId}`);
+  return res.data;
+}
+
 export async function fetchMechanics() {
   const res = await api.get("/admin/mechanics");
   return res.data.mechanics || [];

@@ -17,7 +17,7 @@ export function IncomingJobs({ onChat }) {
   const [jobs, setJobs] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
-  const { setNavigationTarget } = useTrackingStore();
+  const setNavigationTarget = useTrackingStore((s) => s.setNavigationTarget);
   const { success: showSuccess, error: showError } = useToast();
 
   // --- Job Completion Modal State ---

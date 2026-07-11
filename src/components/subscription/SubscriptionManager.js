@@ -32,17 +32,15 @@ export function SubscriptionManager() {
   const toast = useToastStore();
 
   // ── Subscription store ──────────────────────────────────────────────
-  const {
-    planId: currentPlanId,
-    status,
-    activeUntil,
-    isSubscribing,
-    isCancelling,
-    backendAvailable,
-    error,
-    subscribe,
-    cancel,
-  } = useSubscriptionStore();
+  const currentPlanId = useSubscriptionStore((s) => s.planId);
+  const status = useSubscriptionStore((s) => s.status);
+  const activeUntil = useSubscriptionStore((s) => s.activeUntil);
+  const isSubscribing = useSubscriptionStore((s) => s.isSubscribing);
+  const isCancelling = useSubscriptionStore((s) => s.isCancelling);
+  const backendAvailable = useSubscriptionStore((s) => s.backendAvailable);
+  const error = useSubscriptionStore((s) => s.error);
+  const subscribe = useSubscriptionStore((s) => s.subscribe);
+  const cancel = useSubscriptionStore((s) => s.cancel);
 
   // Local state for hydration and backend notice
   const [hydrated, setHydrated] = useState(false);

@@ -26,7 +26,7 @@ const APP_SHORTCUTS = [
 
 export default function QuickActionsPage() {
   const router = useRouter();
-  const { user } = useAuthStore();
+  const user = useAuthStore((s) => s.user);
   const [recentServices, setRecentServices] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
 

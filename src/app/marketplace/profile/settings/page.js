@@ -162,7 +162,7 @@ function useResolvedTheme(preference) {
 // ─── Page ────────────────────────────────────────────────────────────────
 
 export default function SettingsPage() {
-  const { logout } = useAuthStore();
+  const logout = useAuthStore((s) => s.logout);
   const { setTheme: applyTheme } = useThemeStore();
   const toast = useToastStore();
   const { isDemoMode, enableDemo, disableDemo } = useDemoMode();

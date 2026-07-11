@@ -19,7 +19,8 @@ import { Button } from "@/components/ui/Button";
 import { ProfileMenu } from "@/components/profile/ProfileMenu";
 
 export default function ProfilePage() {
-  const { user, isAuthenticated } = useAuthStore();
+  const user = useAuthStore((s) => s.user);
+  const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
   const router = useRouter();
 
   const displayName = user?.name || user?.email || "Guest";

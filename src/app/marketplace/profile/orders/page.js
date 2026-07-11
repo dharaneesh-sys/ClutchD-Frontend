@@ -313,7 +313,7 @@ function DetailModal({ order, onClose }) {
 
 export default function OrdersPage() {
   const router = useRouter();
-  const { user } = useAuthStore();
+  const user = useAuthStore((s) => s.user);
   const { toast } = useToast();
   const [activeTab, setActiveTab] = useState("current");
   const [orders, setOrders] = useState([]);
