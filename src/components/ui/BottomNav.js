@@ -1,7 +1,10 @@
 "use client";
 
 import { useRouter, usePathname } from "next/navigation";
-import { Home, Grid3X3, Search, ShoppingCart, User, Settings, Sun, Moon } from "lucide-react";
+import {
+  Home, Grid3X3, Search, ShoppingCart, User, Settings,
+  Sun, Moon, UserCircle, Package, Heart,
+} from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useCartStore } from "@/store/cartStore";
 import { useThemeStore } from "@/store/themeStore";
@@ -134,6 +137,31 @@ export function BottomNav() {
                     )}
                     onClick={(e) => e.stopPropagation()}
                   >
+                    {/* Profile navigation links */}
+                    <div className="flex flex-col gap-0.5 mb-2 pb-2 border-b border-border-subtle">
+                      <button
+                        onClick={(e) => { e.stopPropagation(); router.push("/marketplace/profile"); setIsSettingsOpen(false); }}
+                        className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-white/5 transition-colors"
+                      >
+                        <UserCircle size={18} className="text-text-muted" />
+                        <span className="text-sm font-medium text-foreground">My Profile</span>
+                      </button>
+                      <button
+                        onClick={(e) => { e.stopPropagation(); router.push("/marketplace/orders"); setIsSettingsOpen(false); }}
+                        className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-white/5 transition-colors"
+                      >
+                        <Package size={18} className="text-text-muted" />
+                        <span className="text-sm font-medium text-foreground">Orders</span>
+                      </button>
+                      <button
+                        onClick={(e) => { e.stopPropagation(); router.push("/marketplace/profile/favorites"); setIsSettingsOpen(false); }}
+                        className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-white/5 transition-colors"
+                      >
+                        <Heart size={18} className="text-text-muted" />
+                        <span className="text-sm font-medium text-foreground">Favorites</span>
+                      </button>
+                    </div>
+
                     {/* Theme row */}
                     <button
                       onClick={(e) => {

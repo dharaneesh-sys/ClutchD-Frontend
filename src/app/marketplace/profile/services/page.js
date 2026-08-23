@@ -17,6 +17,7 @@ import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { ConfirmModal } from "@/components/ui/ConfirmModal";
 import { useToastStore } from "@/store/toastStore";
+import { useAuthStore } from "@/store/authStore";
 import api from "@/lib/api";
 
 // ─── Tab definitions ─────────────────────────────────────────────────
@@ -270,6 +271,7 @@ export default function ServicesPage() {
   const [cancelTarget, setCancelTarget] = useState(null);
   const [isCancelling, setIsCancelling] = useState(false);
   const toast = useToastStore();
+  const user = useAuthStore((s) => s.user);
 
   const fetchServices = useCallback(async () => {
     setIsLoading(true);
@@ -296,7 +298,7 @@ export default function ServicesPage() {
 
   const handleRebook = (service) => {
     toast.success("Redirecting to service request...");
-    router.push("/dashboard");
+    router.push(`/dashboard/${user?.role ?? "customer"}`);
   };
 
   const handleCancel = async () => {
@@ -394,7 +396,7 @@ export default function ServicesPage() {
           action={
             activeTab === "upcoming" ? (
               <button
-                onClick={() => router.push("/dashboard")}
+                onClick={() => router.push(`/dashboard/${user?.role ?? "customer"}`)}
                 className="btn-glow inline-flex h-11 items-center gap-2 rounded-xl px-6 text-sm font-medium text-white transition-all hover-lift active-press"
               >
                 Request Service

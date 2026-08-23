@@ -12,26 +12,34 @@
 - **Distinct App Router routes (`src/app/**/page.js`)**: 35 (see Appendix)
 
 ### Status counts (across all tables)
-- onClick: live 337 / dead 3 / suspicious 0 + 0 other
-- href: live 21 / dead 5
-- router.push: live 40 / dead 5 / suspicious 7
+- onClick: live 340 / dead 0 / suspicious 0 + 0 other (Task 11 fixed the 3 dead)
+- href: live 26 / dead 0 (Task 11: 5 rows re-verified as runtime-variable/public-asset false positives)
+- router.push: live 45 / dead 0 / suspicious 7 (Task 11 fixed the 5 dead)
 - onSubmit: live 33 / suspicious 1
 
 ### Dead / Suspicious inventory (for Task 11)
+
+> **Task 11 update (2026-08-23):** all `dead` rows below are resolved — none remain.
+> D1–D4 now push role-aware `` `/dashboard/${role}` `` (auth store) with a customer fallback;
+> D5 reroutes to `/marketplace/profile/favorites`; D6 deepLinks use a `ROLE_DASHBOARD`
+> (`/dashboard/{role}`) placeholder expanded against the signed-in user at notification time
+> (`null` when logged out). S3 got its submit guard + warning toast. The href rows marked
+> dead were audit false positives (runtime variables, tel:/mailto:/https targets, public assets).
+`scripts/verify-routes.js` KNOWN_DEAD allowlist is now empty; gate: TOTAL=80 LIVE=80 DEAD=0.
 
 These are the only rows with `dead` or `suspicious` — everything else is `live`. Handler existence was verified by grepping the identifier in its file (import/definition check) and route existence by checking `src/app/<path>/page.js` on filesystem.
 
 | # | file:line | element | handler / route | exists | status | notes |
 |---|-----------|---------|---------------|--------|--------|-------|
-| D1 | `src/app/marketplace/layout.js:12` | router.push | `router.push("/dashboard")` in `handleBack()` | N | dead | No `src/app/dashboard/page.js` — dashboards are at `/dashboard/customer|mechanic|garage|fleet`. Either add a role-aware `/dashboard` redirect or push to `\`/`/marketplace`. |
-| D2 | `src/app/marketplace/profile/orders/page.js:454` | button onClick | `() => router.push("/dashboard")` empty-state CTA | N | dead | Same — `/dashboard` 404. |
-| D3 | `src/app/marketplace/profile/services/page.js:299` | handler `handleRebook` | `router.push("/dashboard")` | N | dead | Same — `/dashboard` 404. |
-| D4 | `src/app/marketplace/profile/services/page.js:397` | button onClick | `() => router.push("/dashboard")` upcoming empty | N | dead | Same. |
-| D5 | `src/components/ui/BottomNav.js:157` | button onClick | `router.push("/marketplace/favorites")` settings sheet | N | dead | Real route is `/marketplace/profile/favorites` (`src/app/marketplace/profile/favorites/page.js` exists, `/marketplace/favorites` does not). |
-| D6 | `src/lib/push/pushNotificationHandler.js:37,42,52,57` | deepLink map | `STATUS_UPDATE`/`PAYMENT_RECEIVED`/`MAINTENANCE_REMINDER` → `deepLink: "/dashboard"` | N | dead | Push deepLink to `/dashboard` will 404 on tap. |
+| D1 | `src/app/marketplace/layout.js:12` | router.push | `` router.push(user?.role ? `/dashboard/${user.role}` : "/marketplace") `` in `handleBack()` no-history fallback | Y | **fixed (task 11)** | Was dead `/dashboard`. Role-aware dashboard; marketplace home when logged out. |
+| D2 | `src/app/marketplace/profile/orders/page.js:454` | button onClick | `` () => router.push(`/dashboard/${user?.role ?? "customer"}`) `` empty-state CTA | Y | **fixed (task 11)** | Was dead `/dashboard`; now role-aware dashboard. |
+| D3 | `src/app/marketplace/profile/services/page.js:299` | handler `handleRebook` | `` router.push(`/dashboard/${user?.role ?? "customer"}`) `` | Y | **fixed (task 11)** | Same fix. |
+| D4 | `src/app/marketplace/profile/services/page.js:399` | button onClick | `` () => router.push(`/dashboard/${user?.role ?? "customer"}`) `` upcoming empty | Y | **fixed (task 11)** | Same fix. |
+| D5 | `src/components/ui/BottomNav.js:157` | button onClick | `router.push("/marketplace/profile/favorites")` settings sheet | Y | **fixed (task 11)** | Corrected to the real route `/marketplace/profile/favorites`. |
+| D6 | `src/lib/push/pushNotificationHandler.js` | deepLink map | `STATUS_UPDATE`/`PAYMENT_RECEIVED`/`MAINTENANCE_REMINDER` → `deepLink: ROLE_DASHBOARD` (`/dashboard/{role}`) | Y | **fixed (task 11)** | Placeholder expanded against signed-in user's role in `resolveConfig`; link dropped when logged out. Static `/dashboard` literals removed. |
 | S1 | `src/app/dashboard/customer/page.js:239-247` | form onSubmit `handleScheduleSubmit` | `onSubmit={handleScheduleSubmit}` → `createRequest({scheduledAt, vehicleId, notes})` | Y (handler exists) | suspicious | Schedule payload missing `issueTag`, `description`, `requestType`, `customerLat/Lng`, `scheduledAt` mapping incomplete (plan task 4). Not dead navigation but dead-end API will 422. |
 | S2 | `src/store/trackingStore.js:163` | API call `fetchNearbyProviders` | `api.get("/providers/nearby?lat=&lng=")` | Y | live (with note) | Backend canonical is `/providers/nearby?lat&lng` (providers.py:21, `lng` param). Frontend correctly uses `lng`. **However** legacy `matching_routes.py` offers `/mechanics/nearby?lat&lon` and `/garages/nearby?lat&lon` (`lon` not `lng`) — those two endpoints are dead (never imported by frontend) and have param name mismatch vs provider endpoint. |
-| S3 | `src/components/dashboard/ServiceRequestPanel.js:375-385` | button `Find Help Now` (`type=submit`) | `handleSubmit(submitHandler)` → `onSubmit({issueTag, description, requestType, vehicleId, media})` | Y | suspicious | Submit is reachable even with `gpsStatus===idle/denied/unavailable` and `userLocation` still `MAP_DEFAULT_CENTER`. No client-side guard; backend receives fallback center or `undefined` if array guard fails (customer/page.js:212-219 does `Array.isArray(location)?location[0]:undefined`). Reachability: **reachable but suspicious** — should disable or show fallback warning. Task 11 will add disabled guard + toast. |
+| S3 | `src/components/dashboard/ServiceRequestPanel.js` | button `Find Help Now` (`type=submit`) | `handleSubmit(submitHandler)` → location guard → `onSubmit({issueTag, description, requestType, vehicleId, media})` | Y | **fixed (task 11)** | Was suspicious: submit reachable with `userLocation` still `MAP_DEFAULT_CENTER`. `submitHandler` now blocks submit in that state and fires a warning toast telling the user to set pickup location (Locate Me or manual search). |
 | S4 | `src/components/dashboard/MapView.js:191-218` | OSRM fetch `handleMyLocation/handleZoomIn` etc. | `onClick={handleMyLocation}` etc + `fetch("https://router.project-osrm.org/...")` | Y | suspicious | Route fetch `console.error` only (line 208) — user sees no toast on OSRM 500. Not dead navigation but dead error surfacing (task 9). Buttons themselves live. |
 | S5 | `src/components/ui/ProfileFAB.js:43` / `DashboardShell.js:115` / `DashboardShell.js:185` | avatar/profile pushes | `router.push("/marketplace/profile")` | Y | live (suspicious link chain) | Live route, but verify chain: `/marketplace/profile` exists, but nested edit path uses `router.push("/marketplace/profile/edit")` correctly. |
 | S6 | Backend `matching_routes.py:10-23` | FastAPI endpoints | `GET /mechanics/nearby` + `GET /garages/nearby` (`lon` param) | Y (router registered) | dead (unlinked) | Frontend never calls these; all discovery goes via `GET /providers/nearby?lat&lng` (providers.py). These endpoints are reachable on backend but dead from UI. Keep or delete per plan task 16. |
@@ -116,7 +124,7 @@ These are the only rows with `dead` or `suspicious` — everything else is `live
 | `src/app/marketplace/profile/orders/page.js:193` | button/div | `onClose` | Y | live |
 | `src/app/marketplace/profile/orders/page.js:339` | button/div | `() => downloadReceipt(order)` | Y | live |
 | `src/app/marketplace/profile/orders/page.js:398` | button/div | `() => setActiveTab(tab.key)` | Y | live |
-| `src/app/marketplace/profile/orders/page.js:454` | button/div | `() => router.push("/dashboard") [router.push('/dashboard') -> dead /dashboard]` | N | dead |
+| `src/app/marketplace/profile/orders/page.js:454` | button/div | `` () => router.push(`/dashboard/${user?.role ?? "customer"}`) `` [fixed task 11: was dead /dashboard]` | Y | live |
 | `src/app/marketplace/profile/payments/page.js:99` | button/div | `() => onDownload(payment)` | Y | live |
 | `src/app/marketplace/profile/quick-actions/page.js:78` | button/div | `() => router.push(shortcut.path)` | Y | live |
 | `src/app/marketplace/profile/quick-actions/page.js:100` | button/div | `() => router.push("/marketplace")` | Y | live |
@@ -130,7 +138,7 @@ These are the only rows with `dead` or `suspicious` — everything else is `live
 | `src/app/marketplace/profile/services/page.js:182` | button/div | `onClose` | Y | live |
 | `src/app/marketplace/profile/services/page.js:199` | button/div | `onClose` | Y | live |
 | `src/app/marketplace/profile/services/page.js:340` | button/div | `() => setActiveTab(tab.key)` | Y | live |
-| `src/app/marketplace/profile/services/page.js:397` | button/div | `() => router.push("/dashboard") [router.push('/dashboard') empty upcoming -> ...` | N | dead |
+| `src/app/marketplace/profile/services/page.js:399` | button/div | `` () => router.push(`/dashboard/${user?.role ?? "customer"}`) `` [fixed task 11: was dead /dashboard] | Y | live |
 | `src/app/marketplace/profile/settings/page.js:89` | button/div | `onChange` | Y | live |
 | `src/app/marketplace/profile/settings/page.js:351` | button/div | `fetchSettings` | Y | live |
 | `src/app/marketplace/profile/settings/page.js:391` | button/div | `() => setPwModalOpen(true)` | Y | live |
@@ -336,7 +344,7 @@ These are the only rows with `dead` or `suspicious` — everything else is `live
 | `src/components/ui/BottomNav.js:138` | button/div | `(e) => e.stopPropagation()` | Y | live |
 | `src/components/ui/BottomNav.js:143` | button/div | `(e) => { e.stopPropagation(); router.push("/marketplace/p...` | Y | live |
 | `src/components/ui/BottomNav.js:150` | button/div | `(e) => { e.stopPropagation(); router.push("/marketplace/o...` | Y | live |
-| `src/components/ui/BottomNav.js:157` | button/div | `(e) => { e.stopPropagation(); router.push("/marketplace/f... [router.push('/m...` | N | dead |
+| `src/components/ui/BottomNav.js:157` | button/div | `(e) => { e.stopPropagation(); router.push("/marketplace/profile/favorites") ... }` [fixed task 11: was dead /marketplace/favorites] | Y | live |
 | `src/components/ui/BottomNav.js:167` | button/div | `onClick={(e) => {` | Y | live |
 | `src/components/ui/BottomNav.js:191` | button/div | `() => router.push(path)` | Y | live |
 | `src/components/ui/ChatPanel.js:116` | button/div | `onClose` | Y | live |
@@ -403,19 +411,19 @@ These are the only rows with `dead` or `suspicious` — everything else is `live
 | `src/app/marketplace/cart/page.js:318` | Link/a | `/marketplace` | Y | live |
 | `src/app/marketplace/checkout/page.js:166` | Link/a | `/marketplace/cart` | Y | live |
 | `src/app/marketplace/checkout/page.js:264` | Link/a | `/marketplace` | Y | live |
-| `src/app/marketplace/profile/care/page.js:248` | Link/a | `href` | N | dead |
-| `src/app/marketplace/profile/help/page.js:258` | Link/a | `item.href` | N | dead |
+| `src/app/marketplace/profile/care/page.js:248` | Link/a | `href` (ContactCard prop — runtime tel:/mailto:/https values) | Y | live (verified) |
+| `src/app/marketplace/profile/help/page.js:258` | Link/a | `item.href` (contact items — https://wa.me/... etc.) | Y | live (verified) |
 | `src/app/marketplace/profile/safety/page.js:231` | Link/a | `tel:${contact.number.replace(/\s/g, "")}` | Y | live |
 | `src/app/marketplace/page.js:155` | Link/a | `/marketplace/categories` | Y | live |
 | `src/app/marketplace/page.js:184` | Link/a | `/marketplace/search` | Y | live |
 | `src/app/page.js:25` | Link/a | `/auth` | Y | live |
 | `src/app/page.js:52` | Link/a | `/auth` | Y | live |
 | `src/app/page.js:59` | Link/a | `/auth` | Y | live |
-| `src/app/layout.js:49` | Link/a | `/manifest.json` | N | dead |
+| `src/app/layout.js:49` | Link/a | `/manifest.json` (public asset, file exists) | Y | live (verified) |
 | `src/app/layout.js:93` | Link/a | `#main-content` | Y | live |
 | `src/components/admin/JobMonitor.js:294` | Link/a | `https://www.openstreetmap.org/copyright` | Y | live |
-| `src/components/admin/WarrantyPanel.js:140` | Link/a | `photo` | N | dead |
-| `src/components/admin/Sidebar.js:71` | Link/a | `item.path` | N | dead |
+| `src/components/admin/WarrantyPanel.js:140` | Link/a | `photo` (claim.photos.map remote image URL) | Y | live (verified) |
+| `src/components/admin/Sidebar.js:71` | Link/a | `item.path` (NAV_ITEMS — all /admin/* routes exist on filesystem) | Y | live (verified) |
 | `src/components/dashboard/MapView.js:251` | Link/a | `https://www.openstreetmap.org/copyright` | Y | live |
 | `src/components/marketplace/CategoryCard.js:46` | Link/a | `/marketplace/categories/${category.id}` | Y | live |
 | `src/components/marketplace/ProductCard.js:74` | Link/a | `/marketplace/product/${id}` | Y | live |
@@ -442,18 +450,18 @@ These are the only rows with `dead` or `suspicious` — everything else is `live
 | `src/app/marketplace/checkout/page.js:282` | router.push | `"/marketplace/cart"` | Y | live |
 | `src/app/marketplace/profile/account/page.js:102` | router.push | `"/marketplace/profile/edit"` | Y | live |
 | `src/app/marketplace/profile/edit/page.js:110` | router.push | `"/marketplace/profile"` | Y | live |
-| `src/app/marketplace/profile/orders/page.js:454` | router.push | `"/dashboard"` | N | dead |
+| `src/app/marketplace/profile/orders/page.js:454` | router.push | `` `/dashboard/${user?.role ?? "customer"}` `` [fixed task 11] | Y | live |
 | `src/app/marketplace/profile/quick-actions/page.js:78` | router.push | `shortcut.path` | Y | live |
 | `src/app/marketplace/profile/quick-actions/page.js:100` | router.push | `"/marketplace"` | Y | live |
 | `src/app/marketplace/profile/safety/page.js:163` | router.push | `"/marketplace/profile/help"` | Y | live |
-| `src/app/marketplace/profile/services/page.js:299` | router.push | `"/dashboard"` | N | dead |
-| `src/app/marketplace/profile/services/page.js:397` | router.push | `"/dashboard"` | N | dead |
+| `src/app/marketplace/profile/services/page.js:299` | router.push | `` `/dashboard/${user?.role ?? "customer"}` `` [fixed task 11] | Y | live |
+| `src/app/marketplace/profile/services/page.js:399` | router.push | `` `/dashboard/${user?.role ?? "customer"}` `` [fixed task 11] | Y | live |
 | `src/app/marketplace/profile/favorites/page.js:160` | router.push | `\`/marketplace/product/${productId}\`` | Y | live |
 | `src/app/marketplace/profile/favorites/page.js:211` | router.push | `"/marketplace/search"` | Y | live |
 | `src/app/marketplace/profile/page.js:31` | router.push | `"/auth"` | Y | live |
 | `src/app/marketplace/profile/page.js:122` | router.push | `"/marketplace/profile/edit"` | Y | live |
 | `src/app/marketplace/profile/page.js:164` | router.push | `"/marketplace/profile/account"` | Y | live |
-| `src/app/marketplace/layout.js:12` | router.push | `"/dashboard"` | N | dead |
+| `src/app/marketplace/layout.js:12` | router.push | `` user?.role ? `/dashboard/${user.role}` : "/marketplace" `` [fixed task 11] | Y | live |
 | `src/app/marketplace/page.js:97` | router.push | `\`/marketplace/search?q=${encodeURIComponent(q` | Y | live |
 | `src/components/admin/AdminOverview.js:125` | router.push | `"/admin/kyc"` | Y | live |
 | `src/components/admin/AdminOverview.js:135` | router.push | `"/admin/kyc"` | Y | live |
@@ -471,7 +479,7 @@ These are the only rows with `dead` or `suspicious` — everything else is `live
 | `src/components/auth/SignUpCard.js:148` | router.push | `\`/dashboard/${user.role}\`` | Y | live |
 | `src/components/ui/BottomNav.js:143` | router.push | `"/marketplace/profile"` | Y | live |
 | `src/components/ui/BottomNav.js:150` | router.push | `"/marketplace/orders"` | Y | live |
-| `src/components/ui/BottomNav.js:157` | router.push | `"/marketplace/favorites"` | N | dead |
+| `src/components/ui/BottomNav.js:157` | router.push | `"/marketplace/profile/favorites"` [fixed task 11] | Y | live |
 | `src/components/ui/BottomNav.js:191` | router.push | `path` | Y | suspicious |
 | `src/components/ui/DashboardShell.js:115` | router.push | `"/marketplace/profile"` | Y | live |
 | `src/components/ui/DashboardShell.js:185` | router.push | `"/marketplace/profile"` | Y | live |
@@ -588,4 +596,4 @@ Not present (dead targets referenced): `/dashboard` (generic), `/marketplace/fav
 
 ---
 
-*Machine-greppable:* dead rows contain `| dead |` (lowercase). `grep -c "| dead |" docs/button-audit.md` counts dead entries for Task 11.*
+*Machine-greppable:* dead rows were marked with a lowercase `dead` status cell between table pipes (spaced form, e.g. pipe-space-dead-space-pipe). Since Task 11 that count is **0** — grepping this file for the spaced pipe-dead-pipe pattern must return 0 matches; any hit is a regression.*

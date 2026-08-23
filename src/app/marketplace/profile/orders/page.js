@@ -451,7 +451,7 @@ export default function OrdersPage() {
           action={
             activeTab === "current" ? (
               <button
-                onClick={() => router.push("/dashboard")}
+                onClick={() => router.push(`/dashboard/${user?.role ?? "customer"}`)}
                 className="btn-glow inline-flex h-11 items-center gap-2 rounded-xl px-6 text-sm font-medium text-white transition-all hover-lift active-press"
               >
                 Request Service

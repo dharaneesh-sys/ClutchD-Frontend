@@ -4,15 +4,17 @@ import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { serviceRequestSchema } from "@/lib/validators";
-import { ISSUE_TAGS } from "@/lib/constants";
+import { ISSUE_TAGS, MAP_DEFAULT_CENTER } from "@/lib/constants";
 import { estimatePrice } from "@/lib/utils";
 import { GlassCard } from "@/components/ui/GlassCard";
 import { Button } from "@/components/ui/Button";
 import { Select } from "@/components/ui/Select";
 import { FileUpload } from "@/components/ui/FileUpload";
-import { Navigation, CheckCircle2, CarFront, PlusCircle, MapPin, Loader2, LocateFixed } from "lucide-react";
+import { Navigation, CheckCircle2, CarFront, PlusCircle, MapPin, Loader2, LocateFixed, Zap, Wrench, Building2, X } from "lucide-react";
 import { useTrackingStore } from "@/store/trackingStore";
+import { useToastStore } from "@/store/toastStore";
 import { cn } from "@/lib/utils";
+import { formatIndianPlate } from "@/lib/plateFormatter";
 import api from "@/lib/api";
 import { VehicleManagerModal } from "@/components/dashboard/VehicleManagerModal";
 import { SubscriptionBadge } from "@/components/subscription/SubscriptionBadge";
@@ -145,14 +147,21 @@ function LocationIndicator() {
   );
 }
 
-export function ServiceRequestPanel({ onSubmit, isLoading }) {
+export function ServiceRequestPanel({ onSubmit, isLoading, error, onDismissError }) {
   const [estimatedPrice, setEstimatedPrice] = useState({ min: 500, max: 2000 });
   const [isSuccess, setIsSuccess] = useState(false);
   const [vehicles, setVehicles] = useState([]);
   const [isVehicleModalOpen, setIsVehicleModalOpen] = useState(false);
+  const toast = useToastStore();
+  const userLocation = useTrackingStore((s) => s.userLocation);
 
-
-
+  // A real pickup location is required before dispatch: either GPS-granted
+  // or manually searched. MAP_DEFAULT_CENTER means the user hasn't set one.
+  const isLocationReady = Boolean(
+    userLocation &&
+    (userLocation[0] !== MAP_DEFAULT_CENTER[0] ||
+      userLocation[1] !== MAP_DEFAULT_CENTER[1])
+  );
   const {
     register,
     handleSubmit,
@@ -203,6 +212,12 @@ export function ServiceRequestPanel({ onSubmit, isLoading }) {
   };
 
   const submitHandler = async (data) => {
+    if (!isLocationReady) {
+      toast.warning(
+        'Set your pickup location first — use "Locate Me" or search your address.'
+      );
+      return;
+    }
     await onSubmit({
       ...data,
       priceEstimate: estimatedPrice,
@@ -226,6 +241,24 @@ export function ServiceRequestPanel({ onSubmit, isLoading }) {
 
   return (
     <GlassCard variant="strong" className="w-full p-6 flex flex-col relative flex-shrink-0">
+      {error && (
+        <div className="mb-4 p-4 rounded-xl border border-red-500/30 bg-red-500/10 flex items-start gap-3">
+          <div className="flex-1 min-w-0">
+            <p className="text-sm font-semibold text-red-400 mb-1">Request Failed</p>
+            <p className="text-xs text-red-300/80">{error}</p>
+          </div>
+          {onDismissError && (
+            <button
+              type="button"
+              onClick={onDismissError}
+              className="shrink-0 text-red-400 hover:text-red-300 transition-colors"
+              aria-label="Dismiss error"
+            >
+              <X size={16} />
+            </button>
+          )}
+        </div>
+      )}
       <div className="mb-6">
         <div className="flex items-center gap-2 mb-1">
           <h2 className="text-2xl font-bold text-text-primary">Request Service</h2>
@@ -275,7 +308,7 @@ export function ServiceRequestPanel({ onSubmit, isLoading }) {
                      <input type="radio" value={v.id} {...register("vehicleId")} className="sr-only" />
                       <CarFront size={18} className={selectedVehicleId === v.id ? "text-icon-highlight" : "opacity-50"} />
                      <span className="font-medium text-sm">{v.year} {v.make} {v.model}</span>
-                     {v.license_plate && <span className="text-xs opacity-60 ml-auto">{v.license_plate}</span>}
+                      {v.license_plate && <span className="text-xs font-mono opacity-60 ml-auto">{formatIndianPlate(v.license_plate)}</span>}
                    </label>
                  ))}
                </div>
@@ -306,7 +339,7 @@ export function ServiceRequestPanel({ onSubmit, isLoading }) {
           </div>
 
           <FileUpload
-            label="Upload Photo/Video (Optional)"
+            label="Add photos or video"
             accept="image/*,video/*"
             onChange={(file) => setValue("media", file)}
           />
@@ -315,26 +348,30 @@ export function ServiceRequestPanel({ onSubmit, isLoading }) {
             <label className="mb-3 block text-sm font-medium text-text-primary">
               Provider Preference
             </label>
-            <div className="grid grid-cols-3 gap-2">
-              {['auto', 'mechanic', 'garage'].map((type) => (
-                <label 
-                  key={type} 
+            <div className="flex rounded-xl border border-border-subtle overflow-hidden bg-bg-card">
+              {[
+                { key: "auto", label: "Fastest", icon: Zap },
+                { key: "mechanic", label: "Mechanic", icon: Wrench },
+                { key: "garage", label: "Garage", icon: Building2 },
+              ].map(({ key, label, icon: Icon }) => (
+                <label
+                  key={key}
                   className={cn(
-                    "flex flex-col items-center justify-center p-3 rounded-xl border cursor-pointer transition-all",
-                    requestType === type 
-                      ? "bg-surface-soft border-border-subtle text-text-primary shadow-[0_0_10px_rgba(234,179,8,0.15)]"
-                      : "bg-bg-card border-border-subtle text-text-muted hover:bg-surface-soft hover:text-text-primary"
+                    "flex-1 flex flex-col items-center justify-center gap-1 py-3 cursor-pointer transition-all",
+                    "text-xs font-semibold",
+                    requestType === key
+                      ? "bg-surface-soft text-text-primary shadow-inner"
+                      : "text-text-muted hover:bg-surface-soft/50 hover:text-text-primary"
                   )}
                 >
                   <input
                     type="radio"
-                    value={type}
+                    value={key}
                     className="sr-only"
                     {...register("requestType")}
                   />
-                  <span className="text-xs font-semibold capitalize">
-                    {type === 'auto' ? 'Fastest' : type}
-                  </span>
+                  <Icon size={16} className={requestType === key ? "text-primary" : "text-text-dim"} />
+                  <span>{label}</span>
                 </label>
               ))}
             </div>

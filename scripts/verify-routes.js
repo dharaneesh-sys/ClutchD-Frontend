@@ -18,13 +18,11 @@ const APP_ROOT = path.resolve(__dirname, "..");
 const SRC_APP = path.join(APP_ROOT, "src/app");
 const SRC = path.join(APP_ROOT, "src");
 
-// Inline allowlist — dead routes that are documented in docs/button-audit.md
-// and expected to be fixed by Task 11. Script exits 0 when only these are dead.
+// Inline allowlist — intentionally-dead routes. Kept EMPTY since Task 11:
+// every previously allowlisted dead route was fixed (role-aware /dashboard
+// pushes, /marketplace/profile/favorites reroute, role-expanded push
+// deepLinks). Any dead route now fails the gate. See docs/button-audit.md.
 const KNOWN_DEAD = new Set([
-  "/dashboard", // generic, no src/app/dashboard/page.js (4 sites)
-  "/marketplace/favorites", // real is /marketplace/profile/favorites (BottomNav)
-  // DeepLinks via push handler also use /dashboard — same entry covers them:
-  // pushNotificationHandler.js STATUS_UPDATE / PAYMENT_RECEIVED / MAINTENANCE_REMINDER
 ]);
 
 // Collect existing App Router routes

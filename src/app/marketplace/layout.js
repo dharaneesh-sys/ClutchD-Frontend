@@ -3,13 +3,17 @@
 import { useRouter } from "next/navigation";
 import { ArrowLeft } from "lucide-react";
 import { BottomNav } from "@/components/ui/BottomNav";
+import { useAuthStore } from "@/store/authStore";
 
 export default function MarketplaceLayout({ children }) {
   const router = useRouter();
+  const user = useAuthStore((s) => s.user);
 
   const handleBack = () => {
     if (typeof window !== "undefined" && window.history.length <= 1) {
-      router.push("/dashboard");
+      // No history (deep link / cold start): fall back to the signed-in
+      // user's dashboard, or the marketplace home when logged out.
+      router.push(user?.role ? `/dashboard/${user.role}` : "/marketplace");
     } else {
       router.back();
     }

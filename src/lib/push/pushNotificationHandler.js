@@ -6,6 +6,7 @@
  * Call `initPushHandlers()` once at app bootstrap.
  */
 import { useToastStore } from "@/store/toastStore";
+import { useAuthStore } from "@/store/authStore";
 import { onPushReceived } from "./pushService";
 
 // ── Severity → store method ───────────────────────────────────────────
@@ -19,6 +20,12 @@ const SEVERITY_METHOD = {
 };
 
 // ── Type → toast config map ───────────────────────────────────────────
+
+/**
+ * Placeholder for role-aware dashboard links. Expanded against the
+ * signed-in user's role at notification time (see `resolveConfig`).
+ */
+const ROLE_DASHBOARD = "/dashboard/{role}";
 
 /**
  * Push notification type to toast configuration.
@@ -39,7 +46,7 @@ export const PUSH_TYPE_MAP = {
   STATUS_UPDATE: {
     severity: "info",
     defaultMsg: "Job status has been updated",
-    deepLink: "/dashboard",
+    deepLink: ROLE_DASHBOARD,
   },
   ORDER_SHIPPED: {
     severity: "success",
@@ -49,12 +56,12 @@ export const PUSH_TYPE_MAP = {
   PAYMENT_RECEIVED: {
     severity: "success",
     defaultMsg: "Payment received successfully",
-    deepLink: "/dashboard",
+    deepLink: ROLE_DASHBOARD,
   },
   MAINTENANCE_REMINDER: {
     severity: "warning",
     defaultMsg: "Vehicle maintenance reminder",
-    deepLink: "/dashboard",
+    deepLink: ROLE_DASHBOARD,
   },
 };
 
@@ -104,7 +111,14 @@ function resolveConfig(data) {
   const message = data.body || data.title || mapping.defaultMsg;
 
   // Allow the payload to override the deep link (e.g. a dynamic route)
-  const deepLink = data.deepLink || mapping.deepLink || null;
+  let deepLink = data.deepLink || mapping.deepLink || null;
+
+  // Expand the role placeholder against the signed-in user. With no user
+  // signed in there is no meaningful dashboard to open — drop the link.
+  if (deepLink && deepLink.includes("{role}")) {
+    const role = useAuthStore.getState().user?.role;
+    deepLink = role ? deepLink.replace("{role}", role) : null;
+  }
 
   return {
     severity: mapping.severity,
