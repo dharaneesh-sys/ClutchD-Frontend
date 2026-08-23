@@ -7,7 +7,7 @@ export function Badge({ children, className, variant = "default" }) {
     success:
       "bg-gradient-to-b from-green-500/25 to-green-500/10 text-green-300 border-green-500/35",
     warning:
-      "bg-gradient-to-b from-amber-500/25 to-amber-500/10 text-amber-300 border-amber-500/35",
+      "bg-gradient-to-b from-[#1E29B6]/25 to-[#2e3bd1]/10 text-[#1E29B6] border-[#1E29B6]/35",
     danger:
       "bg-gradient-to-b from-red-500/25 to-red-500/10 text-red-300 border-red-500/35",
     info:

@@ -24,7 +24,7 @@ export function ThemeToggle() {
       aria-label={`Switch to ${theme === "dark" ? "light" : "dark"} mode`}
       className={`p-3 rounded-full transition-all duration-300 shadow-lg backdrop-blur-xl z-[9999] fixed bottom-8 right-8
         ${theme === "light"
-          ? "bg-white/90 border-2 border-yellow-400 text-yellow-600 hover:bg-yellow-50 hover-glow"
+          ? "bg-white/90 border-2 border-[#1E29B6] text-[#1E29B6] hover:bg-[#1E29B6]/5 hover-glow"
           : "bg-zinc-900/90 border-2 border-primary/40 text-primary-light hover:bg-zinc-800 hover-glow"
         }
       `}

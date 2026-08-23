@@ -5,9 +5,8 @@ import { cn } from "@/lib/utils";
 import { Logo } from "@/components/ui/Logo";
 import { ConnectionIndicator } from "@/components/ui/ConnectionIndicator";
 import { NotificationBell } from "@/components/ui/NotificationBell";
-import { useAuthStore } from "@/store/authStore";
 import { useRouter } from "next/navigation";
-import { LogOut, User, Building2, Wrench, Gift, Menu, X } from "lucide-react";
+import { User, Building2, Wrench, Gift, Menu, X } from "lucide-react";
 import { SubscriptionBadge } from "@/components/subscription/SubscriptionBadge";
 
 const MODE_CONFIG = {
@@ -15,8 +14,8 @@ const MODE_CONFIG = {
     icon: User,
     label: "Customer Mode",
     color: "yellow",
-    textClass: "text-yellow-600 dark:text-yellow-100/60",
-    avatarClass: "bg-yellow-500/15 dark:bg-yellow-500/20 border border-yellow-500/30 text-yellow-600 dark:text-yellow-300",
+    textClass: "text-[#1E29B6] dark:text-yellow-100/60",
+    avatarClass: "bg-[#1E29B6]/15 dark:bg-yellow-500/20 border border-[#1E29B6]/30 text-[#1E29B6] dark:text-yellow-300",
   },
   garage: {
     icon: Building2,
@@ -28,9 +27,9 @@ const MODE_CONFIG = {
   mechanic: {
     icon: Wrench,
     label: "Provider Mode",
-    color: "emerald",
-    textClass: "text-emerald-600 dark:text-emerald-100/60",
-    avatarClass: "bg-emerald-500/15 dark:bg-emerald-500/20 border border-emerald-500/30 text-emerald-600 dark:text-emerald-300",
+    color: "warning",
+    textClass: "text-warning dark:text-warning",
+    avatarClass: "bg-warning/15 dark:bg-warning/20 border border-warning/30 text-warning dark:text-warning",
   },
 };
 
@@ -47,16 +46,10 @@ export function DashboardShell({
   hasBottomNav = false,
   desktopSidebar = false,
 }) {
-  const logout = useAuthStore((s) => s.logout);
   const router = useRouter();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const config = MODE_CONFIG[mode] || MODE_CONFIG.customer;
   const ModeIcon = config.icon;
-
-  const handleLogout = () => {
-    logout();
-    router.push("/auth");
-  };
 
   return (
     <div className={cn("min-h-[100dvh] w-full flex flex-col", className)}>
@@ -127,18 +120,6 @@ export function DashboardShell({
             )}
           >
             <ModeIcon size={16} />
-          </button>
-
-          {/* Logout button — always visible */}
-          <button
-            onClick={handleLogout}
-            aria-label="Logout"
-            className={cn(
-              "flex w-9 h-9 lg:w-10 lg:h-10 rounded-full items-center justify-center transition-colors",
-              "bg-surface-soft hover:bg-red-50 dark:hover:bg-red-500/20 border border-border-subtle hover:border-red-200 dark:hover:border-red-500/30 text-text-muted hover:text-red-500 dark:hover:text-red-400"
-            )}
-          >
-            <LogOut size={15} />
           </button>
 
           {/* Mobile menu button — only when sidebar nav is used */}
@@ -230,16 +211,6 @@ export function DashboardShell({
               </button>
             )}
 
-            <button
-              onClick={handleLogout}
-              className={cn(
-                "w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-colors mt-4",
-                "text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-500/10"
-              )}
-            >
-              <LogOut size={18} />
-              <span>Logout</span>
-            </button>
           </nav>
         </aside>
       )}

@@ -23,11 +23,13 @@ import { ChatPanel } from "@/components/ui/ChatPanel";
 import { History, Wrench, Calendar, ShoppingBag, MessageSquare, Car, X } from "lucide-react";
 import { SERVICE_STATUS } from "@/lib/constants";
 import { ScheduleBookingModal } from "@/components/dashboard/ScheduleBookingModal";
+import { ScheduledAppointments } from "@/components/dashboard/ScheduledAppointments";
 import api from "@/lib/api";
 import { NAVIGATION_EVENT } from "@/lib/navigation";
 import { Button } from "@/components/ui/Button";
 import { cn } from "@/lib/utils";
 import { Logo } from "@/components/ui/Logo";
+import SplashScreen from "@/components/ui/SplashScreen";
 
 const MapView = dynamic(
   () => import("../../../components/dashboard/MapView"),
@@ -41,7 +43,7 @@ const MapView = dynamic(
 
 const ServiceHistory = dynamic(
   () => import("../../../components/dashboard/ServiceHistory").then(m => ({ default: m.ServiceHistory })),
-  { ssr: false, loading: () => <div className="flex-1 flex items-center justify-center"><div className="w-8 h-8 border-2 border-t-transparent rounded-full animate-spin border-amber-500 dark:border-primary" /></div> }
+  { ssr: false, loading: () => <div className="flex-1 flex items-center justify-center"><div className="w-8 h-8 border-2 border-t-transparent rounded-full animate-spin border-[#1E29B6] dark:border-primary" /></div> }
 );
 
 const MarketplaceHome = dynamic(
@@ -51,7 +53,7 @@ const MarketplaceHome = dynamic(
 
 const VehicleList = dynamic(
   () => import("../../../components/dashboard/VehicleList").then(m => ({ default: m.VehicleList })),
-  { ssr: false, loading: () => <div className="flex-1 flex items-center justify-center"><div className="w-8 h-8 border-2 border-t-transparent rounded-full animate-spin border-amber-500 dark:border-primary" /></div> }
+  { ssr: false, loading: () => <div className="flex-1 flex items-center justify-center"><div className="w-8 h-8 border-2 border-t-transparent rounded-full animate-spin border-[#1E29B6] dark:border-primary" /></div> }
 );
 
 const TABS = [
@@ -71,6 +73,9 @@ export default function CustomerDashboard() {
   const createRequest = useServiceStore((s) => s.createRequest);
   const cancelRequest = useServiceStore((s) => s.cancelRequest);
   const restoreActiveRequest = useServiceStore((s) => s.restoreActiveRequest);
+  const isLoading = useServiceStore((s) => s.isLoading);
+  const error = useServiceStore((s) => s.error);
+  const clearError = useServiceStore((s) => s.clearError);
   const mechanicLocation = useTrackingStore((s) => s.mechanicLocation);
   const userLocation = useTrackingStore((s) => s.userLocation);
   const updateRequestStatus = useCallback(
@@ -101,6 +106,11 @@ export default function CustomerDashboard() {
   const [activeTab, setActiveTab] = useState("request"); // "request" | "history" | "schedule" | "store"
   const [isScheduleModalOpen, setIsScheduleModalOpen] = useState(false);
   const [isScheduleLoading, setIsScheduleLoading] = useState(false);
+  const [vehicles, setVehicles] = useState([]);
+
+  useEffect(() => {
+    api.get("/vehicles").then(res => setVehicles(res.data)).catch(() => {});
+  }, []);
 
   const handleReleasePayment = useCallback(() => {
     releasePayment();
@@ -194,24 +204,26 @@ export default function CustomerDashboard() {
     };
   }, [activeRequest?.id, activeRequest?.status, updateRequestStatus]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  if (!_hydrated || !isAuthenticated) {
-    return (
-      <div className="min-h-[100dvh] w-full flex items-center justify-center bg-[var(--background)]">
-        <div className="w-8 h-8 border-2 border-t-transparent rounded-full animate-spin border-[var(--primary)]" />
-      </div>
-    );
+  if (!_hydrated) {
+    return <SplashScreen />;
   }
 
   const handleRequestSubmit = async (data) => {
     const location = useTrackingStore.getState().userLocation;
     const lat = Array.isArray(location) ? location[0] : undefined;
     const lng = Array.isArray(location) ? location[1] : undefined;
-    await createRequest({
-      ...data,
-      customerLat: lat,
-      customerLng: lng,
-    });
+    try {
+      await createRequest({
+        ...data,
+        customerLat: lat,
+        customerLng: lng,
+      });
+    } catch {
+      /* error captured in serviceStore — displayed by ServiceRequestPanel */
+    }
   };
+
+  const handleDismissError = () => clearError();
 
   const handlePaymentInitiate = (request) => {
     const req = request ?? useServiceStore.getState().activeRequest;
@@ -224,10 +236,10 @@ export default function CustomerDashboard() {
     setIsPaymentOpen(true);
   };
 
-  const handleScheduleSubmit = async (scheduledAt) => {
+  const handleScheduleSubmit = async ({ scheduledAt, vehicleId, notes }) => {
     setIsScheduleLoading(true);
     try {
-      await createRequest({ scheduledAt });
+      await createRequest({ scheduledAt, vehicleId, notes });
       setIsScheduleModalOpen(false);
     } finally {
       setIsScheduleLoading(false);
@@ -269,28 +281,9 @@ export default function CustomerDashboard() {
 
       {activeTab === "schedule" ? (
         <div className="flex-1 pb-4 lg:pb-6">
-          <div className="max-w-lg mx-auto">
-            <div className="glass-lux p-8 rounded-2xl text-center">
-              <div className="w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6 bg-surface-soft">
-                <Calendar size={40} className="text-icon-highlight" />
-              </div>
-              <h2 className="text-2xl font-bold mb-2 text-text-primary">
-                Schedule a Service
-              </h2>
-              <p className="text-sm text-text-muted mb-8 max-w-sm mx-auto">
-                Book a date and time that works for you. We&apos;ll dispatch a
-                professional at your chosen slot.
-              </p>
-              <Button
-                onClick={() => setIsScheduleModalOpen(true)}
-                className="w-full sm:w-auto"
-                size="lg"
-              >
-                <Calendar size={18} className="mr-2" />
-                Book Appointment
-              </Button>
-            </div>
-          </div>
+          <ScheduledAppointments
+            onBook={() => setIsScheduleModalOpen(true)}
+          />
         </div>
       ) : activeTab === "store" ? (
         <div className="flex-1 overflow-y-auto page-enter">
@@ -302,7 +295,7 @@ export default function CustomerDashboard() {
             <MapView role="customer" />
 
             <div className="absolute top-4 left-4 z-[400] glass-lux px-3 py-1.5 rounded-full text-xs font-semibold flex items-center gap-2 text-foreground">
-              <span className="w-2 h-2 rounded-full bg-yellow-500 dark:bg-primary-light" />
+              <span className="w-2 h-2 rounded-full bg-[#1E29B6] dark:bg-primary-light" />
               Live Area Map
             </div>
           </div>
@@ -310,7 +303,7 @@ export default function CustomerDashboard() {
           <div className="lg:col-span-5 xl:col-span-4 flex flex-col gap-4 lg:gap-6">
             {!activeRequest ? (
               <>
-                <ServiceRequestPanel onSubmit={handleRequestSubmit} />
+                <ServiceRequestPanel onSubmit={handleRequestSubmit} isLoading={isLoading} error={error} onDismissError={handleDismissError} />
                 <ProviderList />
               </>
             ) : (
@@ -356,6 +349,7 @@ export default function CustomerDashboard() {
         onClose={() => setIsScheduleModalOpen(false)}
         onSubmit={handleScheduleSubmit}
         isLoading={isScheduleLoading}
+        vehicles={vehicles}
       />
 
       <ReviewModal
@@ -371,7 +365,6 @@ export default function CustomerDashboard() {
       <div className="flex items-center justify-around h-14 px-1 max-w-lg mx-auto w-full">
         {TABS.map(({ key, icon: Icon, label }) => {
           const isActive = activeTab === key;
-          const isStore = key === "store";
           return (
             <button
               key={key}
@@ -379,39 +372,28 @@ export default function CustomerDashboard() {
               className={cn(
                 "relative flex flex-col items-center justify-center gap-0.5 flex-1 h-full py-1 rounded-xl transition-all duration-200",
                 "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50",
-                isActive && !isStore && "bg-surface-soft"
+                isActive && "bg-surface-soft"
               )}
               aria-label={label}
               aria-current={isActive ? "page" : undefined}
             >
               <div className={cn(
                 "relative flex items-center justify-center w-7 h-7 rounded-lg transition-colors duration-200",
-                isActive && !isStore && "text-primary",
-                !isActive && !isStore && "text-text-muted",
-                isActive && isStore && "text-emerald-600 dark:text-emerald-400",
-                !isActive && isStore && "text-emerald-600/50 dark:text-emerald-400/60"
+                isActive && "text-primary",
+                !isActive && "text-text-muted"
               )}>
-                <Icon size={isStore ? 20 : 22} />
-                {isStore && (
-                  <span className="absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full bg-emerald-500 dark:bg-emerald-400 shadow-[0_0_6px_rgba(52,211,153,0.6)]" />
-                )}
+                <Icon size={22} />
               </div>
               <span className={cn(
                 "text-[10px] font-semibold leading-none transition-colors duration-200",
-                isActive && !isStore && "text-primary",
-                !isActive && !isStore && "text-text-muted",
-                isActive && isStore && "text-emerald-600 dark:text-emerald-400",
-                !isActive && isStore && "text-emerald-600/50 dark:text-emerald-400/60"
+                isActive && "text-primary",
+                !isActive && "text-text-muted"
               )}>
                 {label}
               </span>
               {/* Active indicator line */}
-              {isActive && !isStore && (
+              {isActive && (
                 <span className="absolute -top-0.5 left-1/2 -translate-x-1/2 w-6 h-0.5 rounded-full bg-primary" />
-              )}
-              {/* Store badge dot */}
-              {isStore && (
-                <span className="absolute -top-0.5 right-1/4 w-1.5 h-1.5 rounded-full bg-emerald-400" />
               )}
             </button>
           );

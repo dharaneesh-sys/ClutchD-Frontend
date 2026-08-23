@@ -68,7 +68,7 @@ function ReadOnlyStars({ rating, size = 14 }) {
           className={cn(
             "transition-colors",
             i <= rating
-              ? "fill-amber-400 text-amber-400"
+              ? "fill-warning text-icon-highlight"
               : "fill-white/10 text-white/30"
           )}
           aria-hidden="true"
@@ -105,8 +105,8 @@ function InteractiveStars({ rating, onChange, size = 36 }) {
               className={cn(
                 "transition-all duration-150",
                 active
-                  ? "fill-amber-400 text-amber-400 drop-shadow-[0_0_8px_rgba(251,191,36,0.5)]"
-                  : "fill-white/10 text-white/30 hover:fill-amber-300/40 hover:text-amber-300/40"
+                  ? "fill-warning text-icon-highlight drop-shadow-[0_0_8px_rgba(251,191,36,0.5)]"
+                  : "fill-white/10 text-white/30 hover:fill-warning/40 hover:text-icon-highlight/40"
               )}
             />
           </button>
@@ -175,12 +175,12 @@ function DistributionRow({ star, percentage, count }) {
       </span>
       <Star
         size={12}
-        className="fill-amber-400 text-amber-400 shrink-0"
+        className="fill-warning text-icon-highlight shrink-0"
         aria-hidden="true"
       />
       <div className="relative flex-1 h-2 rounded-full overflow-hidden bg-white/5">
         <div
-          className="absolute inset-y-0 left-0 rounded-full bg-gradient-to-r from-amber-400 to-amber-500 transition-all duration-500"
+          className="absolute inset-y-0 left-0 rounded-full bg-gradient-to-r from-[#1E29B6] to-[#2e3bd1] transition-all duration-500"
           style={{ width: `${percentage}%` }}
         />
       </div>
