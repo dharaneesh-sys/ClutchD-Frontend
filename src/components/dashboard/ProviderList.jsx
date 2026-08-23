@@ -2,7 +2,7 @@
 
 import { useMemo } from "react";
 import { useTrackingStore } from "@/store/trackingStore";
-import { MapPin, Star, Wrench, Building2, Navigation } from "lucide-react";
+import { MapPin, Star, Wrench, Building2, Navigation, AlertTriangle } from "lucide-react";
 import { GlassCard } from "@/components/ui/GlassCard";
 import { cn } from "@/lib/utils";
 
@@ -19,6 +19,7 @@ export function ProviderList() {
   const nearbyMechanics = useTrackingStore((s) => s.nearbyMechanics);
   const nearbyGarages = useTrackingStore((s) => s.nearbyGarages);
   const providerFilter = useTrackingStore((s) => s.providerFilter);
+  const fetchNearbyProviders = useTrackingStore((s) => s.fetchNearbyProviders);
 
   const allProviders = useMemo(() => {
     const all = [
@@ -42,8 +43,16 @@ export function ProviderList() {
 
   if (error) {
     return (
-      <div className="p-6 text-center text-red-400 text-sm">
-        {error}
+      <div className="flex flex-col items-center gap-3 p-6 text-center">
+        <AlertTriangle size={24} className="text-red-400" />
+        <p className="text-red-400 text-sm">{error}</p>
+        <button
+          type="button"
+          onClick={() => fetchNearbyProviders()}
+          className="px-4 py-1.5 rounded-full text-xs font-semibold bg-primary/10 text-primary border border-primary/20 hover:bg-primary/20 transition-colors"
+        >
+          Retry
+        </button>
       </div>
     );
   }
@@ -87,7 +96,7 @@ export function ProviderList() {
               <h4 className="font-bold truncate text-text-primary">
                 {provider.name}
               </h4>
-              <div className="flex items-center gap-1 text-sm font-medium text-amber-400 flex-shrink-0 ml-2">
+              <div className="flex items-center gap-1 text-sm font-medium text-warning flex-shrink-0 ml-2">
                 <Star size={14} fill="currentColor" />
                 {provider.rating}
               </div>

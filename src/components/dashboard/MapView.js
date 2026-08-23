@@ -12,6 +12,7 @@ import {
 } from "react-leaflet";
 import MarkerClusterGroup from "react-leaflet-cluster";
 import { useTrackingStore } from "@/store/trackingStore";
+import { useToastStore } from "@/store/toastStore";
 import {
   createUserLocationIcon,
   createMechanicIcon,
@@ -173,6 +174,7 @@ export default function MapView({ role = "customer" }) {
   const nearbyGarages = useTrackingStore((s) => s.nearbyGarages);
   const fetchNearbyProviders = useTrackingStore((s) => s.fetchNearbyProviders);
   const requestGPSLocation = useTrackingStore((s) => s.requestGPSLocation);
+  const toast = useToastStore();
 
   const [mounted, setMounted] = useState(false);
 
@@ -195,6 +197,9 @@ export default function MapView({ role = "customer" }) {
           const res = await fetch(
             `https://router.project-osrm.org/route/v1/driving/${userLocation[1]},${userLocation[0]};${navigationTarget.lng},${navigationTarget.lat}?overview=full&geometries=geojson`
           );
+          if (!res.ok) {
+            throw new Error(`OSRM route request failed (${res.status})`);
+          }
           const data = await res.json();
           if (data.routes && data.routes.length > 0) {
             const coords = data.routes[0].geometry.coordinates.map((coord) => [
@@ -206,6 +211,9 @@ export default function MapView({ role = "customer" }) {
           }
         } catch (err) {
           console.error("Failed to fetch route:", err);
+          toast.warning(
+            "Couldn't calculate the route right now. Please try again."
+          );
         }
       };
       getRoute();

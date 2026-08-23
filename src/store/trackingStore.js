@@ -157,6 +157,7 @@ export const useTrackingStore = create((set, get) => ({
   
   fetchNearbyProviders: async () => {
     const center = get().userLocation;
+    // Retry clears any previous error before the next attempt.
     set({ isLoading: true, error: null });
 
     try {
@@ -164,17 +165,20 @@ export const useTrackingStore = create((set, get) => ({
       set({
         nearbyMechanics: toCamelCase(data.mechanics || []),
         nearbyGarages: toCamelCase(data.garages || []),
-        isLoading: false,
       });
-    } catch (error) {
+    } catch (err) {
       set({
         nearbyMechanics: [],
         nearbyGarages: [],
-        isLoading: false,
+        error:
+          err.response?.data?.message ||
+          "Couldn't load nearby professionals. Check your connection and try again.",
       });
-      if (!error.response) {
-        console.warn("[trackingStore] Backend unreachable:", error.message);
+      if (!err.response) {
+        console.warn("[trackingStore] Backend unreachable:", err.message);
       }
+    } finally {
+      set({ isLoading: false });
     }
   },
 
