@@ -1,6 +1,6 @@
 import { create } from "zustand";
 import api from "@/lib/api";
-import { SERVICE_STATUS } from "@/lib/constants";
+import { SERVICE_STATUS, issueTagToExpertise } from "@/lib/constants";
 import { BackendHealth } from "@/lib/backendHealth";
 
 export const useServiceStore = create((set, get) => ({
@@ -28,6 +28,7 @@ export const useServiceStore = create((set, get) => ({
       
       const payload = {
         issueTag: data.issueTag,
+        expertise: issueTagToExpertise(data.issueTag),
         description: data.description,
         requestType: data.requestType,
         priceEstimate: data.priceEstimate,

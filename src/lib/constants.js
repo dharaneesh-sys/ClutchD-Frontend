@@ -10,6 +10,7 @@ export const ROLES = {
 export const SERVICE_STATUS = {
   IDLE: "idle",
   SEARCHING: "searching",
+  NOTIFIED: "providers_notified",
   ASSIGNED: "assigned",
   EN_ROUTE: "en_route",
   IN_PROGRESS: "in_progress",
@@ -60,6 +61,37 @@ export const ISSUE_TAGS = [
   { value: "other", label: "Other" },
 ];
 
+/**
+ * Maps frontend ISSUE_TAGS values to backend EXPERTISE_OPTIONS values.
+ * Only 2/12 overlap directly (electrical, transmission) — this map fixes dispatch.
+ * `other` and unknown tags resolve to null (unfiltered dispatch).
+ */
+export const ISSUE_TO_EXPERTISE = {
+  flat_tire: "tires",
+  engine_failure: "engine",
+  battery_dead: "battery",
+  overheating: "engine",
+  brake_issue: "brakes",
+  oil_leak: "oil",
+  electrical: "electrical",
+  ac_not_working: "ac",
+  transmission: "transmission",
+  starting_issue: "engine",
+  noise: "diagnostics",
+  other: null,
+};
+
+/**
+ * Resolve an issue tag to its expertise value.
+ * @param {string} tag - ISSUE_TAGS value
+ * @returns {string|null} EXPERTISE_OPTIONS value or null for unmapped/other
+ */
+export function issueTagToExpertise(tag) {
+  if (typeof tag !== "string" || tag.length === 0) return null;
+  // explicit hasOwnProperty so `other: null` stays null and unknown -> null
+  return Object.prototype.hasOwnProperty.call(ISSUE_TO_EXPERTISE, tag) ? ISSUE_TO_EXPERTISE[tag] : null;
+}
+
 export const PAYMENT_METHODS = [
   { value: "upi", label: "UPI", icon: "Smartphone" },
   { value: "card", label: "Credit/Debit Card", icon: "CreditCard" },
@@ -71,7 +103,7 @@ export const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost
 
 function getDefaultWsUrl() {
   if (typeof window === "undefined") {
-    return "ws://127.0.0.1:8000/ws";
+    return "";
   }
 
   const isCapacitor = window.Capacitor || window.__CAPACITOR__;
@@ -108,7 +140,7 @@ export function validateEnv() {
   if (typeof window !== "undefined") return; // client-side: skip
 
   const required = {
-    NEXT_PUBLIC_API_URL: API_BASE_URL === "http://localhost:8000/api" ? null : API_BASE_URL,
+    NEXT_PUBLIC_API_URL: API_BASE_URL || null,
   };
 
   const requiredMissing = Object.entries(required).filter(([, v]) => v === null);
