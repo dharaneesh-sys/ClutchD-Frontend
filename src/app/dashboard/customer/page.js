@@ -21,7 +21,7 @@ import { SOSButton } from "@/components/ui/SOSButton";
 import { DashboardShell } from "@/components/ui/DashboardShell";
 import { ChatPanel } from "@/components/ui/ChatPanel";
 import { History, Wrench, Calendar, ShoppingBag, MessageSquare, Car, X } from "lucide-react";
-import { SERVICE_STATUS } from "@/lib/constants";
+import { SERVICE_STATUS, MAP_DEFAULT_CENTER } from "@/lib/constants";
 import { ScheduleBookingModal } from "@/components/dashboard/ScheduleBookingModal";
 import { ScheduledAppointments } from "@/components/dashboard/ScheduledAppointments";
 import api from "@/lib/api";
@@ -31,6 +31,7 @@ import { Button } from "@/components/ui/Button";
 import { cn } from "@/lib/utils";
 import { Logo } from "@/components/ui/Logo";
 import SplashScreen from "@/components/ui/SplashScreen";
+import { useToastStore } from "@/store/toastStore";
 
 const MapView = dynamic(
   () => import("../../../components/dashboard/MapView"),
@@ -108,10 +109,23 @@ export default function CustomerDashboard() {
   const [isScheduleModalOpen, setIsScheduleModalOpen] = useState(false);
   const [isScheduleLoading, setIsScheduleLoading] = useState(false);
   const [vehicles, setVehicles] = useState([]);
+  const toast = useToastStore();
+  // A real pickup location is required before dispatch: either GPS-granted
+  // or manually searched. MAP_DEFAULT_CENTER means the user hasn't set one.
+  const isLocationReady = Boolean(
+    userLocation &&
+    (userLocation[0] !== MAP_DEFAULT_CENTER[0] ||
+      userLocation[1] !== MAP_DEFAULT_CENTER[1])
+  );
 
   useEffect(() => {
-    api.get("/vehicles").then(res => setVehicles(res.data)).catch(() => {});
-  }, []);
+    api
+      .get("/vehicles")
+      .then((res) => setVehicles(res.data))
+      .catch(() => {
+        toast.error("Could not load your saved vehicles. Please try again later.");
+      });
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleReleasePayment = useCallback(() => {
     releasePayment();
@@ -238,6 +252,12 @@ export default function CustomerDashboard() {
   };
 
   const handleScheduleSubmit = async ({ scheduledAt, vehicleId, notes }) => {
+    if (!isLocationReady) {
+      toast.warning(
+        'Set your pickup location first — use "Locate Me" or search your address.'
+      );
+      return;
+    }
     setIsScheduleLoading(true);
     try {
       const location = useTrackingStore.getState().userLocation;
