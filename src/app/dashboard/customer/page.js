@@ -26,6 +26,7 @@ import { ScheduleBookingModal } from "@/components/dashboard/ScheduleBookingModa
 import { ScheduledAppointments } from "@/components/dashboard/ScheduledAppointments";
 import api from "@/lib/api";
 import { NAVIGATION_EVENT } from "@/lib/navigation";
+import { serviceRequestSchema } from "@/lib/validators";
 import { Button } from "@/components/ui/Button";
 import { cn } from "@/lib/utils";
 import { Logo } from "@/components/ui/Logo";
@@ -239,8 +240,33 @@ export default function CustomerDashboard() {
   const handleScheduleSubmit = async ({ scheduledAt, vehicleId, notes }) => {
     setIsScheduleLoading(true);
     try {
-      await createRequest({ scheduledAt, vehicleId, notes });
+      const location = useTrackingStore.getState().userLocation;
+      const lat = Array.isArray(location) ? location[0] : undefined;
+      const lng = Array.isArray(location) ? location[1] : undefined;
+      // Scheduled bookings have no dedicated issue picker yet — default to
+      // "other" and fold free-form notes into description so the payload
+      // passes the same validation ServiceRequestPanel enforces.
+      const trimmedNotes = typeof notes === "string" ? notes.trim() : "";
+      const payload = {
+        issueTag: "other",
+        description:
+          trimmedNotes.length >= 10
+            ? trimmedNotes
+            : `Scheduled service booking${trimmedNotes ? `: ${trimmedNotes}` : ""}`,
+        requestType: "auto",
+        customerLat: lat,
+        customerLng: lng,
+        scheduledAt,
+        vehicleId,
+      };
+      const parsed = serviceRequestSchema.safeParse(payload);
+      if (!parsed.success) {
+        throw new Error(parsed.error.issues[0]?.message ?? "Invalid schedule details");
+      }
+      await createRequest(payload);
       setIsScheduleModalOpen(false);
+    } catch {
+      /* error captured in serviceStore — modal stays open for retry */
     } finally {
       setIsScheduleLoading(false);
     }

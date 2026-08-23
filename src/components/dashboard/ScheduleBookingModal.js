@@ -3,7 +3,7 @@
 import { useState, useMemo, useCallback } from "react";
 import { Modal } from "@/components/ui/Modal";
 import { Button } from "@/components/ui/Button";
-import { Calendar, Clock, Loader2 } from "lucide-react";
+import { Calendar, Clock, Car, MessageSquare, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 /**
@@ -35,9 +35,11 @@ function getTodayString() {
   return `${yyyy}-${mm}-${dd}`;
 }
 
-export function ScheduleBookingModal({ isOpen, onClose, onSubmit, isLoading }) {
+export function ScheduleBookingModal({ isOpen, onClose, onSubmit, isLoading, vehicles = [] }) {
   const [selectedDate, setSelectedDate] = useState("");
   const [selectedTime, setSelectedTime] = useState("");
+  const [selectedVehicle, setSelectedVehicle] = useState("");
+  const [notes, setNotes] = useState("");
 
   const timeSlots = useMemo(() => generateTimeSlots(), []);
   const isFormValid = selectedDate && selectedTime;
@@ -45,12 +47,18 @@ export function ScheduleBookingModal({ isOpen, onClose, onSubmit, isLoading }) {
   const handleSubmit = useCallback(() => {
     if (!isFormValid || isLoading) return;
     const scheduledAt = `${selectedDate}T${selectedTime}:00`;
-    onSubmit(scheduledAt);
-  }, [isFormValid, isLoading, selectedDate, selectedTime, onSubmit]);
+    onSubmit({
+      scheduledAt,
+      vehicleId: selectedVehicle || null,
+      notes: notes.trim() || null,
+    });
+  }, [isFormValid, isLoading, selectedDate, selectedTime, selectedVehicle, notes, onSubmit]);
 
   const handleClose = useCallback(() => {
     setSelectedDate("");
     setSelectedTime("");
+    setSelectedVehicle("");
+    setNotes("");
     onClose();
   }, [onClose]);
 
@@ -62,6 +70,29 @@ export function ScheduleBookingModal({ isOpen, onClose, onSubmit, isLoading }) {
       maxWidth="max-w-md"
     >
       <div className="space-y-6">
+        {/* Vehicle Selector */}
+        {vehicles.length > 0 && (
+          <div>
+            <label className="flex items-center gap-1.5 text-sm font-medium text-text-primary mb-2.5">
+              <Car size={14} className="text-icon-highlight" />
+              Select Vehicle <span className="text-text-dim font-normal">(optional)</span>
+            </label>
+            <select
+              value={selectedVehicle}
+              onChange={(e) => setSelectedVehicle(e.target.value)}
+              className="w-full rounded-xl border px-4 py-3 text-sm transition-all bg-bg-card border-border-subtle text-text-primary focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 appearance-none"
+            >
+              <option value="">Any vehicle</option>
+              {vehicles.map((v) => (
+                <option key={v.id} value={v.id}>
+                  {v.year} {v.make} {v.model}
+                  {v.license_plate ? ` (${v.license_plate})` : ""}
+                </option>
+              ))}
+            </select>
+          </div>
+        )}
+
         {/* Date Picker */}
         <div>
           <label className="flex items-center gap-1.5 text-sm font-medium text-text-primary mb-2.5">
@@ -109,6 +140,21 @@ export function ScheduleBookingModal({ isOpen, onClose, onSubmit, isLoading }) {
               ))}
             </div>
           )}
+        </div>
+
+        {/* Notes */}
+        <div>
+          <label className="flex items-center gap-1.5 text-sm font-medium text-text-primary mb-2.5">
+            <MessageSquare size={14} className="text-icon-highlight" />
+            Notes <span className="text-text-dim font-normal">(optional)</span>
+          </label>
+          <textarea
+            value={notes}
+            onChange={(e) => setNotes(e.target.value)}
+            placeholder="Any specific issues or requests?"
+            rows={3}
+            className="w-full rounded-xl border px-4 py-3 text-sm transition-all bg-bg-card border-border-subtle text-text-primary placeholder:text-text-dim focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 resize-none"
+          />
         </div>
 
         {/* Submit */}
