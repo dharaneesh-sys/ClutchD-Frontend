@@ -6,15 +6,15 @@
 :root {
   --background: #faf8f3;
   --foreground: #1c1917;
-  --primary: #b8860b;
-  --primary-dark: #b8860b;
-  --primary-light: #b8860b;
-  --accent: #d4a011;
+  --primary: #1E29B6;
+  --primary-dark: #162086;
+  --primary-light: #2e3bd1;
+  --accent: #1E29B6;
   --danger: #ef4444;
   --warning: #f59e0b;
   --success: #22c55e;
 
-  --color-primary-rgb: 212, 160, 17;
+  --color-primary-rgb: 30, 41, 182;
   --color-white-rgb: 255, 255, 255;
   --color-black-rgb: 0, 0, 0;
 
@@ -42,24 +42,24 @@
 
   --glass-lux-bg: rgba(255, 249, 235, 0.85);
   --glass-lux-bg-strong: rgba(255, 249, 235, 0.92);
-  --glass-lux-border: rgba(212, 160, 17, 0.08);
-  --glass-lux-border-accent: rgba(212, 160, 17, 0.12);
+  --glass-lux-border: rgba(30, 41, 182, 0.08);
+  --glass-lux-border-accent: rgba(30, 41, 182, 0.12);
   --glass-lux-shadow: 0 4px 16px rgba(0, 0, 0, 0.04), 0 1px 4px rgba(0, 0, 0, 0.03), inset 0 1px 0 rgba(255, 255, 255, 0.8);
   --glass-lux-shadow-hover: 0 8px 32px rgba(0, 0, 0, 0.06), 0 2px 8px rgba(0, 0, 0, 0.04), inset 0 1px 0 rgba(255, 255, 255, 0.9);
   --glass-lux-radius: 1.25rem;
 
   --color-emerald-filter: "none";
-  --color-surface-soft: rgba(212, 160, 17, 0.1);
-  --color-surface-mid: rgba(212, 160, 17, 0.15);
+  --color-surface-soft: rgba(30, 41, 182, 0.1);
+  --color-surface-mid: rgba(30, 41, 182, 0.15);
   --color-text-primary: #1c1917;
   --color-text-muted: rgba(80, 80, 80, 0.75);
   --color-text-dim: rgba(120, 120, 120, 0.55);
   --color-text-secondary: rgba(60, 60, 60, 0.85);
   --color-border-subtle: rgba(0, 0, 0, 0.12);
   --color-bg-card: rgba(255, 255, 255, 0.85);
-  --color-icon-highlight: #d4a011;
-  --color-badge-bg: rgba(212, 160, 17, 0.15);
-  --color-badge-text: #d4a011;
+  --color-icon-highlight: #1E29B6;
+  --color-badge-bg: rgba(30, 41, 182, 0.15);
+  --color-badge-text: #1E29B6;
   --chart-1: oklch(0.32 0 none);
   --chart-2: oklch(0.41 0 none);
   --chart-3: oklch(0.54 0 none);
@@ -91,15 +91,15 @@
 [data-theme="dark"] {
   --background: #09090b;
   --foreground: #fafafa;
-  --primary: #10b981;
-  --primary-dark: #047857;
-  --primary-light: #34d399;
-  --accent: #10b981;
+  --primary: #d4a011;
+  --primary-dark: #b8860b;
+  --primary-light: #e0b832;
+  --accent: #d4a011;
   --danger: #ef4444;
   --warning: #f59e0b;
   --success: #22c55e;
 
-  --color-primary-rgb: 16, 185, 129;
+  --color-primary-rgb: 212, 160, 17;
   --color-white-rgb: 255, 255, 255;
   --color-black-rgb: 0, 0, 0;
 
@@ -244,7 +244,7 @@ body {
   background-color: var(--background);
   background-attachment: fixed;
   color: var(--foreground);
-  min-height: 100vh;
+  min-height: 100dvh;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -407,7 +407,7 @@ h1, h2, h3, h4 {
 }
 
 .btn-glow {
-  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  background: linear-gradient(135deg, #d4a011 0%, #b8860b 100%);
   box-shadow: 0 4px 15px rgba(var(--color-primary-rgb), 0.25);
   transition: all 0.2s ease;
 }
@@ -991,16 +991,6 @@ h1, h2, h3, h4 {
 @media (max-width: 640px) {
   button, a, [role="button"] { min-height: 44px; }
   .glass, .glass-strong { border-radius: 0.875rem; }
-}
-
-/* Safe-area insets */
-@supports (padding: env(safe-area-inset-top)) {
-  body {
-    padding-top: env(safe-area-inset-top);
-    padding-bottom: env(safe-area-inset-bottom);
-    padding-left: env(safe-area-inset-left);
-    padding-right: env(safe-area-inset-right);
-  }
 }
 
 /* Print styles */
