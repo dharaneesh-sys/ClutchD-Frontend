@@ -40,8 +40,8 @@
   --glass-border: rgba(28, 25, 23, 0.06);
   --glass-hover: rgba(255, 255, 255, 0.94);
 
-  --glass-lux-bg: rgba(255, 249, 235, 0.85);
-  --glass-lux-bg-strong: rgba(255, 249, 235, 0.92);
+  --glass-lux-bg: rgba(239, 242, 255, 0.85);
+  --glass-lux-bg-strong: rgba(239, 242, 255, 0.92);
   --glass-lux-border: rgba(30, 41, 182, 0.08);
   --glass-lux-border-accent: rgba(30, 41, 182, 0.12);
   --glass-lux-shadow: 0 4px 16px rgba(0, 0, 0, 0.04), 0 1px 4px rgba(0, 0, 0, 0.03), inset 0 1px 0 rgba(255, 255, 255, 0.8);
@@ -400,7 +400,7 @@ h1, h2, h3, h4 {
 }
 
 .gradient-text {
-  background: linear-gradient(135deg, #d4a011 0%, #b8860b 50%, #996515 100%);
+  background: linear-gradient(135deg, #1E29B6 0%, #162086 50%, #121B6F 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -666,7 +666,7 @@ h1, h2, h3, h4 {
 }
 :is(.light, [data-theme="light"]) .my-location-btn:hover {
   background: #ffffff;
-  border-color: rgba(212, 160, 17, 0.25);
+  border-color: rgba(30, 41, 182, 0.25);
 }
 
 /* ─── Zoom Controls ──────────────────────────────────────────────────────── */
@@ -746,7 +746,7 @@ h1, h2, h3, h4 {
 }
 :is(.light, [data-theme="light"]) .route-distance-label {
   background: rgba(255, 255, 255, 0.9);
-  border-color: rgba(212, 160, 17, 0.25);
+  border-color: rgba(30, 41, 182, 0.25);
   color: #1c1917;
 }
 
@@ -873,10 +873,10 @@ h1, h2, h3, h4 {
 }
 
 :is(.light, [data-theme="light"]) .marker-cluster-small {
-  background-color: rgba(212, 160, 17, 0.15) !important;
+  background-color: rgba(30, 41, 182, 0.15) !important;
 }
 :is(.light, [data-theme="light"]) .marker-cluster-small div {
-  background-color: rgba(212, 160, 17, 0.4) !important;
+  background-color: rgba(30, 41, 182, 0.4) !important;
   color: #1c1917 !important;
 }
 :is(.light, [data-theme="light"]) .marker-cluster-medium {
@@ -914,15 +914,15 @@ h1, h2, h3, h4 {
 
 :is(.light, [data-theme="light"]) .glass-hover:hover {
   background: #fff;
-  border-color: rgba(212,160,17,0.2);
-  box-shadow: 0 1px 3px rgba(0,0,0,0.03), 0 12px 40px rgba(212,160,17,0.08);
+  border-color: rgba(30,41,182,0.2);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.03), 0 12px 40px rgba(30,41,182,0.08);
 }
 
 :is(.light, [data-theme="light"]) .glass-lux {
   background: rgba(255, 249, 235, 0.85);
   backdrop-filter: blur(20px) saturate(1.2);
   -webkit-backdrop-filter: blur(20px) saturate(1.2);
-  border: 1px solid rgba(212, 160, 17, 0.08);
+  border: 1px solid rgba(30, 41, 182, 0.08);
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04), 0 1px 4px rgba(0, 0, 0, 0.03), inset 0 1px 0 rgba(255, 255, 255, 0.8);
 }
 
@@ -930,7 +930,7 @@ h1, h2, h3, h4 {
   background: rgba(255, 249, 235, 0.92);
   backdrop-filter: blur(32px) saturate(1.3);
   -webkit-backdrop-filter: blur(32px) saturate(1.3);
-  border: 1px solid rgba(212, 160, 17, 0.12);
+  border: 1px solid rgba(30, 41, 182, 0.12);
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05), 0 1px 6px rgba(0, 0, 0, 0.03), inset 0 1px 0 rgba(255, 255, 255, 0.9);
 }
 
@@ -938,12 +938,12 @@ h1, h2, h3, h4 {
   background: rgba(255, 249, 235, 0.85);
   backdrop-filter: blur(20px) saturate(1.2);
   -webkit-backdrop-filter: blur(20px) saturate(1.2);
-  border: 1px solid rgba(212, 160, 17, 0.08);
+  border: 1px solid rgba(30, 41, 182, 0.08);
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04), 0 1px 4px rgba(0, 0, 0, 0.03);
 }
 
 :is(.light, [data-theme="light"]) .glass-lux-interactive:hover {
-  border-color: rgba(212, 160, 17, 0.2);
+  border-color: rgba(30, 41, 182, 0.2);
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.06), 0 2px 8px rgba(0, 0, 0, 0.04), inset 0 1px 0 rgba(255, 255, 255, 0.9);
 }
 
@@ -952,18 +952,18 @@ h1, h2, h3, h4 {
 }
 
 :is(.light, [data-theme="light"]) .hover-glow:hover {
-  box-shadow: 0 0 0 2px rgba(212, 160, 17, 0.12),
-              0 0 16px rgba(212, 160, 17, 0.08),
+  box-shadow: 0 0 0 2px rgba(30, 41, 182, 0.12),
+              0 0 16px rgba(30, 41, 182, 0.08),
               0 6px 20px rgba(0, 0, 0, 0.05);
 }
 
 :is(.light, [data-theme="light"]) .btn-glow {
-  background: linear-gradient(135deg, #d4a011 0%, #b8860b 100%);
-  box-shadow: 0 4px 14px rgba(212,160,17,0.25);
+  background: linear-gradient(135deg, #1E29B6 0%, #162086 100%);
+  box-shadow: 0 4px 14px rgba(30,41,182,0.25);
   color: #fff;
 }
 
-:is(.light, [data-theme="light"]) .btn-glow:hover { box-shadow: 0 6px 24px rgba(212,160,17,0.35); }
+:is(.light, [data-theme="light"]) .btn-glow:hover { box-shadow: 0 6px 24px rgba(30,41,182,0.35); }
 
 :is(.light, [data-theme="light"]) .input-glass {
   background: #fff;
@@ -972,8 +972,8 @@ h1, h2, h3, h4 {
 }
 :is(.light, [data-theme="light"]) .input-glass::placeholder { color: rgba(28,25,23,0.35); }
 :is(.light, [data-theme="light"]) .input-glass:focus {
-  border-color: #d4a011;
-  box-shadow: 0 0 0 3px rgba(212,160,17,0.12);
+  border-color: #1E29B6;
+  box-shadow: 0 0 0 3px rgba(30,41,182,0.12);
   background: #fff;
 }
 
@@ -983,8 +983,8 @@ h1, h2, h3, h4 {
 :is(.light, [data-theme="light"]) .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(28,25,23,0.08); }
 
 :is(.light, [data-theme="light"]) .focus-lux:focus-visible {
-  box-shadow: 0 0 0 4px rgba(212,160,17,0.18);
-  border-color: rgba(212,160,17,0.5) !important;
+  box-shadow: 0 0 0 4px rgba(30,41,182,0.18);
+  border-color: rgba(30,41,182,0.5) !important;
 }
 
 /* Mobile-first — touch targets, density */
