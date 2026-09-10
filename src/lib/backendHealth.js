@@ -25,7 +25,7 @@ function stopPolling() {
  * Ping a single URL with a timeout. Returns true for any reachable response
  * (even 4xx/5xx — the server is up), false on network error or timeout.
  */
-async function pingUrl(url, timeoutMs = 5000) {
+async function pingUrl(url, timeoutMs = 12000) {
   try {
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
@@ -49,7 +49,8 @@ export const BackendHealth = {
   isAvailable: () => _isAvailable,
 
   /**
-   * Ping backend health endpoints with a 5s timeout per endpoint.
+   * Ping backend health endpoints with a 12s timeout per endpoint (funnel p99.
+   * can exceed 10s on the first hit over a slow DERP relay).
    * Checks both the general /health endpoint and the payments endpoint
    * (via a GET — expects any response as proof of reachability).
    * All endpoints must be reachable for the backend to be considered healthy.
@@ -67,8 +68,19 @@ export const BackendHealth = {
 
     const newStatus = healthReachable && paymentsReachable;
     if (_isAvailable !== newStatus) {
+      const recovered = newStatus === true;
       _isAvailable = newStatus;
       notifyListeners(newStatus);
+      if (recovered) {
+        // Backend came back — re-establish realtime immediately instead of
+        // waiting for the next backoff tick. Dynamic import avoids any
+        // module-cycle risk with socket.js.
+        Promise.all([import("@/lib/socket"), import("@/lib/tokenStore")])
+          .then(([{ reconnectNow }, { getAccessToken }]) => {
+            if (getAccessToken()) reconnectNow();
+          })
+          .catch(() => {}); // socket/tokenStore unavailable (SSR) — skip
+      }
     }
     return newStatus;
   },

@@ -5,8 +5,14 @@ import { getAccessToken } from "@/lib/tokenStore";
 let wsInstance = null;
 let reconnectTimer = null;
 let reconnectAttempts = 0;
-const MAX_RECONNECT_ATTEMPTS = 5;
+let heartbeatTimer = null;
+let lastMessageAt = 0;
+let lastToken = null;
+let netListenersAttached = false;
 const BASE_RECONNECT_DELAY = 3000;
+const MAX_RECONNECT_DELAY = 30000;
+const HEARTBEAT_INTERVAL_MS = 25000;
+const STALE_SILENCE_MS = 60000;
 
 export const connectWebSocket = (token) => {
   if (typeof window === "undefined") return null;
@@ -30,6 +36,8 @@ export const connectWebSocket = (token) => {
     reconnectTimer = null;
   }
 
+  if (token) lastToken = token;
+
   const url = WS_URL;
   
   try {
@@ -48,9 +56,13 @@ export const connectWebSocket = (token) => {
       clearTimeout(reconnectTimer);
       reconnectTimer = null;
     }
+    lastMessageAt = Date.now();
+    startHeartbeat();
+    attachNetListeners();
   };
 
   wsInstance.onmessage = (event) => {
+    lastMessageAt = Date.now();
     try {
       const data = JSON.parse(event.data);
       
@@ -114,20 +126,10 @@ export const connectWebSocket = (token) => {
       return;
     }
 
-    // Exponential backoff with max attempts
-    if (reconnectAttempts < MAX_RECONNECT_ATTEMPTS) {
-      const delay = BASE_RECONNECT_DELAY * Math.pow(2, reconnectAttempts);
-      reconnectAttempts++;
-      console.warn(`[WebSocket] Reconnecting in ${delay / 1000}s (attempt ${reconnectAttempts}/${MAX_RECONNECT_ATTEMPTS})`);
-      reconnectTimer = setTimeout(() => {
-        // Re-read the token from memory so we use the latest refreshed token,
-        // not the stale one captured in the closure.
-        const freshToken = getAccessToken() || token;
-        connectWebSocket(freshToken);
-      }, delay);
-    } else {
-      console.warn("[WebSocket] Max reconnect attempts reached. Giving up.");
-    }
+    // Exponential backoff, capped — reconnect forever while logged in.
+    // A dead server/funnel flap longer than a couple of minutes must NOT kill
+    // realtime permanently (previous code gave up after 5 attempts, ~93s).
+    scheduleReconnect();
   };
 
   wsInstance.onerror = (error) => {
@@ -139,6 +141,7 @@ export const connectWebSocket = (token) => {
 
 export const disconnectWebSocket = () => {
   reconnectAttempts = 0;
+  stopHeartbeat();
   if (reconnectTimer) {
     clearTimeout(reconnectTimer);
     reconnectTimer = null;
@@ -190,4 +193,96 @@ export const getConnectionState = () => {
     case WebSocket.CLOSED: return "disconnected";
     default: return "disconnected";
   }
+};
+
+/**
+ * Schedule a reconnect with capped exponential backoff (3s doubling, max 30s).
+ * Retries forever while the user is logged in — never permanently gives up.
+ */
+function scheduleReconnect() {
+  if (typeof window === "undefined") return;
+  if (!getAccessToken()) {
+    reconnectAttempts = 0;
+    return;
+  }
+  if (reconnectTimer) return; // already scheduled
+  const delay = Math.min(
+    BASE_RECONNECT_DELAY * Math.pow(2, reconnectAttempts),
+    MAX_RECONNECT_DELAY,
+  );
+  reconnectAttempts++;
+  console.warn(`[WebSocket] Reconnecting in ${delay / 1000}s (attempt ${reconnectAttempts})`);
+  reconnectTimer = setTimeout(() => {
+    reconnectTimer = null;
+    // Re-read the token from memory so we use the latest refreshed token,
+    // not a stale one captured in a closure.
+    connectWebSocket(getAccessToken() || lastToken);
+  }, delay);
+}
+
+function stopHeartbeat() {
+  if (heartbeatTimer) {
+    clearInterval(heartbeatTimer);
+    heartbeatTimer = null;
+  }
+}
+
+function startHeartbeat() {
+  stopHeartbeat();
+  if (typeof window === "undefined") return;
+  heartbeatTimer = setInterval(() => {
+    if (wsInstance && wsInstance.readyState === WebSocket.OPEN) {
+      // App-level keepalive — backend ignores unknown types safely.
+      // Keeps NAT/proxy bindings fresh on slow mobile links.
+      try {
+        wsInstance.send(JSON.stringify({ type: "PING", at: Date.now() }));
+      } catch (_) { /* ignore */ }
+      // Half-dead socket guard: OPEN but silent for 60s+ → force reconnect.
+      if (Date.now() - lastMessageAt > STALE_SILENCE_MS) {
+        console.warn("[WebSocket] Stale silent socket — forcing reconnect");
+        try {
+          wsInstance.onclose = null;
+          wsInstance.close();
+        } catch (_) { /* ignore */ }
+        wsInstance = null;
+        scheduleReconnect();
+      }
+    }
+  }, HEARTBEAT_INTERVAL_MS);
+}
+
+function attachNetListeners() {
+  if (netListenersAttached || typeof window === "undefined") return;
+  netListenersAttached = true;
+  if (typeof window.addEventListener === "function") {
+    window.addEventListener("online", () => {
+      console.warn("[WebSocket] Browser online — reconnecting now");
+      reconnectNow();
+    });
+  }
+  if (typeof document !== "undefined" && typeof document.addEventListener === "function") {
+    document.addEventListener("visibilitychange", () => {
+      if (document.visibilityState === "visible") reconnectNow();
+    });
+  }
+  // Capacitor: app returning from background — socket usually died while suspended.
+  import("@capacitor/app").then(({ App }) => {
+    App.addListener("resume", () => reconnectNow());
+  }).catch(() => {}); // web — plugin absent, window events suffice
+}
+
+/**
+ * Reconnect immediately if not already live. Safe to call on online/resume/
+ * visibility events and backend-recovery hooks.
+ */
+export const reconnectNow = () => {
+  if (typeof window === "undefined") return;
+  if (wsInstance && (wsInstance.readyState === WebSocket.OPEN || wsInstance.readyState === WebSocket.CONNECTING)) {
+    return; // already live
+  }
+  if (reconnectTimer) {
+    clearTimeout(reconnectTimer);
+    reconnectTimer = null;
+  }
+  connectWebSocket(getAccessToken() || lastToken);
 };

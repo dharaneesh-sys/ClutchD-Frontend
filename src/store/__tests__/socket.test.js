@@ -267,26 +267,21 @@ describe("socket.js WS smoke", () => {
     expect(FakeWebSocket.instances.length).toBe(1);
   });
 
-  it("gives up after max reconnect attempts (5)", () => {
+  it("never gives up: reconnects forever with backoff capped at 30s", () => {
     vi.useFakeTimers();
 
     const ws1 = connectWebSocket("tok-1");
     ws1.simulateOpen();
 
-    // Consecutive failed attempts (never re-open): delays 3s,6s,12s,24s,48s.
-    // After the 5th scheduled reconnect fails, no further attempt is made.
-    for (let i = 0; i < 5; i++) {
+    // Consecutive failed attempts (never re-open): delays 3s,6s,12s,24s,48s,
+    // then capped at 30s — attempts 6+ keep coming every 30s.
+    const expectedDelays = [3000, 6000, 12000, 24000, 48000, 30000, 30000];
+    for (let i = 0; i < expectedDelays.length; i++) {
       const sock = FakeWebSocket.instances[FakeWebSocket.instances.length - 1];
       sock.onclose({ code: 1006, reason: "abnormal" });
-      vi.advanceTimersByTime(3000 * Math.pow(2, i));
+      vi.advanceTimersByTime(expectedDelays[i]);
       expect(FakeWebSocket.instances.length).toBe(i + 2);
     }
-
-    // 5th reconnect also fails → attempts exhausted, nothing more scheduled
-    const last = FakeWebSocket.instances[FakeWebSocket.instances.length - 1];
-    last.onclose({ code: 1006, reason: "abnormal" });
-    vi.advanceTimersByTime(3000 * Math.pow(2, 10));
-    expect(FakeWebSocket.instances.length).toBe(6); // 1 initial + 5 reconnects
   });
 
   // ── Auth plumbing smoke ────────────────────────────────

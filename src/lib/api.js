@@ -162,6 +162,50 @@ api.interceptors.response.use(
   },
 );
 
+// Network/5xx retry interceptor — transient funnel/DERP blips and slow-link timeouts.
+// Registered last so it runs BEFORE the 429 and 401 handlers. Only handles errors
+// those two ignore: no response at all (timeout/DNS/reset) or retryable 5xx/408.
+// Retries idempotent requests (GET/HEAD or __isRetryable) with backoff, max 3.
+// Non-idempotent requests (POST/PUT/PATCH/DELETE) are never auto-retried.
+const NETWORK_RETRYABLE_STATUS = new Set([408, 425, 500, 502, 503, 504]);
+const MAX_NETWORK_RETRIES = 3;
+const NETWORK_RETRY_BASE_MS = 1500;
+
+api.interceptors.response.use(
+  (response) => response,
+  async (error) => {
+    const originalRequest = error.config;
+    if (!originalRequest || originalRequest.__noRetry) {
+      return Promise.reject(error);
+    }
+
+    const status = error.response?.status;
+    const isNetworkError = !error.response;
+    const isRetryableStatus =
+      status !== undefined && NETWORK_RETRYABLE_STATUS.has(status);
+    if (!isNetworkError && !isRetryableStatus) {
+      return Promise.reject(error);
+    }
+
+    const method = (originalRequest.method || "").toLowerCase();
+    const isIdempotent =
+      method === "get" || method === "head" || originalRequest.__isRetryable;
+    if (!isIdempotent) {
+      return Promise.reject(error);
+    }
+
+    const retryCount = originalRequest.__networkRetryCount || 0;
+    if (retryCount >= MAX_NETWORK_RETRIES) {
+      return Promise.reject(error);
+    }
+    originalRequest.__networkRetryCount = retryCount + 1;
+
+    const delay = NETWORK_RETRY_BASE_MS * Math.pow(2, retryCount);
+    await new Promise((resolve) => setTimeout(resolve, delay));
+    return api(originalRequest);
+  },
+);
+
 export default api;
 
 /**
