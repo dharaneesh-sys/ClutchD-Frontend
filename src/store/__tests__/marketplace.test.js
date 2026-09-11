@@ -128,19 +128,17 @@ describe("marketplaceStore", () => {
         expect(useProductStore.getState().error).toBeNull();
       });
 
-      it("falls back to DEMO_PRODUCTS when API returns empty list", async () => {
+      it("sets empty products when API returns empty list", async () => {
         mockGet.mockResolvedValueOnce({ data: { products: [] } });
 
         await useProductStore.getState().fetchProducts();
 
         const products = useProductStore.getState().products;
-        expect(products.length).toBeGreaterThan(0);
-        // Verify it's demo data by checking specific known products
-        expect(products.find((p) => p.id === "prod-001")).toBeDefined();
+        expect(products).toHaveLength(0);
         expect(useProductStore.getState().isLoading).toBe(false);
       });
 
-      it("falls back to DEMO_PRODUCTS on API error and sets error state", async () => {
+      it("sets error and empty products on API error", async () => {
         mockGet.mockRejectedValueOnce({
           response: { data: { detail: "Server error" } },
         });
@@ -148,8 +146,7 @@ describe("marketplaceStore", () => {
         await useProductStore.getState().fetchProducts();
 
         const products = useProductStore.getState().products;
-        expect(products.length).toBeGreaterThan(0);
-        expect(products.find((p) => p.id === "prod-001")).toBeDefined();
+        expect(products).toHaveLength(0);
         expect(useProductStore.getState().isLoading).toBe(false);
         expect(useProductStore.getState().error).toBe("Server error");
       });
@@ -162,7 +159,7 @@ describe("marketplaceStore", () => {
         expect(useProductStore.getState().error).toBe(
           "Server unreachable.",
         );
-        expect(useProductStore.getState().products.length).toBeGreaterThan(0);
+        expect(useProductStore.getState().products).toHaveLength(0);
       });
     });
 
@@ -669,18 +666,13 @@ describe("marketplaceStore", () => {
           samplePayment,
         );
 
-        expect(mockPost).toHaveBeenCalledWith(
-          "/orders",
-          expect.objectContaining({
-            items: [
-              { productId: "prod-001", name: "Engine Oil", quantity: 1, price: 2199 },
-            ],
-            total: 2199,
-            status: "confirmed",
-            address: sampleAddress,
-            payment: samplePayment,
-          }),
-        );
+        expect(mockPost).toHaveBeenCalledWith("/orders", {
+          items: [
+            { product_id: "prod-001", name: "Engine Oil", quantity: 1, price: 2199 },
+          ],
+          address: sampleAddress,
+          payment: samplePayment,
+        });
         expect(useOrderStore.getState().orders).toHaveLength(1);
         expect(useOrderStore.getState().orders[0].id).toContain("ord-");
         expect(useOrderStore.getState().orders[0].status).toBe("confirmed");
@@ -765,18 +757,17 @@ describe("marketplaceStore", () => {
         expect(useOrderStore.getState().isLoading).toBe(false);
       });
 
-      it("falls back to DEMO_ORDERS when API returns empty list", async () => {
+      it("sets empty orders when API returns empty list", async () => {
         mockGet.mockResolvedValueOnce({ data: { orders: [] } });
 
         await useOrderStore.getState().fetchOrderHistory();
 
         const orders = useOrderStore.getState().orders;
-        expect(orders.length).toBeGreaterThan(0);
-        expect(orders.find((o) => o.id === "ord-1")).toBeDefined();
+        expect(orders).toHaveLength(0);
         expect(useOrderStore.getState().isLoading).toBe(false);
       });
 
-      it("falls back to DEMO_ORDERS on API error and sets error state", async () => {
+      it("sets error and empty orders on API error", async () => {
         mockGet.mockRejectedValueOnce({
           response: { data: { detail: "Server error" } },
         });
@@ -784,8 +775,7 @@ describe("marketplaceStore", () => {
         await useOrderStore.getState().fetchOrderHistory();
 
         const orders = useOrderStore.getState().orders;
-        expect(orders.length).toBeGreaterThan(0);
-        expect(orders.find((o) => o.id === "ord-1")).toBeDefined();
+        expect(orders).toHaveLength(0);
         expect(useOrderStore.getState().isLoading).toBe(false);
         expect(useOrderStore.getState().error).toBe("Server error");
       });
@@ -851,25 +841,23 @@ describe("marketplaceStore", () => {
         expect(useCategoryStore.getState().isLoading).toBe(false);
       });
 
-      it("falls back to DEMO_CATEGORIES when API returns empty list", async () => {
+      it("sets empty categories when API returns empty list", async () => {
         mockGet.mockResolvedValueOnce({ data: { categories: [] } });
 
         await useCategoryStore.getState().fetchCategories();
 
         const categories = useCategoryStore.getState().categories;
-        expect(categories.length).toBeGreaterThan(0);
-        expect(categories.find((c) => c.id === "cat-1")).toBeDefined();
+        expect(categories).toHaveLength(0);
         expect(useCategoryStore.getState().isLoading).toBe(false);
       });
 
-      it("falls back to DEMO_CATEGORIES on API error", async () => {
+      it("sets empty categories on API error", async () => {
         mockGet.mockRejectedValueOnce(new Error("Network error"));
 
         await useCategoryStore.getState().fetchCategories();
 
         const categories = useCategoryStore.getState().categories;
-        expect(categories.length).toBeGreaterThan(0);
-        expect(categories.find((c) => c.id === "cat-1")).toBeDefined();
+        expect(categories).toHaveLength(0);
         expect(useCategoryStore.getState().isLoading).toBe(false);
       });
 

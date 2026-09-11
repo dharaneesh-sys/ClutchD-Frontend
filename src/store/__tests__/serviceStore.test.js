@@ -75,6 +75,7 @@ describe("serviceStore", () => {
         issueTag: "flat_tire",
         description: "Left front tire is completely flat.",
         requestType: "mechanic",
+        expertise: "tires",
         priceEstimate: { min: 200, max: 800 },
         customerLat: 11.0168,
         customerLng: 76.9558,
@@ -109,6 +110,7 @@ describe("serviceStore", () => {
       // Second POST → create request with the returned mediaUrl
       expect(mockPost).toHaveBeenNthCalledWith(2, "/service/request", {
         ...basePayload,
+        expertise: "tires",
         mediaUrl: "https://cdn.example.com/tire.jpg",
       });
       expect(result.mediaUrl).toBe("https://cdn.example.com/tire.jpg");
@@ -126,6 +128,7 @@ describe("serviceStore", () => {
       expect(mockPost).toHaveBeenCalledTimes(1);
       expect(mockPost).toHaveBeenCalledWith("/service/request", {
         ...basePayload,
+        expertise: "tires",
         mediaUrl: undefined, // The media field is not passed; mediaUrl stays undefined
       });
     });
