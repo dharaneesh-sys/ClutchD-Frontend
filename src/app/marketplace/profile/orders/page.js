@@ -18,8 +18,8 @@ import { EmptyState } from "@/components/ui/EmptyState";
 import { ShimmerList } from "@/components/ui/Shimmer";
 import { Badge } from "@/components/ui/Badge";
 import { useAuthStore } from "@/store/authStore";
-import api, { extractApiError } from "@/lib/api";
-import { useToast } from "@/hooks/useToast";
+import api from "@/lib/api";
+import { downloadOrderReceipt } from "@/lib/documentDownload";
 
 // ─── Tab definitions ─────────────────────────────────────────────────
 
@@ -314,39 +314,14 @@ function DetailModal({ order, onClose }) {
 export default function OrdersPage() {
   const router = useRouter();
   const user = useAuthStore((s) => s.user);
-  const { toast } = useToast();
   const [activeTab, setActiveTab] = useState("current");
   const [orders, setOrders] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   const [selectedOrder, setSelectedOrder] = useState(null);
 
-  const downloadReceipt = async (order) => {
-    try {
-      const res = await api.get(`/jobs/history/${order.id}/invoice`, { responseType: "blob" });
-      const url = window.URL.createObjectURL(new Blob([res.data]));
-      const link = document.createElement('a');
-      link.href = url;
-      link.setAttribute('download', `receipt_${order.id.substring(0, 8)}.pdf`);
-      document.body.appendChild(link);
-      link.click();
-      link.parentNode.removeChild(link);
-    } catch (e) {
-      const status = e.response?.status;
-      if (status === 503) {
-        toast.error("Invoice unavailable — try again later", {
-          persistent: true,
-          action: { label: "Retry", onClick: () => downloadReceipt(order) },
-        });
-      } else if (status === 501) {
-        toast.error("Invoice generation not available");
-      } else if (status === 404) {
-        // Receipt endpoint not available — show inline breakdown
-        setSelectedOrder(order);
-      } else {
-        toast.error(extractApiError(e, "Failed to download receipt."));
-      }
-    }
+  const downloadReceipt = (order) => {
+    downloadOrderReceipt(order);
   };
 
   const fetchOrders = useCallback(async () => {

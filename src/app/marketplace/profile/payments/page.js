@@ -13,7 +13,7 @@ import { cn, formatCurrency, formatDate } from "@/lib/utils";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { ShimmerList } from "@/components/ui/Shimmer";
 import { Badge } from "@/components/ui/Badge";
-import { useToastStore } from "@/store/toastStore";
+import { downloadPaymentReceipt } from "@/lib/documentDownload";
 import api from "@/lib/api";
 
 // ─── Status helpers ──────────────────────────────────────────────────
@@ -116,7 +116,6 @@ export default function PaymentsPage() {
   const [payments, setPayments] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
-  const toast = useToastStore();
 
   const fetchPayments = useCallback(async () => {
     setIsLoading(true);
@@ -138,7 +137,7 @@ export default function PaymentsPage() {
   }, [fetchPayments]);
 
   const handleDownload = (payment) => {
-    toast.info("Receipt download coming soon");
+    downloadPaymentReceipt(payment);
   };
 
   const sortedPayments = [...payments].sort(

@@ -157,3 +157,6 @@ export const useCartStore = create(
     { name: "cart-store" },
   ),
 );
+
+
+// TODO(BACKEND_CONTRACTS §1 cart): flip setBackendEnabled(true) only after live verify of GET/POST/PATCH/DELETE /marketplace/cart.

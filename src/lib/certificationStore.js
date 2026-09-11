@@ -198,3 +198,6 @@ export const CertificationStore = {
     return certs[idx];
   },
 };
+
+
+// TODO(BACKEND_CONTRACTS §2 certifications): wire GET /mechanic/certifications + POST /admin/certifications/{id}/verify; keep SEED as offline fallback.

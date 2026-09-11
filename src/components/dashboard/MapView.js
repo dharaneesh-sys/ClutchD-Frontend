@@ -295,11 +295,6 @@ export default function MapView({ role = "customer" }) {
               color="#10b981"
               weight={5}
               opacity={0.7}
-              eventHandlers={{
-                click: () => {
-                  /* polyline click placeholder for future route details */
-                },
-              }}
             >
               <Tooltip sticky>
                 <span className="text-xs font-semibold">

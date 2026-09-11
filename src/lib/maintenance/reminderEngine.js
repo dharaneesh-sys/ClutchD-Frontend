@@ -263,3 +263,6 @@ export function updateServiceRecord(vehicleId, serviceId, options = {}) {
 export function getServiceIntervals() {
   return Object.values(SERVICE_INTERVALS);
 }
+
+
+// TODO(BACKEND_CONTRACTS §2 maintenance): wire GET /vehicles/{id}/maintenance (or /reminders); engine stays as offline calculator.

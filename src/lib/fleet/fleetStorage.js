@@ -207,3 +207,6 @@ export function getFleetTier(totalSpent) {
   if (totalSpent >= 100000) return { name: "silver", discountRate: 10, label: "Silver" };
   return { name: "bronze", discountRate: 5, label: "Bronze" };
 }
+
+
+// TODO(BACKEND_CONTRACTS §2 fleet): wire POST /fleet/register, GET/POST /fleet/vehicles, GET/POST /fleet/bookings; keep demo seed as offline fallback.

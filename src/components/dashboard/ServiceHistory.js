@@ -1,17 +1,25 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { GlassCard } from "@/components/ui/GlassCard";
 import { Badge } from "@/components/ui/Badge";
 import { ConfirmModal } from "@/components/ui/ConfirmModal";
-import { Calendar, Download, MapPin, Loader2, Wrench, ChevronDown, ChevronUp, Receipt, RefreshCw, Mail, ShieldCheck } from "lucide-react";
+import { Calendar, Download, MapPin, Loader2, Wrench, ChevronDown, ChevronUp, Receipt, RefreshCw, Mail, ShieldCheck, ListFilter } from "lucide-react";
+import { cn } from "@/lib/utils";
 import { WarrantyTerms } from "@/components/dashboard/WarrantyTerms";
 import api, { extractApiError } from "@/lib/api";
+import { downloadJobInvoice, buildJobInvoiceText } from "@/lib/documentDownload";
 import { GST_RATE } from "@/lib/constants";
 import { useToast } from "@/hooks/useToast";
 import { useAuthStore } from "@/store/authStore";
 import { format } from "date-fns";
 import { PaymentModal } from "@/components/dashboard/PaymentModal";
+
+const FILTERS = [
+  { key: "all", label: "All" },
+  { key: "completed", label: "Completed" },
+  { key: "cancelled", label: "Cancelled" },
+];
 
 export function ServiceHistory() {
   const [history, setHistory] = useState([]);
@@ -21,14 +29,29 @@ export function ServiceHistory() {
   const [deleteJob, setDeleteJob] = useState(null);
   const [deleteLoading, setDeleteLoading] = useState(false);
   const [errorToast, setErrorToast] = useState(null);
+  const [filter, setFilter] = useState("all");
   const { toast } = useToast();
+
+  const filteredHistory = useMemo(() => {
+    if (filter === "all") return history;
+    return history.filter((j) => j.status === filter);
+  }, [history, filter]);
+
+  const filterCounts = useMemo(() => {
+    if (loading) return null;
+    return {
+      all: history.length,
+      completed: history.filter((j) => j.status === "completed").length,
+      cancelled: history.filter((j) => j.status === "cancelled").length,
+    };
+  }, [history, loading]);
 
   const fetchHistory = async () => {
     try {
       const res = await api.get("/jobs/history");
       setHistory(res.data.jobs || []);
     } catch (e) {
-      console.warn("Failed to fetch history", e);
+      toast.error(extractApiError(e, "Failed to load history"));
     } finally {
       setLoading(false);
     }
@@ -51,107 +74,86 @@ export function ServiceHistory() {
     fetchHistory();
   };
 
-  const downloadInvoice = async (jobId) => {
-    try {
-      const res = await api.get(`/jobs/history/${jobId}/invoice`, { responseType: "blob" });
-      const url = window.URL.createObjectURL(new Blob([res.data]));
-      const link = document.createElement('a');
-      link.href = url;
-      link.setAttribute('download', `invoice_${jobId.substring(0, 8)}.pdf`);
-      document.body.appendChild(link);
-      link.click();
-      link.parentNode.removeChild(link);
-    } catch (e) {
-      const status = e.response?.status;
-      if (status === 503) {
-        toast.error("Invoice unavailable — try again later", {
-          persistent: true,
-          action: { label: "Retry", onClick: () => downloadInvoice(jobId) },
-        });
-      } else if (status === 501) {
-        toast.error("Invoice generation not available");
-      } else {
-        setErrorToast(extractApiError(e, "Failed to download invoice."));
-        setTimeout(() => setErrorToast(null), 4000);
-      }
-    }
+  const downloadInvoice = (jobId) => {
+    const job = history.find((j) => j.id === jobId);
+    downloadJobInvoice(job && job.id ? job : { id: jobId });
   };
 
-  const emailInvoice = async (job) => {
-    const pricing = job.pricing;
-    if (!pricing) return;
+  const emailInvoice = (job) => {
+    if (!job) return;
+    downloadJobInvoice(job);
 
     const userEmail = useAuthStore.getState().user?.email || "";
     const email = window.prompt("Send invoice to email:", userEmail);
     if (!email) return;
 
-    const invoiceId = job.id.substring(0, 8).toUpperCase();
+    const invoiceId = String(job.id ?? "unknown").substring(0, 8).toUpperCase();
     const subject = `Invoice from ClutchD - ${invoiceId}`;
-
-    const bodyLines = [
-      `Invoice #${invoiceId}`,
-      `Service: ${job.issueTag}`,
-      `Date: ${job.createdAt ? format(new Date(job.createdAt), "MMM d, yyyy") : "N/A"}`,
-      `Description: ${job.description}`,
-      "",
-      "--- Pricing Breakdown ---",
-      `Service Fee: ₹${(pricing.serviceAmount ?? 0).toFixed(2)}`,
-      `Convenience Fee: ₹${(pricing.convenienceFee ?? 0).toFixed(2)}`,
-      `Cancellation Fee: ₹${(pricing.cancellationFee ?? 0).toFixed(2)}`,
-      `Distance (${(pricing.distanceKm ?? 0).toFixed(1)} km): ₹${(pricing.distanceFee ?? 0).toFixed(2)}`,
-      `GST (${GST_RATE * 100}%): ₹${(pricing.gstAmount ?? 0).toFixed(2)}`,
-      `Grand Total: ₹${(pricing.totalAmount ?? 0).toFixed(2)}`,
-      "",
-      `Download your invoice PDF here:`,
-      `${window.location.origin}/api/jobs/history/${job.id}/invoice`,
-      "",
-      "Thank you for choosing ClutchD!",
-    ];
-
-    const mailtoLink =
+    const body = buildJobInvoiceText(job);
+    window.location.href =
       `mailto:${encodeURIComponent(email)}` +
       `?subject=${encodeURIComponent(subject)}` +
-      `&body=${encodeURIComponent(bodyLines.join("\n"))}`;
-
-    window.location.href = mailtoLink;
-
-    toast.info("Email client opened — send from your device");
-
-    try {
-      const downloadUrl = `${window.location.origin}/api/jobs/history/${job.id}/invoice`;
-      await navigator.clipboard.writeText(downloadUrl);
-      toast.success("Invoice download URL copied to clipboard");
-    } catch {} // clipboard unavailable
+      `&body=${encodeURIComponent(body)}`;
   };
 
   const toggleInvoice = (jobId) => {
     setExpandedInvoice(expandedInvoice === jobId ? null : jobId);
   };
 
-  if (loading) {
-    return (
-      <div className="flex flex-col items-center justify-center p-12">
-        <Loader2 size={40} className="animate-spin mb-4 text-icon-highlight" />
-        <p className="text-text-muted">Loading your history...</p>
-      </div>
-    );
-  }
-
-  if (history.length === 0) {
-    return (
-      <div className="flex flex-col items-center justify-center p-12 text-center rounded-2xl border bg-bg-card border-border-subtle">
-        <Wrench size={48} className="mb-4 opacity-50 text-text-dim" />
-        <h3 className="text-xl font-semibold mb-2 text-text-primary">No History Yet</h3>
-        <p className="text-text-muted">
-          Your completed and cancelled service requests will appear here.
-        </p>
-      </div>
-    );
-  }
+  const showFilterTabs = !loading || history.length > 0;
 
   return (
     <div className="space-y-4">
-      {history.map(job => {
+      {showFilterTabs && (
+        <div className="flex items-center gap-2 pb-1">
+          <ListFilter size={14} className="text-text-muted shrink-0" />
+          {FILTERS.map(({ key, label }) => (
+            <button
+              key={key}
+              onClick={() => setFilter(key)}
+              className={cn(
+                "px-3 py-1.5 rounded-lg text-xs font-semibold transition-all",
+                filter === key
+                  ? "bg-primary/10 text-primary border border-primary/20"
+                  : "text-text-muted hover:text-text-primary hover:bg-surface-soft"
+              )}
+            >
+              {label}
+              {filterCounts && <span className="ml-1.5 text-[10px] opacity-60">({filterCounts[key]})</span>}
+            </button>
+          ))}
+        </div>
+      )}
+
+      {loading ? (
+        <div className="flex flex-col items-center justify-center p-12">
+          <Loader2 size={40} className="animate-spin mb-4 text-icon-highlight" />
+          <p className="text-text-muted">Loading your history...</p>
+        </div>
+      ) : history.length === 0 ? (
+        <div className="flex flex-col items-center justify-center p-12 text-center rounded-2xl border bg-bg-card border-border-subtle">
+          <Wrench size={48} className="mb-4 opacity-50 text-text-dim" />
+          <h3 className="text-xl font-semibold mb-2 text-text-primary">No History Yet</h3>
+          <p className="text-text-muted">
+            Your completed and cancelled service requests will appear here.
+          </p>
+        </div>
+      ) : filteredHistory.length === 0 ? (
+        <div className="text-center py-10 rounded-2xl border border-dashed bg-bg-card border-border-subtle">
+          <ListFilter size={28} className="mx-auto mb-2 text-text-dim opacity-50" />
+          <p className="text-sm font-medium text-text-muted">
+            No {filter === "all" ? "" : filter} service requests
+          </p>
+          <p className="text-xs text-text-dim mt-1">
+            {filter === "completed"
+              ? "Completed service requests will appear here."
+              : filter === "cancelled"
+                ? "Cancelled service requests will appear here."
+                : "Service requests will appear here once created."}
+          </p>
+        </div>
+      ) : null}
+      {filteredHistory.length > 0 && filteredHistory.map(job => {
         const pricing = job.pricing;
         const displayAmount = pricing?.totalAmount ?? job.priceEstimate?.min ?? 0;
         const isExpanded = expandedInvoice === job.id;

@@ -394,3 +394,6 @@ export const payoutService = {
     }
   },
 };
+
+
+// TODO(BACKEND_CONTRACTS §2 payouts): wire GET /admin/payouts + POST /admin/payouts/manual + PUT /admin/payouts/schedule; keep mock only as 503 fallback.

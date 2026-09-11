@@ -275,3 +275,6 @@ export const useFleetStore = create(
     }
   )
 );
+
+
+// TODO(BACKEND_CONTRACTS §2 fleet): wire POST /fleet/register, GET/POST /fleet/vehicles, GET/POST /fleet/bookings; keep demo seed as offline fallback.

@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { Button } from "@/components/ui/Button";
 import { BackendHealth } from "@/lib/backendHealth";
 import { SERVICE_STATUS } from "@/lib/constants";
@@ -16,6 +17,7 @@ import { Shield, CheckCheck, AlertTriangle, ArrowRight, ThumbsUp } from "lucide-
  * parent store so the UI works fully offline/demo.
  */
 export function EscrowStatus({ status, paymentAmount, onRelease, onDispute }) {
+  const [disputeReason, setDisputeReason] = useState("Issue with service");
   const isBackendUnavailable = BackendHealth.isAvailable() === false;
 
   switch (status) {
@@ -43,14 +45,31 @@ export function EscrowStatus({ status, paymentAmount, onRelease, onDispute }) {
                   Release Payment
                 </Button>
                 {onDispute && (
-                  <button
-                    type="button"
-                    onClick={() => onDispute("Issue with service")}
-                    className="w-full text-sm text-red-400 hover:text-red-300 transition-colors py-2 rounded-lg hover:bg-red-500/5"
-                  >
-                    <AlertTriangle size={14} className="inline mr-1.5 -mt-0.5" />
-                    Raise a Dispute
-                  </button>
+                  <div className="flex flex-col gap-2">
+                    <label htmlFor="escrow-dispute-reason" className="text-xs text-text-muted">
+                      Reason for dispute
+                    </label>
+                    <select
+                      id="escrow-dispute-reason"
+                      value={disputeReason}
+                      onChange={(e) => setDisputeReason(e.target.value)}
+                      className="w-full rounded-lg bg-white/[0.04] border border-white/10 px-3 py-2 text-sm text-foreground" 
+                    >
+                      <option value="Issue with service">Issue with service</option>
+                      <option value="Service not completed">Service not completed</option>
+                      <option value="Overcharged">Overcharged</option>
+                      <option value="Provider never arrived">Provider never arrived</option>
+                      <option value="Other">Other</option>
+                    </select>
+                    <button
+                      type="button"
+                      onClick={() => onDispute(disputeReason)}
+                      className="w-full text-sm text-red-400 hover:text-red-300 transition-colors py-2 rounded-lg hover:bg-red-500/5"
+                    >
+                      <AlertTriangle size={14} className="inline mr-1.5 -mt-0.5" />
+                      Raise a Dispute
+                    </button>
+                  </div>
                 )}
               </div>
               {isBackendUnavailable && (

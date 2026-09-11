@@ -132,3 +132,6 @@ export const WarrantyClaimsStore = {
     return claims[idx];
   },
 };
+
+
+// TODO(BACKEND_CONTRACTS §2 warranty): wire POST /warranty/claims + GET /warranty/claims?userId=; keep localStorage as offline fallback.

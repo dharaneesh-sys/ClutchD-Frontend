@@ -147,3 +147,6 @@ export const useOrderStore = create(
     { name: "order-store" },
   ),
 );
+
+
+// TODO(BACKEND_CONTRACTS §1 orders): wire POST/GET /orders + socket STATUS_UPDATE; keep local builder as offline fallback.

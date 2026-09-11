@@ -29,6 +29,7 @@ import { useAuthStore } from "@/store/authStore";
 import { useNotificationStore } from "@/store/notificationStore";
 import { useThemeStore } from "@/store/themeStore";
 import { useToastStore } from "@/store/toastStore";
+import { downloadLocalUserData } from "@/lib/exportLocalUserData";
 import { navigateToAuth } from "@/lib/navigation";
 import { Button } from "@/components/ui/Button";
 import { Modal } from "@/components/ui/Modal";
@@ -270,24 +271,6 @@ export default function SettingsPage() {
     [saveSettings]
   );
 
-  const handleLanguageChange = useCallback(
-    (value) => {
-      setLanguage(value);
-      saveSettings({ language: value });
-
-      // Attempt to switch i18n locale using next-intl cookie pattern
-      try {
-        if (typeof window !== "undefined") {
-          document.cookie = `NEXT_LOCALE=${value}; path=/; max-age=${
-            365 * 24 * 60 * 60
-          }; SameSite=Lax`;
-        }
-      } catch {
-        // cookie write failed — non-critical
-      }
-    },
-    [saveSettings]
-  );
 
   const handleLogout = useCallback(async () => {
     setLogoutConfirmOpen(false);
@@ -341,7 +324,12 @@ export default function SettingsPage() {
   }, [pwCurrent, pwNew, pwConfirm, toast]);
 
   const handleDataDownload = useCallback(() => {
-    toast.success("Data download request submitted");
+    const result = downloadLocalUserData();
+    if (result) {
+      toast.success(`Downloaded ${result.filename} (${result.exportedKeys.length} sections)`);
+    } else {
+      toast.error("No local data found on this device to export.");
+    }
   }, [toast]);
 
   // ── Render ───────────────────────────────────────────────────────────
@@ -604,23 +592,30 @@ export default function SettingsPage() {
       </section>
 
       {/* ══════════════════════════════════════════════════════════════════
-          LANGUAGE SECTION
+          LANGUAGE SECTION — UI only, no i18n integration yet
           ══════════════════════════════════════════════════════════════════ */}
-      <section className="glass-lux rounded-2xl p-6 space-y-4">
-        <SectionHeader icon={Globe} title="Language" />
+      <section className="glass-lux rounded-2xl p-6 space-y-4 opacity-60 pointer-events-none select-none">
+        <div className="flex items-center justify-between mb-5">
+          <SectionHeader icon={Globe} title="Language" />
+          <span className="rounded-full bg-white/10 px-2.5 py-0.5 text-[0.625rem] font-medium text-text-muted uppercase tracking-wider">
+            Coming soon
+          </span>
+        </div>
 
         <div className="grid grid-cols-2 gap-3">
           {LANGUAGE_OPTIONS.map(({ value, label, flag }) => (
             <button
               key={value}
               type="button"
-              onClick={() => handleLanguageChange(value)}
+              disabled
+              aria-disabled="true"
+              title="Language switching coming soon"
               className={cn(
                 "flex items-center gap-3 rounded-xl p-4 transition-all duration-200",
                 "border",
                 language === value
                   ? "border-primary/30 bg-primary/10 ring-1 ring-primary/20"
-                  : "border-white/10 bg-white/[0.03] hover:bg-white/[0.06] hover:border-white/20"
+                  : "border-white/10 bg-white/[0.03]"
               )}
             >
               <span className="text-lg">{flag}</span>
@@ -695,7 +690,7 @@ export default function SettingsPage() {
                 Download My Data
               </p>
               <p className="text-xs text-text-muted">
-                Request a copy of your account data
+                Save a copy of the data stored on this device (JSON)
               </p>
             </div>
           </div>

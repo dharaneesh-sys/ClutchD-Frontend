@@ -180,3 +180,6 @@ export const useSubscriptionStore = create(
     }
   )
 );
+
+
+// TODO(BACKEND_CONTRACTS §2 subscriptions): wire POST /subscriptions/create|/cancel + GET /subscriptions/status via subscriptionService.

@@ -452,3 +452,6 @@ export const useAuthStore = create(
     }
   )
 );
+
+
+// TODO(BACKEND_CONTRACTS §1 auth): narrow demo-/firebase- bypass to explicit Firebase fallback; require /auth/login|refresh when live.

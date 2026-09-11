@@ -218,3 +218,6 @@ export const subscriptionService = {
     clearSubscription();
   },
 };
+
+
+// TODO(BACKEND_CONTRACTS §2 subscriptions): wire POST /subscriptions/create|/cancel + GET /subscriptions/status; SUBSCRIPTION_PLANS stays as pricing config.

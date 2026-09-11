@@ -73,3 +73,6 @@ export function useOrderStatusNotifications({ demo = false, demoOrderId } = {}) 
     };
   }, [demo, runDemo]);
 }
+
+
+// TODO(BACKEND_CONTRACTS §1 orders): replace DEMO_STATUS_FLOW timer with socket STATUS_UPDATE when backend is live.
