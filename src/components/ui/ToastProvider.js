@@ -2,6 +2,7 @@
 
 import { useToastStore } from "@/store/toastStore";
 import { Toast } from "@/components/ui/Toast";
+import { cn } from "@/lib/utils";
 
 export function ToastProvider() {
   const toasts = useToastStore((s) => s.toasts);
@@ -11,7 +12,14 @@ export function ToastProvider() {
 
   return (
     <div
-      className="fixed bottom-6 right-6 z-[600] flex flex-col-reverse gap-3 pointer-events-none"
+      className={cn(
+        "fixed z-[600] flex flex-col-reverse gap-3 pointer-events-none",
+        // Phone: full-width bar parked above the BottomNav (h-16 + safe area)
+        // so toasts are never under the nav or clipped by the screen edge.
+        "left-3 right-3 bottom-[calc(4rem+env(safe-area-inset-bottom)+0.75rem)]",
+        // sm+ screens have no BottomNav: classic corner toast
+        "sm:left-auto sm:right-6 sm:bottom-6 sm:max-w-md"
+      )}
       aria-live="polite"
       aria-atomic="true"
       aria-label="Notifications"

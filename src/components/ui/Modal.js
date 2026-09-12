@@ -114,8 +114,12 @@ export function Modal({
         aria-hidden="true"
       />
 
-      {/* Modal Container */}
-      <div className="fixed inset-0 z-[61] flex items-start sm:items-center justify-center p-4 sm:px-6 pt-12 pb-[calc(env(safe-area-inset-bottom)+5rem)] sm:pb-12 overflow-y-auto w-full h-full pointer-events-none">
+      {/* Modal Container — portals above the BottomNav (z-61 > nav z-40),
+          so no nav-clearing padding. Safe-centering: items-start + my-auto
+          centers the dialog when it fits, and when the Android keyboard
+          shrinks the viewport the container scrolls — nothing is ever
+          pushed below the screen or clipped unreachable. */}
+      <div className="fixed inset-0 z-[61] flex items-start justify-center p-4 sm:px-6 overflow-y-auto w-full h-full pointer-events-none">
         <div
           ref={modalRef}
           role={role}
@@ -147,8 +151,9 @@ export function Modal({
             </button>
           </div>
 
-           {/* Content */}
-           <div className="max-h-[calc(100dvh-8rem)] overflow-y-auto pr-2 custom-scrollbar">
+           {/* Content — flex-basis cap instead of a dvh calc so the inner
+               area shrinks with the container instead of overflowing it */}
+           <div className="max-h-[60dvh] overflow-y-auto pr-2 custom-scrollbar">
             {children}
            </div>
         </div>
