@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/Input";
 import { MultiSelect } from "@/components/ui/MultiSelect";
 import { EXPERTISE_OPTIONS } from "@/lib/constants";
 import { User, MapPin, Phone, Loader2, QrCode } from "lucide-react";
+import { KycBadge } from "@/components/ui/KycBadge";
 import { useAuthStore } from "@/store/authStore";
 import { useToast } from "@/components/ui/ToastProvider";
 import api from "@/lib/api";
@@ -84,6 +85,9 @@ export function ProfileEditor() {
         <div>
           <h3 className="text-xl font-semibold text-text-primary">{displayName}</h3>
            <p className="text-sm text-text-muted">Independent Mechanic</p>
+          <div className="flex items-center gap-2 mt-1.5">
+            <KycBadge user={user} />
+          </div>
           <div className="flex items-center text-xs text-icon-highlight mt-1">
             ⭐ {user.rating ?? "—"} Rating
           </div>

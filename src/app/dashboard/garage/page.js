@@ -10,6 +10,7 @@ import { NotificationBell } from "@/components/ui/NotificationBell";
 import { DashboardShell } from "@/components/ui/DashboardShell";
 import { ChatPanel } from "@/components/ui/ChatPanel";
 import { GarageProfile } from "@/components/garage/GarageProfile";
+import { KycDocumentsSection } from "@/components/ui/KycDocumentsSection";
 import { GarageJobQueue } from "@/components/garage/GarageJobQueue";
 import { GarageAnalytics } from "@/components/garage/GarageAnalytics";
 import { Logo } from "@/components/ui/Logo";
@@ -85,6 +86,9 @@ export default function GarageDashboard() {
                 <GarageProfile />
               </div>
               <div>
+                <KycDocumentsSection role="garage" />
+              </div>
+              <div>
                 <GarageAnalytics />
               </div>
             </div>
@@ -100,6 +104,9 @@ export default function GarageDashboard() {
           <div className="grid grid-cols-1 gap-4 lg:gap-6">
             <div>
               <GarageProfile />
+            </div>
+            <div>
+              <KycDocumentsSection role="garage" />
             </div>
             <div>
               <GarageAnalytics />

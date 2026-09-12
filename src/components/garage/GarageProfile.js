@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/Input";
 import { MultiSelect } from "@/components/ui/MultiSelect";
 import { EXPERTISE_OPTIONS } from "@/lib/constants";
 import { Building2, MapPin, Phone, Clock, Users, Loader2, QrCode } from "lucide-react";
+import { KycBadge } from "@/components/ui/KycBadge";
 import { useAuthStore } from "@/store/authStore";
 import { useToast } from "@/components/ui/ToastProvider";
 import api from "@/lib/api";
@@ -74,9 +75,7 @@ export function GarageProfile() {
               <div className="flex items-center text-xs text-icon-highlight">
                 ⭐ {user?.rating ?? "—"} <span className="ml-1 text-text-dim">Rating</span>
               </div>
-              <span className="px-2 py-0.5 rounded text-[10px] font-medium bg-success/20 text-success border border-success/30">
-                Verified Partner
-              </span>
+              <KycBadge user={user} />
           </div>
         </div>
       </div>

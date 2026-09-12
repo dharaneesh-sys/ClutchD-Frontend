@@ -8,6 +8,7 @@ import "leaflet/dist/leaflet.css";
 import "react-leaflet-cluster/dist/assets/MarkerCluster.css";
 import "react-leaflet-cluster/dist/assets/MarkerCluster.Default.css";
 import { ProfileEditor } from "@/components/mechanic/ProfileEditor";
+import { KycDocumentsSection } from "@/components/ui/KycDocumentsSection";
 import { AvailabilityToggle } from "@/components/mechanic/AvailabilityToggle";
 import { IncomingJobs } from "@/components/mechanic/IncomingJobs";
 import { EarningsChart } from "@/components/mechanic/EarningsChart";
@@ -140,6 +141,7 @@ export default function MechanicDashboard() {
             <div className="lg:col-span-4 flex flex-col gap-4 lg:gap-6">
               <AvailabilityToggle />
               <ProfileEditor />
+              <KycDocumentsSection role="mechanic" />
             </div>
             
             <div className="lg:col-span-8 flex flex-col gap-4 lg:gap-6">
