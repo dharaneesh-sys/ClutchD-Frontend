@@ -27,7 +27,7 @@ import api, { extractApiError } from "@/lib/api";
 import { cn } from "@/lib/utils";
 import { useAuthStore } from "@/store/authStore";
 import { useNotificationStore } from "@/store/notificationStore";
-import { useThemeStore } from "@/store/themeStore";
+import { useThemeStore, hasExplicitThemePreference } from "@/store/themeStore";
 import { useToastStore } from "@/store/toastStore";
 import { downloadLocalUserData } from "@/lib/exportLocalUserData";
 import { navigateToAuth } from "@/lib/navigation";
@@ -134,36 +134,12 @@ function SectionHeader({ icon: Icon, title, danger }) {
   );
 }
 
-// ─── System Theme Listener ───────────────────────────────────────────────
-
-/**
- * Resolve "system" theme preference to "light" or "dark" and keep it in sync.
- * Returns the resolved theme string.
- */
-function useResolvedTheme(preference) {
-  const [systemPrefersDark, setSystemPrefersDark] = useState(
-    typeof window !== "undefined"
-      ? window.matchMedia("(prefers-color-scheme: dark)").matches
-      : false
-  );
-
-  useEffect(() => {
-    const mq = window.matchMedia("(prefers-color-scheme: dark)");
-    const update = () => setSystemPrefersDark(mq.matches);
-    update();
-    mq.addEventListener("change", update);
-    return () => mq.removeEventListener("change", update);
-  }, []);
-
-  if (preference !== "system") return preference;
-  return systemPrefersDark ? "dark" : "light";
-}
-
 // ─── Page ────────────────────────────────────────────────────────────────
 
 export default function SettingsPage() {
   const logout = useAuthStore((s) => s.logout);
-  const { setTheme: applyTheme } = useThemeStore();
+  const themeStoreState = useThemeStore();
+  const { setTheme, followSystemTheme } = themeStoreState;
   const toast = useToastStore();
   const storeSetPushEnabled = useNotificationStore((s) => s.setPushEnabled);
 
@@ -176,7 +152,10 @@ export default function SettingsPage() {
   const [pushEnabled, setPushEnabled] = useState(DEFAULT_SETTINGS.push_notifications);
   const [smsEnabled, setSmsEnabled] = useState(DEFAULT_SETTINGS.sms_notifications);
   const [emailEnabled, setEmailEnabled] = useState(DEFAULT_SETTINGS.email_notifications);
-  const [themePref, setThemePref] = useState(DEFAULT_SETTINGS.theme);
+  // Initialize from the theme store (hydrated from localStorage / system
+  // preference) so this page always starts on the theme the app currently
+  // uses — never a hardcoded default that fights the rest of the UI.
+  const [themePref, setThemePref] = useState(themeStoreState.theme);
   const [language, setLanguage] = useState(DEFAULT_SETTINGS.language);
 
   // Password change modal
@@ -191,9 +170,6 @@ export default function SettingsPage() {
   const [logoutConfirmOpen, setLogoutConfirmOpen] = useState(false);
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
   const [deleteSubmitting, setDeleteSubmitting] = useState(false);
-
-  // Resolve system theme to actual value
-  const resolvedTheme = useResolvedTheme(themePref);
 
   // ── Fetch settings on mount ──────────────────────────────────────────
   const fetchSettings = useCallback(async () => {
@@ -214,28 +190,33 @@ export default function SettingsPage() {
       setEmailEnabled(email);
       setThemePref(theme);
       setLanguage(lang);
+
+      // Realign the global theme store to the saved preference ONLY when the
+      // user has no explicit local choice — a local toggle (BottomNav or this
+      // page) always wins, so the app never switches theme unexpectedly.
+      if (!hasExplicitThemePreference()) {
+        if (theme === "system") {
+          followSystemTheme();
+        } else {
+          setTheme(theme);
+        }
+      }
     } catch (err) {
-      // Use demo defaults on failure — no error state for first load,
-      // user can still interact with local state
+      // Keep the current theme untouched on failure — only reset the
+      // notification toggles to safe defaults.
       setError(extractApiError(err, "Could not load settings. Using defaults."));
       setPushEnabled(DEFAULT_SETTINGS.push_notifications);
       setSmsEnabled(DEFAULT_SETTINGS.sms_notifications);
       setEmailEnabled(DEFAULT_SETTINGS.email_notifications);
-      setThemePref(DEFAULT_SETTINGS.theme);
       setLanguage(DEFAULT_SETTINGS.language);
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [setTheme, followSystemTheme]);
 
   useEffect(() => {
     fetchSettings();
   }, [fetchSettings]);
-
-  // ── Sync resolved system theme to ThemeProvider ──────────────────────
-  useEffect(() => {
-    applyTheme(resolvedTheme);
-  }, [resolvedTheme, applyTheme]);
 
   // ── Save settings to API ─────────────────────────────────────────────
   const saveSettings = useCallback(
@@ -266,9 +247,17 @@ export default function SettingsPage() {
   const handleThemeChange = useCallback(
     (value) => {
       setThemePref(value);
+      // Apply app-wide immediately: writes localStorage and toggles the
+      // <html> data-theme/dark class, so the whole app follows this page.
+      if (value === "system") {
+        followSystemTheme();
+      } else {
+        setTheme(value);
+      }
+      // Persist the raw preference ("dark" | "light" | "system") server-side
       saveSettings({ theme: value });
     },
-    [saveSettings]
+    [saveSettings, setTheme, followSystemTheme]
   );
 
 

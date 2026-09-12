@@ -828,36 +828,50 @@ describe("marketplaceStore", () => {
   describe("categoryStore", () => {
     // ── fetchCategories ─────────────────────────────────
     describe("fetchCategories", () => {
-      it("fetches categories from API and stores them", async () => {
+      it("fetches categories from API and consolidates to accessories + spare parts", async () => {
         const apiCategories = [
           { id: "cat-1", name: "Engine Parts", productCount: 24 },
+          { id: "cat-2", slug: "accessories", name: "Accessories", productCount: 7 },
         ];
         mockGet.mockResolvedValueOnce({ data: { categories: apiCategories } });
 
         await useCategoryStore.getState().fetchCategories();
 
         expect(mockGet).toHaveBeenCalledWith("/categories");
-        expect(useCategoryStore.getState().categories).toEqual(apiCategories);
+        const categories = useCategoryStore.getState().categories;
+        expect(categories).toHaveLength(2);
+        expect(categories[0]).toMatchObject({
+          id: "accessories",
+          name: "Accessories",
+          productCount: 7,
+        });
+        expect(categories[1]).toMatchObject({
+          id: "spare-parts",
+          name: "Spare Parts",
+          productCount: 24,
+        });
         expect(useCategoryStore.getState().isLoading).toBe(false);
       });
 
-      it("sets empty categories when API returns empty list", async () => {
+      it("falls back to the two trimmed categories when API returns empty list", async () => {
         mockGet.mockResolvedValueOnce({ data: { categories: [] } });
 
         await useCategoryStore.getState().fetchCategories();
 
         const categories = useCategoryStore.getState().categories;
-        expect(categories).toHaveLength(0);
+        expect(categories).toHaveLength(2);
+        expect(categories.map((c) => c.id)).toEqual(["accessories", "spare-parts"]);
         expect(useCategoryStore.getState().isLoading).toBe(false);
       });
 
-      it("sets empty categories on API error", async () => {
+      it("falls back to the two trimmed categories on API error", async () => {
         mockGet.mockRejectedValueOnce(new Error("Network error"));
 
         await useCategoryStore.getState().fetchCategories();
 
         const categories = useCategoryStore.getState().categories;
-        expect(categories).toHaveLength(0);
+        expect(categories).toHaveLength(2);
+        expect(categories.map((c) => c.id)).toEqual(["accessories", "spare-parts"]);
         expect(useCategoryStore.getState().isLoading).toBe(false);
       });
 
