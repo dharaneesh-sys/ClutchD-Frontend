@@ -1,5 +1,6 @@
 const STORAGE_KEY = "clutchd_access_token";
 const EXPIRY_KEY = "clutchd_token_expires_at";
+const REFRESH_KEY = "clutchd_refresh_token";
 
 // When false, the token lives in sessionStorage only (Remember Me unchecked).
 // When true (default), it persists in localStorage across restarts.
@@ -88,6 +89,39 @@ export function clearAccessToken() {
   token = null;
   tokenExpiresAt = 0;
   persist();
+}
+
+// ── Refresh token persistence ─────────────────────────────────────────────
+// Android WebViews block third-party cookies, so the backend's refresh cookie
+// never sticks in the Capacitor app. We keep the refresh token client-side
+// (same storage mode as the access token) and send it via X-Refresh-Token.
+
+export function setRefreshToken(newRefreshToken) {
+  try {
+    if (newRefreshToken) {
+      localStorage.setItem(REFRESH_KEY, newRefreshToken);
+    } else {
+      localStorage.removeItem(REFRESH_KEY);
+    }
+  } catch {
+    // storage unavailable
+  }
+}
+
+export function getRefreshToken() {
+  try {
+    return localStorage.getItem(REFRESH_KEY) || null;
+  } catch {
+    return null;
+  }
+}
+
+export function clearRefreshToken() {
+  try {
+    localStorage.removeItem(REFRESH_KEY);
+  } catch {
+    // storage unavailable
+  }
 }
 
 

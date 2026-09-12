@@ -8,6 +8,9 @@ const mockSetAccessToken = vi.hoisted(() => vi.fn());
 const mockSetTokenPersistMode = vi.hoisted(() => vi.fn());
 const mockGetAccessToken = vi.hoisted(() => vi.fn(() => "fake-token"));
 const mockClearAccessToken = vi.hoisted(() => vi.fn());
+const mockSetRefreshToken = vi.hoisted(() => vi.fn());
+const mockClearRefreshToken = vi.hoisted(() => vi.fn());
+const mockRefreshAccessToken = vi.hoisted(() => vi.fn(() => Promise.resolve("fake-token")));
 const mockConnectWebSocket = vi.hoisted(() => vi.fn());
 const mockDisconnectWebSocket = vi.hoisted(() => vi.fn());
 
@@ -25,6 +28,14 @@ vi.mock("@/lib/tokenStore", () => ({
   setTokenPersistMode: mockSetTokenPersistMode,
   getAccessToken: mockGetAccessToken,
   clearAccessToken: mockClearAccessToken,
+  setRefreshToken: mockSetRefreshToken,
+  clearRefreshToken: mockClearRefreshToken,
+}));
+
+vi.mock("@/lib/authRefresh", () => ({
+  refreshAccessToken: mockRefreshAccessToken,
+  handleRefreshFailure: vi.fn(),
+  ACCESS_TTL_MS: 15 * 60 * 1000,
 }));
 
 // Mock Firebase auth so it throws — ensures loginWithGoogle's API-failure
@@ -320,14 +331,13 @@ describe("authStore", () => {
         isAuthenticated: true,
         _hydrated: true,
       });
-      mockPost.mockResolvedValueOnce({
-        data: { token: "refreshed-token" },
-      });
+      mockRefreshAccessToken.mockResolvedValueOnce("refreshed-token");
 
       await useAuthStore.getState().checkAuth();
 
-      expect(mockPost).toHaveBeenCalledWith("/auth/refresh");
-      expect(mockSetAccessToken).toHaveBeenCalledWith("refreshed-token", expect.any(Number));
+      expect(mockRefreshAccessToken).toHaveBeenCalled();
+      expect(mockConnectWebSocket).toHaveBeenCalledWith("refreshed-token");
+      expect(useAuthStore.getState().isAuthenticated).toBe(true);
     });
 
     it("logs out on 401 during checkAuth", async () => {
@@ -336,7 +346,7 @@ describe("authStore", () => {
         isAuthenticated: true,
         _hydrated: true,
       });
-      mockPost.mockRejectedValueOnce({
+      mockRefreshAccessToken.mockRejectedValueOnce({
         response: { status: 401 },
       });
 
@@ -423,17 +433,18 @@ describe("authStore", () => {
       expect(mockSetAccessToken).toHaveBeenCalledWith(mockToken, expect.any(Number));
     });
 
-    it("passes a ttl on proactive-style refresh via restoreSession", async () => {
+    it("uses the shared refresh helper with websocket reconnect on restoreSession", async () => {
       useAuthStore.setState({
         user: { id: "u-1", role: "customer" },
         isAuthenticated: true,
         _hydrated: true,
       });
-      mockPost.mockResolvedValueOnce({ data: { token: "fresh" } });
+      mockRefreshAccessToken.mockResolvedValueOnce("fresh");
 
       await useAuthStore.getState().restoreSession();
 
-      expect(mockSetAccessToken).toHaveBeenCalledWith("fresh", expect.any(Number));
+      expect(mockRefreshAccessToken).toHaveBeenCalled();
+      expect(mockConnectWebSocket).toHaveBeenCalledWith("fresh");
     });
   });
 
@@ -453,20 +464,17 @@ describe("authStore", () => {
 
   // ── firebase session refresh ─────────────────────
   describe("firebase session refresh", () => {
-    it("attempts POST /auth/refresh for firebase users", async () => {
+    it("attempts token refresh for firebase users via shared helper", async () => {
       useAuthStore.setState({
         user: { id: "firebase-uid-1", role: "customer", name: "G User" },
         isAuthenticated: true,
         _hydrated: true,
       });
-      mockPost.mockResolvedValueOnce({
-        data: { token: "fresh", user: { id: "firebase-uid-1" } },
-      });
+      mockRefreshAccessToken.mockResolvedValueOnce("fresh");
 
       await useAuthStore.getState().restoreSession();
 
-      expect(mockPost).toHaveBeenCalledWith("/auth/refresh");
-      expect(mockSetAccessToken).toHaveBeenCalledWith("fresh", expect.any(Number));
+      expect(mockRefreshAccessToken).toHaveBeenCalled();
       expect(useAuthStore.getState().isAuthenticated).toBe(true);
     });
 
@@ -477,7 +485,7 @@ describe("authStore", () => {
         isAuthenticated: true,
         _hydrated: true,
       });
-      mockPost.mockRejectedValueOnce({ response: { status: 401 } });
+      mockRefreshAccessToken.mockRejectedValueOnce({ response: { status: 401 } });
 
       await useAuthStore.getState().restoreSession();
 
@@ -495,7 +503,7 @@ describe("authStore", () => {
         isAuthenticated: true,
         _hydrated: true,
       });
-      mockPost.mockRejectedValueOnce(new Error("Network Error"));
+      mockRefreshAccessToken.mockRejectedValueOnce(new Error("Network Error"));
 
       await useAuthStore.getState().restoreSession();
 

@@ -2,7 +2,8 @@ import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import api from "@/lib/api";
 import { connectWebSocket, disconnectWebSocket } from "@/lib/socket";
-import { setAccessToken, getAccessToken, clearAccessToken, setTokenPersistMode } from "@/lib/tokenStore";
+import { setAccessToken, getAccessToken, clearAccessToken, setTokenPersistMode, setRefreshToken, clearRefreshToken } from "@/lib/tokenStore";
+import { refreshAccessToken } from "@/lib/authRefresh";
 import { cacheUserProfile } from "@/lib/offline/offlineCache";
 import { useToastStore } from "@/store/toastStore";
 
@@ -125,10 +126,8 @@ function scheduleProactiveRefresh() {
   clearProactiveRefresh();
   refreshTimer = setTimeout(async () => {
     try {
-      const res = await api.post("/auth/refresh");
-      const newToken = res.data.token;
+      const newToken = await refreshAccessToken();
       if (typeof window !== "undefined" && newToken) {
-        setAccessToken(newToken, ACCESS_TTL_MS);
         connectWebSocket(newToken);
       }
       scheduleProactiveRefresh();
@@ -184,15 +183,12 @@ export const useAuthStore = create(
         }
         const isFirebase = uid.startsWith("firebase-");
         try {
-          const res = await api.post("/auth/refresh");
-          const newToken = res.data.token;
+          const newToken = await refreshAccessToken();
           if (typeof window !== "undefined" && newToken) {
-            setAccessToken(newToken, ACCESS_TTL_MS);
             connectWebSocket(newToken);
             scheduleProactiveRefresh();
           }
-          const userData = res.data.user || user;
-          set({ user: userData, isAuthenticated: true, _isRestoring: false });
+          set({ user, isAuthenticated: true, _isRestoring: false });
         } catch (error) {
           const status = error.response?.status;
           if (status === 401 || status === 403) {
@@ -230,6 +226,7 @@ export const useAuthStore = create(
         clearProactiveRefresh();
         disconnectWebSocket();
         clearAccessToken();
+        clearRefreshToken();
         clearAllStorage();
         writeSessionMirror(null);
         set({ user: null, isAuthenticated: false, _hydrated: false, _isRestoring: false, error: null, isLoading: false });
@@ -272,6 +269,7 @@ export const useAuthStore = create(
           const remember = opts?.rememberMe ?? get().rememberMe ?? true;
           if (response.data.token && typeof window !== "undefined") {
             setAccessToken(response.data.token, ACCESS_TTL_MS);
+            setRefreshToken(response.data.refresh_token || null);
             connectWebSocket(response.data.token);
             scheduleProactiveRefresh();
             applyRememberChoice(remember, response.data.user);
@@ -309,6 +307,7 @@ export const useAuthStore = create(
           const remember = opts?.rememberMe ?? get().rememberMe ?? true;
           if (response.data.token && typeof window !== "undefined") {
             setAccessToken(response.data.token, ACCESS_TTL_MS);
+            setRefreshToken(response.data.refresh_token || null);
             connectWebSocket(response.data.token);
             scheduleProactiveRefresh();
             applyRememberChoice(remember, response.data.user);
@@ -501,6 +500,7 @@ export const useAuthStore = create(
           const remember = opts?.rememberMe ?? get().rememberMe ?? true;
           if (response.data.token && typeof window !== "undefined") {
             setAccessToken(response.data.token, ACCESS_TTL_MS);
+            setRefreshToken(response.data.refresh_token || null);
             connectWebSocket(response.data.token);
             scheduleProactiveRefresh();
             applyRememberChoice(remember, response.data.user);
@@ -528,6 +528,7 @@ export const useAuthStore = create(
         }
         if (typeof window !== "undefined") {
           clearAccessToken();
+          clearRefreshToken();
           disconnectWebSocket();
           writeSessionMirror(null);
         }

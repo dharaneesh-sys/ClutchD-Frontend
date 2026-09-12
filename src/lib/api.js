@@ -1,7 +1,7 @@
 import axios from "axios";
 import { API_BASE_URL } from "@/lib/constants";
 import { getAccessToken, setAccessToken, clearAccessToken } from "@/lib/tokenStore";
-import { navigateToAuth } from "@/lib/navigation";
+import { refreshAccessToken, handleRefreshFailure } from "@/lib/authRefresh";
 
 
 // Public API path prefixes that should NOT trigger auth redirect on 401.
@@ -43,7 +43,6 @@ api.interceptors.request.use(
 );
 
 // Response interceptor — handle 401 with token refresh, and other errors
-let isRefreshing = false;
 let pendingRequests = [];
 
 function onTokenRefreshed(newToken) {
@@ -69,47 +68,24 @@ api.interceptors.response.use(
 
       originalRequest._retry = true;
 
-      if (!isRefreshing) {
-        isRefreshing = true;
-        try {
-          const res = await api.post("/auth/refresh");
-          const newToken = res.data.token;
-          if (typeof window !== "undefined" && newToken) {
-            setAccessToken(newToken, ACCESS_TTL_MS);
-          }
-          isRefreshing = false;
+      // Single shared refresh (singleton promise inside refreshAccessToken —
+      // concurrent 401s all await the same request instead of stampeding).
+      try {
+        const newToken = await refreshAccessToken();
+        if (newToken) {
           onTokenRefreshed(newToken);
           originalRequest.headers.Authorization = `Bearer ${newToken}`;
           return api(originalRequest);
-        } catch (refreshError) {
-          isRefreshing = false;
-          pendingRequests = [];
-          
-           const status = refreshError.response?.status;
-           // Only force logout on explicit 401/403 credentials failure.
-               if (status === 401 || status === 403) {
-              if (typeof window !== "undefined") {
-                // Don't redirect demo / Firebase-only users — their tokens can't validate against real backend
-                try {
-                  const stored = JSON.parse(localStorage.getItem("auth-storage") || "{}");
-                  const uid = stored?.state?.user?.id || "";
-                  if (uid.startsWith("demo-") || uid.startsWith("firebase-")) return Promise.reject(refreshError);
-                } catch (e) {}
-                clearAccessToken();
-                navigateToAuth();
-              }
-           }
-          return Promise.reject(refreshError);
         }
+      } catch {
+        // fall through to failure handling below
       }
 
-      // Another request triggered refresh — queue this one
-      return new Promise((resolve) => {
-        pendingRequests.push((newToken) => {
-          originalRequest.headers.Authorization = `Bearer ${newToken}`;
-          resolve(api(originalRequest));
-        });
-      });
+      // Refresh failed — drop tokens and redirect (unless demo session).
+      pendingRequests = [];
+      handleRefreshFailure();
+      // Reject with the ORIGINAL error so callers see the real failure.
+      return Promise.reject(error);
     }
 
     return Promise.reject(error);
