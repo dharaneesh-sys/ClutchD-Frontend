@@ -11,6 +11,7 @@ import { MechanicFields } from "@/components/auth/MechanicFields";
 import { GarageFields } from "@/components/auth/GarageFields";
 
 import api from "@/lib/api";
+import { uploadKycDocuments } from "@/lib/kycUpload";
 import { useRouter } from "next/navigation";
 
 export function SignUpCard() {
@@ -41,6 +42,7 @@ export function SignUpCard() {
     handleSubmit,
     setValue,
     watch,
+    getValues,
     formState: { errors },
   } = useForm({
     resolver: zodResolver(schemas[selectedRole]),
@@ -49,8 +51,14 @@ export function SignUpCard() {
 
   const onSubmit = async (data) => {
     try {
+      // File inputs are outside the zod schema — read them from raw form state
+      const raw = getValues();
       const user = await signup(data, selectedRole);
       if (user) {
+        // Best-effort KYC upload (mechanic/garage) — never blocks the signup
+        if (selectedRole === "mechanic" || selectedRole === "garage") {
+          uploadKycDocuments({ aadhaarPhoto: raw.aadhaarPhoto, licensePhoto: raw.licensePhoto }).catch(() => {});
+        }
         if (selectedRole === "customer") router.push("/dashboard/customer");
         else if (selectedRole === "mechanic") router.push("/dashboard/mechanic");
         else if (selectedRole === "garage") router.push("/dashboard/garage");

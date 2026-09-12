@@ -11,6 +11,7 @@ import {
   saveFleetServiceHistory,
   initDemoFleet,
   getFleetTier,
+  saveFleetRegistration,
 } from "@/lib/fleet/fleetStorage";
 
 /**
@@ -62,13 +63,26 @@ export const useFleetStore = create(
       initialized: false,
 
       /**
-       * Initialize fleet data from localStorage (demo).
-       * Call once on the fleet dashboard mount.
+       * Initialize fleet data. Prefers the real backend registration
+       * (GET /fleet/my-fleet) when the user is signed in; falls back to
+       * localStorage (demo) otherwise. Call once on the dashboard mount.
        */
-      initialize: () => {
-        const fleet = initDemoFleet();
+      initialize: async () => {
         const vehicles = getFleetVehicles();
         const history = getFleetServiceHistory();
+        let fleet = null;
+        try {
+          const api = (await import("@/lib/api")).default;
+          const { data } = await api.get("/fleet/my-fleet");
+          if (data?.fleets?.length) {
+            fleet = { ...data.fleets[0] };
+            // Mirror to localStorage so registration checks elsewhere stay true
+            saveFleetRegistration(fleet);
+          }
+        } catch {
+          // Not signed in / backend unreachable — demo path below
+        }
+        if (!fleet) fleet = initDemoFleet();
         set({
           fleetAccount: fleet,
           vehicles,

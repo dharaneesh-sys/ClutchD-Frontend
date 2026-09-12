@@ -18,6 +18,14 @@ export function GarageFields({ register, errors, setValue, watch }) {
     setValue("garageImages", files);
   };
 
+  const handleAadhaarChange = (file) => {
+    setValue("aadhaarPhoto", file);
+  };
+
+  const handleLicenseChange = (file) => {
+    setValue("licensePhoto", file);
+  };
+
   const handleGetLocation = () => {
     if (typeof window === "undefined" || !navigator.geolocation) return;
     setGpsLoading(true);
@@ -159,6 +167,28 @@ export function GarageFields({ register, errors, setValue, watch }) {
         value={watch("garageImages")}
         error={errors.garageImages?.message}
       />
+
+      {/* KYC Documents */}
+      <div className="space-y-1 pt-2">
+        <h3 className="text-sm font-semibold text-text-muted uppercase tracking-wider">
+          KYC Documents (optional, speeds up verification)
+        </h3>
+        <div className="h-px bg-border-subtle" />
+      </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <FileUpload
+          label="Aadhaar Card Photo"
+          onChange={handleAadhaarChange}
+          value={watch("aadhaarPhoto")}
+          error={errors.aadhaarPhoto?.message}
+        />
+        <FileUpload
+          label="Business License / GST Photo"
+          onChange={handleLicenseChange}
+          value={watch("licensePhoto")}
+          error={errors.licensePhoto?.message}
+        />
+      </div>
     </div>
   );
 }

@@ -34,23 +34,42 @@ export default function FleetDashboardPage() {
   const [chatJobId, setChatJobId] = useState(null);
   const [chatOtherName, setChatOtherName] = useState("Support");
 
-  // Check if a fleet registration exists in localStorage
+  // Check if a fleet registration exists — localStorage first, then backend
   useEffect(() => {
     if (typeof window === "undefined") return;
-    try {
-      const raw = localStorage.getItem("clutchd-fleet-registration");
-      /* eslint-disable react-hooks/set-state-in-effect */
-      setHasRegistration(!!raw);
-      if (!raw) {
-        setActiveTab("register");
+    let cancelled = false;
+    (async () => {
+      try {
+        const raw = localStorage.getItem("clutchd-fleet-registration");
+        if (raw) {
+          if (!cancelled) setHasRegistration(true);
+          return;
+        }
+        // No local copy — a registration may exist server-side (e.g. signed
+        // up on another device). Backend decides; failure means demo/register.
+        try {
+          const api = (await import("@/lib/api")).default;
+          const { data } = await api.get("/fleet/my-fleet");
+          if (!cancelled && data?.fleets?.length) {
+            const { saveFleetRegistration } = await import("@/lib/fleet/fleetStorage");
+            saveFleetRegistration(data.fleets[0]);
+            setHasRegistration(true);
+            return;
+          }
+        } catch {
+          // not signed in or backend unreachable — fall through to register
+        }
+        if (!cancelled) setActiveTab("register");
+      } catch {
+        if (!cancelled) {
+          setHasRegistration(false);
+          setActiveTab("register");
+        }
       }
-      /* eslint-enable react-hooks/set-state-in-effect */
-    } catch {
-      /* eslint-disable-next-line react-hooks/set-state-in-effect */
-      setHasRegistration(false);
-      /* eslint-disable-next-line react-hooks/set-state-in-effect */
-      setActiveTab("register");
-    }
+    })();
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   useEffect(() => {
