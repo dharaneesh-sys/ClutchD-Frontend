@@ -2,12 +2,8 @@ import CategoryProductsClient from './client';
 
 export function generateStaticParams() {
   return [
-    { id: 'engine-parts' },
-    { id: 'brake-parts' },
-    { id: 'electrical' },
-    { id: 'suspension' },
-    { id: 'filters' },
     { id: 'accessories' },
+    { id: 'spare-parts' },
   ];
 }
 

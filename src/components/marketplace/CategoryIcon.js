@@ -19,6 +19,7 @@ const CATEGORY_ICON_MAP = {
   suspension: Route,
   filters: Filter,
   accessories: Package,
+  "spare-parts": Wrench,
 };
 
 /**

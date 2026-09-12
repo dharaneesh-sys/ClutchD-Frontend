@@ -19,14 +19,26 @@ import { Shimmer } from "@/components/ui/Shimmer";
  * matches "brake-parts" and vice versa) to accommodate differences between
  * product store demo data and PRODUCT_CATEGORIES slugs.
  */
+function normalizeCat(s) {
+  return s?.toLowerCase().replace(/[^a-z0-9]/g, "") || "";
+}
+
 function categoryMatches(productCategory, targetId) {
-  const normalize = (s) => s?.toLowerCase().replace(/[^a-z0-9]/g, "") || "";
-  const a = normalize(productCategory);
-  const b = normalize(targetId);
+  const a = normalizeCat(productCategory);
+  const b = normalizeCat(targetId);
   if (a === b) return true;
   // Compare first N chars (max 5) for partial / prefix matches
   const minLen = Math.min(a.length, b.length, 5);
   return a.substring(0, minLen) === b.substring(0, minLen);
+}
+
+function isSparePartsTarget(targetId) {
+  const n = normalizeCat(targetId);
+  return n.includes("spare") || n === "spares";
+}
+
+function isAccessoriesProduct(productCategory) {
+  return normalizeCat(productCategory).includes("accessor");
 }
 
 // ─── Loading Skeleton ─────────────────────────────────────────────────
@@ -88,10 +100,19 @@ export default function CategoryProductsClient({ id }) {
     [id],
   );
 
-  // Filter products by category
+  // Filter products by category (Spare Parts = all non-accessory products,
+  // since the backend seeds no dedicated spare-parts category)
   const filteredProducts = useMemo(() => {
     if (!id) return [];
-    return products.filter((p) => categoryMatches(p.category, id));
+    if (isSparePartsTarget(id)) {
+      return products.filter((p) => {
+        const pc = p.category ?? p.categoryId;
+        return pc && !isAccessoriesProduct(pc);
+      });
+    }
+    return products.filter((p) =>
+      categoryMatches(p.category ?? p.categoryId, id),
+    );
   }, [products, id]);
 
   const displayName = apiCategory?.name || constCategory?.label || id;

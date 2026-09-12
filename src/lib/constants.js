@@ -184,15 +184,13 @@ export const FEE_CONSTANTS = {
 
 /**
  * Product categories for the marketplace.
+ * Curated to 2 tiles: Accessories + Spare Parts (consolidated group for all
+ * non-accessory replacement parts: engine, brake, electrical, suspension, filters).
  * @type {Array<{value: string, label: string, icon: string, description: string}>}
  */
 export const PRODUCT_CATEGORIES = [
-  { value: "engine-parts", label: "Engine Parts", icon: "Wrench", description: "Pistons, rings, gaskets, timing belts, and other engine components" },
-  { value: "brake-parts", label: "Brake Parts", icon: "Disc", description: "Brake pads, discs, calipers, and brake fluid" },
-  { value: "electrical", label: "Electrical Components", icon: "Zap", description: "Spark plugs, batteries, alternators, and wiring harnesses" },
-  { value: "suspension", label: "Suspension Parts", icon: "Route", description: "Shock absorbers, struts, springs, and bushings" },
-  { value: "filters", label: "Filters", icon: "Filter", description: "Oil filters, air filters, fuel filters, and cabin filters" },
   { value: "accessories", label: "Accessories", icon: "Package", description: "Car care products, floor mats, covers, and interior accessories" },
+  { value: "spare-parts", label: "Spare Parts", icon: "Wrench", description: "Engine, brake, electrical, suspension, filters and other replacement parts" },
 ];
 
 /**

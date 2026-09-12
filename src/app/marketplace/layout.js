@@ -1,13 +1,27 @@
 "use client";
 
+import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { ArrowLeft } from "lucide-react";
 import { BottomNav } from "@/components/ui/BottomNav";
 import { useAuthStore } from "@/store/authStore";
+import { NAVIGATION_EVENT } from "@/lib/navigation";
 
 export default function MarketplaceLayout({ children }) {
   const router = useRouter();
   const user = useAuthStore((s) => s.user);
+
+  // Listen for navigation events from non-React contexts (e.g., axios interceptors)
+  useEffect(() => {
+    const handleNavigation = (event) => {
+      const { path } = event.detail;
+      if (path) {
+        router.push(path);
+      }
+    };
+    window.addEventListener(NAVIGATION_EVENT, handleNavigation);
+    return () => window.removeEventListener(NAVIGATION_EVENT, handleNavigation);
+  }, [router]);
 
   const handleBack = () => {
     if (typeof window !== "undefined" && window.history.length <= 1) {

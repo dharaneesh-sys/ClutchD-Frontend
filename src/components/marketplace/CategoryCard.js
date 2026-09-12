@@ -23,6 +23,10 @@ function resolveIconKey(name) {
     "wheels & tyres": null,
     "interior & accessories": "accessories",
     accessories: "accessories",
+    "spare parts": "spare-parts",
+    "spare-parts": "spare-parts",
+    spareparts: "spare-parts",
+    spares: "spare-parts",
   };
   return map[name.toLowerCase()] ?? null;
 }
@@ -40,6 +44,7 @@ function resolveIconKey(name) {
  */
 export function CategoryCard({ category, icon, className }) {
   const iconKey = icon || resolveIconKey(category.name);
+  const isAccessories = iconKey === "accessories";
 
   return (
     <Link
@@ -52,7 +57,19 @@ export function CategoryCard({ category, icon, className }) {
         className
       )}
     >
-      <CategoryIcon category={iconKey} size="md" />
+      {isAccessories ? (
+        <span className="inline-flex items-center justify-center overflow-hidden rounded-2xl bg-white/10 ring-1 ring-white/10 w-16 h-16">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/images/marketplace/accessories.jpg"
+            alt="Accessories category"
+            className="w-full h-full object-cover"
+            loading="lazy"
+          />
+        </span>
+      ) : (
+        <CategoryIcon category={iconKey} size="md" />
+      )}
       <span className="text-sm font-medium text-on-surface leading-snug break-words max-w-full">
         {category.name}
       </span>

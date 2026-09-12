@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Search, AlertTriangle, RefreshCw, ChevronRight, Plus } from "lucide-react";
@@ -107,6 +107,39 @@ export default function MarketplaceHome() {
   );
 
   const featuredProducts = products.slice(0, 6);
+
+  const displayedCategories = useMemo(() => {
+    const norm = (s) => s?.toLowerCase().replace(/[^a-z0-9]/g, "") || "";
+    const isAccessories = (c) =>
+      norm(c?.name).includes("accessor") || norm(c?.slug).includes("accessor");
+    const isSpare = (c) =>
+      norm(c?.name).includes("spare") || norm(c?.slug).includes("spare");
+    const list = categories.filter((c) => isAccessories(c) || isSpare(c));
+    const hasAccessories = list.some((c) => isAccessories(c));
+    const hasSpare = list.some((c) => isSpare(c));
+    const out = [...list];
+    if (!hasAccessories) {
+      const fb = categories.find((c) => isAccessories(c));
+      if (fb) out.push(fb);
+    }
+    if (!hasSpare) {
+      const spareCount = categories
+        .filter((c) => !isAccessories(c) && !isSpare(c))
+        .reduce((sum, c) => sum + (Number(c.productCount) || 0), 0);
+      const baseCount =
+        spareCount ||
+        categories
+          .filter((c) => !isAccessories(c))
+          .reduce((sum, c) => sum + (Number(c.productCount) || 0), 0);
+      out.push({
+        id: "spare-parts",
+        slug: "spare-parts",
+        name: "Spare Parts",
+        productCount: baseCount,
+      });
+    }
+    return out.filter((c) => isAccessories(c) || isSpare(c)).slice(0, 2);
+  }, [categories]);
 
   return (
     <div className="space-y-5 p-4 pb-8 page-enter">
