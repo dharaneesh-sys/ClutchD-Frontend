@@ -46,24 +46,29 @@ function loadVehicle() {
  *   whenever the user completes or changes the full selection.
  * @param {string}   [props.className]       — Additional wrapper classes
  */
-export function VehicleSelector({ onVehicleChange, className }) {
+export function VehicleSelector({ onVehicleChange, className, initialVehicle }) {
   const [make, setMake] = useState("");
   const [model, setModel] = useState("");
   const [year, setYear] = useState("");
   const [variant, setVariant] = useState("");
 
-  // ── Initialise from localStorage on mount ───────────────────────
+  // ── Initialise from initialVehicle (priority) or localStorage ──
   useEffect(() => {
-    const saved = loadVehicle();
-    if (saved) {
-      /* eslint-disable react-hooks/set-state-in-effect */
-      setMake(saved.make || "");
-      setModel(saved.model || "");
-      setYear(saved.year || "");
-      setVariant(saved.variant || "");
-      /* eslint-enable react-hooks/set-state-in-effect */
+    if (initialVehicle) {
+      setMake(initialVehicle.make || "");
+      setModel(initialVehicle.model || "");
+      setYear(initialVehicle.year || "");
+      setVariant(initialVehicle.variant || "");
+    } else {
+      const saved = loadVehicle();
+      if (saved) {
+        setMake(saved.make || "");
+        setModel(saved.model || "");
+        setYear(saved.year || "");
+        setVariant(saved.variant || "");
+      }
     }
-  }, []);
+  }, [initialVehicle]);
 
   // ── Derived: available options for each cascade level ────────────
   const availableModels = useMemo(
@@ -229,8 +234,8 @@ export function VehicleSelector({ onVehicleChange, className }) {
 
       {/* ── Selection summary ────────────────────────────────── */}
       {isComplete && (
-        <div className="mt-4 flex items-center gap-2 rounded-xl border border-emerald-500/20 bg-emerald-500/10 px-4 py-2.5 text-sm">
-          <CheckCircle2 size={16} className="shrink-0 text-emerald-400" />
+        <div className="mt-4 flex items-center gap-2 rounded-xl border border-icon-highlight/20 bg-icon-highlight/10 px-4 py-2.5 text-sm">
+          <CheckCircle2 size={16} className="shrink-0 text-icon-highlight" />
           <span className="text-text-primary">
             <span className="font-medium">{fullSelection.makeLabel}</span>{" "}
             <span className="text-text-muted">{fullSelection.modelLabel}</span>

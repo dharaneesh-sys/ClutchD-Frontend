@@ -25,6 +25,14 @@ function getInitialTheme() {
     } catch {
       // localStorage unavailable
     }
+
+    // No stored preference — check system preference
+    try {
+      const mq = window.matchMedia('(prefers-color-scheme: dark)');
+      if (mq.matches) return 'dark';
+    } catch {
+      // matchMedia unavailable
+    }
   }
   return 'light';
 }
@@ -42,8 +50,22 @@ const useThemeStoreZustand = create((set, get) => ({
       set({ theme: t });
     }
   },
+
+  followSystemTheme: () => {
+    try { localStorage.removeItem(STORAGE_KEY); } catch {}
+    if (typeof window !== 'undefined') {
+      try {
+        const mq = window.matchMedia('(prefers-color-scheme: dark)');
+        set({ theme: mq.matches ? 'dark' : 'light' });
+      } catch {
+        set({ theme: 'light' });
+      }
+    }
+  },
 }));
 
-export function useThemeStore() {
-  return useThemeStoreZustand();
+export function useThemeStore(selector) {
+  return useThemeStoreZustand(selector);
 }
+
+export { useThemeStoreZustand as themeStore };

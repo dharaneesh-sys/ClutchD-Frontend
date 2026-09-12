@@ -22,7 +22,7 @@ export function ConfirmModal({
             className={
               variant === "danger"
                 ? "text-red-500"
-                : "text-amber-500"
+                : "text-warning"
             }
           />
         </div>

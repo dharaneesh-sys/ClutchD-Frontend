@@ -1,0 +1,150 @@
+SELF-HOST BACKEND ON OLD PC
+============================
+
+Prerequisites:
+- Old PC with Ubuntu (or any Linux distro)
+- Stable internet connection
+- Router access (for port forwarding, or use Cloudflare Tunnel)
+
+---------------------------------------------------------------
+STEP 1: INSTALL UBUNTU SERVER
+---------------------------------------------------------------
+- Download Ubuntu Server LTS from ubuntu.com
+- Write to USB using Rufus (Windows) or dd (Linux)
+- Boot from USB, follow installer prompts
+- Keep it simple: ext4 partition, default packages
+
+---------------------------------------------------------------
+STEP 2: INSTALL POSTGRESQL + PYTHON
+---------------------------------------------------------------
+Run these commands:
+
+    sudo apt update && sudo apt upgrade -y
+    sudo apt install postgresql postgresql-client -y
+    sudo apt install python3 python3-pip python3-venv git -y
+
+---------------------------------------------------------------
+STEP 3: SET UP DATABASE
+---------------------------------------------------------------
+    sudo -u postgres psql
+
+Inside psql shell:
+
+    CREATE DATABASE clutchd;
+    CREATE USER clutchd_user WITH PASSWORD 'your_strong_password';
+    GRANT ALL PRIVILEGES ON DATABASE clutchd TO clutchd_user;
+    \q
+
+---------------------------------------------------------------
+STEP 4: CLONE AND SET UP BACKEND
+---------------------------------------------------------------
+    cd ~
+    git clone https://github.com/dharaneesh-sys/ClutchD-Backend
+    cd ClutchD-Backend
+    python3 -m venv venv
+    source venv/bin/activate
+    pip install -r backend/requirements.txt
+
+---------------------------------------------------------------
+STEP 5: CREATE .env FILE
+---------------------------------------------------------------
+    nano .env
+
+Paste and fill in your values:
+
+DATABASE_URL=postgresql+asyncpg://clutchd_user:your_strong_password@localhost:5432/clutchd
+SECRET_KEY=generate_a_random_secret_key_here
+CORS_ORIGIN_LIST=["capacitor://localhost","http://localhost:3000","https://clutchd-app.onrender.com"]
+DEBUG=false
+API_PREFIX=/api
+APP_NAME=ClutchD
+
+Save: Ctrl+O, Enter, then Ctrl+X to exit.
+
+---------------------------------------------------------------
+STEP 6: TEST IT RUNS
+---------------------------------------------------------------
+    source venv/bin/activate
+    cd backend
+    python -m uvicorn app.main:app --host 0.0.0.0 --port 8000
+
+Open browser on same network: http://YOUR_PC_IP:8000/docs
+Stop with Ctrl+C when confirmed.
+
+---------------------------------------------------------------
+STEP 7: AUTO-START WITH SYSTEMD (runs on boot)
+---------------------------------------------------------------
+    sudo nano /etc/systemd/system/clutchd-backend.service
+
+Paste this (replace 'your_user' with your actual username):
+
+[Unit]
+Description=ClutchD Backend
+After=network.target postgresql.service
+
+[Service]
+User=your_user
+WorkingDirectory=/home/your_user/ClutchD-Backend/backend
+ExecStart=/home/your_user/ClutchD-Backend/venv/bin/uvicorn app.main:app --host 0.0.0.0 --port 8000
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
+
+Then:
+
+    sudo systemctl daemon-reload
+    sudo systemctl enable --now clutchd-backend
+    sudo systemctl status clutchd-backend
+
+---------------------------------------------------------------
+STEP 8: EXPOSE TO INTERNET (Pick ONE method)
+---------------------------------------------------------------
+
+METHOD A: CLOUDFLARE TUNNEL (Recommended, easiest, free)
+  - Go to cloudflare.com, sign up free, add your domain
+  - On your PC:
+      curl -L https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64 -o cloudflared
+      chmod +x cloudflared && sudo mv cloudflared /usr/local/bin/
+      cloudflared tunnel login
+      cloudflared tunnel create clutchd
+      cloudflared tunnel route dns clutchd clutchd-api.yourdomain.com
+      cloudflared tunnel run clutchd
+
+  - Make it permanent:
+      sudo nano /etc/systemd/system/cloudflared.service
+      (Add cloudflared tunnel run clutchd as ExecStart)
+      sudo systemctl enable --now cloudflared
+
+METHOD B: PORT FORWARDING + DUCKDNS (No domain needed)
+  - Go to duckdns.org, register your-name.duckdns.org
+  - On router: Forward port 443 to YOUR_PC_IP:8000
+  - Install Caddy for HTTPS:
+      sudo apt install caddy
+      sudo nano /etc/caddy/Caddyfile
+      Content:
+        your-name.duckdns.org {
+            reverse_proxy localhost:8000
+        }
+      sudo systemctl restart caddy
+
+---------------------------------------------------------------
+STEP 9: UPDATE FRONTEND API URL
+---------------------------------------------------------------
+In the mobile app, update the API base URL from:
+    https://clutchd-api.onrender.com
+to:
+    https://clutchd-api.yourdomain.com  (Cloudflare)
+    OR
+    https://your-name.duckdns.org       (DuckDNS)
+
+Then rebuild the APK.
+
+---------------------------------------------------------------
+NOTES
+---------------------------------------------------------------
+- To check logs: sudo journalctl -u clutchd-backend -f
+- To restart: sudo systemctl restart clutchd-backend
+- Database backup: pg_dump -U clutchd_user clutchd > backup.sql
+- Database restore: psql -U clutchd_user clutchd < backup.sql

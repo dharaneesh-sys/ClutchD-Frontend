@@ -69,7 +69,7 @@ function LiveChatModal({ isOpen, onClose }) {
           )}
         >
           <div className="w-14 h-14 mx-auto mb-4 rounded-full bg-amber-500/15 flex items-center justify-center">
-            <MessageCircle size={28} className="text-amber-400" />
+            <MessageCircle size={28} className="text-warning" />
           </div>
           <h3 className="text-lg font-semibold text-foreground mb-2">
             Live Chat is Offline
@@ -363,7 +363,7 @@ export default function CarePage() {
       label: "WhatsApp",
       description: `Chat on WhatsApp (${CONTACT_INFO.whatsapp})`,
       href: `https://wa.me/${CONTACT_INFO.whatsapp}`,
-      color: "bg-emerald-500/15 text-emerald-400",
+      color: "bg-icon-highlight/15 text-icon-highlight",
     },
     {
       icon: Phone,

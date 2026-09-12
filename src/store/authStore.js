@@ -2,8 +2,9 @@ import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import api from "@/lib/api";
 import { connectWebSocket, disconnectWebSocket } from "@/lib/socket";
-import { setAccessToken, getAccessToken, clearAccessToken } from "@/lib/tokenStore";
+import { setAccessToken, getAccessToken, clearAccessToken, setTokenPersistMode } from "@/lib/tokenStore";
 import { cacheUserProfile } from "@/lib/offline/offlineCache";
+import { useToastStore } from "@/store/toastStore";
 
 /**
  * Clear ALL client-side storage — localStorage, sessionStorage, and cookies
@@ -26,6 +27,92 @@ function clearAllStorage() {
   }
 }
 
+const SESSION_MIRROR_KEY = "auth-session";
+
+/**
+ * Mirror the user into sessionStorage when Remember Me is off.
+ * Zustand persist skips localStorage in that mode (see partialize), so this
+ * keeps the session alive for the tab lifetime without persisting restarts.
+ */
+function writeSessionMirror(user) {
+  if (typeof window === "undefined") return;
+  try {
+    if (user) sessionStorage.setItem(SESSION_MIRROR_KEY, JSON.stringify({ user }));
+    else sessionStorage.removeItem(SESSION_MIRROR_KEY);
+  } catch (e) {
+    console.warn("[authStore] session mirror write failed:", e);
+  }
+}
+
+function readSessionMirror() {
+  if (typeof window === "undefined") return null;
+  try {
+    const raw = sessionStorage.getItem(SESSION_MIRROR_KEY);
+    if (!raw) return null;
+    const mirror = JSON.parse(raw);
+    return mirror?.user?.id ? mirror.user : null;
+  } catch (e) {
+    console.warn("[authStore] session mirror read failed:", e);
+    return null;
+  }
+}
+
+/**
+ * Apply the Remember-Me choice after a successful auth: route the access
+ * token to localStorage vs sessionStorage-only and keep localStorage free
+ * of auth-storage when the session must not survive a restart.
+ */
+function applyRememberChoice(remember, user) {
+  setTokenPersistMode(remember);
+  if (!remember && typeof window !== "undefined") {
+    try {
+      localStorage.removeItem("auth-storage");
+    } catch (e) {
+      console.warn("[authStore] auth-storage clear failed:", e);
+    }
+    writeSessionMirror(user);
+    // The trailing set() re-persists an (empty) snapshot — drop the key
+    // again once it lands so session-only auth leaves no auth-storage trace.
+    if (typeof queueMicrotask === "function") {
+      queueMicrotask(() => {
+        try {
+          const raw = localStorage.getItem("auth-storage");
+          if (raw && !JSON.parse(raw)?.state?.userId) {
+            localStorage.removeItem("auth-storage");
+          }
+        } catch (e) {
+          console.warn("[authStore] auth-storage sweep failed:", e);
+        }
+      });
+    }
+  }
+}
+
+/**
+ * Send the user to /auth?expired=1 after the refresh token is rejected.
+ * Dispatches the SPA navigation event first, then hard-redirects as a
+ * fallback in case no navigation listener is mounted on this page.
+ */
+function redirectToExpired() {
+  if (typeof window === "undefined") return;
+  try {
+    window.dispatchEvent(
+      new CustomEvent("clutchd:navigate", { detail: { path: "/auth?expired=1" } }),
+    );
+  } catch (e) {
+    console.warn("[authStore] navigate event failed:", e);
+  }
+  setTimeout(() => {
+    try {
+      if (!window.location.pathname.startsWith("/auth")) {
+        window.location.assign("/auth?expired=1");
+      }
+    } catch (e) {
+      console.warn("[authStore] expired redirect failed:", e);
+    }
+  }, 150);
+}
+
 // Proactive refresh: refresh the access token at 80% of its TTL.
 // Default access token TTL is 15 min (from backend config); override via env.
 const ACCESS_TTL_MS =
@@ -41,7 +128,7 @@ function scheduleProactiveRefresh() {
       const res = await api.post("/auth/refresh");
       const newToken = res.data.token;
       if (typeof window !== "undefined" && newToken) {
-        setAccessToken(newToken);
+        setAccessToken(newToken, ACCESS_TTL_MS);
         connectWebSocket(newToken);
       }
       scheduleProactiveRefresh();
@@ -63,6 +150,7 @@ export const useAuthStore = create(
     (set, get) => ({
       user: null,
       isAuthenticated: false,
+      rememberMe: true,
       _hydrated: false,
       _isRestoring: true,
       isLoading: false,
@@ -79,19 +167,27 @@ export const useAuthStore = create(
       restoreSession: async () => {
         const { user, isAuthenticated } = get();
         if (!isAuthenticated || !user?.id) {
+          // Session-only (Remember Me off) sessions live in sessionStorage.
+          const mirrored = readSessionMirror();
+          if (mirrored) {
+            set({ user: mirrored, isAuthenticated: true, _isRestoring: false });
+            return;
+          }
           set({ _isRestoring: false });
           return;
         }
-        // Demo & Firebase-only users have fake tokens — skip refresh against real backend
-        if (typeof user.id === "string" && (user.id.startsWith("demo-") || user.id.startsWith("firebase-"))) {
+        const uid = typeof user.id === "string" ? user.id : "";
+        // Demo users have fake tokens — skip refresh against real backend
+        if (uid.startsWith("demo-")) {
           set({ _isRestoring: false });
           return;
         }
+        const isFirebase = uid.startsWith("firebase-");
         try {
           const res = await api.post("/auth/refresh");
           const newToken = res.data.token;
           if (typeof window !== "undefined" && newToken) {
-            setAccessToken(newToken);
+            setAccessToken(newToken, ACCESS_TTL_MS);
             connectWebSocket(newToken);
             scheduleProactiveRefresh();
           }
@@ -100,11 +196,24 @@ export const useAuthStore = create(
         } catch (error) {
           const status = error.response?.status;
           if (status === 401 || status === 403) {
+            if (isFirebase) {
+              // Explicit Firebase fallback (BACKEND_CONTRACTS §1): keep the
+              // cached user so the app stays usable, but say so out loud —
+              // never a silent local login.
+              useToastStore.getState().warning(
+                "Backend unavailable. Continuing with your Google (Firebase) session — some features may be limited.",
+              );
+              set({ _isRestoring: false });
+              return;
+            }
             if (typeof window !== "undefined") {
               clearAccessToken();
               disconnectWebSocket();
+              writeSessionMirror(null);
             }
+            clearProactiveRefresh();
             set({ user: null, isAuthenticated: false, error: null, _isRestoring: false });
+            redirectToExpired();
           } else {
             // Network error — allow the user to stay logged in
             // with their cached data; the 401 interceptor handles real failures
@@ -122,55 +231,56 @@ export const useAuthStore = create(
         disconnectWebSocket();
         clearAccessToken();
         clearAllStorage();
+        writeSessionMirror(null);
         set({ user: null, isAuthenticated: false, _hydrated: false, _isRestoring: false, error: null, isLoading: false });
       },
 
       /**
-       * Validate the current session on app startup.
-       * Attempts to refresh the access token using the httpOnly refresh cookie.
-       * If successful, the user stays logged in; otherwise they are logged out.
+       * Remember-Me toggle (LoginCard checkbox, default true).
+       * When false, auth is sessionStorage-only: the token mirror and the
+       * session mirror stay in this tab, and nothing persists to localStorage.
        */
-      checkAuth: async () => {
-        if (!get().isAuthenticated) return;
-        // Demo users have fake tokens — skip refresh against real backend
-        if (get().user?.id?.startsWith?.("demo-")) return;
-
-        try {
-          const res = await api.post("/auth/refresh");
-          const newToken = res.data.token;
-          if (typeof window !== "undefined" && newToken) {
-            setAccessToken(newToken);
-            connectWebSocket(newToken);
-            scheduleProactiveRefresh();
-          }
-        } catch (error) {
-          const status = error.response?.status;
-          if (status === 401 || status === 403) {
-            if (typeof window !== "undefined") {
-              clearAccessToken();
-              disconnectWebSocket();
-            }
-            set({ user: null, isAuthenticated: false, error: null });
+      setRememberMe: (value) => {
+        const remember = value !== false;
+        set({ rememberMe: remember });
+        setTokenPersistMode(remember);
+        if (!remember && typeof window !== "undefined") {
+          // Drop the key AFTER set() so the persist write it triggers is wiped.
+          try {
+            localStorage.removeItem("auth-storage");
+          } catch (e) {
+            console.warn("[authStore] auth-storage clear failed:", e);
           }
         }
       },
 
-      login: async (email, password, role) => {
+      /**
+       * Validate the current session on app startup.
+       * Delegates to restoreSession() — the single source of truth for the
+       * withCredentials refresh flow (BACKEND_CONTRACTS §1).
+       */
+      checkAuth: async () => {
+        await get().restoreSession();
+      },
+
+      login: async (email, password, role, opts) => {
         set({ isLoading: true, error: null });
 
         try {
           const response = await api.post("/auth/login", { email, password, role });
 
+          const remember = opts?.rememberMe ?? get().rememberMe ?? true;
           if (response.data.token && typeof window !== "undefined") {
-            setAccessToken(response.data.token);
+            setAccessToken(response.data.token, ACCESS_TTL_MS);
             connectWebSocket(response.data.token);
             scheduleProactiveRefresh();
+            applyRememberChoice(remember, response.data.user);
           }
 
           // Single set() call after await — no pre-await mutation to avoid
           // React 19 flushSync cascade (#185). Both error clearing and user
           // data are set together so useSyncExternalStore only fires once.
-          set({ user: response.data.user, isAuthenticated: true, _hydrated: true, isLoading: false, error: null });
+          set({ user: response.data.user, isAuthenticated: true, _hydrated: true, isLoading: false, error: null, rememberMe: remember });
           cacheUserProfile(response.data.user);
           return response.data.user;
 
@@ -183,7 +293,7 @@ export const useAuthStore = create(
         }
       },
 
-      loginWithGoogle: async (credential, role = null, state = null) => {
+      loginWithGoogle: async (credential, role = null, state = null, opts) => {
         set({ isLoading: true, error: null });
 
         const safeRole =
@@ -196,10 +306,12 @@ export const useAuthStore = create(
             state: state || undefined,
           });
 
+          const remember = opts?.rememberMe ?? get().rememberMe ?? true;
           if (response.data.token && typeof window !== "undefined") {
-            setAccessToken(response.data.token);
+            setAccessToken(response.data.token, ACCESS_TTL_MS);
             connectWebSocket(response.data.token);
             scheduleProactiveRefresh();
+            applyRememberChoice(remember, response.data.user);
           }
 
           set({
@@ -208,6 +320,7 @@ export const useAuthStore = create(
             _hydrated: true,
             isLoading: false,
             error: null,
+            rememberMe: remember,
           });
           cacheUserProfile(response.data.user);
           return response.data.user;
@@ -226,7 +339,7 @@ export const useAuthStore = create(
             }
 
             const localUser = {
-              id: firebaseUser.uid,
+              id: `firebase-${firebaseUser.uid}`,
               name: firebaseUser.displayName || "Google User",
               email: firebaseUser.email || "",
               avatar: firebaseUser.photoURL || null,
@@ -235,14 +348,22 @@ export const useAuthStore = create(
             };
 
             if (typeof window !== "undefined") {
-              setAccessToken("firebase-local-jwt-token");
+              setAccessToken("firebase-local-jwt-token", ACCESS_TTL_MS);
             }
+            // Explicit fallback (BACKEND_CONTRACTS §1): the backend OAuth
+            // failed, so say so instead of silently logging in locally.
+            useToastStore.getState().warning(
+              "Backend unavailable. Continuing with your Google (Firebase) session — some features may be limited.",
+            );
 
+            applyRememberChoice(opts?.rememberMe ?? get().rememberMe ?? true, localUser);
             set({
               user: localUser,
               isAuthenticated: true,
               _hydrated: true,
               isLoading: false,
+              error: null,
+              rememberMe: opts?.rememberMe ?? get().rememberMe ?? true,
             });
             cacheUserProfile(localUser);
             return localUser;
@@ -291,9 +412,10 @@ export const useAuthStore = create(
           };
 
           if (typeof window !== "undefined") {
-            setAccessToken("firebase-local-jwt-token");
+            setAccessToken("firebase-local-jwt-token", ACCESS_TTL_MS);
           }
 
+          applyRememberChoice(get().rememberMe ?? true, localUser);
           set({
             user: localUser,
             isAuthenticated: true,
@@ -304,11 +426,17 @@ export const useAuthStore = create(
           cacheUserProfile(localUser);
           return localUser;
         } catch (error) {
-          const msg =
-            error.code === "auth/popup-closed-by-user"
-              ? null
-              : "Google sign-in via Firebase failed. Please try again.";
-          set({ isLoading: false, error: msg });
+          if (error.code === "auth/popup-closed-by-user") {
+            set({ isLoading: false, error: null });
+          } else if (error.code === "auth/popup-blocked") {
+            useToastStore.getState().warning(
+              "Pop-up was blocked. Please allow pop-ups for this site and try again.",
+            );
+            set({ isLoading: false, error: null });
+          } else {
+            const msg = "Google sign-in via Firebase failed. Please try again.";
+            set({ isLoading: false, error: msg });
+          }
           return null;
         }
       },
@@ -342,9 +470,10 @@ export const useAuthStore = create(
           };
 
           if (typeof window !== "undefined") {
-            setAccessToken("firebase-local-jwt-token");
+            setAccessToken("firebase-local-jwt-token", ACCESS_TTL_MS);
           }
 
+          applyRememberChoice(get().rememberMe ?? true, localUser);
           set({
             user: localUser,
             isAuthenticated: true,
@@ -363,16 +492,18 @@ export const useAuthStore = create(
         }
       },
 
-      signup: async (data, role) => {
+      signup: async (data, role, opts) => {
 
         try {
           const payload = { ...data, role };
           const response = await api.post("/auth/signup", payload);
 
+          const remember = opts?.rememberMe ?? get().rememberMe ?? true;
           if (response.data.token && typeof window !== "undefined") {
-            setAccessToken(response.data.token);
+            setAccessToken(response.data.token, ACCESS_TTL_MS);
             connectWebSocket(response.data.token);
             scheduleProactiveRefresh();
+            applyRememberChoice(remember, response.data.user);
           }
 
           set({ user: response.data.user, isAuthenticated: true, _hydrated: true, isLoading: false, error: null });
@@ -398,6 +529,7 @@ export const useAuthStore = create(
         if (typeof window !== "undefined") {
           clearAccessToken();
           disconnectWebSocket();
+          writeSessionMirror(null);
         }
         set({ user: null, isAuthenticated: false, _hydrated: true, error: null });
       },
@@ -416,24 +548,48 @@ export const useAuthStore = create(
     }),
     {
       name: "auth-storage",
-      partialize: (state) => ({
-        userId: state.user?.id,
-        userRole: state.user?.role,
-        isAuthenticated: state.isAuthenticated,
-        _hydrated: state._hydrated,
-        user: state.user?.name ? { id: state.user.id, role: state.user.role, name: state.user.name, email: state.user.email, phone: state.user.phone } : undefined,
-      }),
+      partialize: (state) => {
+        // Remember-Me-off sessions are sessionStorage-only: persist nothing
+        // to localStorage so a restart signs the user out.
+        if (state.rememberMe === false) return {};
+        // Persist the user whenever an id exists (backend users may lack
+        // `name` — gating on name dropped those sessions on restart).
+        const u = state.user;
+        return {
+          userId: u?.id,
+          userRole: u?.role,
+          isAuthenticated: state.isAuthenticated,
+          _hydrated: state._hydrated,
+          rememberMe: state.rememberMe ?? true,
+          user: u?.id
+            ? {
+                id: u.id,
+                role: u.role,
+                name: u.name ?? u.fullName ?? null,
+                email: u.email ?? null,
+                phone: u.phone ?? null,
+              }
+            : undefined,
+        };
+      },
       // Merge persisted state over current state, ensuring _hydrated and _isRestoring
       // are correct WITHOUT a separate post-hydration setState call.
       // This avoids a redundant synchronous store update (onRehydrateStorage → setState)
       // that can cascade into React's render cycle and trigger
       // "Maximum update depth exceeded" (#185) in Zustand 5 + React 19.
       merge: (persistedState, currentState) => {
-        // Reconstruct minimal user from persisted fields if full user not persisted
-        if (persistedState?.userId && !persistedState?.user) {
-          currentState = { ...currentState, user: { id: persistedState.userId, role: persistedState.userRole } };
+        const merged = { ...currentState };
+        // Apply only defined persisted values — a `user: undefined` entry
+        // must NOT wipe the reconstructed user below.
+        if (persistedState) {
+          for (const [k, v] of Object.entries(persistedState)) {
+            if (v !== undefined) merged[k] = v;
+          }
         }
-        const merged = { ...currentState, ...persistedState };
+        // Reconstruct minimal user from persisted fields if full user not persisted
+        if (!merged.user && persistedState?.userId) {
+          merged.user = { id: persistedState.userId, role: persistedState.userRole };
+        }
         // Ensure _hydrated is true after rehydration so page guards can proceed
         if (!merged._hydrated && (merged.user || merged.isAuthenticated)) {
           merged._hydrated = true;
@@ -454,4 +610,4 @@ export const useAuthStore = create(
 );
 
 
-// TODO(BACKEND_CONTRACTS §1 auth): narrow demo-/firebase- bypass to explicit Firebase fallback; require /auth/login|refresh when live.
+

@@ -229,7 +229,7 @@ export function PayoutManager() {
 
         <GlassCard variant="outlined" className="p-4">
           <div className="flex items-center gap-3">
-            <div className="p-2.5 rounded-xl bg-amber-500/15 text-amber-400">
+            <div className="p-2.5 rounded-xl bg-warning/15 text-warning">
               <Calendar size={20} />
             </div>
             <div>
@@ -531,7 +531,7 @@ export function PayoutManager() {
             </div>
 
             <div className="flex items-start gap-2 p-3 rounded-xl bg-amber-500/10 border border-amber-500/20">
-              <AlertCircle size={16} className="shrink-0 mt-0.5 text-amber-400" />
+              <AlertCircle size={16} className="shrink-0 mt-0.5 text-warning" />
               <p className="text-xs text-amber-300/80">
                 This will process a manual payout. The amount will be deducted
                 from the mechanic&apos;s pending balance. Backend will be used if

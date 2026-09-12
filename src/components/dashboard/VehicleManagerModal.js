@@ -6,6 +6,7 @@ import { ConfirmModal } from "@/components/ui/ConfirmModal";
 import { Trash2, Plus, Car, Loader2, AlertTriangle } from "lucide-react";
 import api from "@/lib/api";
 import { extractApiError } from "@/lib/api";
+import { formatIndianPlate, canonicalPlate, formatPlateLive } from "@/lib/plateFormatter";
 import { cacheVehicleData } from "@/lib/offline/offlineCache";
 
 export function VehicleManagerModal({ isOpen, onClose, onVehiclesChanged }) {
@@ -46,6 +47,19 @@ export function VehicleManagerModal({ isOpen, onClose, onVehiclesChanged }) {
   }, [isOpen]);
 
   const handleChange = (e) => setFormData({ ...formData, [e.target.name]: e.target.value });
+
+  const handlePlateChange = (e) => {
+    const formatted = formatPlateLive(e.target.value);
+    setFormData((prev) => ({ ...prev, license_plate: formatted }));
+  };
+  const handlePlateBlur = () => {
+    const raw = formData.license_plate;
+    if (!raw) return;
+    const canonical = canonicalPlate(raw);
+    if (canonical !== raw) {
+      setFormData((prev) => ({ ...prev, license_plate: canonical }));
+    }
+  };
 
   const handleAddSubmit = async (e) => {
     e.preventDefault();
@@ -109,7 +123,7 @@ export function VehicleManagerModal({ isOpen, onClose, onVehiclesChanged }) {
             <Input label="Year" name="year" type="number" min="1900" max="2100" value={formData.year} onChange={handleChange} />
             <Input label="Color" name="color" value={formData.color} onChange={handleChange} />
           </div>
-          <Input label="License Plate" name="license_plate" value={formData.license_plate} onChange={handleChange} placeholder="e.g. KA-01-AB-1234" />
+          <Input label="License Plate" name="license_plate" value={formData.license_plate} onChange={handlePlateChange} onBlur={handlePlateBlur} placeholder="e.g. TN-38-AB-1234" />
           
           <div className="flex gap-3 justify-end pt-4 mt-2 border-t border-white/10">
             <Button type="button" variant="ghost" onClick={() => setAdding(false)} disabled={saving}>Cancel</Button>
@@ -136,7 +150,7 @@ export function VehicleManagerModal({ isOpen, onClose, onVehiclesChanged }) {
                     <div>
                       <p className="font-semibold text-text-primary">{v.year} {v.make} {v.model}</p>
                       <p className="text-xs text-text-muted">
-                        {v.license_plate || "No plate"} {v.color ? `• ${v.color}` : ""}
+                        {v.license_plate ? formatIndianPlate(v.license_plate) : "No plate"} {v.color ? `• ${v.color}` : ""}
                       </p>
                     </div>
                   </div>

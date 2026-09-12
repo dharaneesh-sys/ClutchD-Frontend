@@ -3,6 +3,7 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import { BULK_DISCOUNT_TIERS, FLEET_SERVICE_TYPES } from "@/lib/constants";
+import { formatIndianPlate } from "@/lib/plateFormatter";
 import {
   getFleetVehicles,
   saveFleetVehicles,
@@ -146,7 +147,7 @@ export const useFleetStore = create(
           return {
             vehicleId: vid,
             vehicleName: v
-              ? `${v.make} ${v.model} (${v.plate})`
+              ? `${v.make} ${v.model} (${formatIndianPlate(v.plate)})`
               : "Unknown vehicle",
             serviceType: svc,
             price,
@@ -203,7 +204,7 @@ export const useFleetStore = create(
             const v = vehicles.find((veh) => veh.id === vid);
             return {
               vehicleId: vid,
-              vehicleName: v ? `${v.make} ${v.model} (${v.plate})` : "Unknown",
+              vehicleName: v ? `${v.make} ${v.model} (${formatIndianPlate(v.plate)})` : "Unknown",
               serviceType: vehicleServices[vid] || "general_service",
             };
           }),
@@ -224,7 +225,7 @@ export const useFleetStore = create(
           return {
             id: "fsh-" + Math.random().toString(36).substring(2, 9),
             vehicleId: vid,
-            vehicleName: v ? `${v.make} ${v.model} (${v.plate})` : "Unknown",
+            vehicleName: v ? `${v.make} ${v.model} (${formatIndianPlate(v.plate)})` : "Unknown",
             serviceType: vehicleServices[vid] || "general_service",
             description: `Bulk booking - ${vehicleServices[vid] || "service"}`,
             status: "scheduled",

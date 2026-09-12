@@ -38,7 +38,7 @@ function StatsCard({ icon: Icon, label, value, color }) {
             "w-10 h-10 rounded-lg flex items-center justify-center",
             color === "primary" && "bg-primary/10 text-primary-light",
             color === "success" && "bg-green-500/10 text-green-400",
-            color === "warning" && "bg-amber-500/10 text-amber-400",
+            color === "warning" && "bg-warning/10 text-warning",
             color === "danger" && "bg-red-500/10 text-red-400",
             color === "default" && "bg-white/10 text-text-dim"
           )}
@@ -324,6 +324,11 @@ export function CertificationPanel() {
                     <div className="flex items-center gap-2">
                       <Award size={14} className="text-primary-light shrink-0" />
                       <span className="text-sm text-text-primary">{cert.badgeName}</span>
+                      {String(cert.id || "").startsWith("cert-demo-") && (
+                        <span className="rounded-full border border-warning/40 px-1.5 py-0.5 text-[10px] font-semibold text-warning">
+                          Demo
+                        </span>
+                      )}
                     </div>
                   </td>
                   <td className="py-3 px-3">

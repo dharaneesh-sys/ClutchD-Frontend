@@ -71,7 +71,7 @@ export function GarageProfile() {
           <h3 className="text-xl font-semibold text-text-primary">{user?.name || user?.garageName || "Your Garage"}</h3>
            <p className="text-sm text-text-muted">Managed by {user?.ownerName || "Owner"}</p>
           <div className="flex items-center gap-3 mt-2">
-              <div className="flex items-center text-xs text-amber-500">
+              <div className="flex items-center text-xs text-icon-highlight">
                 ⭐ {user?.rating ?? "—"} <span className="ml-1 text-text-dim">Rating</span>
               </div>
               <span className="px-2 py-0.5 rounded text-[10px] font-medium bg-success/20 text-success border border-success/30">

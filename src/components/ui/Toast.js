@@ -27,7 +27,7 @@ const TYPE_CLASSES = {
 const ICON_CLASSES = {
   success: "text-primary-light",
   error: "text-red-400",
-  warning: "text-amber-400",
+  warning: "text-warning",
   info: "text-blue-400",
 };
 

@@ -27,9 +27,9 @@ function StarRating({ rating }) {
   return (
     <div className="flex items-center gap-0.5">
       {Array.from({ length: full }).map((_, i) => (
-        <Star key={`full-${i}`} size={12} className="fill-amber-400 text-amber-400" />
+        <Star key={`full-${i}`} size={12} className="fill-warning text-icon-highlight" />
       ))}
-      {half && <StarHalf size={12} className="fill-amber-400 text-amber-400" />}
+      {half && <StarHalf size={12} className="fill-warning text-icon-highlight" />}
       <span className="text-[11px] text-text-muted ml-1">{Number(rating).toFixed(1)}</span>
     </div>
   );

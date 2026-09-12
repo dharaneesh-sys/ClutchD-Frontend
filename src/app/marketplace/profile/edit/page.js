@@ -8,7 +8,7 @@ import { useAuthStore } from "@/store/authStore";
 import { useToastStore } from "@/store/toastStore";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
-import api from "@/lib/api";
+import api, { extractApiError } from "@/lib/api";
 
 
 
@@ -51,7 +51,7 @@ export default function EditProfilePage() {
         const res = await api.get("/profile/me");
         const p = res.data;
         setForm({
-          name: p.name || "",
+          name: p.full_name || "",
           phone: p.phone || "",
           email: p.email || user?.email || "",
           address: p.address || "",
@@ -99,24 +99,17 @@ export default function EditProfilePage() {
     setIsSubmitting(true);
     try {
       const payload = {
-        name: form.name.trim(),
+        full_name: form.name.trim(),
         phone: form.phone.trim(),
         address: form.address.trim(),
         ...(photoPreview && photoPreview.startsWith("data:") ? { photo: photoPreview } : {}),
       };
       const res = await api.put("/profile/me", payload);
-      updateUserData(res.data.user || payload);
+      updateUserData(res.data || payload);
       toast.success("Profile updated successfully");
       router.push("/marketplace/profile");
     } catch (err) {
-      // Demo fallback — update locally even if API fails
-      updateUserData({
-        name: form.name.trim(),
-        phone: form.phone.trim(),
-        address: form.address.trim(),
-      });
-      toast.success("Profile updated (offline mode)");
-      router.push("/marketplace/profile");
+      toast.error(extractApiError(err));
     } finally {
       setIsSubmitting(false);
     }

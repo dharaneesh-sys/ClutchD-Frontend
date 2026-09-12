@@ -54,14 +54,7 @@ export function PayoutLedger() {
     }
   };
 
-  const formatDate = (dateStr) => {
-    if (!dateStr) return "—";
-    return new Date(dateStr).toLocaleDateString("en-IN", {
-      day: "2-digit",
-      month: "short",
-      year: "numeric",
-    });
-  };
+  import { formatDate } from "@/lib/utils";
 
   return (
     <GlassCard variant="outlined" className="p-4 sm:p-6">

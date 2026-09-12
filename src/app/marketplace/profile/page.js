@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import {
   User,
@@ -17,11 +18,23 @@ import { cn, getInitials, formatDate } from "@/lib/utils";
 import { useAuthStore } from "@/store/authStore";
 import { Button } from "@/components/ui/Button";
 import { ProfileMenu } from "@/components/profile/ProfileMenu";
+import SplashScreen from "@/components/ui/SplashScreen";
 
 export default function ProfilePage() {
   const user = useAuthStore((s) => s.user);
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
+  const _hydrated = useAuthStore((s) => s._hydrated);
   const router = useRouter();
+
+  useEffect(() => {
+    if (_hydrated && !isAuthenticated) {
+      router.push("/auth");
+    }
+  }, [_hydrated, isAuthenticated, router]);
+
+  if (!_hydrated) {
+    return <SplashScreen />;
+  }
 
   const displayName = user?.name || user?.email || "Guest";
   const displayEmail = user?.email || "—";
@@ -87,14 +100,14 @@ export default function ProfilePage() {
               "flex-shrink-0 inline-flex items-center gap-1.5 rounded-full px-2.5 py-1",
               "text-[0.625rem] font-semibold tracking-wide uppercase",
               isAuthenticated
-                ? "bg-emerald-500/15 text-emerald-300"
-                : "bg-amber-500/15 text-amber-300"
+                ? "bg-warning/15 text-warning"
+                : "bg-warning/15 text-warning"
             )}
           >
             <span
               className={cn(
                 "w-1.5 h-1.5 rounded-full",
-                isAuthenticated ? "bg-emerald-400" : "bg-amber-400"
+                isAuthenticated ? "bg-warning" : "bg-warning"
               )}
             />
             {isAuthenticated ? "Active" : "Guest"}
@@ -127,8 +140,8 @@ export default function ProfilePage() {
           </p>
         </div>
         <div className="glass-lux rounded-2xl p-4 text-center">
-          <div className="w-8 h-8 rounded-lg bg-emerald-500/[0.12] flex items-center justify-center mx-auto mb-2">
-            <Wrench size={16} className="text-emerald-400" />
+          <div className="w-8 h-8 rounded-lg bg-warning/10 flex items-center justify-center mx-auto mb-2">
+            <Wrench size={16} className="text-warning" />
           </div>
           <p className="text-lg font-bold text-foreground">0</p>
           <p className="text-[10px] font-medium text-text-muted uppercase tracking-wider mt-0.5">
@@ -137,7 +150,7 @@ export default function ProfilePage() {
         </div>
         <div className="glass-lux rounded-2xl p-4 text-center">
           <div className="w-8 h-8 rounded-lg bg-amber-500/[0.12] flex items-center justify-center mx-auto mb-2">
-            <Gift size={16} className="text-amber-400" />
+            <Gift size={16} className="text-icon-highlight" />
           </div>
           <p className="text-lg font-bold text-foreground">₹0</p>
           <p className="text-[10px] font-medium text-text-muted uppercase tracking-wider mt-0.5">

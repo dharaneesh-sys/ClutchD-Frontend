@@ -67,7 +67,6 @@ export default function RootLayout({ children }) {
                   var a = JSON.parse(localStorage.getItem('auth-storage') || '{}');
                   var u = a && a.state ? (a.state.user || null) : null;
                   document.documentElement.setAttribute('data-auth', u && u.id ? 'true' : 'false');
-                  if (u && u.id) document.documentElement.setAttribute('data-user-id', u.id);
                 } catch(e) {
                   document.documentElement.setAttribute('data-auth', 'false');
                 }

@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 
 import { useAuthStore } from "@/store/authStore";
-import { LogOut, Building2, LayoutDashboard, Users, BarChart3, ShoppingBag, MessageSquare } from "lucide-react";
+import { LayoutDashboard, Users, BarChart3, ShoppingBag, MessageSquare, PackagePlus, Store } from "lucide-react";
 import { ConnectionIndicator } from "@/components/ui/ConnectionIndicator";
 import { NotificationBell } from "@/components/ui/NotificationBell";
 import { DashboardShell } from "@/components/ui/DashboardShell";
@@ -13,11 +13,15 @@ import { GarageProfile } from "@/components/garage/GarageProfile";
 import { GarageJobQueue } from "@/components/garage/GarageJobQueue";
 import { GarageAnalytics } from "@/components/garage/GarageAnalytics";
 import { Logo } from "@/components/ui/Logo";
+import SplashScreen from "@/components/ui/SplashScreen";
 import { NAVIGATION_EVENT } from "@/lib/navigation";
+import { Modal } from "@/components/ui/Modal";
+import { SellerProductForm } from "@/components/marketplace/SellerProductForm";
+import { MyListings } from "@/components/marketplace/MyListings";
 
 export default function GarageDashboard() {
   const user = useAuthStore((s) => s.user);
-  const logout = useAuthStore((s) => s.logout);
+  const [sellOpen, setSellOpen] = useState(false);
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
   const _hydrated = useAuthStore((s) => s._hydrated);
   const router = useRouter();
@@ -46,14 +50,16 @@ export default function GarageDashboard() {
   const [chatJobId, setChatJobId] = useState(null);
   const [chatOtherName, setChatOtherName] = useState("Customer");
 
-  if (!_hydrated || !isAuthenticated) {
-    return <div className="min-h-[100dvh] w-full flex items-center justify-center bg-[var(--background)]"><div className="w-8 h-8 border-2 border-t-transparent rounded-full animate-spin border-[var(--primary)]" /></div>;
+  if (!_hydrated) {
+    return <SplashScreen />;
   }
 
   const sidebarItems = [
     { icon: LayoutDashboard, label: "Dashboard", onClick: () => setActiveTab("dashboard") },
     { icon: Users, label: "Garage Profile", onClick: () => setActiveTab("profile") },
     { icon: BarChart3, label: "Analytics", onClick: () => setActiveTab("analytics") },
+    { icon: PackagePlus, label: "Sell Part", onClick: () => setSellOpen(true) },
+    { icon: Store, label: "My Listings", onClick: () => setActiveTab("mylistings") },
     { icon: ShoppingBag, label: "Parts Store", onClick: () => router.push("/marketplace") },
   ];
 
@@ -108,6 +114,12 @@ export default function GarageDashboard() {
             </div>
           </div>
         )}
+
+        {activeTab === "mylistings" && (
+          <div className="grid grid-cols-1 gap-4 lg:gap-6">
+            <MyListings onAddNew={() => setSellOpen(true)} />
+          </div>
+        )}
       </div>
 
       {/* ── Chat button (appears when a job is active) ──────────────── */}
@@ -132,6 +144,20 @@ export default function GarageDashboard() {
           </button>
         </div>
       )}
+
+      {/* ── Sell Part modal (1 tap from sidebar) ─────────────────────── */}
+      <Modal
+        isOpen={sellOpen}
+        onClose={() => setSellOpen(false)}
+        title="Sell a part"
+      >
+        <SellerProductForm
+          onSuccess={() => {
+            setSellOpen(false);
+            setActiveTab("mylistings");
+          }}
+        />
+      </Modal>
     </DashboardShell>
   );
 }

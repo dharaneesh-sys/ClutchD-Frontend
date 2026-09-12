@@ -73,7 +73,7 @@ export function ETAIndicator({ mechanicLocation, userLocation, status }) {
           aria-live="polite"
           className="flex items-center gap-2 px-4 py-3 rounded-xl bg-bg-card border border-border-subtle text-sm"
         >
-          <CheckCircle2 size={16} className="shrink-0 text-emerald-500" />
+          <CheckCircle2 size={16} className="shrink-0 text-success" />
           <span className="font-medium text-text-primary">
             Mechanic has arrived
           </span>

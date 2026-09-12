@@ -29,19 +29,8 @@ function loadRazorpayScript() {
   });
 }
 
-function simulatePaymentSuccess({ setPayState, onSuccess, method, amount }) {
-  setTimeout(() => {
-    setPayState("success");
-    setTimeout(() => {
-      onSuccess({
-        method,
-        amount,
-        status: "success",
-        transactionId: "TXN_OFFLINE_" + Date.now(),
-      });
-    }, 1500);
-  }, 800);
-}
+// NOTE: offline/simulated payments are intentionally unsupported.
+// A payment only succeeds after a backend-confirmed response — never locally.
 
 // Wrapper remounts content on open/close → fresh state, no reset effect needed
 export function PaymentModal(props) {
@@ -81,15 +70,15 @@ function PaymentModalContent({ isOpen, onClose, amount, pricing, jobId, onSucces
 
     const backendAvailable = await BackendHealth.check();
     if (!backendAvailable) {
-      showError("Backend unreachable. Completing payment offline.");
-      simulatePaymentSuccess({ setPayState, onSuccess, method: preferredMethod, amount: displayAmount });
+      setPayState("failed");
+      showError("Backend unreachable. No payment was taken — try Cash or retry when online.");
       return;
     }
 
     const loaded = await loadRazorpayScript();
     if (!loaded) {
-      showError("Payment gateway unavailable. Completing payment offline.");
-      simulatePaymentSuccess({ setPayState, onSuccess, method: preferredMethod, amount: displayAmount });
+      setPayState("failed");
+      showError("Payment gateway unavailable. No payment was taken — try Cash or QR instead.");
       return;
     }
 

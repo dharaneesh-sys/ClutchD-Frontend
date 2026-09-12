@@ -97,7 +97,7 @@ export function GaragesManager() {
                     <td className={`px-4 py-4 ${"text-text-muted"}`}>{g.phone}</td>
                     <td className="px-4 py-4">
                       <span className="flex items-center gap-1">
-                        <Star size={12} className="text-amber-500" />
+                        <Star size={12} className="text-icon-highlight" />
                         {g.rating}
                       </span>
                     </td>
@@ -190,7 +190,7 @@ export function GaragesManager() {
             <div className="grid grid-cols-2 gap-4">
               <div className={`p-4 rounded-xl border ${"bg-bg-card border-border-subtle"}`}>
                 <p className={`text-xs uppercase mb-1 ${"text-text-dim"}`}>Rating</p>
-                <p className={`font-medium flex items-center gap-1 ${"text-text-primary"}`}><Star size={14} className="text-amber-500" /> {profileModal.rating}</p>
+                <p className={`font-medium flex items-center gap-1 ${"text-text-primary"}`}><Star size={14} className="text-icon-highlight" /> {profileModal.rating}</p>
               </div>
               <div className={`p-4 rounded-xl border ${"bg-bg-card border-border-subtle"}`}>
                 <p className={`text-xs uppercase mb-1 ${"text-text-dim"}`}>Penalty</p>

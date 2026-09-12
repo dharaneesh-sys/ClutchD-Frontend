@@ -17,7 +17,6 @@ import { MaintenanceAlertBanner } from "@/components/dashboard/MaintenanceAlertB
 import { PaymentModal } from "@/components/dashboard/PaymentModal";
 import { ReviewModal } from "@/components/dashboard/ReviewModal";
 import { NotificationBell } from "@/components/ui/NotificationBell";
-import { SOSButton } from "@/components/ui/SOSButton";
 import { DashboardShell } from "@/components/ui/DashboardShell";
 import { ChatPanel } from "@/components/ui/ChatPanel";
 import { History, Wrench, Calendar, ShoppingBag, MessageSquare, Car, X } from "lucide-react";
@@ -446,7 +445,7 @@ export default function CustomerDashboard() {
         })}
       </div>
     </nav>
-    <SOSButton />
+    {/* SOS lives in BottomNav Menu / ProfileMenu / Safety page — no floating overlay */}
 
     {/* ── Chat button (appears when mechanic is assigned) ──────────── */}
     {hasMechanic && chatJobId && (

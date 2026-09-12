@@ -67,14 +67,14 @@ function TimelineStep({ step, state, timestamp, isLast }) {
 
   const stateClasses = {
     completed: {
-      dot: "bg-emerald-400 border-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.45)]",
-      line: "bg-emerald-400/60",
-      text: "text-emerald-300",
-      icon: "text-emerald-900",
+      dot: "bg-success border-success shadow-[0_0_8px_var(--color-success)]",
+      line: "bg-success/60",
+      text: "text-success",
+      icon: "text-success",
       desc: "",
     },
     current: {
-      dot: "bg-primary border-primary shadow-[0_0_12px_rgba(16,185,129,0.55)]",
+      dot: "bg-primary border-primary shadow-[0_0_12px_rgba(var(--color-primary-rgb),0.55)]",
       line: "bg-primary/40",
       text: "text-primary-light",
       icon: "text-primary",

@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import { AlertTriangle } from "lucide-react";
 
 export class ErrorBoundary extends React.Component {
   constructor(props) {
@@ -22,21 +23,37 @@ export class ErrorBoundary extends React.Component {
         return this.props.fallback;
       }
 
+      const errorMessage =
+        this.state.error?.message || "An unexpected error occurred.";
+
       return (
-        <div className="flex items-center justify-center p-8">
-          <div className="glass p-6 text-center max-w-sm w-full">
-            <div className="w-12 h-12 mx-auto mb-4 rounded-full bg-red-500/10 flex items-center justify-center">
-              <svg className="w-6 h-6 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z" />
-              </svg>
+        <div className="flex items-center justify-center min-h-screen px-4 bg-background">
+          <div className="glass-lux p-8 sm:p-12 text-center max-w-md w-full">
+            <div className="w-16 h-16 mx-auto mb-6 rounded-full bg-red-500/10 flex items-center justify-center">
+              <AlertTriangle className="w-8 h-8 text-red-400" strokeWidth={2} />
             </div>
-            <h3 className="text-base font-bold text-[var(--foreground)] mb-1">Something went wrong</h3>
-            <p className="text-[var(--foreground)]/50 text-xs mb-4">This section encountered an error.</p>
+            <h2 className="text-xl font-bold text-foreground mb-2">
+              Something went wrong
+            </h2>
+            <p className="text-sm text-text-muted mb-6">{errorMessage}</p>
+
+            {/* Expandable error details */}
+            {this.state.error && (
+              <details className="mb-6 text-left">
+                <summary className="cursor-pointer text-xs text-text-muted hover:text-foreground transition-colors select-none">
+                  Error details
+                </summary>
+                <pre className="mt-2 p-3 rounded-lg bg-surface-soft text-xs text-text-muted overflow-auto max-h-32 whitespace-pre-wrap break-all">
+                  {this.state.error.stack || this.state.error.message}
+                </pre>
+              </details>
+            )}
+
             <button
               onClick={() => this.setState({ hasError: false, error: null })}
-              className="px-4 py-2 rounded-lg bg-[var(--primary)] hover:opacity-90 text-white text-xs font-semibold transition-all"
+              className="px-6 py-3 rounded-xl bg-primary hover:opacity-90 text-white font-semibold text-sm transition-all duration-200"
             >
-              Retry
+              Try Again
             </button>
           </div>
         </div>

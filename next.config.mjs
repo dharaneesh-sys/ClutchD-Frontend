@@ -75,7 +75,7 @@ const nextConfig = {
                 //     - raw.githubusercontent.com — Leaflet marker icons
                 //       loaded by react-leaflet
                 //     - www.gstatic.com           — Firebase FCM SW scripts
-                `script-src 'self' https://accounts.google.com https://checkout.razorpay.com https://raw.githubusercontent.com https://www.gstatic.com 'unsafe-inline' 'unsafe-eval'`,
+                `script-src 'self' https://accounts.google.com https://checkout.razorpay.com https://raw.githubusercontent.com https://www.gstatic.com 'unsafe-inline'${process.env.NODE_ENV === 'production' ? '' : " 'unsafe-eval'"}`,
 
                 // ── style-src ───────────────────────────────────────────
                 //   'unsafe-inline' — Next.js injects inline styles for

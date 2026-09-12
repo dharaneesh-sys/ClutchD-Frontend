@@ -5,6 +5,7 @@ import { Modal } from "@/components/ui/Modal";
 import { Button } from "@/components/ui/Button";
 import { Calendar, Clock, Car, MessageSquare, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { formatIndianPlate } from "@/lib/plateFormatter";
 
 /**
  * Generate 30-minute time slots from 8:00 AM to 6:00 PM.
@@ -86,7 +87,7 @@ export function ScheduleBookingModal({ isOpen, onClose, onSubmit, isLoading, veh
               {vehicles.map((v) => (
                 <option key={v.id} value={v.id}>
                   {v.year} {v.make} {v.model}
-                  {v.license_plate ? ` (${v.license_plate})` : ""}
+                  {v.license_plate ? ` (${formatIndianPlate(v.license_plate)})` : ""}
                 </option>
               ))}
             </select>

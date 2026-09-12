@@ -36,6 +36,7 @@ export const useOrderStore = create(
           0,
         );
 
+        // Build local order object (camelCase for frontend consumption)
         const newOrder = {
           id: "ord-" + Date.now(),
           items: cartItems.map(({ productId, name, quantity, price }) => ({
@@ -51,8 +52,18 @@ export const useOrderStore = create(
           createdAt: new Date().toISOString(),
         };
 
+        // Send correct OrderCreate payload matching backend schema
         try {
-          await api.post("/orders", newOrder);
+          await api.post("/orders", {
+            items: cartItems.map(({ productId, name, quantity, price }) => ({
+              product_id: productId,
+              name,
+              quantity,
+              price,
+            })),
+            address,
+            payment: payment || { method: "unknown" },
+          });
         } catch (error) {
           const msg =
             error.response?.data?.detail ||

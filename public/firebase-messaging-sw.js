@@ -21,12 +21,16 @@ importScripts(
 );
 
 // ---- Firebase initialisation ----
+// Config is passed via query params from pushService.registerFcmSw().
+const _cfg = Object.fromEntries(
+  new URL(self.location.href).searchParams.entries(),
+);
 // eslint-disable-next-line no-undef
 firebase.initializeApp({
-  apiKey: self.__FIREBASE_API_KEY || undefined,
-  projectId: self.__FIREBASE_PROJECT_ID || undefined,
-  messagingSenderId: self.__FIREBASE_SENDER_ID || undefined,
-  appId: self.__FIREBASE_APP_ID || undefined,
+  apiKey: _cfg.apiKey || undefined,
+  projectId: _cfg.projectId || undefined,
+  messagingSenderId: _cfg.senderId || undefined,
+  appId: _cfg.appId || undefined,
 });
 
 // ---- Messaging instance ----

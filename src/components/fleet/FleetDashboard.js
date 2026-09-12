@@ -15,12 +15,14 @@ import {
   DollarSign,
   AlertCircle,
   Zap,
+  MessageSquare,
 } from "lucide-react";
 import { GlassCard } from "@/components/ui/GlassCard";
 import { Badge } from "@/components/ui/Badge";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { Button } from "@/components/ui/Button";
-import { cn } from "@/lib/utils";
+import { cn, formatDate } from "@/lib/utils";
+import { formatIndianPlate } from "@/lib/plateFormatter";
 import {
   getFleetRegistration,
   getFleetVehicles,
@@ -68,6 +70,7 @@ function StatCard({ icon: Icon, label, value, sub, className }) {
 }
 
 function VehicleCard({ vehicle }) {
+  const [expanded, setExpanded] = useState(false);
   const statusColor =
     vehicle.status === "active"
       ? "bg-green-500"
@@ -76,6 +79,7 @@ function VehicleCard({ vehicle }) {
         : "bg-red-500";
 
   const typeLabel = VEHICLE_TYPE_LABELS[vehicle.type] || vehicle.type || "Vehicle";
+  const detailsId = `vehicle-details-${vehicle.id}`;
 
   return (
     <GlassCard variant="glass-lux-interactive" className="p-4">
@@ -88,13 +92,13 @@ function VehicleCard({ vehicle }) {
             <p className="text-sm font-semibold text-foreground truncate">
               {vehicle.make} {vehicle.model}
             </p>
-            <p className="text-xs text-text-muted">{vehicle.plate}</p>
+            <p className="text-xs text-text-muted font-mono tracking-wider">{formatIndianPlate(vehicle.plate)}</p>
             <div className="flex items-center gap-2 mt-1.5">
               <span className="text-[10px] text-text-dim">{typeLabel} • {vehicle.year}</span>
               <span className={cn(
                 "inline-flex items-center gap-1 text-[10px] font-medium",
                 vehicle.status === "active" ? "text-green-400" :
-                vehicle.status === "maintenance" ? "text-amber-400" : "text-red-400"
+                vehicle.status === "maintenance" ? "text-warning" : "text-red-400"
               )}>
                 <span className={cn("w-1.5 h-1.5 rounded-full", statusColor)} />
                 {vehicle.status}
@@ -102,13 +106,42 @@ function VehicleCard({ vehicle }) {
             </div>
           </div>
         </div>
-        <ChevronRight size={16} className="text-text-dim shrink-0" />
+        <button
+          type="button"
+          onClick={() => setExpanded((e) => !e)}
+          aria-expanded={expanded}
+          aria-controls={detailsId}
+          aria-label={expanded ? `Collapse details for ${vehicle.make} ${vehicle.model}` : `Expand details for ${vehicle.make} ${vehicle.model}`}
+          className="p-1.5 -m-1.5 rounded-lg text-text-dim hover:text-foreground hover:bg-surface-soft transition-colors shrink-0"
+        >
+          <ChevronRight size={16} className={cn("transition-transform", expanded && "rotate-90")} />
+        </button>
       </div>
+      {expanded && (
+        <div id={detailsId} className="mt-3 pt-3 border-t border-border-subtle/50 grid grid-cols-2 gap-2 text-xs">
+          <div>
+            <p className="text-[10px] uppercase tracking-wider text-text-dim">Plate</p>
+            <p className="font-medium font-mono tracking-wider text-foreground mt-0.5">{formatIndianPlate(vehicle.plate)}</p>
+          </div>
+          <div>
+            <p className="text-[10px] uppercase tracking-wider text-text-dim">Type</p>
+            <p className="font-medium text-foreground mt-0.5">{typeLabel}</p>
+          </div>
+          <div>
+            <p className="text-[10px] uppercase tracking-wider text-text-dim">Year</p>
+            <p className="font-medium text-foreground mt-0.5">{vehicle.year}</p>
+          </div>
+          <div>
+            <p className="text-[10px] uppercase tracking-wider text-text-dim">Status</p>
+            <p className="font-medium text-foreground mt-0.5 capitalize">{vehicle.status}</p>
+          </div>
+        </div>
+      )}
     </GlassCard>
   );
 }
 
-function ServiceRow({ entry }) {
+function ServiceRow({ entry, onChat }) {
   const statusVariant =
     entry.status === "completed" ? "success" :
     entry.status === "in_progress" ? "warning" : "glass";
@@ -135,7 +168,7 @@ function ServiceRow({ entry }) {
         <div className="flex items-center gap-3 mt-1.5 text-[11px] text-text-dim">
           <span className="flex items-center gap-1">
             <Calendar size={10} />
-            {new Date(entry.date).toLocaleDateString()}
+            {formatDate(entry.date)}
           </span>
           <span className="flex items-center gap-1">
             <DollarSign size={10} />
@@ -143,6 +176,16 @@ function ServiceRow({ entry }) {
           </span>
           <span className="truncate">{entry.providerName}</span>
         </div>
+          {onChat && (
+            <button
+              type="button"
+              onClick={() => onChat(entry.id, entry.providerName)}
+              aria-label={`Chat about service ${entry.id}`}
+              className="mt-2 inline-flex items-center gap-1 text-xs font-medium text-primary-light hover:text-primary transition-colors"
+            >
+              <MessageSquare size={14} className="mr-1" /> Chat
+            </button>
+          )}
       </div>
     </div>
   );
@@ -151,7 +194,7 @@ function ServiceRow({ entry }) {
 /**
  * Fleet/B2B dashboard showing fleet vehicles, service history, and bulk discounts.
  */
-export function FleetDashboard({ onRegisterNew, onStartBooking }) {
+export function FleetDashboard({ onRegisterNew, onStartBooking, onChat }) {
   const [fleet, setFleet] = useState(null);
   const [vehicles, setVehicles] = useState([]);
   const [serviceHistory, setServiceHistory] = useState([]);
@@ -345,10 +388,6 @@ export function FleetDashboard({ onRegisterNew, onStartBooking }) {
                   {tierInfo.discountRate}% off parts
                 </span>
               </div>
-              <div className="flex items-center justify-between py-1.5">
-                <span>Dedicated account manager</span>
-                <Badge variant="glass">Coming Soon</Badge>
-              </div>
             </div>
           </GlassCard>
 
@@ -365,7 +404,7 @@ export function FleetDashboard({ onRegisterNew, onStartBooking }) {
             {recentServices.length > 0 ? (
               <GlassCard variant="glass-lux" className="divide-y divide-border-subtle/50">
                 {recentServices.map((entry) => (
-                  <ServiceRow key={entry.id} entry={entry} />
+                  <ServiceRow key={entry.id} entry={entry} onChat={onChat} />
                 ))}
               </GlassCard>
             ) : (

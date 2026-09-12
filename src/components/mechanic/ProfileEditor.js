@@ -84,7 +84,7 @@ export function ProfileEditor() {
         <div>
           <h3 className="text-xl font-semibold text-text-primary">{displayName}</h3>
            <p className="text-sm text-text-muted">Independent Mechanic</p>
-          <div className="flex items-center text-xs text-amber-500 mt-1">
+          <div className="flex items-center text-xs text-icon-highlight mt-1">
             ⭐ {user.rating ?? "—"} Rating
           </div>
         </div>

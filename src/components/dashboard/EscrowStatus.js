@@ -25,7 +25,7 @@ export function EscrowStatus({ status, paymentAmount, onRelease, onDispute }) {
       return (
         <div className="rounded-xl border p-5 bg-bg-card border-border-subtle">
           <div className="flex items-start gap-4">
-            <div className="w-11 h-11 rounded-full flex items-center justify-center shrink-0 bg-amber-500/10 text-amber-400">
+            <div className="w-11 h-11 rounded-full flex items-center justify-center shrink-0 bg-warning/10 text-warning">
               <Shield size={22} />
             </div>
             <div className="flex-1 min-w-0">
@@ -73,7 +73,7 @@ export function EscrowStatus({ status, paymentAmount, onRelease, onDispute }) {
                 )}
               </div>
               {isBackendUnavailable && (
-                <p className="text-[10px] mt-3 text-amber-500/70 flex items-center gap-1">
+                <p className="text-[10px] mt-3 text-warning/70 flex items-center gap-1">
                   <ArrowRight size={10} />
                   Offline mode — state managed locally
                 </p>
@@ -98,7 +98,7 @@ export function EscrowStatus({ status, paymentAmount, onRelease, onDispute }) {
                 Payment released to the mechanic. Thank you for your business!
               </p>
               {isBackendUnavailable && (
-                <p className="text-[10px] mt-3 text-amber-500/70 flex items-center gap-1">
+                <p className="text-[10px] mt-3 text-warning/70 flex items-center gap-1">
                   <ArrowRight size={10} />
                   Offline mode — state managed locally
                 </p>
@@ -123,7 +123,7 @@ export function EscrowStatus({ status, paymentAmount, onRelease, onDispute }) {
                 Dispute raised — your payment is secure while we review the case.
               </p>
               {isBackendUnavailable && (
-                <p className="text-[10px] mt-3 text-amber-500/70 flex items-center gap-1">
+                <p className="text-[10px] mt-3 text-warning/70 flex items-center gap-1">
                   <ArrowRight size={10} />
                   Offline mode — state managed locally
                 </p>

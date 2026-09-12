@@ -27,10 +27,10 @@ const CERT_STYLE = {
     icon: Wrench,
   },
   bosch: {
-    gradient: "from-emerald-500/25 to-emerald-500/10",
-    text: "text-emerald-300",
-    border: "border-emerald-500/35",
-    glow: "rgba(16,185,129,0.15)",
+    gradient: "from-warning/25 to-warning/10",
+    text: "text-warning",
+    border: "border-warning/35",
+    glow: "rgba(245,158,11,0.15)",
     icon: Hexagon,
   },
 };
@@ -136,7 +136,7 @@ export function CertificationBadge({ certification, issuedDate, expiryDate, show
                 <div
                   className={cn(
                     "h-full rounded-full transition-all",
-                    expiresIn > 180 ? "bg-emerald-500" : expiresIn > 60 ? "bg-amber-500" : "bg-red-500"
+                    expiresIn > 180 ? "bg-success" : expiresIn > 60 ? "bg-warning" : "bg-danger"
                   )}
                   style={{ width: `${Math.min(100, (expiresIn / 1095) * 100)}%` }}
                 />

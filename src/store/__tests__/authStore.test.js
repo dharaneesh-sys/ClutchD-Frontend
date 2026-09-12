@@ -5,6 +5,7 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 // ---------------------------------------------------------------------------
 const mockPost = vi.hoisted(() => vi.fn());
 const mockSetAccessToken = vi.hoisted(() => vi.fn());
+const mockSetTokenPersistMode = vi.hoisted(() => vi.fn());
 const mockGetAccessToken = vi.hoisted(() => vi.fn(() => "fake-token"));
 const mockClearAccessToken = vi.hoisted(() => vi.fn());
 const mockConnectWebSocket = vi.hoisted(() => vi.fn());
@@ -21,15 +22,24 @@ vi.mock("@/lib/socket", () => ({
 
 vi.mock("@/lib/tokenStore", () => ({
   setAccessToken: mockSetAccessToken,
+  setTokenPersistMode: mockSetTokenPersistMode,
   getAccessToken: mockGetAccessToken,
   clearAccessToken: mockClearAccessToken,
+}));
+
+// Mock Firebase auth so it throws — ensures loginWithGoogle's API-failure
+// path surfaces the original error instead of falling through to Firebase.
+vi.mock("@/lib/auth/firebaseAuth", () => ({
+  signInWithGoogleCredential: vi.fn(() => {
+    throw new Error("Firebase not available in test");
+  }),
 }));
 
 // ---------------------------------------------------------------------------
 // Import store AFTER mocks (vi.mock hoists them)
 // ---------------------------------------------------------------------------
 import { useAuthStore } from "@/store/authStore";
-
+import { useToastStore } from "@/store/toastStore";
 // ---------------------------------------------------------------------------
 // Helpers
 // ---------------------------------------------------------------------------
@@ -40,10 +50,15 @@ function resetStore() {
   useAuthStore.setState({
     user: null,
     isAuthenticated: false,
+    rememberMe: true,
     _hydrated: true,
+    _isRestoring: false,
     isLoading: false,
     error: null,
   });
+  useToastStore.getState().clearToasts();
+  localStorage.removeItem("auth-storage");
+  sessionStorage.removeItem("auth-session");
 }
 
 // ---------------------------------------------------------------------------
@@ -70,7 +85,7 @@ describe("authStore", () => {
         email: "alice@example.com",
         password: "Pass1234",
       });
-      expect(mockSetAccessToken).toHaveBeenCalledWith(mockToken);
+      expect(mockSetAccessToken).toHaveBeenCalledWith(mockToken, expect.any(Number));
       expect(useAuthStore.getState().user).toEqual(mockUser);
       expect(useAuthStore.getState().isAuthenticated).toBe(true);
       expect(useAuthStore.getState().isLoading).toBe(false);
@@ -147,7 +162,9 @@ describe("authStore", () => {
         .getState()
         .loginWithGoogle("bad-cred");
 
-      expect(useAuthStore.getState().error).toBe("Google auth failed");
+      expect(useAuthStore.getState().error).toBe(
+        "Google sign-in failed. Please try again.",
+      );
       expect(result).toBeNull();
     });
   });
@@ -310,7 +327,7 @@ describe("authStore", () => {
       await useAuthStore.getState().checkAuth();
 
       expect(mockPost).toHaveBeenCalledWith("/auth/refresh");
-      expect(mockSetAccessToken).toHaveBeenCalledWith("refreshed-token");
+      expect(mockSetAccessToken).toHaveBeenCalledWith("refreshed-token", expect.any(Number));
     });
 
     it("logs out on 401 during checkAuth", async () => {
@@ -375,4 +392,185 @@ describe("authStore", () => {
       expect(useAuthStore.getState().error).toBeNull();
     });
   });
+
+  // ── access token ttl ─────────────────────────────
+  describe("access token ttl", () => {
+    it("passes a ttl to setAccessToken on login", async () => {
+      mockPost.mockResolvedValueOnce({
+        data: { token: mockToken, user: mockUser },
+      });
+
+      await useAuthStore.getState().login("alice@example.com", "Pass1234");
+
+      expect(mockSetAccessToken).toHaveBeenCalledWith(mockToken, expect.any(Number));
+      expect(mockSetAccessToken.mock.calls[0][1]).toBeGreaterThan(0);
+    });
+
+    it("passes a ttl on signup and Google login", async () => {
+      mockPost.mockResolvedValueOnce({
+        data: { token: mockToken, user: mockUser },
+      });
+      await useAuthStore
+        .getState()
+        .signup({ email: "a@b.c", password: "Pass1234" }, "customer");
+      expect(mockSetAccessToken).toHaveBeenCalledWith(mockToken, expect.any(Number));
+
+      vi.clearAllMocks();
+      mockPost.mockResolvedValueOnce({
+        data: { token: mockToken, user: mockUser },
+      });
+      await useAuthStore.getState().loginWithGoogle("cred", "customer");
+      expect(mockSetAccessToken).toHaveBeenCalledWith(mockToken, expect.any(Number));
+    });
+
+    it("passes a ttl on proactive-style refresh via restoreSession", async () => {
+      useAuthStore.setState({
+        user: { id: "u-1", role: "customer" },
+        isAuthenticated: true,
+        _hydrated: true,
+      });
+      mockPost.mockResolvedValueOnce({ data: { token: "fresh" } });
+
+      await useAuthStore.getState().restoreSession();
+
+      expect(mockSetAccessToken).toHaveBeenCalledWith("fresh", expect.any(Number));
+    });
+  });
+
+  // ── checkAuth delegation ─────────────────────────
+  describe("checkAuth delegation", () => {
+    it("delegates to restoreSession", async () => {
+      const spy = vi
+        .spyOn(useAuthStore.getState(), "restoreSession")
+        .mockResolvedValue(undefined);
+
+      await useAuthStore.getState().checkAuth();
+
+      expect(spy).toHaveBeenCalled();
+      spy.mockRestore();
+    });
+  });
+
+  // ── firebase session refresh ─────────────────────
+  describe("firebase session refresh", () => {
+    it("attempts POST /auth/refresh for firebase users", async () => {
+      useAuthStore.setState({
+        user: { id: "firebase-uid-1", role: "customer", name: "G User" },
+        isAuthenticated: true,
+        _hydrated: true,
+      });
+      mockPost.mockResolvedValueOnce({
+        data: { token: "fresh", user: { id: "firebase-uid-1" } },
+      });
+
+      await useAuthStore.getState().restoreSession();
+
+      expect(mockPost).toHaveBeenCalledWith("/auth/refresh");
+      expect(mockSetAccessToken).toHaveBeenCalledWith("fresh", expect.any(Number));
+      expect(useAuthStore.getState().isAuthenticated).toBe(true);
+    });
+
+    it("falls back to cached firebase user with explicit toast on 401", async () => {
+      const cached = { id: "firebase-uid-1", role: "customer", name: "G User" };
+      useAuthStore.setState({
+        user: cached,
+        isAuthenticated: true,
+        _hydrated: true,
+      });
+      mockPost.mockRejectedValueOnce({ response: { status: 401 } });
+
+      await useAuthStore.getState().restoreSession();
+
+      expect(useAuthStore.getState().user).toEqual(cached);
+      expect(useAuthStore.getState().isAuthenticated).toBe(true);
+      expect(mockClearAccessToken).not.toHaveBeenCalled();
+      const toasts = useToastStore.getState().toasts;
+      expect(toasts.some((t) => t.type === "warning")).toBe(true);
+    });
+
+    it("keeps cached user on network error (offline fallback)", async () => {
+      const cached = { id: "u-1", role: "customer" };
+      useAuthStore.setState({
+        user: cached,
+        isAuthenticated: true,
+        _hydrated: true,
+      });
+      mockPost.mockRejectedValueOnce(new Error("Network Error"));
+
+      await useAuthStore.getState().restoreSession();
+
+      expect(useAuthStore.getState().user).toEqual(cached);
+      expect(useAuthStore.getState().isAuthenticated).toBe(true);
+    });
+  });
+
+  // ── rememberMe ───────────────────────────────────
+  describe("rememberMe", () => {
+    it("defaults to true", () => {
+      expect(useAuthStore.getState().rememberMe).toBe(true);
+    });
+
+    it("session-only login skips auth-storage persist and mirrors to sessionStorage", async () => {
+      mockPost.mockResolvedValueOnce({
+        data: { token: mockToken, user: mockUser },
+      });
+
+      await useAuthStore
+        .getState()
+        .login("alice@example.com", "Pass1234", "customer", { rememberMe: false });
+
+      expect(mockSetTokenPersistMode).toHaveBeenCalledWith(false);
+      expect(useAuthStore.getState().isAuthenticated).toBe(true);
+      const persisted = JSON.parse(localStorage.getItem("auth-storage") || "null");
+      expect(persisted?.state?.userId).toBeUndefined();
+      const mirror = JSON.parse(sessionStorage.getItem("auth-session"));
+      expect(mirror.user).toEqual(mockUser);
+    });
+
+    it("setRememberMe(false) clears persisted auth-storage", () => {
+      localStorage.setItem("auth-storage", JSON.stringify({ state: {} }));
+
+      useAuthStore.getState().setRememberMe(false);
+
+      expect(useAuthStore.getState().rememberMe).toBe(false);
+      expect(localStorage.getItem("auth-storage")).toBeNull();
+      expect(mockSetTokenPersistMode).toHaveBeenCalledWith(false);
+    });
+  });
 });
+
+  // ── cold-start persist regression ─────────────────
+  describe("cold-start persist", () => {
+    it("partialize keeps users without a name field", () => {
+      const noNameUser = { id: "u-9", email: "noname@example.com", role: "customer" };
+      useAuthStore.setState({ user: noNameUser, isAuthenticated: true, rememberMe: true });
+      const persisted = useAuthStore.persist?.getOptions?.()?.partialize?.(
+        useAuthStore.getState(),
+      );
+      expect(persisted?.user?.id).toBe("u-9");
+      expect(persisted?.userId).toBe("u-9");
+    });
+
+    it("merge reconstructs user from userId when user is undefined", () => {
+      const merge = useAuthStore.persist?.getOptions?.()?.merge;
+      expect(typeof merge).toBe("function");
+      const current = {
+        user: null,
+        isAuthenticated: false,
+        _hydrated: false,
+        _isRestoring: true,
+      };
+      const persisted = {
+        userId: "u-9",
+        userRole: "mechanic",
+        isAuthenticated: true,
+        _hydrated: false,
+        user: undefined,
+      };
+      const merged = merge(persisted, current);
+      expect(merged.user?.id).toBe("u-9");
+      expect(merged.user?.role).toBe("mechanic");
+      expect(merged.isAuthenticated).toBe(true);
+      expect(merged._hydrated).toBe(true);
+    });
+  });

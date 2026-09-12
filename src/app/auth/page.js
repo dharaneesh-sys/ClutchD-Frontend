@@ -3,8 +3,10 @@
 import { useState } from "react";
 import { LoginCard } from "@/components/auth/LoginCard";
 import { SignUpCard } from "@/components/auth/SignUpCard";
+import { useAuthRedirect } from "@/hooks/useAuthRedirect";
 export default function AuthPage() {
   const [isLoginView, setIsLoginView] = useState(true);
+  useAuthRedirect();
 
   return (
     <div className="min-h-screen flex items-center justify-center p-4 sm:p-8 relative overflow-hidden page-enter">

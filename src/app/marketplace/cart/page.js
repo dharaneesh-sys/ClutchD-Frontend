@@ -7,7 +7,7 @@ import { ShoppingCart, Minus, Plus, Trash2, Tag } from "lucide-react";
 import { useCartStore } from "@/store/cartStore";
 import { ProductImage } from "@/components/marketplace/ProductImage";
 import { Button } from "@/components/ui/Button";
-import { cn, formatCurrency } from "@/lib/utils";
+import { formatCurrency } from "@/lib/utils";
 
 const DELIVERY_FREE_THRESHOLD = 500;
 const DELIVERY_CHARGE = 49;
@@ -36,7 +36,7 @@ export default function CartPage() {
 
   const total = Math.max(0, subtotal - discount) + deliveryCharge;
 
-  const handleApplyCoupon = () => {
+  const handleApplyCoupon = async () => {
     const code = couponInput.trim();
     if (!code) {
       setCouponError("Please enter a coupon code");
@@ -44,10 +44,15 @@ export default function CartPage() {
       return;
     }
     setCouponError("");
-    applyCoupon(code);
-    setCouponSuccess(`Coupon "${code.toUpperCase()}" applied!`);
-    setCouponInput("");
-    setShowCoupon(false);
+    setCouponSuccess("");
+    const result = await applyCoupon(code);
+    if (result.success) {
+      setCouponSuccess(result.message);
+      setCouponInput("");
+      setShowCoupon(false);
+    } else {
+      setCouponError(result.message);
+    }
   };
 
   const handleQuantityChange = (productId, newQty) => {

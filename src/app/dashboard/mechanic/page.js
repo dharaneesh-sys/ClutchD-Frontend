@@ -13,13 +13,17 @@ import { IncomingJobs } from "@/components/mechanic/IncomingJobs";
 import { EarningsChart } from "@/components/mechanic/EarningsChart";
 import { useAuthStore } from "@/store/authStore";
 import { useTrackingStore } from "@/store/trackingStore";
-import { LogOut, Wrench, Briefcase, MapPin, DollarSign, ShoppingBag, X, MessageSquare } from "lucide-react";
+import { Briefcase, MapPin, DollarSign, ShoppingBag, X, MessageSquare, PackagePlus, Store } from "lucide-react";
 import { NotificationBell } from "@/components/ui/NotificationBell";
 import { ConnectionIndicator } from "@/components/ui/ConnectionIndicator";
 import { DashboardShell } from "@/components/ui/DashboardShell";
 import { ChatPanel } from "@/components/ui/ChatPanel";
 import { Logo } from "@/components/ui/Logo";
+import SplashScreen from "@/components/ui/SplashScreen";
 import { NAVIGATION_EVENT } from "@/lib/navigation";
+import { Modal } from "@/components/ui/Modal";
+import { SellerProductForm } from "@/components/marketplace/SellerProductForm";
+import { MyListings } from "@/components/marketplace/MyListings";
 
 const NavigationMap = dynamic(
   () => import("../../../components/dashboard/MapView"),
@@ -31,7 +35,7 @@ const NavigationMap = dynamic(
 
 export default function MechanicDashboard() {
   const user = useAuthStore((s) => s.user);
-  const logout = useAuthStore((s) => s.logout);
+  const [sellOpen, setSellOpen] = useState(false);
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
   const _hydrated = useAuthStore((s) => s._hydrated);
   const router = useRouter();
@@ -59,7 +63,7 @@ export default function MechanicDashboard() {
       clearTimeout(id);
       stopWatching();
     };
-  }, [_hydrated, isAuthenticated]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [_hydrated, isAuthenticated]);
 
   // Listen for navigation events from non-React contexts (e.g., axios interceptors)
   useEffect(() => {
@@ -78,14 +82,16 @@ export default function MechanicDashboard() {
   const [chatJobId, setChatJobId] = useState(null);
   const [chatOtherName, setChatOtherName] = useState("Customer");
 
-  if (!_hydrated || !isAuthenticated) {
-    return <div className="min-h-[100dvh] w-full flex items-center justify-center bg-[var(--background)]"><div className="w-8 h-8 border-2 border-t-transparent rounded-full animate-spin border-[var(--primary)]" /></div>;
+  if (!_hydrated) {
+    return <SplashScreen />;
   }
 
   const sidebarItems = [
     { icon: Briefcase, label: "Jobs", onClick: () => setActiveTab("jobs") },
     { icon: MapPin, label: "Navigation", onClick: () => setActiveTab("navigation") },
     { icon: DollarSign, label: "Earnings", onClick: () => setActiveTab("earnings") },
+    { icon: PackagePlus, label: "Sell Part", onClick: () => setSellOpen(true) },
+    { icon: Store, label: "My Listings", onClick: () => setActiveTab("mylistings") },
     { icon: ShoppingBag, label: "Parts Store", onClick: () => router.push("/marketplace") },
   ];
 
@@ -116,7 +122,7 @@ export default function MechanicDashboard() {
                 onClick={item.onClick}
                 className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium transition-all ${
                   isStore
-                    ? "text-emerald-400 hover:bg-emerald-500/10 border border-emerald-500/20"
+                    ? "text-text-muted hover:text-text-primary hover:bg-bg-card/50 border border-transparent"
                     : isActive
                       ? "bg-bg-card shadow-sm border border-border-subtle text-text-primary"
                       : "text-text-muted hover:text-text-primary hover:bg-bg-card/50 border border-transparent"
@@ -167,7 +173,7 @@ export default function MechanicDashboard() {
                 <div className="backdrop-blur-xl bg-black/70 rounded-2xl border border-white/10 shadow-2xl overflow-hidden max-h-[55vh]">
                   <div className="flex items-center justify-between px-4 py-3 border-b border-white/10">
                     <div className="flex items-center gap-2">
-                      <Briefcase size={15} className="text-emerald-400" />
+                      <Briefcase size={15} className="text-icon-highlight" />
                       <span className="text-sm font-semibold text-white">Job Queue</span>
                     </div>
                     <button onClick={() => setJobsPanelOpen(false)} className="p-1.5 rounded-lg hover:bg-white/10 text-white/50 hover:text-white transition-colors">
@@ -183,7 +189,7 @@ export default function MechanicDashboard() {
               {/* Toggle button when panel is closed */}
               {!jobsPanelOpen && (
                 <button onClick={() => setJobsPanelOpen(true)} className="absolute top-4 right-4 z-[400] backdrop-blur-xl bg-black/70 rounded-xl border border-white/10 shadow-2xl px-4 py-3 text-white hover:bg-black/80 transition-all flex items-center gap-2">
-                  <Briefcase size={16} className="text-emerald-400" />
+                  <Briefcase size={16} className="text-icon-highlight" />
                   <span className="text-sm font-medium">Jobs</span>
                 </button>
               )}
@@ -201,6 +207,12 @@ export default function MechanicDashboard() {
             <div className="lg:col-span-8">
               <EarningsChart />
             </div>
+          </div>
+        )}
+
+        {activeTab === "mylistings" && (
+          <div className="space-y-4">
+            <MyListings onAddNew={() => setSellOpen(true)} />
           </div>
         )}
       </div>
@@ -227,6 +239,20 @@ export default function MechanicDashboard() {
           </button>
         </div>
       )}
+
+      {/* ── Sell Part modal (1 tap from sidebar) ─────────────────────── */}
+      <Modal
+        isOpen={sellOpen}
+        onClose={() => setSellOpen(false)}
+        title="Sell a part"
+      >
+        <SellerProductForm
+          onSuccess={() => {
+            setSellOpen(false);
+            setActiveTab("mylistings");
+          }}
+        />
+      </Modal>
     </DashboardShell>
   );
 }

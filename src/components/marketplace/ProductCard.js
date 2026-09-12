@@ -2,12 +2,13 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { Star, Truck, Clock, ShoppingCart, Check, Crown } from "lucide-react";
+import { Star, ShoppingCart, Check, Crown, Heart } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { formatCurrency } from "@/lib/utils";
 import { ProductImage } from "@/components/marketplace/ProductImage";
 import { useCartStore } from "@/store/cartStore";
 import { useSubscriptionStore } from "@/store/subscriptionStore";
+import api from "@/lib/api";
 
 /**
  * Product card for marketplace search results.
@@ -21,13 +22,14 @@ import { useSubscriptionStore } from "@/store/subscriptionStore";
  * @param {string} product.image - Image URL
  * @param {string} product.brand - Brand name
  * @param {boolean} product.availability - In stock flag
- * @param {string} product.deliveryTime - Estimated delivery time
  * @param {string} product.vendor - Vendor/store name
  * @param {string} product.vendorId - Vendor/store ID
  * @param {string} className - Additional classes
  */
 export function ProductCard({ product, className }) {
   const [adding, setAdding] = useState(false);
+  const [fav, setFav] = useState(false);
+  const [favBusy, setFavBusy] = useState(false);
   const addItem = useCartStore((s) => s.addItem);
   const subscriptionPlanId = useSubscriptionStore((s) => s.planId);
   const subscriptionStatus = useSubscriptionStore((s) => s.status);
@@ -44,12 +46,31 @@ export function ProductCard({ product, className }) {
     image,
     brand,
     availability,
-    deliveryTime,
     vendor,
     vendorId,
   } = product;
 
   const safePrice = price ?? 0;
+
+  const handleToggleFav = async (e) => {
+    e.stopPropagation();
+    e.preventDefault();
+    if (favBusy) return;
+    setFavBusy(true);
+    try {
+      if (fav) {
+        await api.delete(`/favorites/${id}`);
+        setFav(false);
+      } else {
+        await api.post("/favorites", { product_id: id });
+        setFav(true);
+      }
+    } catch {
+      // stays as-is; favorites page shows honest load errors
+    } finally {
+      setFavBusy(false);
+    }
+  };
 
   const handleAddToCart = (e) => {
     e.stopPropagation();
@@ -102,15 +123,20 @@ export function ProductCard({ product, className }) {
             </span>
           </div>
 
-          {/* Delivery time */}
-          {deliveryTime && (
-            <div className="absolute top-3 right-3">
-              <span className="inline-flex items-center gap-1 rounded-full bg-white/10 backdrop-blur-sm px-2 py-1 text-[0.625rem] font-medium text-text-muted">
-                <Clock size={10} className="shrink-0" />
-                {deliveryTime}
-              </span>
-            </div>
-          )}
+          {/* Favorite toggle */}
+          <button
+            type="button"
+            onClick={handleToggleFav}
+            disabled={favBusy}
+            aria-label={fav ? "Remove from favorites" : "Add to favorites"}
+            className={cn(
+              "absolute top-3 right-3 inline-flex items-center justify-center w-8 h-8 rounded-full backdrop-blur-xl transition-all active:scale-95",
+              "focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/50",
+              fav ? "bg-primary/30 text-white" : "bg-black/30 text-white/80 hover:text-white"
+            )}
+          >
+            <Heart size={15} className={fav ? "fill-current" : ""} />
+          </button>
         </div>
       </Link>
 
@@ -137,13 +163,15 @@ export function ProductCard({ product, className }) {
           </p>
         )}
 
-        {/* Rating */}
-        <div className="flex items-center gap-1.5">
-          <Star size={12} className="fill-amber-400 text-amber-400" />
-          <span className="text-xs font-medium text-text-muted">
-            {Number(rating ?? 0).toFixed(1)}
-          </span>
-        </div>
+        {/* Rating — only if real */}
+        {Number(rating ?? 0) > 0 && (
+          <div className="flex items-center gap-1.5">
+            <Star size={12} className="fill-warning text-icon-highlight" />
+            <span className="text-xs font-medium text-text-muted">
+              {Number(rating).toFixed(1)}
+            </span>
+          </div>
+        )}
 
         {/* Price + Add to Cart */}
         <div className="flex items-center justify-between pt-1 gap-2">

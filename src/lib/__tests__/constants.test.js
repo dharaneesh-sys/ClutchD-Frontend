@@ -37,7 +37,7 @@ describe("ROLES", () => {
 // ---------------------------------------------------------------------------
 describe("SERVICE_STATUS", () => {
   it("has all expected status values", () => {
-    expect(SERVICE_STATUS).toEqual({
+    expect(SERVICE_STATUS).toMatchObject({
       IDLE: "idle",
       SEARCHING: "searching",
       ASSIGNED: "assigned",

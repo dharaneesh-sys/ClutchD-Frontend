@@ -20,9 +20,10 @@ import {
   MapPin,
   Clock,
 } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { cn, formatDate } from "@/lib/utils";
+import { formatIndianPlate } from "@/lib/plateFormatter";
+import { Shimmer } from "@/components/ui/Shimmer";
 import api from "@/lib/api";
-import { format } from "date-fns";
 
 /* ── Per-vehicle service job card ──────────────────────────────── */
 function VehicleServiceJobCard({ job }) {
@@ -56,7 +57,7 @@ function VehicleServiceJobCard({ job }) {
             <span className="flex items-center gap-1">
               <Calendar size={11} className="text-icon-highlight" />
               {job.createdAt
-                ? format(new Date(job.createdAt), "MMM d, yyyy")
+                ? formatDate(job.createdAt)
                 : "Unknown"}
             </span>
             {job.mechanic && (
@@ -98,7 +99,7 @@ function VehicleCard({
     overdueCount > 0 ? (
       <AlertTriangle size={14} className="text-red-400 shrink-0" />
     ) : dueSoonCount > 0 ? (
-      <Clock size={14} className="text-amber-400 shrink-0" />
+      <Clock size={14} className="text-warning shrink-0" />
     ) : (
       <CheckCircle2 size={14} className="text-green-400 shrink-0" />
     );
@@ -134,8 +135,8 @@ function VehicleCard({
 
       {/* License plate */}
       {vehicle.license_plate && (
-        <p className="text-xs font-mono text-text-muted mb-3 tracking-wider uppercase">
-          {vehicle.license_plate}
+        <p className="text-xs font-mono text-text-muted mb-3 tracking-wider">
+          {formatIndianPlate(vehicle.license_plate)}
         </p>
       )}
 
@@ -146,7 +147,7 @@ function VehicleCard({
           <History size={13} className="text-icon-highlight shrink-0" />
           <span>
             {lastServiceDate
-              ? `Last serviced ${format(lastServiceDate, "MMM d, yyyy")}`
+              ? `Last serviced ${formatDate(lastServiceDate)}`
               : "No service history"}
           </span>
         </div>
@@ -175,7 +176,7 @@ function AddVehicleCard({ onClick }) {
       className={cn(
         "p-5 rounded-2xl border-2 border-dashed border-border-subtle",
         "bg-bg-card hover:bg-surface-soft transition-all duration-200",
-        "flex flex-col items-center justify-center min-h-[210px]",
+        "flex flex-col items-center justify-center min-h-[160px]",
         "hover-lift active-press group"
       )}
     >
@@ -277,12 +278,21 @@ export function VehicleList() {
   /* ── Loading state ──────────────────────────────────────────── */
   if (loading) {
     return (
-      <div className="flex flex-col items-center justify-center p-12">
-        <Loader2
-          size={40}
-          className="animate-spin mb-4 text-icon-highlight"
-        />
-        <p className="text-text-muted">Loading your vehicles...</p>
+      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
+        {Array.from({ length: 3 }).map((_, i) => (
+          <div
+            key={i}
+            className="p-5 rounded-2xl border border-border-subtle bg-bg-card space-y-4"
+          >
+            <Shimmer variant="avatar" className="w-12 h-12 rounded-xl" />
+            <Shimmer variant="title" className="w-3/4" />
+            <Shimmer variant="text" className="w-1/2" />
+            <div className="space-y-2 pt-2">
+              <Shimmer variant="text" className="w-full" />
+              <Shimmer variant="text" className="w-2/3" />
+            </div>
+          </div>
+        ))}
       </div>
     );
   }
@@ -290,12 +300,12 @@ export function VehicleList() {
   /* ── Empty state ────────────────────────────────────────────── */
   if (vehicles.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center p-12 text-center rounded-2xl border bg-bg-card border-border-subtle">
-        <Car size={48} className="mb-4 opacity-50 text-text-dim" />
-        <h3 className="text-xl font-semibold mb-2 text-text-primary">
+      <div className="flex flex-col items-center justify-center p-8 text-center rounded-2xl border bg-bg-card border-border-subtle">
+        <Car size={36} className="mb-3 opacity-50 text-text-dim" />
+        <h3 className="text-lg font-semibold mb-1 text-text-primary">
           No Vehicles Yet
         </h3>
-        <p className="text-text-muted mb-6">
+        <p className="text-text-muted mb-5 text-sm">
           Add your first vehicle to track service history and maintenance.
         </p>
         <Button onClick={() => setIsVehicleModalOpen(true)}>

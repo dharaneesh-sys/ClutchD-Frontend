@@ -6,9 +6,7 @@ import { cn } from "@/lib/utils";
 
 /**
  * Maps a category name to a CategoryIcon key for icon rendering.
- * Falls back gracefully if no match is found (CategoryIcon handles this).
- * @param {string} name
- * @returns {string|null}
+ * Used as fallback when no explicit icon slug is provided.
  */
 function resolveIconKey(name) {
   const map = {
@@ -32,33 +30,35 @@ function resolveIconKey(name) {
 /**
  * CategoryCard — a glass-lux tile with icon, name, and item count.
  *
- * @param {object}   category         - Category object from the store
- * @param {string}   category.id      - Unique identifier
- * @param {string}   category.name    - Display name
+ * @param {object}   category              - Category object from the store
+ * @param {string}   category.id           - Unique identifier (slug or id)
+ * @param {string}   category.name         - Display name
  * @param {number}   [category.productCount] - Number of products (optional)
- * @param {string}   [className]      - Additional wrapper classes
+ * @param {string}   [icon]                - Explicit icon slug (e.g. "engine-parts").
+ *                                           When provided, bypasses name-based resolution.
+ * @param {string}   [className]           - Additional wrapper classes
  */
-export function CategoryCard({ category, className }) {
-  const iconKey = resolveIconKey(category.name);
+export function CategoryCard({ category, icon, className }) {
+  const iconKey = icon || resolveIconKey(category.name);
 
   return (
     <Link
       href={`/marketplace/categories/${category.id}`}
       className={cn(
-        "glass-lux-interactive rounded-2xl p-4",
-        "flex flex-col items-center gap-3 text-center",
-        "hover:border-emerald-500/30",
+        "glass-lux-interactive rounded-2xl p-3.5",
+        "flex flex-col items-center gap-2.5 text-center",
+        "hover:border-primary/30",
         "hover-lift active-press",
         className
       )}
     >
-      <CategoryIcon category={iconKey} size="lg" />
-      <span className="text-sm font-medium text-on-surface leading-tight">
+      <CategoryIcon category={iconKey} size="md" />
+      <span className="text-sm font-medium text-on-surface leading-snug break-words max-w-full">
         {category.name}
       </span>
       {category.productCount != null && (
-        <span className="text-[11px] text-muted font-medium">
-          {category.productCount} items
+        <span className="text-[0.6875rem] text-muted font-medium">
+          {category.productCount} item{category.productCount !== 1 ? "s" : ""}
         </span>
       )}
     </Link>

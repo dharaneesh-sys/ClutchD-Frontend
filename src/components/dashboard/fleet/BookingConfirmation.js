@@ -14,7 +14,7 @@ import {
   ArrowRight,
   FileText,
 } from "lucide-react";
-import { format } from "date-fns";
+import { formatTime } from "@/lib/utils";
 
 const SERVICE_LABELS = {
   oil_change: "Oil Change",
@@ -69,11 +69,16 @@ export function BookingConfirmation({ booking, onDismiss, onNewBooking }) {
             <h4 className="text-sm font-semibold text-text-primary">Scheduled Date</h4>
           </div>
           <p className="text-lg font-bold text-text-primary">
-            {format(scheduledDate, "EEEE, MMM d, yyyy")}
+            {scheduledDate.toLocaleDateString("en-IN", {
+              weekday: "long",
+              day: "numeric",
+              month: "short",
+              year: "numeric",
+            })}
           </p>
           <div className="flex items-center gap-1.5 mt-1 text-sm text-text-muted">
             <Clock size={14} />
-            {format(scheduledDate, "h:mm a")}
+            {formatTime(scheduledDate)}
           </div>
         </GlassCard>
 

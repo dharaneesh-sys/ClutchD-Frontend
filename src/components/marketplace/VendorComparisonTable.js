@@ -283,8 +283,8 @@ export function VendorComparisonTable({ productId, product }) {
                       key={entry.vendorId}
                       className={cn(
                         "transition-colors hover:bg-white/[0.03]",
-                        isBestPrice && "bg-emerald-500/[0.04]",
-                        isBestRating && "bg-amber-500/[0.04]",
+                        isBestPrice && "bg-icon-highlight/[0.04]",
+                        isBestRating && "bg-icon-highlight/[0.04]",
                       )}
                     >
                       {/* Vendor name + badges */}
@@ -294,13 +294,13 @@ export function VendorComparisonTable({ productId, product }) {
                             {entry.vendor.name}
                           </span>
                           {isBestPrice && (
-                            <span className="inline-flex items-center gap-0.5 rounded-full bg-emerald-500/15 px-1.5 py-0.5 text-[0.5rem] font-semibold uppercase tracking-wider text-emerald-400">
+                            <span className="inline-flex items-center gap-0.5 rounded-full bg-icon-highlight/15 px-1.5 py-0.5 text-[0.5rem] font-semibold uppercase tracking-wider text-icon-highlight">
                               <Trophy size={8} />
                               Best Price
                             </span>
                           )}
                           {isBestRating && (
-                            <span className="inline-flex items-center gap-0.5 rounded-full bg-amber-500/15 px-1.5 py-0.5 text-[0.5rem] font-semibold uppercase tracking-wider text-amber-400">
+                            <span className="inline-flex items-center gap-0.5 rounded-full bg-icon-highlight/15 px-1.5 py-0.5 text-[0.5rem] font-semibold uppercase tracking-wider text-icon-highlight">
                               <Award size={8} />
                               Best Rated
                             </span>
@@ -314,10 +314,9 @@ export function VendorComparisonTable({ productId, product }) {
                           className={cn(
                             "text-sm font-bold",
                             isBestPrice
-                              ? "text-emerald-400"
+                              ? "text-icon-highlight"
                               : "text-foreground",
-                          )}
-                        >
+                          )}>
                           {formatCurrency(entry.price)}
                         </span>
                         {entry.originalPrice && (
@@ -334,15 +333,15 @@ export function VendorComparisonTable({ productId, product }) {
                             size={11}
                             className={
                               isBestRating
-                                ? "fill-amber-400 text-amber-400"
-                                : "fill-amber-400/50 text-amber-400/50"
+                                ? "fill-warning text-icon-highlight"
+                                : "fill-warning/50 text-icon-highlight/50"
                             }
                           />
                           <span
                             className={cn(
                               "text-xs font-medium",
                               isBestRating
-                                ? "text-amber-400"
+                                ? "text-icon-highlight"
                                 : "text-text-muted",
                             )}
                           >
@@ -372,7 +371,7 @@ export function VendorComparisonTable({ productId, product }) {
                             className={cn(
                               "inline-flex items-center gap-1 text-xs font-medium",
                               entry.stock > 0
-                                ? "text-emerald-400"
+                                ? "text-success"
                                 : "text-red-400",
                             )}
                           >
@@ -410,11 +409,11 @@ export function VendorComparisonTable({ productId, product }) {
           {/* ── Legend ────────────────────────────────────────── */}
           <div className="mt-4 hidden md:flex items-center gap-4 text-[0.6875rem] text-text-dim">
             <span className="inline-flex items-center gap-1">
-              <Trophy size={10} className="text-emerald-400" />
+              <Trophy size={10} className="text-icon-highlight" />
               Best Price
             </span>
             <span className="inline-flex items-center gap-1">
-              <Award size={10} className="text-amber-400" />
+              <Award size={10} className="text-icon-highlight" />
               Best Rated
             </span>
           </div>
@@ -432,7 +431,7 @@ export function VendorComparisonTable({ productId, product }) {
                   className={cn(
                     "rounded-xl border border-white/[0.06] bg-white/[0.03] p-4",
                     "transition-colors hover:bg-white/[0.05]",
-                    isBestPrice && "border-emerald-500/20",
+                    isBestPrice && "border-icon-highlight/20",
                   )}
                 >
                   {/* Row 1: Vendor name + badges */}
@@ -450,13 +449,13 @@ export function VendorComparisonTable({ productId, product }) {
                             size={10}
                             className={cn(
                               isBestRating
-                                ? "fill-amber-400 text-amber-400"
-                                : "fill-amber-400/50 text-amber-400/50",
+                                ? "fill-warning text-icon-highlight"
+                                : "fill-warning/50 text-icon-highlight/50",
                             )}
                           />
                           <span className={cn(
                             "text-[0.6875rem]",
-                            isBestRating ? "text-amber-400 font-medium" : "text-text-muted",
+                            isBestRating ? "text-icon-highlight font-medium" : "text-text-muted",
                           )}>
                             {Number(entry.vendor.rating || 0).toFixed(1)}
                           </span>
@@ -470,13 +469,13 @@ export function VendorComparisonTable({ productId, product }) {
                     </div>
                     <div className="flex flex-wrap gap-1 justify-end">
                       {isBestPrice && (
-                        <span className="inline-flex items-center gap-0.5 rounded-full bg-emerald-500/15 px-1.5 py-0.5 text-[0.5rem] font-semibold uppercase tracking-wider text-emerald-400">
+                        <span className="inline-flex items-center gap-0.5 rounded-full bg-icon-highlight/15 px-1.5 py-0.5 text-[0.5rem] font-semibold uppercase tracking-wider text-icon-highlight">
                           <Trophy size={8} />
                           Best Price
                         </span>
                       )}
                       {isBestRating && (
-                        <span className="inline-flex items-center gap-0.5 rounded-full bg-amber-500/15 px-1.5 py-0.5 text-[0.5rem] font-semibold uppercase tracking-wider text-amber-400">
+                        <span className="inline-flex items-center gap-0.5 rounded-full bg-icon-highlight/15 px-1.5 py-0.5 text-[0.5rem] font-semibold uppercase tracking-wider text-icon-highlight">
                           <Award size={8} />
                           Best Rated
                         </span>
@@ -490,7 +489,7 @@ export function VendorComparisonTable({ productId, product }) {
                       <p className="text-[0.6875rem] text-text-dim">Price</p>
                       <p className={cn(
                         "text-sm font-bold",
-                        isBestPrice ? "text-emerald-400" : "text-foreground",
+                        isBestPrice ? "text-icon-highlight" : "text-foreground",
                       )}>
                         {formatCurrency(entry.price)}
                       </p>
@@ -514,7 +513,7 @@ export function VendorComparisonTable({ productId, product }) {
                       <span
                         className={cn(
                           "inline-flex items-center gap-1 text-xs font-medium",
-                          entry.stock > 0 ? "text-emerald-400" : "text-red-400",
+                          entry.stock > 0 ? "text-success" : "text-red-400",
                         )}
                       >
                         {entry.stock > 0 ? (
@@ -549,11 +548,11 @@ export function VendorComparisonTable({ productId, product }) {
             {sorted.length > 0 && (
               <div className="flex items-center gap-4 text-[0.6875rem] text-text-dim pt-1">
                 <span className="inline-flex items-center gap-1">
-                  <Trophy size={10} className="text-emerald-400" />
+                  <Trophy size={10} className="text-icon-highlight" />
                   Best Price
                 </span>
                 <span className="inline-flex items-center gap-1">
-                  <Award size={10} className="text-amber-400" />
+                  <Award size={10} className="text-icon-highlight" />
                   Best Rated
                 </span>
               </div>

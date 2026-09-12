@@ -95,7 +95,7 @@ export function ChatPanel({ jobId, otherUserName, otherUserRole, onClose }) {
       ? "bg-blue-500/20 text-blue-400 border-blue-500/30"
       : otherUserRole === "garage"
         ? "bg-purple-500/20 text-purple-400 border-purple-500/30"
-        : "bg-emerald-500/20 text-emerald-400 border-emerald-500/30";
+        : "bg-icon-highlight/20 text-icon-highlight border-icon-highlight/30";
 
   return (
     <>

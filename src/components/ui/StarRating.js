@@ -24,9 +24,9 @@ export function StarRating({ rating = 0, max = 5, size = 16, interactive = false
               className={cn(
                 "transition-colors",
                 isFilled 
-                  ? "fill-amber-400 text-amber-400" 
+                  ? "fill-warning text-icon-highlight" 
                   : "fill-white/10 text-white/30",
-                interactive && "hover:fill-amber-300 hover:text-amber-300"
+                interactive && "hover:fill-warning/70 hover:text-icon-highlight/70"
               )}
             />
           </button>

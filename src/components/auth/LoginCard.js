@@ -17,6 +17,9 @@ export function LoginCard() {
   const loginWithGoogleCapacitor = useAuthStore((s) => s.loginWithGoogleCapacitor);
   const authError = useAuthStore((s) => s.error);
   const router = useRouter();
+  const setRememberMe = useAuthStore((s) => s.setRememberMe);
+  const [rememberMe, setRememberMeChecked] = useState(true);
+  const [sessionExpired, setSessionExpired] = useState(false);
   const [selectedRole, setSelectedRole] = useState("customer");
   const selectedRoleRef = useRef(selectedRole);
   const googleButtonRef = useRef(null);
@@ -37,7 +40,8 @@ export function LoginCard() {
 
   const onSubmit = async (data) => {
     try {
-      const user = await login(data.email, data.password, selectedRole);
+      setRememberMe(rememberMe);
+      const user = await login(data.email, data.password, selectedRole, { rememberMe });
       if (user) {
         // Defer navigation to break React 19's flushSync cascade
         // Without this, router.push() can start a transition render while
@@ -73,6 +77,7 @@ export function LoginCard() {
       oauthState = crypto.randomUUID();
     }
     sessionStorage.setItem("oauth_state", oauthState);
+    setRememberMe(rememberMe);
     let user;
     try {
       user = await loginWithGoogle(credential, role, oauthState);
@@ -82,7 +87,7 @@ export function LoginCard() {
     if (!user) return;
 
     navigateAfterGoogleLogin(user);
-  }, [loginWithGoogle, navigateAfterGoogleLogin]);
+  }, [loginWithGoogle, navigateAfterGoogleLogin, rememberMe, setRememberMe]);
 
   const googleClientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
   const [googleReady, setGoogleReady] = useState(false);
@@ -93,6 +98,22 @@ export function LoginCard() {
   useEffect(() => {
     selectedRoleRef.current = selectedRole;
   }, [selectedRole]);
+
+  // Show session-expired notice after restoreSession redirects with ?expired=1.
+  // window.location is read in an effect (not useSearchParams) so the
+  // statically-exported Capacitor build needs no Suspense boundary.
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    try {
+      const expired = new URLSearchParams(window.location.search).get("expired");
+      if (expired === "1") {
+        setSessionExpired(true);
+        window.history.replaceState(null, "", window.location.pathname);
+      }
+    } catch (e) {
+      console.warn("[LoginCard] expired-param read failed:", e);
+    }
+  }, []);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -149,6 +170,7 @@ export function LoginCard() {
   // Handle Google sign-in when running inside Capacitor native app
   const handleCapacitorGoogleSignIn = async () => {
     try {
+      setRememberMe(rememberMe);
       const user = await loginWithGoogleCapacitor(selectedRole);
       if (user) navigateAfterGoogleLogin(user);
     } catch (err) {
@@ -341,7 +363,16 @@ export function LoginCard() {
             {...register("password")}
             error={errors.password?.message}
           />
-          <div className="flex justify-end">
+          <div className="flex items-center justify-between">
+            <label className="flex items-center gap-2 text-sm text-text-muted cursor-pointer select-none">
+              <input
+                type="checkbox"
+                checked={rememberMe}
+                onChange={(e) => setRememberMeChecked(e.target.checked)}
+                className="h-4 w-4 rounded accent-yellow-500"
+              />
+              Remember me
+            </label>
             <button
               type="button"
               onClick={() => setView("forgot_email")}
@@ -351,13 +382,16 @@ export function LoginCard() {
             </button>
           </div>
         </div>
-
+        {sessionExpired && (
+          <div className="p-3 rounded-lg bg-amber-500/10 border border-amber-500/20 text-amber-400 text-sm">
+            Your session expired. Please sign in again.
+          </div>
+        )}
         {authError && (
           <div className="p-3 rounded-lg bg-red-500/10 border border-red-500/20 text-red-400 text-sm">
             {authError}
           </div>
         )}
-
         <Button type="submit" className="w-full mt-2" size="lg" isLoading={isSubmitting}>
           <LogIn size={18} className="mr-2" />
           Sign In

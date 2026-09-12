@@ -1,18 +1,17 @@
 "use client";
 
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useCallback } from "react";
 import { GlassCard } from "@/components/ui/GlassCard";
 import { Badge } from "@/components/ui/Badge";
 import { ConfirmModal } from "@/components/ui/ConfirmModal";
 import { Calendar, Download, MapPin, Loader2, Wrench, ChevronDown, ChevronUp, Receipt, RefreshCw, Mail, ShieldCheck, ListFilter } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { cn, formatDate, formatTime } from "@/lib/utils";
 import { WarrantyTerms } from "@/components/dashboard/WarrantyTerms";
 import api, { extractApiError } from "@/lib/api";
 import { downloadJobInvoice, buildJobInvoiceText } from "@/lib/documentDownload";
 import { GST_RATE } from "@/lib/constants";
 import { useToast } from "@/hooks/useToast";
 import { useAuthStore } from "@/store/authStore";
-import { format } from "date-fns";
 import { PaymentModal } from "@/components/dashboard/PaymentModal";
 
 const FILTERS = [
@@ -46,7 +45,7 @@ export function ServiceHistory() {
     };
   }, [history, loading]);
 
-  const fetchHistory = async () => {
+  const fetchHistory = useCallback(async () => {
     try {
       const res = await api.get("/jobs/history");
       setHistory(res.data.jobs || []);
@@ -55,11 +54,11 @@ export function ServiceHistory() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [toast]);
 
   useEffect(() => {
     fetchHistory();
-  }, []);
+  }, [fetchHistory]);
 
   const handlePaymentSuccess = async (details) => {
     try {
@@ -173,7 +172,7 @@ export function ServiceHistory() {
                 <div className="flex flex-wrap items-center gap-4 text-xs text-text-muted">
                    <div className="flex items-center gap-1.5">
                      <Calendar size={14} className="text-icon-highlight" />
-                     {job.createdAt ? format(new Date(job.createdAt), "MMM d, yyyy h:mm a") : "Unknown Date"}
+                     {job.createdAt ? `${formatDate(job.createdAt)} · ${formatTime(job.createdAt)}` : "Unknown Date"}
                    </div>
                    {job.mechanic && (
                      <div className="flex items-center gap-1.5">

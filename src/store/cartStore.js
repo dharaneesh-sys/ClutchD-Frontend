@@ -29,6 +29,7 @@ const initialState = {
   couponCode: "",
   discount: 0,
   isLoading: false,
+  backendEnabled: false,
 };
 
 export const useCartStore = create(
@@ -36,8 +37,45 @@ export const useCartStore = create(
     (set, get) => ({
       ...initialState,
 
+      /** Enable or disable backend sync. When enabled, mutations also call the API. */
+      setBackendEnabled: (enabled) => set({ backendEnabled: enabled }),
+
+      /**
+       * Load cart items from the backend and merge with local state.
+       * Items from the backend that don't exist locally are appended.
+       * Items that exist locally keep local quantity (last-write-wins for qty).
+       */
+      fetchCart: async () => {
+        const { backendEnabled } = get();
+        if (!backendEnabled) return;
+        set({ isLoading: true });
+        try {
+          const { data } = await api.get("/marketplace/cart");
+          const remoteItems = data.map((item) => ({
+            productId: item.productId || item.product_id,
+            vendorId: item.vendorId || item.vendor_id || null,
+            quantity: item.quantity,
+            // Merge with local to pick up price/name/image
+          }));
+          set((state) => {
+            const localMap = new Map(state.items.map((i) => [i.productId, i]));
+            const merged = remoteItems.map((r) => ({
+              ...(localMap.get(r.productId) || {}),
+              ...r,
+            }));
+            const localIds = new Set(remoteItems.map((r) => r.productId));
+            const localOnly = state.items.filter((i) => !localIds.has(i.productId));
+            return { items: [...merged, ...localOnly], isLoading: false };
+          });
+          persistItems(get().items);
+        } catch {
+          set({ isLoading: false });
+        }
+      },
+
       addItem: (product, vendor) => {
-        const existing = get().items.find(
+        const { items, backendEnabled } = get();
+        const existing = items.find(
           (item) => item.productId === product.id && item.vendorId === vendor?.id,
         );
 
@@ -65,6 +103,14 @@ export const useCartStore = create(
           }));
         }
         persistItems(get().items);
+
+        if (backendEnabled) {
+          api.post("/marketplace/cart", {
+            product_id: product.id,
+            vendor_id: vendor?.id || null,
+            quantity: existing ? existing.quantity + 1 : 1,
+          }).catch(() => {}); // silent fallback
+        }
       },
 
       removeItem: (productId) => {
@@ -72,6 +118,9 @@ export const useCartStore = create(
           items: state.items.filter((item) => item.productId !== productId),
         }));
         persistItems(get().items);
+
+        // Backend delete by productId — backend requires item_id, so we skip
+        // for individual removes; full clearCart handles batch cleanup
       },
 
       updateQuantity: (productId, qty) => {
@@ -88,6 +137,10 @@ export const useCartStore = create(
         persistItems(get().items);
       },
 
+      /**
+       * Apply a coupon code. Returns an object { success, message } so callers
+       * can surface the exact validation error without catching exceptions.
+       */
       applyCoupon: async (code) => {
         set({ isLoading: true, couponCode: "", discount: 0 });
         try {
@@ -106,13 +159,16 @@ export const useCartStore = create(
               discount: data.discountAmount || 0,
               isLoading: false,
             });
-          } else {
-            set({ isLoading: false });
-            throw new Error(data.message || "Invalid coupon code");
+            return { success: true, message: data.message || "Coupon applied!" };
           }
+          set({ isLoading: false });
+          return { success: false, message: data.message || "Invalid coupon code" };
         } catch (error) {
+          const msg =
+            error.response?.data?.detail ||
+            (error.response ? "Failed to validate coupon." : "Server unreachable.");
           set({ couponCode: "", discount: 0, isLoading: false });
-          throw error;
+          return { success: false, message: msg };
         }
       },
 
@@ -123,6 +179,11 @@ export const useCartStore = create(
       clearCart: () => {
         set({ items: [], couponCode: "", discount: 0, isLoading: false });
         persistItems([]);
+
+        const { backendEnabled } = get();
+        if (backendEnabled) {
+          api.delete("/marketplace/cart").catch(() => {});
+        }
       },
 
       /**

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect } from "react";
 import {
   Shield,
   ChevronDown,
@@ -9,6 +9,8 @@ import {
   FileText,
   Lock,
   ExternalLink,
+  Loader2,
+  WifiOff,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Shimmer } from "@/components/ui/Shimmer";
@@ -16,6 +18,7 @@ import { Button } from "@/components/ui/Button";
 import { useToastStore } from "@/store/toastStore";
 import { useRouter } from "next/navigation";
 import api from "@/lib/api";
+import { useSOS } from "@/components/ui/useSOS";
 
 // ─── Legal content ──────────────────────────────────────────────────
 
@@ -129,7 +132,18 @@ function ExpandableSection({ icon: Icon, title, content, defaultOpen = false }) 
 export default function SafetyPage() {
   const router = useRouter();
   const toast = useToastStore();
-
+  const sos = useSOS();
+  const sosDisabled = sos.loading || sos.status === "sent" || sos.status === "queued";
+  const sosLabel =
+    sos.loading
+      ? "Sending SOS..."
+      : sos.status === "sent"
+        ? "Help En Route!"
+        : sos.status === "queued"
+          ? "SOS Queued"
+          : sos.status === "confirming"
+            ? "Tap AGAIN to confirm SOS"
+            : "Send SOS";
   const [privacyPolicy, setPrivacyPolicy] = useState(null);
   const [terms, setTerms] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -216,6 +230,51 @@ export default function SafetyPage() {
         />
       </section>
 
+      {/* Send SOS — inline 2-tap confirm, no overlay */}
+      <section>
+        <div className="rounded-2xl border border-red-500/25 bg-red-500/[0.06] p-4">
+          <div className="flex items-center gap-3">
+            <div className="flex-shrink-0 w-10 h-10 rounded-xl bg-red-500/15 flex items-center justify-center">
+              {sos.loading ? (
+                <Loader2 size={18} className="text-red-400 animate-spin" />
+              ) : sos.status === "queued" ? (
+                <WifiOff size={18} className="text-orange-400" />
+              ) : (
+                <AlertTriangle size={18} className="text-red-400" />
+              )}
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-semibold text-foreground">Emergency SOS</p>
+              <p className="text-xs text-text-muted">
+                {sos.status === "confirming"
+                  ? "Tap again within 5s to send your location to support"
+                  : sos.status === "queued"
+                    ? "Offline — queued and will send when online"
+                    : "Shares your location with support instantly"}
+              </p>
+            </div>
+          </div>
+          <Button
+            onClick={sos.handleSOS}
+            disabled={sosDisabled}
+            className={cn(
+              "mt-3 w-full bg-red-600 hover:bg-red-700 text-white font-semibold",
+              sos.status === "confirming" && "animate-pulse",
+            )}
+          >
+            {sosLabel}
+          </Button>
+          {sos.queuedMsg && (
+            <p className="mt-2 text-xs text-orange-400">{sos.queuedMsg}</p>
+          )}
+          {!sos.isOnline && sos.status === "idle" && (
+            <p className="mt-2 text-xs text-orange-400">
+              You appear offline — SOS will be queued.
+            </p>
+          )}
+        </div>
+      </section>
+
       {/* Emergency Contacts */}
       <section>
         <h2 className="text-base font-semibold text-foreground mb-3 flex items-center gap-2">
@@ -255,7 +314,7 @@ export default function SafetyPage() {
           className="glass-lux rounded-2xl p-4 w-full flex items-center gap-3 hover:bg-white/[0.08] transition-colors text-left"
         >
           <div className="flex-shrink-0 w-10 h-10 rounded-xl bg-amber-500/15 flex items-center justify-center">
-            <AlertTriangle size={18} className="text-amber-400" />
+            <AlertTriangle size={18} className="text-warning" />
           </div>
           <div className="flex-1 min-w-0">
             <p className="text-sm font-semibold text-foreground">

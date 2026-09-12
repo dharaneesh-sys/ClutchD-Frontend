@@ -35,6 +35,21 @@ export function formatTime(date) {
   });
 }
 
+// Canonical date+time for UI. Receipts keep their own
+// en-IN formatDateTime in src/lib/documentDownload.js (do not consolidate).
+export function formatDateTime(date) {
+  if (!date) return "—";
+  const d = new Date(date);
+  if (isNaN(d.getTime())) return "—";
+  return d.toLocaleString("en-IN", {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+}
+
 export function getInitials(name) {
   if (!name || typeof name !== "string") return "??";
   return name

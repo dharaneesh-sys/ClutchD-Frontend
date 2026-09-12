@@ -3,12 +3,13 @@
 import { useRouter, usePathname } from "next/navigation";
 import {
   Home, Grid3X3, Search, ShoppingCart, User, Settings,
-  Sun, Moon, UserCircle, Package, Heart,
+  Sun, Moon, UserCircle, Package, Heart, AlertTriangle, Loader2,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useCartStore } from "@/store/cartStore";
 import { useThemeStore } from "@/store/themeStore";
 import { useState, useEffect, useRef } from "react";
+import { useSOS } from "@/components/ui/useSOS";
 
 const NAV_ITEMS = [
   { icon: Home, label: "Home", path: "/marketplace" },
@@ -26,6 +27,7 @@ export function BottomNav() {
   const theme = useThemeStore((s) => s.theme);
   const toggleTheme = useThemeStore((s) => s.toggleTheme);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const sos = useSOS();
   const settingsRef = useRef(null);
   const popoverRef = useRef(null);
 
@@ -147,7 +149,7 @@ export function BottomNav() {
                         <span className="text-sm font-medium text-foreground">My Profile</span>
                       </button>
                       <button
-                        onClick={(e) => { e.stopPropagation(); router.push("/marketplace/orders"); setIsSettingsOpen(false); }}
+                        onClick={(e) => { e.stopPropagation(); router.push("/marketplace/profile/orders"); setIsSettingsOpen(false); }}
                         className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-white/5 transition-colors"
                       >
                         <Package size={18} className="text-text-muted" />
@@ -161,6 +163,37 @@ export function BottomNav() {
                         <span className="text-sm font-medium text-foreground">Favorites</span>
                       </button>
                     </div>
+
+                    {/* Emergency SOS row — inline 2-tap confirm, no overlay */}
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        sos.handleSOS();
+                      }}
+                      disabled={sos.loading || sos.status === "sent" || sos.status === "queued"}
+                      className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-red-500/10 transition-colors text-left"
+                      aria-label="Emergency SOS"
+                    >
+                      {sos.loading ? (
+                        <Loader2 size={18} className="text-red-400 animate-spin" />
+                      ) : (
+                        <AlertTriangle size={18} className="text-red-400" />
+                      )}
+                      <span className="text-sm font-semibold text-red-400">
+                        {sos.loading
+                          ? "Sending SOS..."
+                          : sos.status === "sent"
+                            ? "Help En Route!"
+                            : sos.status === "queued"
+                              ? "SOS Queued"
+                              : sos.status === "confirming"
+                                ? "Tap again to confirm"
+                                : "Emergency SOS"}
+                      </span>
+                    </button>
+                    {sos.queuedMsg && (
+                      <p className="px-3 pb-1 text-xs text-orange-400">{sos.queuedMsg}</p>
+                    )}
 
                     {/* Theme row */}
                     <button

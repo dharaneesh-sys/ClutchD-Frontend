@@ -15,8 +15,12 @@ import {
   Settings,
   ChevronRight,
   Crown,
+  Zap,
   ShieldAlert,
+  AlertTriangle,
+  Loader2,
 } from "lucide-react";
+import { useSOS } from "@/components/ui/useSOS";
 import { cn } from "@/lib/utils";
 
 const MENU_SECTIONS = [
@@ -36,6 +40,7 @@ const MENU_SECTIONS = [
       { icon: Wrench, label: "My Services", path: "/marketplace/profile/services" },
       { icon: ShieldAlert, label: "Warranty Claims", path: "/marketplace/profile/warranty" },
       { icon: Heart, label: "Favorites", path: "/marketplace/profile/favorites" },
+      { icon: Zap, label: "Quick Actions", path: "/marketplace/profile/quick-actions" },
     ],
   },
   {
@@ -64,7 +69,18 @@ const MENU_SECTIONS = [
 export function ProfileMenu({ className }) {
   const router = useRouter();
   const pathname = usePathname();
-
+  const sos = useSOS();
+  const sosDisabled = sos.loading || sos.status === "sent" || sos.status === "queued";
+  const sosLabel =
+    sos.loading
+      ? "Sending SOS..."
+      : sos.status === "sent"
+        ? "Help En Route!"
+        : sos.status === "queued"
+          ? "SOS Queued"
+          : sos.status === "confirming"
+            ? "Tap again to confirm"
+            : "Emergency SOS";
   return (
     <div className={cn("space-y-5", className)}>
       {MENU_SECTIONS.map((section) => (
@@ -107,6 +123,30 @@ export function ProfileMenu({ className }) {
                 </button>
               );
             })}
+            {section.label === "Support & Safety" && (
+              <button
+                type="button"
+                onClick={sos.handleSOS}
+                disabled={sosDisabled}
+                aria-label="Emergency SOS"
+                className="w-full flex items-center gap-3 px-4 py-3.5 text-left transition-all duration-200 text-red-400 hover:bg-red-500/[0.06]"
+              >
+                <div className="flex-shrink-0 w-9 h-9 rounded-xl flex items-center justify-center bg-red-500/[0.12] text-red-400">
+                  {sos.loading ? (
+                    <Loader2 size={17} className="animate-spin" />
+                  ) : (
+                    <AlertTriangle size={17} />
+                  )}
+                </div>
+                <span className="flex-1 text-sm font-semibold">{sosLabel}</span>
+                <ChevronRight size={16} className="flex-shrink-0 text-red-400/60" />
+              </button>
+            )}
+            {section.label === "Support & Safety" && sos.queuedMsg && (
+              <p className="px-4 py-2 text-xs text-orange-400 bg-orange-500/[0.06]">
+                {sos.queuedMsg}
+              </p>
+            )}
           </div>
         </div>
       ))}

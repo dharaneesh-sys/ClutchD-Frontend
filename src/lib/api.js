@@ -9,6 +9,10 @@ import { navigateToAuth } from "@/lib/navigation";
 // can fall back to demo data instead of redirecting to /auth.
 const PUBLIC_API_PATHS = ['/products', '/categories', '/health'];
 
+// Access-token TTL mirrors authStore — keeps 401-refresh tokens expiring client-side.
+const ACCESS_TTL_MS =
+  (parseInt(process.env.NEXT_PUBLIC_ACCESS_TTL_MINUTES, 10) || 15) * 60 * 1000;
+
 const api = axios.create({
   baseURL: API_BASE_URL,
   timeout: 30000,
@@ -71,7 +75,7 @@ api.interceptors.response.use(
           const res = await api.post("/auth/refresh");
           const newToken = res.data.token;
           if (typeof window !== "undefined" && newToken) {
-            setAccessToken(newToken);
+            setAccessToken(newToken, ACCESS_TTL_MS);
           }
           isRefreshing = false;
           onTokenRefreshed(newToken);

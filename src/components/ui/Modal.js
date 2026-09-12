@@ -19,16 +19,12 @@ export function Modal({
   const reactId = useId();
   const titleId = `modal-title-${reactId}`;
 
-  // Lock body scroll
   useEffect(() => {
     if (isOpen) {
+      const prev = document.body.style.overflow;
       document.body.style.overflow = "hidden";
-    } else {
-      document.body.style.overflow = "unset";
+      return () => { document.body.style.overflow = prev; };
     }
-    return () => {
-      document.body.style.overflow = "unset";
-    };
   }, [isOpen]);
 
   // Save focus on open, restore on close
@@ -142,7 +138,7 @@ export function Modal({
           </div>
 
            {/* Content */}
-           <div className="max-h-[calc(100vh-8rem)] overflow-y-auto pr-2 custom-scrollbar">
+           <div className="max-h-[calc(100dvh-8rem)] overflow-y-auto pr-2 custom-scrollbar">
             {children}
            </div>
         </div>

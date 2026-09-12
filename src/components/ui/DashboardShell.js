@@ -6,7 +6,7 @@ import { Logo } from "@/components/ui/Logo";
 import { ConnectionIndicator } from "@/components/ui/ConnectionIndicator";
 import { NotificationBell } from "@/components/ui/NotificationBell";
 import { useRouter } from "next/navigation";
-import { User, Building2, Wrench, Gift, Menu, X } from "lucide-react";
+import { User, Building2, Wrench, Truck, Gift, Menu, X } from "lucide-react";
 import { SubscriptionBadge } from "@/components/subscription/SubscriptionBadge";
 
 const MODE_CONFIG = {
@@ -30,6 +30,13 @@ const MODE_CONFIG = {
     color: "warning",
     textClass: "text-warning dark:text-warning",
     avatarClass: "bg-warning/15 dark:bg-warning/20 border border-warning/30 text-warning dark:text-warning",
+  },
+  fleet: {
+    icon: Truck,
+    label: "Fleet Mode",
+    color: "info",
+    textClass: "text-sky-600 dark:text-sky-300",
+    avatarClass: "bg-sky-500/15 dark:bg-sky-500/20 border border-sky-500/30 text-sky-600 dark:text-sky-300",
   },
 };
 

@@ -224,7 +224,7 @@ function StatsCard({ icon: Icon, label, value, color }) {
             "w-10 h-10 rounded-lg flex items-center justify-center",
             color === "primary" && "bg-primary/10 text-primary-light",
             color === "success" && "bg-green-500/10 text-green-400",
-            color === "warning" && "bg-amber-500/10 text-amber-400",
+            color === "warning" && "bg-warning/10 text-warning",
             color === "danger" && "bg-red-500/10 text-red-400",
             color === "default" && "bg-white/10 text-text-dim"
           )}

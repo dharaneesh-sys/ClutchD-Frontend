@@ -9,6 +9,7 @@ import {
   ArrowUpDown,
   ChevronDown,
   PackageSearch,
+  AlertTriangle,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useProductStore } from "@/store/productStore";
@@ -32,16 +33,6 @@ function parsePriceRange(value) {
   };
 }
 
-function matchesQuery(product, query) {
-  if (!query?.trim()) return true;
-  const q = query.toLowerCase();
-  return (
-    product.name?.toLowerCase().includes(q) ||
-    product.brand?.toLowerCase().includes(q) ||
-    product.vendor?.toLowerCase().includes(q)
-  );
-}
-
 function matchesFilters(product, filters) {
   // Categories
   if (filters.categories?.length) {
@@ -61,20 +52,9 @@ function matchesFilters(product, filters) {
     if (product.brand?.toLowerCase() !== filters.brand.toLowerCase()) return false;
   }
 
-  // Rating (minimum)
-  if (filters.rating) {
-    if (product.rating < filters.rating) return false;
-  }
-
   // Availability
   if (filters.availability) {
     if (!product.availability) return false;
-  }
-
-  // Delivery time
-  if (filters.deliveryTime) {
-    const normalizedFilter = filters.deliveryTime.replace(/-/g, " ");
-    if (product.deliveryTime?.toLowerCase() !== normalizedFilter) return false;
   }
 
   return true;
@@ -148,11 +128,21 @@ function SearchPageContent() {
     products,
     filters,
     isLoading,
+    error: productsError,
     searchProducts,
     setFilter,
     clearFilters,
     fetchProducts,
   } = useProductStore();
+
+  // Derive display state from search data
+  const searchState = useMemo(() => {
+    if (productsError) return "ERROR";
+    if (isLoading) return "LOADING";
+    if (products.length > 0) return "RESULTS";
+    if (!debouncedQuery && !Object.values(filters).some((v) => v != null)) return "NO_QUERY";
+    return "NO_RESULTS";
+  }, [productsError, isLoading, products.length, debouncedQuery, filters]);
 
   // Fetch products on mount
   useEffect(() => {
@@ -180,24 +170,42 @@ function SearchPageContent() {
   // Sync debounced query → store + URL
   useEffect(() => {
     searchProducts(debouncedQuery);
-    const params = new URLSearchParams(searchParams.toString());
+    const urlParams = new URLSearchParams(searchParams.toString());
     if (debouncedQuery) {
-      params.set("q", debouncedQuery);
+      urlParams.set("q", debouncedQuery);
     } else {
-      params.delete("q");
+      urlParams.delete("q");
     }
-    router.replace(`/marketplace/search${params.toString() ? `?${params.toString()}` : ""}`, {
+    router.replace(`/marketplace/search${urlParams.toString() ? `?${urlParams.toString()}` : ""}`, {
       scroll: false,
     });
   }, [debouncedQuery]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Derived: filtered + sorted results
+  // Fetch from backend with filter/sort params when they change
+  // Falls back to client-side filtering (below) when backend is unreachable
+  useEffect(() => {
+    const params = {};
+    if (debouncedQuery) params.search = debouncedQuery;
+    if (filters.categories?.length) params.category = filters.categories[0];
+    if (filters.priceRange) {
+      const range = parsePriceRange(filters.priceRange);
+      if (range) {
+        params.min_price = range.min;
+        if (range.max !== Infinity) params.max_price = range.max;
+      }
+    }
+    if (filters.brand) params.brand = filters.brand;
+    if (filters.availability) params.in_stock = true;
+    if (sortBy !== "popularity") params.sort_by = sortBy;
+    params.limit = 50;
+    fetchProducts(params);
+  }, [debouncedQuery, filters, sortBy]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Client-side safety net — refines backend results via matchesFilters + sortProducts
   const results = useMemo(() => {
-    const filtered = products.filter(
-      (p) => matchesQuery(p, debouncedQuery) && matchesFilters(p, filters)
-    );
+    const filtered = products.filter((p) => matchesFilters(p, filters));
     return sortProducts(filtered, sortBy);
-  }, [products, debouncedQuery, filters, sortBy]);
+  }, [products, filters, sortBy]);
 
   const handleFilterChange = useCallback(
     (name, value) => setFilter(name, value),
@@ -215,6 +223,24 @@ function SearchPageContent() {
 
   const currentSortLabel =
     SORT_OPTIONS.find((o) => o.value === sortBy)?.label || "Sort";
+
+  const handleRetry = useCallback(() => {
+    const params = {};
+    if (debouncedQuery) params.search = debouncedQuery;
+    if (filters.categories?.length) params.category = filters.categories[0];
+    if (filters.priceRange) {
+      const range = parsePriceRange(filters.priceRange);
+      if (range) {
+        params.min_price = range.min;
+        if (range.max !== Infinity) params.max_price = range.max;
+      }
+    }
+    if (filters.brand) params.brand = filters.brand;
+    if (filters.availability) params.in_stock = true;
+    if (sortBy !== "popularity") params.sort_by = sortBy;
+    params.limit = 50;
+    fetchProducts(params);
+  }, [debouncedQuery, filters, sortBy, fetchProducts]);
 
   // Close sort dropdown on outside click
   useEffect(() => {
@@ -266,12 +292,76 @@ function SearchPageContent() {
       </div>
 
       {/* ─── Main Content ──────────────────────────────────── */}
-      <div className="max-w-7xl mx-auto px-4 py-5">
-        {isLoading && products.length === 0 ? (
-          <SearchSkeleton />
-        ) : (
+      {searchState === "LOADING" && <SearchSkeleton />}
+
+      {searchState === "ERROR" && (
+        <div className="max-w-7xl mx-auto px-4 py-16">
+          <div className="flex flex-col items-center justify-center text-center">
+            <div className="w-14 h-14 rounded-2xl bg-rose-500/15 flex items-center justify-center mb-4">
+              <AlertTriangle size={26} className="text-rose-400" />
+            </div>
+            <h2 className="text-lg font-semibold text-foreground mb-1">
+              Couldn&rsquo;t load search results
+            </h2>
+            <p className="text-sm text-text-muted max-w-md mb-6">
+              {productsError || "The server is currently unreachable. Please try again."}
+            </p>
+            <button
+              type="button"
+              onClick={handleRetry}
+              className="inline-flex items-center gap-2 rounded-xl bg-primary px-5 py-2.5 text-sm font-semibold text-white hover:bg-primary-dark transition-colors"
+            >
+              Try Again
+            </button>
+          </div>
+        </div>
+      )}
+
+      {searchState === "NO_QUERY" && (
+        <div className="max-w-7xl mx-auto px-4 py-16">
+          <div className="flex flex-col items-center justify-center text-center">
+            <div className="w-14 h-14 rounded-2xl bg-white/5 flex items-center justify-center mb-4">
+              <Search size={26} className="text-text-dim" />
+            </div>
+            <h2 className="text-lg font-semibold text-foreground mb-1">
+              Search products
+            </h2>
+            <p className="text-sm text-text-muted max-w-md">
+              Find auto parts, accessories, and more from our marketplace.
+            </p>
+          </div>
+        </div>
+      )}
+
+      {searchState === "NO_RESULTS" && (
+        <div className="max-w-7xl mx-auto px-4 py-5">
           <div className="flex gap-6">
-            {/* Filters sidebar (desktop) + overlay (mobile) */}
+            <SearchFilters
+              filters={filters}
+              onFilterChange={handleFilterChange}
+              onClear={handleClearFilters}
+              isMobileOpen={mobileFilterOpen}
+              onMobileClose={() => setMobileFilterOpen(false)}
+            />
+            <div className="flex-1 min-w-0">
+              <EmptyState
+                icon={PackageSearch}
+                title="No products found"
+                description={
+                  debouncedQuery
+                    ? `We couldn't find any products matching "${debouncedQuery}". Try adjusting your search or filters.`
+                    : "No products match your current filters. Try broadening your criteria."
+                }
+                className="mt-8"
+              />
+            </div>
+          </div>
+        </div>
+      )}
+
+      {searchState === "RESULTS" && (
+        <div className="max-w-7xl mx-auto px-4 py-5">
+          <div className="flex gap-6">
             <SearchFilters
               filters={filters}
               onFilterChange={handleFilterChange}
@@ -280,29 +370,24 @@ function SearchPageContent() {
               onMobileClose={() => setMobileFilterOpen(false)}
             />
 
-            {/* Results area */}
             <div className="flex-1 min-w-0">
               {/* Sort & results count bar */}
               <div className="flex items-center justify-between mb-5 gap-4 flex-wrap">
                 <p className="text-sm text-text-muted shrink-0">
-                  <span className="text-foreground font-semibold">
-                    {results.length}
-                  </span>{" "}
-                  of{" "}
-                  <span className="text-foreground font-semibold">
-                    {products.length}
-                  </span>{" "}
-                  results
+                  <span className="text-foreground font-semibold">{results.length}</span>{" "}
+                  result{results.length !== 1 ? "s" : ""}
                   {debouncedQuery && (
-                    <span className="hidden sm:inline">
+                    <span>
                       {" "}
                       for &ldquo;<span className="text-text-muted">{debouncedQuery}</span>&rdquo;
                     </span>
                   )}
+                  {Object.values(filters).some((v) => v != null) && (
+                    <span className="text-text-dim"> (filtered)</span>
+                  )}
                 </p>
 
                 <div className="flex items-center gap-2">
-                  {/* Mobile filter toggle */}
                   <button
                     type="button"
                     onClick={() => setMobileFilterOpen(true)}
@@ -372,35 +457,21 @@ function SearchPageContent() {
                 </div>
               </div>
 
-              {/* Results grid or empty state */}
-              {results.length > 0 ? (
-                <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4">
-                  {results.map((product, i) => (
-                    <div
-                      key={product.id}
-                      className="animate-fade-in-up"
-                      style={{ animationDelay: `${(i % 8) * 50}ms` }}
-                    >
-                      <ProductCard product={product} />
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <EmptyState
-                  icon={PackageSearch}
-                  title="No products found"
-                  description={
-                    debouncedQuery
-                      ? `We couldn't find any products matching "${debouncedQuery}". Try adjusting your search or filters.`
-                      : "No products match your current filters. Try broadening your criteria."
-                  }
-                  className="mt-8"
-                />
-              )}
+              <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4">
+                {results.map((product, i) => (
+                  <div
+                    key={product.id}
+                    className="animate-fade-in-up"
+                    style={{ animationDelay: `${(i % 8) * 50}ms` }}
+                  >
+                    <ProductCard product={product} />
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
-        )}
-      </div>
+        </div>
+      )}
     </div>
   );
 }

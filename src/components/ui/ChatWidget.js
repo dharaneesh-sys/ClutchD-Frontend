@@ -166,12 +166,12 @@ export function ChatWidget() {
               <span
                 className={cn(
                   "w-2 h-2 rounded-full",
-                  wsConnected ? "bg-primary-light" : "bg-amber-400",
-                  wsConnected ? "" : "animate-pulse"
-                )}
-              />
-              <span className="type-title-3 text-on-surface">
-                Live Assist
+wsConnected ? "bg-primary-light" : "bg-warning",
+                   wsConnected ? "" : "animate-pulse"
+                 )}
+               />
+               <span className="type-title-3 text-on-surface">
+                 Live Assist
               </span>
             </div>
 
@@ -331,7 +331,7 @@ export function ChatWidget() {
         <span
           className={cn(
             "absolute bottom-0 right-0 w-3.5 h-3.5 rounded-full border-2 border-[var(--background)]",
-            wsConnected ? "bg-primary-light" : "bg-amber-400",
+            wsConnected ? "bg-primary-light" : "bg-warning",
             wsConnected ? "" : "animate-pulse"
           )}
           style={{ bottom: "-2px", right: "-2px" }}

@@ -89,7 +89,7 @@ function formatKm(km) {
 function severityLabel(sev) {
   switch (sev) {
     case "critical": return { label: "Critical", cls: "bg-red-500/15 text-red-400 border-red-500/25" };
-    case "high":     return { label: "Due Soon", cls: "bg-amber-500/15 text-amber-400 border-amber-500/25" };
+    case "high":     return { label: "Due Soon", cls: "bg-warning/15 text-warning border-warning/25" };
     default:         return { label: "Upcoming", cls: "bg-blue-500/15 text-blue-400 border-blue-500/25" };
   }
 }
@@ -174,7 +174,7 @@ export function MaintenanceAlertBanner() {
           "shrink-0 w-9 h-9 rounded-full flex items-center justify-center",
           top.status === "overdue"
             ? "bg-red-500/15 text-red-400"
-            : "bg-amber-500/15 text-amber-400"
+            : "bg-warning/15 text-warning"
         )}>
           <AlertTriangle size={16} />
         </span>

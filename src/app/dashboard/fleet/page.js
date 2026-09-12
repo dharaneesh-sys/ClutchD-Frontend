@@ -19,6 +19,7 @@ import { FleetDashboard } from "@/components/fleet/FleetDashboard";
 import { FleetBookingPanel } from "@/components/dashboard/fleet/FleetBookingPanel";
 import { BookingConfirmation } from "@/components/dashboard/fleet/BookingConfirmation";
 import { NAVIGATION_EVENT } from "@/lib/navigation";
+import SplashScreen from "@/components/ui/SplashScreen";
 
 export default function FleetDashboardPage() {
   const user = useAuthStore((s) => s.user);
@@ -102,12 +103,14 @@ export default function FleetDashboardPage() {
     clearLastBooking();
   }, [clearLastBooking]);
 
-  if (!_hydrated || !isAuthenticated) {
-    return (
-      <div className="min-h-[100dvh] w-full flex items-center justify-center bg-[var(--background)]">
-        <div className="w-8 h-8 border-2 border-t-transparent rounded-full animate-spin border-[var(--primary)]" />
-      </div>
-    );
+  const openChat = useCallback((jobId, providerName) => {
+    setChatJobId(jobId);
+    setChatOtherName(providerName || "Provider");
+    setChatOpen(true);
+  }, []);
+
+  if (!_hydrated) {
+    return <SplashScreen />;
   }
 
   const sidebarItems = [
@@ -131,9 +134,9 @@ export default function FleetDashboardPage() {
   return (
     <DashboardShell
       title="Fleet Dashboard"
-      subtitle="B2B Mode"
+      subtitle="Fleet Mode"
       user={user}
-      mode="garage"
+      mode="fleet"
       sidebar={sidebarItems}
     >
       <div className="flex-1 pb-4 lg:pb-6">
@@ -145,6 +148,7 @@ export default function FleetDashboardPage() {
           <FleetDashboard
             onRegisterNew={handleRegisterNew}
             onStartBooking={handleStartBooking}
+            onChat={openChat}
           />
         )}
 
@@ -186,7 +190,7 @@ export default function FleetDashboardPage() {
             <ChatPanel
               jobId={chatJobId}
               otherUserName={chatOtherName}
-              otherUserRole="customer"
+              otherUserRole="garage"
               onClose={() => setChatOpen(false)}
             />
           )}
@@ -195,7 +199,7 @@ export default function FleetDashboardPage() {
             className="w-14 h-14 rounded-full flex items-center justify-center transition-all active-press
                        shadow-[0_8px_32px_rgba(var(--color-primary-rgb),0.3)]
                        bg-primary text-white hover:shadow-[0_12px_40px_rgba(var(--color-primary-rgb),0.4)] hover-lift"
-            aria-label={chatOpen ? "Close chat" : "Chat with support"}
+            aria-label={chatOpen ? "Close chat" : "Chat with provider"}
           >
             <MessageSquare size={22} />
           </button>

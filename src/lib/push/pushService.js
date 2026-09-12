@@ -114,10 +114,19 @@ async function registerFcmSw() {
   if (!("serviceWorker" in navigator)) return;
 
   try {
-    const registration = await navigator.serviceWorker.register(
-      "/firebase-messaging-sw.js",
-      { scope: "/" },
-    );
+    // Pass Firebase config to the SW via query params so it can
+    // initialize without relying on injected globals.
+    const params = new URLSearchParams({
+      apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY || "",
+      projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID || "",
+      senderId: process.env.NEXT_PUBLIC_FIREBASE_SENDER_ID || "",
+      appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID || "",
+    });
+    const swUrl = `/firebase-messaging-sw.js?${params.toString()}`;
+
+    const registration = await navigator.serviceWorker.register(swUrl, {
+      scope: "/",
+    });
     if (process.env.NODE_ENV === "development") {
       console.log("[push] FCM SW registered:", registration.scope);
     }

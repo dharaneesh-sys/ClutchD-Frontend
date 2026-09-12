@@ -5,10 +5,7 @@ export const loginSchema = z.object({
   email: z.string().email("Please enter a valid email address"),
   password: z
     .string()
-    .min(8, "Password must be at least 8 characters")
-    .regex(/[A-Z]/, "Must include an uppercase letter")
-    .regex(/[a-z]/, "Must include a lowercase letter")
-    .regex(/[0-9]/, "Must include a number"),
+    .min(6, "Password must be at least 6 characters"),
 });
 
 export const customerSignupSchema = z
@@ -87,4 +84,22 @@ export const serviceRequestSchema = z.object({
 export const reviewSchema = z.object({
   rating: z.number().min(1).max(5),
   comment: z.string().optional(),
+});
+
+// ── Marketplace (seller flow) ─────────────────────────
+// Mirrors ProductResponse so a future POST /api/marketplace/products
+// drops in without shape changes. Local-first fallback per
+// docs/BACKEND_CONTRACTS.md migration rule.
+export const PRODUCT_IMAGE_TYPES = ["image/jpeg", "image/png", "image/webp"];
+export const PRODUCT_IMAGE_MAX_MB = 5;
+
+export const productSchema = z.object({
+  name: z.string().min(3, "Enter a part name (min 3 chars)"),
+  price: z.coerce.number({ required_error: "Enter a price" }).min(0, "Price cannot be negative"),
+  brand: z.string().optional(),
+  category: z.string().optional(),
+  description: z.string().min(10, "Describe the part (min 10 chars)"),
+  availability: z.boolean().default(true),
+  deliveryTime: z.string().optional(),
+  image: z.string().optional(),
 });

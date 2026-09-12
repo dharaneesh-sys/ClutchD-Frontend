@@ -11,12 +11,12 @@ const STATE_CONFIG = {
   },
   connecting: {
     label: "Live: Reconnecting...",
-    dot: "bg-amber-400",
+    dot: "bg-warning",
     pulse: true,
   },
   closing: {
     label: "Live: Reconnecting...",
-    dot: "bg-amber-400",
+    dot: "bg-warning",
     pulse: true,
   },
   disconnected: {

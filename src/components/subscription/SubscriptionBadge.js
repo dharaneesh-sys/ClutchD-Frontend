@@ -115,7 +115,7 @@ export function SubscriptionFeatureBadge({
       className={cn(
         "inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[0.625rem] font-semibold uppercase tracking-wider transition-colors",
         hasAccess
-          ? "bg-emerald-500/15 text-emerald-300"
+          ? "bg-success/15 text-success"
           : "bg-white/5 text-text-dim",
         className
       )}

@@ -19,7 +19,7 @@ import api from "@/lib/api";
 
 const APP_SHORTCUTS = [
   { icon: Wrench, label: "Request Service", path: "/dashboard/customer", color: "text-primary-light" },
-  { icon: ShoppingBag, label: "Browse Parts", path: "/marketplace", color: "text-amber-400" },
+  { icon: ShoppingBag, label: "Browse Parts", path: "/marketplace", color: "text-icon-highlight" },
   { icon: History, label: "Order History", path: "/marketplace/profile/orders", color: "text-blue-400" },
   { icon: Calendar, label: "Schedule Booking", path: "/dashboard/customer", color: "text-violet-400" },
 ];
@@ -131,8 +131,8 @@ export default function QuickActionsPage() {
                 <span className={cn(
                   "text-[10px] font-medium px-2 py-0.5 rounded-full uppercase tracking-wider",
                   svc.status === "completed"
-                    ? "bg-emerald-500/15 text-emerald-300"
-                    : "bg-amber-500/15 text-amber-300"
+                    ? "bg-warning/15 text-warning"
+                    : "bg-warning/15 text-warning"
                 )}>
                   {svc.status}
                 </span>

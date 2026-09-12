@@ -244,7 +244,7 @@ function ContactSupport() {
       label: "WhatsApp",
       description: "Chat on WhatsApp",
       href: "https://wa.me/919876543210",
-      color: "bg-emerald-500/15 text-emerald-400",
+      color: "bg-icon-highlight/15 text-icon-highlight",
     },
   ];
 

@@ -51,7 +51,7 @@ export const PUSH_TYPE_MAP = {
   ORDER_SHIPPED: {
     severity: "success",
     defaultMsg: "Your order has been shipped",
-    deepLink: "/marketplace/orders",
+    deepLink: "/marketplace/profile/orders",
   },
   PAYMENT_RECEIVED: {
     severity: "success",

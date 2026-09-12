@@ -136,35 +136,29 @@ test.describe('customer dashboard buttons', () => {
     await expect(page.getByRole('heading', { name: 'Request Service' })).toBeVisible({ timeout: 10000 })
   })
 
-  test('SOSButton two-step confirm reaches the real /api/sos endpoint', async ({ page }) => {
+  test('SOS two-step confirm reaches the real /service/sos endpoint via menu', async ({ page }) => {
     let sosPost = null
     page.on('response', (resp) => {
       if (resp.url().includes('/sos') && resp.request().method() === 'POST') sosPost = resp
     })
 
     await loginViaUi(page, await signupFreshCustomer('sos'))
-    await page.waitForURL('**/dashboard/customer', { timeout: 20000 })
-    await ensureRequestPanel(page)
-    await expect(page.getByRole('heading', { name: 'Request Service' })).toBeVisible({ timeout: 20000 })
-
-    // Idle SOS FAB renders an icon only (no accessible name) — the red round
-    // floating button is its stable visual identity.
-    const sos = page.locator('button.bg-red-500')
+    await page.goto('/marketplace/profile/safety')
+    await expect(page.getByRole('heading', { name: 'Safety' })).toBeVisible({ timeout: 20000 })
+    const sos = page.getByRole('button', { name: 'Emergency SOS' }).first()
     await expect(sos).toBeVisible({ timeout: 10000 })
 
-    // First tap arms the confirmation state — the button then swaps
-    // bg-red-500 → bg-red-600, so re-click via its label text, which
-    // survives the class transition (the stale class locator would only
-    // match again after the 5s revert timer resets it to idle).
+    // Menu SOS uses inline 2-tap confirm (no floating overlay).
+    // First tap arms, second tap sends via confirm label.
     await sos.click()
-    const armed = page.getByText('Tap AGAIN to SOS')
+    const armed = page.getByText('Tap again to confirm')
     await expect(armed).toBeVisible({ timeout: 5000 })
     await armed.click()
 
-    // Backend /service/sos replies emergency_notified → "Help En Route!".
+    // Backend /service/sos replies success → toast; offline queues instead —
     // If BackendHealth flagged the API offline the app queues instead —
     // both are real outcomes of the two-step interaction.
-    await expect(page.getByText(/Help En Route!|SOS Queued/)).toBeVisible({ timeout: 15000 })
+    await expect(page.getByText(/SOS sent|Help En Route!|SOS Queued/)).toBeVisible({ timeout: 15000 })
     if (sosPost) expect(sosPost.status()).toBe(200)
   })
 })

@@ -20,6 +20,7 @@ import {
   Zap,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { formatIndianPlate } from "@/lib/plateFormatter";
 
 function generateTimeSlots() {
   const slots = [];
@@ -79,7 +80,7 @@ export function FleetBookingPanel() {
   const [error, setError] = useState(null);
 
   const timeSlots = useMemo(() => generateTimeSlots(), []);
-  const pricing = useMemo(() => getPricingBreakdown(), [selectedVehicleIds, vehicleServices]);
+  const pricing = useMemo(() => getPricingBreakdown(), [getPricingBreakdown]);
 
   const handleSubmit = () => {
     setError(null);
@@ -170,7 +171,7 @@ export function FleetBookingPanel() {
                     <p className="text-sm font-semibold text-text-primary truncate">
                       {v.year} {v.make} {v.model}
                     </p>
-                    <p className="text-xs text-text-muted font-mono mt-0.5">{v.plate}</p>
+                    <p className="text-xs text-text-muted font-mono tracking-wider mt-0.5">{formatIndianPlate(v.plate)}</p>
                     <span className="inline-block text-[10px] text-text-dim mt-1 capitalize">
                       {v.type?.replace(/_/g, " ")}
                     </span>

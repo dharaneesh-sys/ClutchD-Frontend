@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import { useAuthStore } from "@/store/authStore";
+import { registerOnlineFlush } from "@/lib/offline/requestQueue";
 
 /**
  * AuthInit runs once on mount.
@@ -23,8 +24,66 @@ export function AuthInit() {
 
   useEffect(() => {
     if (ran.current) return;
-    ran.current = true;
-    useAuthStore.getState().restoreSession();
+
+    const start = () => {
+      if (ran.current) return;
+      ran.current = true;
+      useAuthStore.getState().restoreSession();
+      registerOnlineFlush();
+    };
+
+    // Wait for zustand-persist rehydration: on a cold start (especially the
+    // Capacitor WebView) storage is slower than mount, so calling
+    // restoreSession() immediately would see empty state and bail out,
+    // losing the session. Go at once only if already hydrated.
+    const alreadyHydrated =
+      useAuthStore.getState()._hydrated ||
+      useAuthStore.persist?.hasHydrated?.() === true;
+    if (alreadyHydrated) {
+      start();
+      return;
+    }
+    const unsub = useAuthStore.persist?.onFinishHydration?.(() => start());
+    // Safety net in case hydration never fires — don't block the app.
+    const t = setTimeout(() => {
+      if (typeof unsub === "function") unsub();
+      start();
+    }, 3000);
+    return () => {
+      clearTimeout(t);
+      if (typeof unsub === "function") unsub();
+    };
+  }, []);
+
+  // Refresh the session when the native app returns to foreground.
+  // Covers background→foreground after hours (token TTL is 15 min).
+  // Web builds never fire this event — the effect below is a no-op there.
+  useEffect(() => {
+    let removeListener = null;
+    let cancelled = false;
+    (async () => {
+      try {
+        if (typeof window === "undefined" || !window.Capacitor?.isNativePlatform?.()) return;
+        if (!window.Capacitor.isNativePlatform()) return;
+        const { App } = await import("@capacitor/app");
+        if (cancelled) return;
+        const sub = await App.addListener("resume", () => {
+          const st = useAuthStore.getState();
+          if (st.isAuthenticated && st.user?.id) st.restoreSession();
+        });
+        removeListener = () => sub.remove();
+      } catch (e) {
+        console.debug("[AuthInit] native resume unavailable:", e?.message);
+      }
+    })();
+    return () => {
+      cancelled = true;
+      try {
+        removeListener?.();
+      } catch (e) {
+        console.debug("[AuthInit] resume cleanup:", e?.message);
+      }
+    };
   }, []);
 
   return null;

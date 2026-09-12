@@ -24,8 +24,8 @@ export const useNotificationStore = create((set, get) => ({
     if (!token) return false;
 
     try {
-      await api.post("/api/push/register", { token });
-      set({ pushToken: token, pushEnabled: true });
+      const { data } = await api.post("/providers/device-tokens", { token, platform: "android" });
+      set({ pushToken: token, pushTokenId: data?.id || null, pushEnabled: true });
       return true;
     } catch (err) {
       console.error("[notificationStore] Failed to register push token with backend:", err);
@@ -38,17 +38,19 @@ export const useNotificationStore = create((set, get) => ({
    * Deletes the token from the backend and clears local state.
    */
   unregisterPushToken: async () => {
-    const { pushToken } = get();
-    if (!pushToken) return;
+    const { pushToken, pushTokenId } = get();
+    if (!pushToken && !pushTokenId) return;
 
     try {
-      await api.post("/api/push/unregister", { token: pushToken });
+      if (pushTokenId) {
+        await api.delete(`/providers/device-tokens/${pushTokenId}`);
+      }
     } catch (err) {
       console.error("[notificationStore] Failed to unregister push token with backend:", err);
     }
 
     await unregisterPush(pushToken);
-    set({ pushToken: null, pushEnabled: false });
+    set({ pushToken: null, pushTokenId: null, pushEnabled: false });
   },
 
   /**

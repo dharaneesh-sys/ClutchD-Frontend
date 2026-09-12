@@ -15,6 +15,7 @@ import api from "@/lib/api";
 
 export function IncomingJobs({ onChat }) {
   const [jobs, setJobs] = useState([]);
+  const [pendingOffers, setPendingOffers] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   const setNavigationTarget = useTrackingStore((s) => s.setNavigationTarget);
@@ -43,6 +44,14 @@ export function IncomingJobs({ onChat }) {
     } finally {
       setIsLoading(false);
     }
+
+    // Dispatched (not-yet-assigned) offers arrive here, not on /jobs/incoming.
+    try {
+      const { data } = await api.get("/providers/offers", { params: { status: "pending" } });
+      setPendingOffers(Array.isArray(data.offers) ? data.offers : []);
+    } catch {
+      setPendingOffers([]); // best-effort — queue still renders
+    }
   }, []);
 
   useEffect(() => {
@@ -65,6 +74,17 @@ export function IncomingJobs({ onChat }) {
       showSuccess("Job accepted! Navigate to the customer's location.");
     } catch (err) {
       showError(`Failed to accept: ${err.response?.data?.detail || err.message}`);
+    }
+  };
+
+  // Respond to a dispatched offer; the job becomes assigned on accept.
+  const respondToOffer = async (offerId, action) => {
+    try {
+      await api.post(`/offers/${offerId}/${action}`);
+      showSuccess(action === "accept" ? "Offer accepted! Job assigned to you." : "Offer declined.");
+      fetchJobs();
+    } catch (err) {
+      showError(`Failed to ${action} offer: ${err.response?.data?.detail || err.message}`);
     }
   };
 
@@ -116,7 +136,7 @@ export function IncomingJobs({ onChat }) {
             <p className="text-sm text-text-muted">Manage your service requests</p>
          </div>
         <Badge variant="warning" className="animate-pulse">
-           {jobs.filter(j => j.status === 'pending' || j.status === 'assigned').length} Request(s)
+           {pendingOffers.length + jobs.filter(j => j.status === 'pending' || j.status === 'assigned').length} Request(s)
         </Badge>
       </div>
 
@@ -128,18 +148,49 @@ export function IncomingJobs({ onChat }) {
            </div>
         ) : error ? (
            <div className="h-full flex flex-col items-center justify-center text-text-dim">
-              <AlertTriangle size={40} className="mb-4 text-amber-400/50" />
+              <AlertTriangle size={40} className="mb-4 text-warning/50" />
               <p>{error}</p>
              <Button variant="ghost" size="sm" className="mt-2" onClick={fetchJobs}>Retry</Button>
            </div>
-        ) : jobs.length === 0 ? (
+        ) : jobs.length === 0 && pendingOffers.length === 0 ? (
            <div className="h-full flex flex-col items-center justify-center text-text-dim">
               <Clock size={40} className="mb-4 opacity-50" />
              <p>No jobs in queue.</p>
              <p className="text-sm">Stay online to receive requests.</p>
            </div>
         ) : (
-          jobs.map(job => (
+          <>
+            {/* Dispatched offers awaiting response — accept assigns the job */}
+            {pendingOffers.map(offer => (
+              <div key={offer.id} className="p-4 rounded-xl border transition-all bg-bg-card border-border-subtle">
+                <div className="flex justify-between items-start mb-2">
+                  <h4 className="font-semibold text-text-primary">{offer.job?.issueTag || "New Job Offer"}</h4>
+                  <span className="text-xs flex items-center text-text-muted">
+                    <Clock size={12} className="mr-1"/>
+                    {offer.createdAt ? new Date(offer.createdAt).toLocaleTimeString() : "—"}
+                  </span>
+                </div>
+
+                <div className="mb-3">
+                  <Badge variant="danger" className="mb-2">New Offer</Badge>
+                  <p className="text-sm mb-2 text-text-muted">{offer.job?.description || "No description"}</p>
+                </div>
+
+                <div className="border-t pt-3 mt-3 flex items-center justify-between border-border-subtle">
+                  <div>
+                    <p className="text-[10px] uppercase tracking-wider mb-0.5 text-text-dim">Est. Cost</p>
+                    <p className="font-bold text-icon-highlight">
+                      {offer.job?.priceEstimate ? `₹${offer.job.priceEstimate.min} - ₹${offer.job.priceEstimate.max}` : "—"}
+                    </p>
+                  </div>
+                  <div className="flex gap-2">
+                    <Button variant="ghost" size="sm" onClick={() => respondToOffer(offer.id, "decline")}>Decline</Button>
+                    <Button size="sm" onClick={() => respondToOffer(offer.id, "accept")}>Accept Job</Button>
+                  </div>
+                </div>
+              </div>
+            ))}
+            {jobs.map(job => (
             <div key={job.id} className={`p-4 rounded-xl border transition-all ${
               job.status === 'accepted' || job.status === 'en_route' || job.status === 'in_progress'
                 ? 'bg-surface-soft border-border-subtle'
@@ -212,7 +263,8 @@ export function IncomingJobs({ onChat }) {
                 </div>
               </div>
             </div>
-          ))
+            ))}
+          </>
         )}
       </div>
 

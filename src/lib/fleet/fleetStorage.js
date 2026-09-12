@@ -26,17 +26,17 @@ function createDefaultFleet() {
     registeredAt: new Date().toISOString(),
     // Fleet vehicles
     vehicles: [
-      { id: "fv-1", make: "Tata", model: "Ace", year: 2022, plate: "TN 38 AB 1001", type: "light_truck", status: "active" },
-      { id: "fv-2", make: "Tata", model: "Ace", year: 2023, plate: "TN 38 AB 1002", type: "light_truck", status: "active" },
-      { id: "fv-3", make: "Ashok Leyland", model: "Dost", year: 2021, plate: "TN 38 CD 2001", type: "light_truck", status: "active" },
-      { id: "fv-4", make: "Mahindra", model: "Bolero", year: 2020, plate: "TN 38 EF 3001", type: "suv", status: "active" },
+      { id: "fv-1", make: "Tata", model: "Ace", year: 2022, plate: "TN-38-AB-1001", type: "light_truck", status: "active" },
+      { id: "fv-2", make: "Tata", model: "Ace", year: 2023, plate: "TN-38-AB-1002", type: "light_truck", status: "active" },
+      { id: "fv-3", make: "Ashok Leyland", model: "Dost", year: 2021, plate: "TN-38-CD-2001", type: "light_truck", status: "active" },
+      { id: "fv-4", make: "Mahindra", model: "Bolero", year: 2020, plate: "TN-38-EF-3001", type: "suv", status: "active" },
     ],
     // Service history
     serviceHistory: [
       {
         id: "fsh-1",
         vehicleId: "fv-1",
-        vehicleName: "Tata Ace (TN 38 AB 1001)",
+        vehicleName: "Tata Ace (TN-38-AB-1001)",
         serviceType: "oil_change",
         description: "Regular oil change + filter replacement",
         status: "completed",
@@ -47,7 +47,7 @@ function createDefaultFleet() {
       {
         id: "fsh-2",
         vehicleId: "fv-2",
-        vehicleName: "Tata Ace (TN 38 AB 1002)",
+        vehicleName: "Tata Ace (TN-38-AB-1002)",
         serviceType: "brake_repair",
         description: "Brake pad replacement front wheels",
         status: "completed",
@@ -58,7 +58,7 @@ function createDefaultFleet() {
       {
         id: "fsh-3",
         vehicleId: "fv-3",
-        vehicleName: "Ashok Leyland Dost (TN 38 CD 2001)",
+        vehicleName: "Ashok Leyland Dost (TN-38-CD-2001)",
         serviceType: "engine_diagnostic",
         description: "Check engine light diagnostic + ECU reset",
         status: "completed",
@@ -69,7 +69,7 @@ function createDefaultFleet() {
       {
         id: "fsh-4",
         vehicleId: "fv-4",
-        vehicleName: "Mahindra Bolero (TN 38 EF 3001)",
+        vehicleName: "Mahindra Bolero (TN-38-EF-3001)",
         serviceType: "ac_service",
         description: "AC gas recharge + vent cleaning",
         status: "completed",

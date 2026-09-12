@@ -1,47 +1,9 @@
 "use client";
 
 import { useCallback } from "react";
-import { X, RotateCcw, Star, Filter } from "lucide-react";
+import { X, RotateCcw, Filter } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { PRODUCT_CATEGORIES, PRICE_RANGES, BRANDS, DELIVERY_TIMES } from "@/lib/constants";
-
-function StarGroup({ value, onChange }) {
-  return (
-    <div className="flex flex-col gap-1.5">
-      {[5, 4, 3, 2, 1].map((star) => {
-        const active = value === star;
-        return (
-          <button
-            key={star}
-            type="button"
-            onClick={() => onChange(active ? null : star)}
-            className={cn(
-              "flex items-center gap-2 rounded-lg px-3 py-1.5 text-xs font-medium transition-all",
-              active
-                ? "bg-primary/20 text-primary-light"
-                : "text-text-muted hover:bg-white/5 hover:text-foreground"
-            )}
-          >
-            <div className="flex items-center gap-0.5">
-              {Array.from({ length: 5 }).map((_, i) => (
-                <Star
-                  key={i}
-                  size={12}
-                  className={cn(
-                    i < star
-                      ? "fill-amber-400 text-amber-400"
-                      : "fill-white/10 text-white/30"
-                  )}
-                />
-              ))}
-            </div>
-            <span className="text-[0.625rem] text-text-dim">& up</span>
-          </button>
-        );
-      })}
-    </div>
-  );
-}
+import { PRODUCT_CATEGORIES, PRICE_RANGES, BRANDS } from "@/lib/constants";
 
 function FilterSection({ title, children, defaultOpen = true }) {
   return (
@@ -113,7 +75,8 @@ function FilterChip({ label, active, onClick }) {
 }
 
 /**
- * Search filter panel — category, price, brand, rating, availability, delivery.
+ * Search filter panel — category, price, brand, availability.
+ * Only exposes filters supported by the backend /products endpoint.
  *
  * @param {Object}   props
  * @param {Object}   props.filters          - Current filter state
@@ -224,19 +187,11 @@ export function SearchFilters({
               onClick={() =>
                 setFilter(
                   "brand",
-                  filters.brand?.toLowerCase() === brand.value ? null : brand.label
+                  filters.brand?.toLowerCase() === brand.value ? null : brand.value
                 )
               }
             />
           ))}
-        </FilterSection>
-
-        {/* Rating */}
-        <FilterSection title="Minimum Rating">
-          <StarGroup
-            value={filters.rating}
-            onChange={(v) => setFilter("rating", v)}
-          />
         </FilterSection>
 
         {/* Availability */}
@@ -266,23 +221,6 @@ export function SearchFilters({
             </div>
           </label>
         </FilterSection>
-
-        {/* Delivery Time */}
-        <FilterSection title="Delivery Time">
-          {DELIVERY_TIMES.map((dt) => (
-            <FilterChip
-              key={dt.value}
-              label={dt.label}
-              active={filters.deliveryTime === dt.value}
-              onClick={() =>
-                setFilter(
-                  "deliveryTime",
-                  filters.deliveryTime === dt.value ? null : dt.value
-                )
-              }
-            />
-          ))}
-        </FilterSection>
       </div>
 
       {/* Apply button on mobile */}
@@ -303,7 +241,7 @@ export function SearchFilters({
   return (
     <>
       {/* Desktop sidebar */}
-      <aside className="hidden lg:flex flex-col w-64 shrink-0 glass-lux rounded-2xl overflow-hidden h-fit max-h-[calc(100vh-12rem)] sticky top-24">
+      <aside className="hidden lg:flex flex-col w-64 shrink-0 glass-lux rounded-2xl overflow-hidden h-fit max-h-[calc(100dvh-12rem)] sticky top-24">
         {content}
       </aside>
 

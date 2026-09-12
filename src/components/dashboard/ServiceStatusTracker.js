@@ -1,3 +1,4 @@
+import Image from "next/image";
 import { useState, useEffect } from "react";
 import { SERVICE_STATUS, GST_RATE } from "@/lib/constants";
 import { GlassCard } from "@/components/ui/GlassCard";
@@ -7,6 +8,7 @@ import { WarrantyTerms } from "@/components/dashboard/WarrantyTerms";
 import { Search, UserCheck, Navigation, Wrench, CreditCard, CheckCircle2, Shield, CheckCheck, Phone, MessageSquare, MapPin, Star, CarFront, ChevronDown } from "lucide-react";
 import api from "@/lib/api";
 import { cn } from "@/lib/utils";
+import { formatIndianPlate } from "@/lib/plateFormatter";
 
 export function ServiceStatusTracker({ request, onComplete, onCancel, onReleasePayment, onDisputePayment, onVehicleChange }) {
   const [isVehicleSelectorOpen, setIsVehicleSelectorOpen] = useState(false);
@@ -32,6 +34,7 @@ export function ServiceStatusTracker({ request, onComplete, onCancel, onReleaseP
 
   const steps = [
     { id: SERVICE_STATUS.SEARCHING, label: "Finding Mechanic", icon: Search },
+    { id: SERVICE_STATUS.NOTIFIED, label: "Providers Notified", icon: UserCheck },
     { id: SERVICE_STATUS.ASSIGNED, label: "Assigned", icon: UserCheck },
     { id: SERVICE_STATUS.EN_ROUTE, label: "En Route", icon: Navigation },
     { id: SERVICE_STATUS.IN_PROGRESS, label: "Fixing Vehicle", icon: Wrench },
@@ -58,6 +61,18 @@ export function ServiceStatusTracker({ request, onComplete, onCancel, onReleaseP
           </div>
         );
 
+      case SERVICE_STATUS.NOTIFIED:
+        return (
+          <div className="text-center py-6">
+            <div className="w-16 h-16 mx-auto rounded-full flex items-center justify-center mb-4 bg-surface-soft text-icon-highlight">
+              <div className="absolute inset-0 rounded-full border-2 animate-ping border-icon-highlight/30"></div>
+              <UserCheck size={28} />
+            </div>
+            <h3 className="text-lg font-bold mb-2 text-text-primary">Providers Notified</h3>
+            <p className="text-sm text-text-muted">Nearby providers have been notified of your request. Waiting for a response...</p>
+          </div>
+        );
+
       case SERVICE_STATUS.ASSIGNED:
       case SERVICE_STATUS.EN_ROUTE:
       case SERVICE_STATUS.IN_PROGRESS:
@@ -66,7 +81,7 @@ export function ServiceStatusTracker({ request, onComplete, onCancel, onReleaseP
             <div className="flex items-center gap-4 border-b pb-4 mb-4 border-border-subtle">
               <div className="w-12 h-12 rounded-full flex items-center justify-center overflow-hidden border bg-surface-soft border-border-subtle">
                 {request.mechanic?.image ? (
-                  <img src={request.mechanic.image} alt="Mechanic profile photo" className="w-full h-full object-cover" />
+                  <Image src={request.mechanic.image} alt="Mechanic profile photo" width={48} height={48} className="w-full h-full object-cover" />
                 ) : (
                   <UserCheck className="text-icon-highlight" />
                 )}
@@ -235,7 +250,14 @@ export function ServiceStatusTracker({ request, onComplete, onCancel, onReleaseP
                 </p>
                 <p className="text-xs text-text-muted">
                   {request.vehicle.color}
-                  {request.vehicle.plate ? ` · ${request.vehicle.plate}` : ""}
+                  {request.vehicle.plate ? (
+                    <>
+                      {" · "}
+                      <span className="font-mono tracking-wider">{formatIndianPlate(request.vehicle.plate)}</span>
+                    </>
+                  ) : (
+                    ""
+                  )}
                 </p>
               </div>
             </div>
@@ -279,7 +301,7 @@ export function ServiceStatusTracker({ request, onComplete, onCancel, onReleaseP
                           {v.year} {v.make} {v.model}
                         </p>
                         {v.plate && (
-                          <p className="text-xs text-text-muted truncate">{v.plate}</p>
+                          <p className="text-xs text-text-muted truncate font-mono tracking-wider">{formatIndianPlate(v.plate)}</p>
                         )}
                       </div>
                       {isSelected && (

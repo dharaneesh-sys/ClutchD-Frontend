@@ -31,40 +31,28 @@ describe("loginSchema", () => {
     }
   });
 
-  it("rejects password shorter than 8 characters", () => {
-    const result = loginSchema.safeParse({ ...validInput, password: "Short1A" }); // 7 chars
+  it("rejects password shorter than 6 characters", () => {
+    const result = loginSchema.safeParse({ ...validInput, password: "Sh1A" }); // 4 chars
     expect(result.success).toBe(false);
     if (!result.success) {
       const msgs = result.error.issues.map((i) => i.message).join(" ");
-      expect(msgs).toMatch(/at least 8/i);
+      expect(msgs).toMatch(/at least 6/i);
     }
   });
 
-  it("rejects password without uppercase letter", () => {
+  it("accepts password without uppercase letter (login schema is lenient)", () => {
     const result = loginSchema.safeParse({ ...validInput, password: "mypassword1" });
-    expect(result.success).toBe(false);
-    if (!result.success) {
-      const msgs = result.error.issues.map((i) => i.message).join(" ");
-      expect(msgs).toMatch(/uppercase/i);
-    }
+    expect(result.success).toBe(true); // loginSchema doesn't require uppercase
   });
 
-  it("rejects password without lowercase letter", () => {
+  it("accepts password without lowercase letter (login schema is lenient)", () => {
     const result = loginSchema.safeParse({ ...validInput, password: "MYPASSWORD1" });
-    expect(result.success).toBe(false);
-    if (!result.success) {
-      const msgs = result.error.issues.map((i) => i.message).join(" ");
-      expect(msgs).toMatch(/lowercase/i);
-    }
+    expect(result.success).toBe(true); // loginSchema doesn't require lowercase
   });
 
-  it("rejects password without number", () => {
+  it("accepts password without number (login schema is lenient)", () => {
     const result = loginSchema.safeParse({ ...validInput, password: "MyPassword" });
-    expect(result.success).toBe(false);
-    if (!result.success) {
-      const msgs = result.error.issues.map((i) => i.message).join(" ");
-      expect(msgs).toMatch(/number/i);
-    }
+    expect(result.success).toBe(true); // loginSchema doesn't require a number
   });
 
   it("rejects missing email field", () => {
@@ -162,6 +150,8 @@ describe("mechanicSignupSchema", () => {
     experience: "5",
     expertise: ["engine", "brakes"],
     location: "Coimbatore",
+    latitude: 11.0168,
+    longitude: 76.9558,
   };
 
   it("accepts valid mechanic signup data", () => {
@@ -217,6 +207,8 @@ describe("garageSignupSchema", () => {
     ownerName: "Alice Owner",
     phone: "9876543210",
     location: "Coimbatore",
+    latitude: 11.0168,
+    longitude: 76.9558,
     services: ["engine", "brakes"],
     mechanicCount: "3",
     operatingHours: "9 AM - 9 PM",

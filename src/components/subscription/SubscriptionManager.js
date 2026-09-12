@@ -182,7 +182,7 @@ export function SubscriptionManager() {
       {showOfflineNotice && !backendOnline && (
         <GlassCard variant="glass" className="p-4 border border-amber-500/20 bg-amber-500/5">
           <div className="flex items-start gap-3">
-            <AlertTriangle size={18} className="text-amber-400 flex-shrink-0 mt-0.5" />
+            <AlertTriangle size={18} className="text-warning flex-shrink-0 mt-0.5" />
             <div className="flex-1 min-w-0">
               <p className="text-sm font-medium text-amber-300">
                 Payment system offline
@@ -217,7 +217,7 @@ export function SubscriptionManager() {
               <span
                 className={`inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-[0.625rem] font-semibold uppercase tracking-wider ${
                   status === "active"
-                    ? "bg-emerald-500/15 text-emerald-300"
+                    ? "bg-success/15 text-success"
                     : status === "cancelled"
                     ? "bg-amber-500/15 text-amber-300"
                     : "bg-white/10 text-text-muted"
@@ -277,7 +277,7 @@ export function SubscriptionManager() {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
               {currentPlan.features.map((feature) => (
                 <div key={feature} className="flex items-center gap-2 text-sm text-text-secondary">
-                  <CheckCircle2 size={14} className="text-emerald-400 flex-shrink-0" />
+                  <CheckCircle2 size={14} className="text-icon-highlight flex-shrink-0" />
                   <span>{feature}</span>
                 </div>
               ))}
@@ -302,12 +302,12 @@ export function SubscriptionManager() {
       {/* Upgrade vs Downgrade hint */}
       <GlassCard variant="glass" className="p-4">
         <div className="flex items-start gap-3">
-          <ArrowUp size={16} className="text-emerald-400 flex-shrink-0 mt-0.5" />
-          <ArrowDown size={16} className="text-amber-400 flex-shrink-0 mt-0.5" />
+          <ArrowUp size={16} className="text-icon-highlight flex-shrink-0 mt-0.5" />
+          <ArrowDown size={16} className="text-warning flex-shrink-0 mt-0.5" />
           <p className="text-xs text-text-muted leading-relaxed">
-            <span className="text-emerald-400 font-medium">Upgrade</span> anytime to unlock more features.
+            <span className="text-icon-highlight font-medium">Upgrade</span> anytime to unlock more features.
             {" "}
-            <span className="text-amber-400 font-medium">Downgrade</span> at any time — changes apply at the
+            <span className="text-warning font-medium">Downgrade</span> at any time — changes apply at the
             start of your next billing cycle. Cancel anytime with no hidden fees.
           </p>
         </div>

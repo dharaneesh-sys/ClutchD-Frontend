@@ -37,8 +37,8 @@ export function PlanCard({ plan, isCurrent, onSubscribe, isSubscribing }) {
           </span>
         )}
         {isCurrent && (
-          <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-500/15 px-3 py-1 text-[0.625rem] font-semibold uppercase tracking-wider text-emerald-300">
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+          <span className="inline-flex items-center gap-1.5 rounded-full bg-warning/15 px-3 py-1 text-[0.625rem] font-semibold uppercase tracking-wider text-warning">
+            <span className="w-1.5 h-1.5 rounded-full bg-warning" />
             Current Plan
           </span>
         )}
