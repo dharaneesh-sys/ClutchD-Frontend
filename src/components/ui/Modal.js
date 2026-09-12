@@ -1,4 +1,5 @@
-import { useEffect, useId, useRef } from "react";
+import { useEffect, useId, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { X } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -18,6 +19,11 @@ export function Modal({
   const previousActiveElement = useRef(null);
   const reactId = useId();
   const titleId = `modal-title-${reactId}`;
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   // Lock body scroll
   useEffect(() => {
@@ -99,17 +105,20 @@ export function Modal({
 
   if (!isOpen) return null;
 
-  return (
+  const canPortal =
+    mounted && typeof window !== "undefined" && typeof document !== "undefined";
+
+  const modalContent = (
     <>
       {/* Backdrop */}
       <div
         onClick={onClose}
-        className="fixed inset-0 z-40 backdrop-blur-sm animate-[backdrop-in_0.2s_ease] bg-black/50"
+        className="fixed inset-0 z-[60] backdrop-blur-sm animate-[backdrop-in_0.2s_ease] bg-black/50"
         aria-hidden="true"
       />
 
       {/* Modal Container */}
-      <div className="fixed inset-0 z-50 flex items-center justify-center p-4 py-12 px-4 sm:px-6 overflow-y-auto w-full h-full pointer-events-none">
+      <div className="fixed inset-0 z-[61] flex items-start sm:items-center justify-center p-4 sm:px-6 pt-12 pb-[calc(env(safe-area-inset-bottom)+5rem)] sm:pb-12 overflow-y-auto w-full h-full pointer-events-none">
         <div
           ref={modalRef}
           role={role}
@@ -118,7 +127,7 @@ export function Modal({
           tabIndex={-1}
           className={cn(
             "relative w-full rounded-2xl border pointer-events-auto animate-[modal-in_0.25s_ease]",
-            "p-6 backdrop-blur-3xl",
+            "p-6 backdrop-blur-3xl my-auto",
             "border-border-subtle bg-surface shadow-[0_30px_80px_rgba(var(--color-black-rgb),0.35)] ring-1 ring-primary/10",
             maxWidth,
             className
@@ -142,11 +151,17 @@ export function Modal({
           </div>
 
            {/* Content */}
-           <div className="max-h-[calc(100vh-8rem)] overflow-y-auto pr-2 custom-scrollbar">
+           <div className="max-h-[calc(100dvh-8rem)] overflow-y-auto pr-2 custom-scrollbar">
             {children}
            </div>
         </div>
       </div>
     </>
   );
+
+  if (canPortal) {
+    return createPortal(modalContent, document.body);
+  }
+
+  return modalContent;
 }

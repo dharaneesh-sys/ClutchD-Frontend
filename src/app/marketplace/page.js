@@ -1,7 +1,8 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useMemo } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { Search } from "lucide-react";
 import { useProductStore } from "@/store/productStore";
 import { useCategoryStore } from "@/store/categoryStore";
@@ -14,8 +15,8 @@ import { Skeleton } from "@/components/ui/Skeleton";
 
 function CategoryGridSkeleton() {
   return (
-    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-3">
-      {Array.from({ length: 6 }).map((_, i) => (
+    <div className="grid grid-cols-2 gap-3">
+      {Array.from({ length: 2 }).map((_, i) => (
         <div
           key={i}
           className="glass-lux rounded-2xl p-4 flex flex-col items-center gap-3"
@@ -77,6 +78,39 @@ export default function MarketplaceHome() {
 
   const featuredProducts = products.slice(0, 6);
 
+  const displayedCategories = useMemo(() => {
+    const norm = (s) => s?.toLowerCase().replace(/[^a-z0-9]/g, "") || "";
+    const isAccessories = (c) =>
+      norm(c?.name).includes("accessor") || norm(c?.slug).includes("accessor");
+    const isSpare = (c) =>
+      norm(c?.name).includes("spare") || norm(c?.slug).includes("spare");
+    const list = categories.filter((c) => isAccessories(c) || isSpare(c));
+    const hasAccessories = list.some((c) => isAccessories(c));
+    const hasSpare = list.some((c) => isSpare(c));
+    const out = [...list];
+    if (!hasAccessories) {
+      const fb = categories.find((c) => isAccessories(c));
+      if (fb) out.push(fb);
+    }
+    if (!hasSpare) {
+      const spareCount = categories
+        .filter((c) => !isAccessories(c) && !isSpare(c))
+        .reduce((sum, c) => sum + (Number(c.productCount) || 0), 0);
+      const baseCount =
+        spareCount ||
+        categories
+          .filter((c) => !isAccessories(c))
+          .reduce((sum, c) => sum + (Number(c.productCount) || 0), 0);
+      out.push({
+        id: "spare-parts",
+        slug: "spare-parts",
+        name: "Spare Parts",
+        productCount: baseCount,
+      });
+    }
+    return out.filter((c) => isAccessories(c) || isSpare(c)).slice(0, 2);
+  }, [categories]);
+
   return (
     <div className="space-y-7 p-4 page-enter">
       {/* ── Header ── */}
@@ -109,16 +143,24 @@ export default function MarketplaceHome() {
       <section>
         <div className="flex items-center justify-between mb-4">
           <h2 className="type-title-1 text-on-surface">Categories</h2>
-          <span className="text-[11px] text-muted font-medium">
-            {categories.length} total
-          </span>
+          <div className="flex items-center gap-3">
+            <span className="text-[11px] text-muted font-medium">
+              {displayedCategories.length} total
+            </span>
+            <Link
+              href="/marketplace/categories"
+              className="text-[11px] font-semibold text-primary-light hover:text-primary transition-colors"
+            >
+              See all
+            </Link>
+          </div>
         </div>
 
         {categoriesLoading ? (
           <CategoryGridSkeleton />
         ) : (
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-3">
-            {categories.map((cat) => (
+          <div className="grid grid-cols-2 gap-3">
+            {displayedCategories.map((cat) => (
               <CategoryCard key={cat.id} category={cat} />
             ))}
           </div>

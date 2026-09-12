@@ -84,6 +84,7 @@ function matchRoute(url, method) {
   if (path.includes("/auth/forgot-password/request") && m === "post") return "forgot_request";
   if (path.includes("/auth/forgot-password/reset") && m === "post") return "forgot_reset";
   if (path.includes("/auth/google") && m === "post") return "auth_google";
+  if (path.includes("/auth/logout") && m === "post") return "auth_logout";
 
   if (/\/service\/request\/?$/.test(path) && m === "post") return "create_request";
   if (/\/service\/request\/[^/]+\/status/.test(path) && m === "patch") return "update_status";
@@ -203,6 +204,11 @@ function matchRoute(url, method) {
   // ═══════════════════════════════════════════
   // End marketplace routes
   // ═══════════════════════════════════════════
+
+  if (/\/settings\/change-password\/?$/.test(path) && m === "put") return "settings_password";
+  if (/\/settings\/delete-account\/?$/.test(path) && m === "delete") return "settings_delete";
+  if (/\/settings\/?$/.test(path) && m === "get") return "settings_get";
+  if (/\/settings\/?$/.test(path) && m === "put") return "settings_update";
 
   return null;
 }
@@ -727,6 +733,29 @@ function handleRoute(routeDef, reqData) {
       }
       return { data: order };
     }
+
+    case "auth_logout":
+      return { data: { success: true } };
+
+    case "settings_get":
+      return {
+        data: {
+          push_notifications: true,
+          sms_notifications: true,
+          email_notifications: true,
+          theme: "system",
+          language: "en",
+        },
+      };
+
+    case "settings_update":
+      return { data: { success: true, ...(data || {}) } };
+
+    case "settings_password":
+      return { data: { success: true, message: "Password changed" } };
+
+    case "settings_delete":
+      return { data: { success: true } };
 
     default:
       return { data: { success: true } };

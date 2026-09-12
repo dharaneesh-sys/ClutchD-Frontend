@@ -159,12 +159,20 @@ export function MaintenanceAlertBanner() {
       )}
     >
       {/* ── Primary alert row ─────────────────────────────────── */}
-      <button
-        type="button"
+      <div
+        role="button"
+        tabIndex={0}
         onClick={() => setExpanded((e) => !e)}
+        onKeyDown={(e) => {
+          if (e.key === "Enter" || e.key === " ") {
+            e.preventDefault();
+            setExpanded((prev) => !prev);
+          }
+        }}
         className={cn(
-          "w-full flex items-center gap-3 px-4 py-3 text-left",
-          "transition-colors hover:bg-surface-soft/50"
+          "w-full flex items-center gap-3 px-4 py-3 text-left cursor-pointer",
+          "transition-colors hover:bg-surface-soft/50",
+          "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 rounded-t-2xl"
         )}
         aria-expanded={expanded}
         aria-label={expanded ? "Collapse maintenance schedule" : "Expand maintenance schedule"}
@@ -228,7 +236,7 @@ export function MaintenanceAlertBanner() {
         >
           <X size={14} />
         </button>
-      </button>
+      </div>
 
       {/* ── Expanded: full schedule ──────────────────────────── */}
       {expanded && (
