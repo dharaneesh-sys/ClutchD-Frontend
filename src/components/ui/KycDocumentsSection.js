@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef, useState } from "react";
-import { FileCheck2, IdCard, Loader2, UploadCloud } from "lucide-react";
+import { AlertTriangle, FileCheck2, IdCard, Loader2, UploadCloud } from "lucide-react";
 import { GlassCard } from "@/components/ui/GlassCard";
 import { Button } from "@/components/ui/Button";
 import { FileUpload } from "@/components/ui/FileUpload";
@@ -71,8 +71,19 @@ export function KycDocumentsSection({ role }) {
           ? "Your identity is verified. You can replace your documents below if they change."
           : status === "submitted"
             ? "We've received your documents and are reviewing them. This usually takes 1–2 business days."
-            : "Upload your Aadhaar and license to get verified. Verified providers get more jobs."}
+            : status === "rejected"
+              ? "Your documents were rejected. Check the admin's note below, then re-upload corrected photos — we'll review them again."
+              : "Upload your Aadhaar and license to get verified. Verified providers get more jobs."}
       </p>
+
+      {status === "rejected" && user.kycNote && (
+        <div className="mb-5 flex items-start gap-2 text-sm text-amber-300/90 bg-amber-500/10 border border-amber-500/25 rounded-xl px-4 py-3">
+          <AlertTriangle size={16} className="shrink-0 mt-0.5" />
+          <span>
+            <span className="font-medium">Reason:</span> {user.kycNote}
+          </span>
+        </div>
+      )}
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-5">
         <div>

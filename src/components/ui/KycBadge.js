@@ -1,6 +1,6 @@
 "use client";
 
-import { ShieldCheck, Clock, ShieldAlert } from "lucide-react";
+import { ShieldCheck, Clock, ShieldAlert, XCircle } from "lucide-react";
 import { Badge } from "@/components/ui/Badge";
 
 /**
@@ -28,6 +28,12 @@ const KYC_CONFIG = {
     icon: Clock,
     label: "KYC Under Review",
     title: "Documents received — verification in progress.",
+  },
+  rejected: {
+    variant: "danger",
+    icon: XCircle,
+    label: "KYC Rejected",
+    title: "Your documents were rejected — check the note below and resubmit.",
   },
   pending: {
     variant: "danger",

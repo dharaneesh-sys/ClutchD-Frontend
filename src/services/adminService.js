@@ -83,9 +83,14 @@ export async function messageDisputeParties(disputeId, message) {
   return res.data;
 }
 
-export async function fetchPendingKyc() {
-  const res = await api.get("/admin/kyc/pending");
+export async function fetchPendingKyc(params = {}) {
+  const res = await api.get("/admin/kyc/pending", { params });
   return res.data.applications || [];
+}
+
+export async function reviewKyc(profileType, profileId, action, note = null) {
+  const res = await api.patch(`/admin/kyc/${profileType}/${profileId}/review`, { action, note });
+  return res.data;
 }
 
 export async function verifyMechanic(mechanicId, verified) {
