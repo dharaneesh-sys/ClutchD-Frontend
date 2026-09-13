@@ -121,5 +121,7 @@ export const productSchema = z.object({
   description: z.string().min(10, "Describe the part (min 10 chars)"),
   availability: z.boolean().default(true),
   deliveryTime: z.string().optional(),
-  image: z.string().optional(),
+  image: z
+    .string({ required_error: "Upload a photo of the part" })
+    .min(1, "Upload a photo of the part"),
 });

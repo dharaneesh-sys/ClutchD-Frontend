@@ -82,6 +82,8 @@ export function SellerProductForm({ initialProduct = null, onSuccess }) {
     formState: { errors, isSubmitting },
   } = useForm({
     resolver: zodResolver(productSchema),
+    // Re-validate on blur so the required-photo error surfaces before submit.
+    mode: "onTouched",
     defaultValues: {
       name: initialProduct?.name || "",
       price: initialProduct?.price ?? "",
@@ -246,12 +248,17 @@ export function SellerProductForm({ initialProduct = null, onSuccess }) {
 
       <div className="space-y-2">
         <FileUpload
-          label="Part photo"
+          label="Part photo *"
           accept="image/*"
           value={pickedFile}
           onChange={handleFile}
           error={errors.image?.message}
         />
+        {!imageUrl && !uploading && (
+          <p className="text-xs text-text-muted">
+            A photo of the actual part is required — buyers see this in the store.
+          </p>
+        )}
         {imageUrl && (
           <div className="w-28">
             <ProductImage
