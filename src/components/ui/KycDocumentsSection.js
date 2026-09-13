@@ -77,7 +77,7 @@ export function KycDocumentsSection({ role }) {
       </p>
 
       {status === "rejected" && user.kycNote && (
-        <div className="mb-5 flex items-start gap-2 text-sm text-amber-300/90 bg-amber-500/10 border border-amber-500/25 rounded-xl px-4 py-3">
+        <div className="mb-5 flex items-start gap-2 text-sm text-red-300/90 bg-red-500/10 border border-red-500/25 rounded-xl px-4 py-3">
           <AlertTriangle size={16} className="shrink-0 mt-0.5" />
           <span>
             <span className="font-medium">Reason:</span> {user.kycNote}

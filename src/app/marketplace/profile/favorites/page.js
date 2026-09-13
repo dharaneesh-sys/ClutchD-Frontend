@@ -189,8 +189,8 @@ export default function FavoritesPage() {
 
       {/* Error Banner */}
       {error && (
-        <div className="flex items-start gap-3 glass-lux rounded-2xl p-4 border border-amber-500/20 bg-amber-500/5">
-          <p className="text-sm text-amber-300 flex-1">{error}</p>
+        <div className="flex items-start gap-3 glass-lux rounded-2xl p-4 border border-red-500/20 bg-red-500/5">
+          <p className="text-sm text-red-300 flex-1">{error}</p>
           <button
             onClick={fetchFavorites}
             className="text-xs font-medium text-primary-light hover:text-primary shrink-0"

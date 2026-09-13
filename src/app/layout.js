@@ -53,6 +53,7 @@ export default function RootLayout({ children }) {
               (function() {
                 var t = localStorage.getItem('clutchd_theme');
                 var isDark = t === 'dark';
+                document.documentElement.setAttribute('data-theme', isDark ? 'dark' : 'light');
                 document.documentElement.classList.toggle('dark', isDark);
               })();
             `,

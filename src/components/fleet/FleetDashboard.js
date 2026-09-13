@@ -43,7 +43,7 @@ const VEHICLE_TYPE_LABELS = {
 
 const TIER_COLORS = {
   platinum: { badge: "info", text: "text-blue-300", bg: "bg-blue-500/10" },
-  gold: { badge: "warning", text: "text-amber-300", bg: "bg-amber-500/10" },
+  gold: { badge: "primary", text: "text-emerald-300", bg: "bg-emerald-500/10" },
   silver: { badge: "default", text: "text-primary-light", bg: "bg-primary/10" },
   bronze: { badge: "glass", text: "text-text-muted", bg: "bg-white/5" },
 };
@@ -75,7 +75,7 @@ function VehicleCard({ vehicle }) {
     vehicle.status === "active"
       ? "bg-green-500"
       : vehicle.status === "maintenance"
-        ? "bg-amber-500"
+        ? "bg-emerald-500"
         : "bg-red-500";
 
   const typeLabel = VEHICLE_TYPE_LABELS[vehicle.type] || vehicle.type || "Vehicle";
@@ -98,7 +98,7 @@ function VehicleCard({ vehicle }) {
               <span className={cn(
                 "inline-flex items-center gap-1 text-[10px] font-medium",
                 vehicle.status === "active" ? "text-green-400" :
-                vehicle.status === "maintenance" ? "text-warning" : "text-red-400"
+                vehicle.status === "maintenance" ? "text-primary-light" : "text-red-400"
               )}>
                 <span className={cn("w-1.5 h-1.5 rounded-full", statusColor)} />
                 {vehicle.status}

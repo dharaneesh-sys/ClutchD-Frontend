@@ -238,7 +238,7 @@ export default function SafetyPage() {
               {sos.loading ? (
                 <Loader2 size={18} className="text-red-400 animate-spin" />
               ) : sos.status === "queued" ? (
-                <WifiOff size={18} className="text-orange-400" />
+                <WifiOff size={18} className="text-emerald-400" />
               ) : (
                 <AlertTriangle size={18} className="text-red-400" />
               )}
@@ -265,10 +265,10 @@ export default function SafetyPage() {
             {sosLabel}
           </Button>
           {sos.queuedMsg && (
-            <p className="mt-2 text-xs text-orange-400">{sos.queuedMsg}</p>
+            <p className="mt-2 text-xs text-emerald-400">{sos.queuedMsg}</p>
           )}
           {!sos.isOnline && sos.status === "idle" && (
-            <p className="mt-2 text-xs text-orange-400">
+            <p className="mt-2 text-xs text-emerald-400">
               You appear offline — SOS will be queued.
             </p>
           )}
@@ -313,7 +313,7 @@ export default function SafetyPage() {
           onClick={handleReportSafetyIssue}
           className="glass-lux rounded-2xl p-4 w-full flex items-center gap-3 hover:bg-white/[0.08] transition-colors text-left"
         >
-          <div className="flex-shrink-0 w-10 h-10 rounded-xl bg-amber-500/15 flex items-center justify-center">
+          <div className="flex-shrink-0 w-10 h-10 rounded-xl bg-emerald-500/15 flex items-center justify-center">
             <AlertTriangle size={18} className="text-warning" />
           </div>
           <div className="flex-1 min-w-0">

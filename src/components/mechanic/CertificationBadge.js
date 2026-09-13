@@ -6,10 +6,10 @@ import { CERTIFICATIONS } from "@/lib/constants";
 
 const CERT_STYLE = {
   ase: {
-    gradient: "from-amber-500/25 to-amber-500/10",
-    text: "text-amber-300",
-    border: "border-amber-500/35",
-    glow: "rgba(245,158,11,0.15)",
+    gradient: "from-emerald-500/25 to-emerald-500/10",
+    text: "text-emerald-300",
+    border: "border-emerald-500/35",
+    glow: "rgba(52,211,153,0.15)",
     icon: Award,
   },
   toyota: {
@@ -27,10 +27,10 @@ const CERT_STYLE = {
     icon: Wrench,
   },
   bosch: {
-    gradient: "from-warning/25 to-warning/10",
-    text: "text-warning",
-    border: "border-warning/35",
-    glow: "rgba(245,158,11,0.15)",
+    gradient: "from-primary/25 to-primary/10",
+    text: "text-primary-light",
+    border: "border-primary/35",
+    glow: "rgba(16,185,129,0.15)",
     icon: Hexagon,
   },
 };

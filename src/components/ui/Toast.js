@@ -20,7 +20,7 @@ const ICONS = {
 const TYPE_CLASSES = {
   success: "border-primary/30 bg-primary/10",
   error: "border-red-500/30 bg-red-500/10",
-  warning: "border-amber-500/30 bg-amber-500/10",
+  warning: "border-emerald-500/30 bg-emerald-500/10",
   info: "border-blue-500/30 bg-blue-500/10",
 };
 
@@ -41,7 +41,7 @@ const TOAST_ROLES = {
 const PROGRESS_CLASSES = {
   success: "bg-primary",
   error: "bg-red-500",
-  warning: "bg-amber-500",
+  warning: "bg-emerald-500",
   info: "bg-blue-500",
 };
 

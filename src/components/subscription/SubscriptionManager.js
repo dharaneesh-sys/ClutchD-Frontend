@@ -180,11 +180,11 @@ export function SubscriptionManager() {
 
       {/* Backend Offline Notice */}
       {showOfflineNotice && !backendOnline && (
-        <GlassCard variant="glass" className="p-4 border border-amber-500/20 bg-amber-500/5">
+        <GlassCard variant="glass" className="p-4 border border-emerald-500/20 bg-emerald-500/5">
           <div className="flex items-start gap-3">
-            <AlertTriangle size={18} className="text-warning flex-shrink-0 mt-0.5" />
+            <AlertTriangle size={18} className="text-primary-light flex-shrink-0 mt-0.5" />
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium text-amber-300">
+              <p className="text-sm font-medium text-emerald-300">
                 Payment system offline
               </p>
               <p className="text-xs text-text-muted mt-1">
@@ -219,7 +219,7 @@ export function SubscriptionManager() {
                   status === "active"
                     ? "bg-success/15 text-success"
                     : status === "cancelled"
-                    ? "bg-amber-500/15 text-amber-300"
+                    ? "bg-red-500/15 text-red-300"
                     : "bg-white/10 text-text-muted"
                 }`}
               >

@@ -146,7 +146,7 @@ export default function MarketplaceHome() {
       {/* ── Error State ── */}
       {status === "ERROR" && (
         <div className="flex flex-col items-center justify-center py-14 px-6 text-center">
-          <AlertTriangle size={32} className="text-amber-500 mb-3" />
+          <AlertTriangle size={32} className="text-emerald-500 mb-3" />
           <p className="text-base font-semibold text-foreground mb-1">Unable to load marketplace</p>
           <p className="text-sm text-muted mb-5">We couldn&apos;t reach the marketplace.</p>
           <button

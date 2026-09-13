@@ -68,7 +68,7 @@ function LiveChatModal({ isOpen, onClose }) {
             "border-border-subtle bg-surface shadow-[0_30px_80px_rgba(var(--color-black-rgb),0.35)] ring-1 ring-primary/10"
           )}
         >
-          <div className="w-14 h-14 mx-auto mb-4 rounded-full bg-amber-500/15 flex items-center justify-center">
+          <div className="w-14 h-14 mx-auto mb-4 rounded-full bg-emerald-500/15 flex items-center justify-center">
             <MessageCircle size={28} className="text-warning" />
           </div>
           <h3 className="text-lg font-semibold text-foreground mb-2">

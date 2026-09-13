@@ -35,10 +35,10 @@ const TIER_CONFIG = {
   gold: {
     icon: Award,
     label: "Gold",
-    color: "text-amber-300",
-    bg: "bg-amber-500/10",
-    ring: "ring-amber-500/30",
-    gradient: "from-amber-500/20 to-yellow-500/10",
+    color: "text-emerald-300",
+    bg: "bg-emerald-500/10",
+    ring: "ring-emerald-500/30",
+    gradient: "from-emerald-500/20 to-teal-500/10",
     discount: "30%",
   },
   silver: {
@@ -53,10 +53,10 @@ const TIER_CONFIG = {
   bronze: {
     icon: Zap,
     label: "Bronze",
-    color: "text-orange-300",
-    bg: "bg-orange-500/10",
-    ring: "ring-orange-500/30",
-    gradient: "from-orange-500/20 to-amber-500/10",
+    color: "text-lime-300",
+    bg: "bg-lime-500/10",
+    ring: "ring-lime-500/30",
+    gradient: "from-lime-500/20 to-emerald-500/10",
     discount: "5%",
   },
 };
@@ -245,8 +245,8 @@ export default function ClutchDCardPage() {
 
       {/* Error Banner */}
       {error && (
-        <div className="flex items-start gap-3 glass-lux rounded-2xl p-4 border border-amber-500/20 bg-amber-500/5">
-          <p className="text-sm text-amber-300 flex-1">{error}</p>
+        <div className="flex items-start gap-3 glass-lux rounded-2xl p-4 border border-red-500/20 bg-red-500/5">
+          <p className="text-sm text-red-300 flex-1">{error}</p>
           <button
             onClick={fetchData}
             className="text-xs font-medium text-primary-light hover:text-primary shrink-0"

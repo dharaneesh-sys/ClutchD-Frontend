@@ -91,15 +91,15 @@
 [data-theme="dark"] {
   --background: #09090b;
   --foreground: #fafafa;
-  --primary: #d4a011;
-  --primary-dark: #b8860b;
-  --primary-light: #e0b832;
-  --accent: #d4a011;
+  --primary: #10b981;
+  --primary-dark: #059669;
+  --primary-light: #34d399;
+  --accent: #10b981;
   --danger: #ef4444;
-  --warning: #f59e0b;
+  --warning: #34d399;
   --success: #22c55e;
 
-  --color-primary-rgb: 212, 160, 17;
+  --color-primary-rgb: 16, 185, 129;
   --color-white-rgb: 255, 255, 255;
   --color-black-rgb: 0, 0, 0;
 
@@ -407,7 +407,7 @@ h1, h2, h3, h4 {
 }
 
 .btn-glow {
-  background: linear-gradient(135deg, #d4a011 0%, #b8860b 100%);
+  background: linear-gradient(135deg, #34d399 0%, #059669 100%);
   box-shadow: 0 4px 15px rgba(var(--color-primary-rgb), 0.25);
   transition: all 0.2s ease;
 }

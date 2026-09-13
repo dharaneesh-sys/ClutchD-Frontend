@@ -192,7 +192,7 @@ export function BottomNav() {
                       </span>
                     </button>
                     {sos.queuedMsg && (
-                      <p className="px-3 pb-1 text-xs text-orange-400">{sos.queuedMsg}</p>
+                      <p className="px-3 pb-1 text-xs text-emerald-400">{sos.queuedMsg}</p>
                     )}
 
                     {/* Theme row */}

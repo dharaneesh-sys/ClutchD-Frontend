@@ -336,12 +336,12 @@ export default function SettingsPage() {
 
       {/* ── Error Banner ─────────────────────────────────────────────── */}
       {error && (
-        <div className="flex items-start gap-3 glass-lux rounded-2xl p-4 border border-amber-500/20 bg-amber-500/5">
+        <div className="flex items-start gap-3 glass-lux rounded-2xl p-4 border border-red-500/20 bg-red-500/5">
           <AlertTriangle
             size={18}
-            className="mt-0.5 shrink-0 text-amber-400"
+            className="mt-0.5 shrink-0 text-red-400"
           />
-          <p className="text-sm text-amber-300 flex-1">{error}</p>
+          <p className="text-sm text-red-300 flex-1">{error}</p>
           <button
             onClick={fetchSettings}
             className="text-xs font-medium text-primary-light hover:text-primary shrink-0"
