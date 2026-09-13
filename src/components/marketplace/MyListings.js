@@ -1,10 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect } from "react";
 import { Pencil, Trash2, Power, Package } from "lucide-react";
 import { cn, formatCurrency } from "@/lib/utils";
 import { useProductStore } from "@/store/productStore";
-import { useAuthStore } from "@/store/authStore";
 import { Modal } from "@/components/ui/Modal";
 import { Button } from "@/components/ui/Button";
 import { ConfirmModal } from "@/components/ui/ConfirmModal";
@@ -14,27 +13,30 @@ import { SellerProductForm } from "@/components/marketplace/SellerProductForm";
 
 /**
  * Current seller's listings with edit / delete / stock toggle.
- * The edit flow reuses SellerProductForm in edit mode.
+ * Listings come from the backend (GET /products/my-listings, server-scoped);
+ * the edit flow reuses SellerProductForm in edit mode.
  */
 export function MyListings({ onAddNew }) {
-  const userId = useAuthStore((s) => s.user?.id);
+  const fetchMyListings = useProductStore((s) => s.fetchMyListings);
   const sellerProducts = useProductStore((s) => s.sellerProducts);
   const updateSellerProduct = useProductStore((s) => s.updateSellerProduct);
   const removeSellerProduct = useProductStore((s) => s.removeSellerProduct);
   const [editing, setEditing] = useState(null);
   const [deleting, setDeleting] = useState(null);
 
-  const listings = userId
-    ? sellerProducts.filter((p) => p.vendorId === userId)
-    : [];
+  useEffect(() => {
+    fetchMyListings();
+  }, [fetchMyListings]);
 
-  const handleToggleStock = (product) => {
-    updateSellerProduct(product.id, { availability: !product.availability });
+  const listings = sellerProducts;
+
+  const handleToggleStock = async (product) => {
+    await updateSellerProduct(product.id, { availability: !product.availability });
   };
 
-  const handleDelete = () => {
+  const handleDelete = async () => {
     if (!deleting) return;
-    const ok = removeSellerProduct(deleting.id);
+    const ok = await removeSellerProduct(deleting.id);
     if (ok) setDeleting(null);
   };
 

@@ -3,7 +3,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { loginSchema } from "@/lib/validators";
 import { useAuthStore } from "@/store/authStore";
-import { Mail, Lock, LogIn, UserCircle, Wrench, Building2, Truck } from "lucide-react";
+import { Mail, Lock, LogIn, UserCircle, Wrench, Building2, Truck, Store } from "lucide-react";
 import { GlassCard } from "@/components/ui/GlassCard";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
@@ -28,6 +28,7 @@ export function LoginCard() {
     { id: "customer", label: "Customer", icon: UserCircle, desc: "Find mechanics & garages" },
     { id: "mechanic", label: "Mechanic", icon: Wrench, desc: "Get on-demand jobs" },
     { id: "garage", label: "Garage", icon: Building2, desc: "Manage services locally" },
+    { id: "seller", label: "Seller", icon: Store, desc: "Sell parts & accessories" },
     { id: "fleet", label: "Fleet", icon: Truck, desc: "Manage business fleets" },
   ];
 
@@ -73,7 +74,8 @@ export function LoginCard() {
 
   const handleGoogleCallback = useCallback(async (resp) => {
     const credential = resp?.credential;
-    if (!credential) return;      const role = selectedRoleRef.current === "fleet" ? "customer" : selectedRoleRef.current;
+    if (!credential) return;
+    const role = selectedRoleRef.current === "fleet" ? "customer" : selectedRoleRef.current;
     let oauthState;
     try {
       const res = await api.get("/auth/oauth/state");
@@ -320,7 +322,7 @@ export function LoginCard() {
         <p className="text-text-muted">Sign in to your ClutchD account</p>
       </div>
 
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
+      <div className="grid grid-cols-3 sm:grid-cols-5 gap-3 mb-6">
         {ROLES.map((role) => {
           const Icon = role.icon;
           const isSelected = selectedRole === role.id;

@@ -8,7 +8,7 @@ import {
   PRODUCT_IMAGE_TYPES,
   PRODUCT_IMAGE_MAX_MB,
 } from "@/lib/validators";
-import { useProductStore } from "@/store/productStore";
+import { useProductStore, SELLER_ROLES } from "@/store/productStore";
 import { useCategoryStore } from "@/store/categoryStore";
 import { useAuthStore } from "@/store/authStore";
 import { useToastStore } from "@/store/toastStore";
@@ -18,8 +18,6 @@ import { FileUpload } from "@/components/ui/FileUpload";
 import { ProductImage } from "@/components/marketplace/ProductImage";
 import { BackendHealth } from "@/lib/backendHealth";
 import api from "@/lib/api";
-
-const SELLER_ROLES = ["mechanic", "garage"];
 
 function readAsDataURL(file) {
   return new Promise((resolve, reject) => {
@@ -58,9 +56,9 @@ function categoryLabel(cat) {
 }
 
 /**
- * Seller part form. Creates a local listing shaped like ProductResponse so a
- * future POST /api/marketplace/products drops in without shape changes.
- * Reused in create mode (dashboards, marketplace CTA) and edit mode
+ * Seller part form. Persists to the backend via productStore (POST/PATCH
+ * /api/products), with a local-only fallback when offline.
+ * Reused in create mode (seller dashboard, marketplace CTA) and edit mode
  * (My Listings).
  */
 export function SellerProductForm({ initialProduct = null, onSuccess }) {
@@ -141,14 +139,13 @@ export function SellerProductForm({ initialProduct = null, onSuccess }) {
 
   const onSubmit = async (data) => {
     if (!SELLER_ROLES.includes(role)) {
-      useToastStore.getState().error("Only mechanics and garages can sell parts.");
+      useToastStore.getState().error("Only sellers, mechanics and garages can sell parts.");
       return;
     }
     const payload = { ...data, price: Number(data.price) };
-    // Single store write after validation — no intermediate partial states.
     const saved = isEdit
-      ? updateSellerProduct(initialProduct.id, payload)
-      : addSellerProduct(payload);
+      ? await updateSellerProduct(initialProduct.id, payload)
+      : await addSellerProduct(payload);
     if (saved && onSuccess) onSuccess(saved);
   };
 

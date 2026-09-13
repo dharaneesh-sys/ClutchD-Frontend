@@ -1,14 +1,15 @@
 import { useState, useRef, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { customerSignupSchema, mechanicSignupSchema, garageSignupSchema } from "@/lib/validators";
+import { customerSignupSchema, mechanicSignupSchema, garageSignupSchema, sellerSignupSchema } from "@/lib/validators";
 import { useAuthStore } from "@/store/authStore";
-import { UserCircle, Wrench, Building2, UserPlus, Truck } from "lucide-react";
+import { UserCircle, Wrench, Building2, UserPlus, Store } from "lucide-react";
 import { GlassCard } from "@/components/ui/GlassCard";
 import { Button } from "@/components/ui/Button";
 import { CustomerFields } from "@/components/auth/CustomerFields";
 import { MechanicFields } from "@/components/auth/MechanicFields";
 import { GarageFields } from "@/components/auth/GarageFields";
+import { SellerFields } from "@/components/auth/SellerFields";
 
 import api from "@/lib/api";
 import { uploadKycDocuments } from "@/lib/kycUpload";
@@ -29,17 +30,18 @@ export function SignUpCard() {
     { id: "customer", label: "Customer", icon: UserCircle, desc: "Need repairs" },
     { id: "mechanic", label: "Mechanic", icon: Wrench, desc: "Provide services" },
     { id: "garage", label: "Garage", icon: Building2, desc: "Business owner" },
-    { id: "fleet", label: "Fleet", icon: Truck, desc: "Manage business fleets" },
+    { id: "seller", label: "Seller", icon: Store, desc: "Sell parts & accessories" },
   ];
 
   // Fleet is a frontend persona — the account is customer-role on the
   // backend; company registration happens on the fleet dashboard.
-  const backendRole = selectedRole === "fleet" ? "customer" : selectedRole;
+  const backendRole = selectedRole;
 
   const schemas = {
     customer: customerSignupSchema,
     mechanic: mechanicSignupSchema,
     garage: garageSignupSchema,
+    seller: sellerSignupSchema,
   };
 
   const {
@@ -64,7 +66,7 @@ export function SignUpCard() {
         if (selectedRole === "mechanic" || selectedRole === "garage") {
           uploadKycDocuments({ aadhaarPhoto: raw.aadhaarPhoto, licensePhoto: raw.licensePhoto }).catch(() => {});
         }
-        if (selectedRole === "fleet") router.push("/dashboard/fleet");
+        if (selectedRole === "seller") router.push("/dashboard/seller");
         else if (selectedRole === "customer") router.push("/dashboard/customer");
         else if (selectedRole === "mechanic") router.push("/dashboard/mechanic");
         else if (selectedRole === "garage") router.push("/dashboard/garage");
@@ -98,7 +100,7 @@ export function SignUpCard() {
           const credential = resp?.credential;
           if (!credential) return;
 
-          const role = selectedRoleRef.current === "fleet" ? "customer" : selectedRoleRef.current;
+          const role = selectedRoleRef.current;
           let oauthState;
           try {
             const res = await api.get("/auth/oauth/state");
@@ -116,7 +118,6 @@ export function SignUpCard() {
           if (!user) return;
 
           if (user.role === "admin") router.push("/admin");
-          else if (selectedRoleRef.current === "fleet") router.push("/dashboard/fleet");
           else router.push(`/dashboard/${user.role}`);
         },
       });
@@ -160,7 +161,7 @@ export function SignUpCard() {
       const user = await loginWithGoogleCapacitor(backendRole);
       if (user) {
         if (user.role === "admin") router.push("/admin");
-        else if (selectedRole === "fleet") router.push("/dashboard/fleet");
+        else if (selectedRole === "seller") router.push("/dashboard/seller");
         else router.push(`/dashboard/${user.role}`);
       }
     } catch (err) {
@@ -203,7 +204,8 @@ export function SignUpCard() {
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
         <div className="max-h-[300px] overflow-y-auto px-1 -mx-1 custom-scrollbar">
-          {(selectedRole === "customer" || selectedRole === "fleet") && <CustomerFields register={register} errors={errors} />}
+          {selectedRole === "customer" && <CustomerFields register={register} errors={errors} />}
+          {selectedRole === "seller" && <SellerFields register={register} errors={errors} />}
           {selectedRole === "mechanic" && <MechanicFields register={register} errors={errors} watch={watch} setValue={setValue} />}
           {selectedRole === "garage" && <GarageFields register={register} errors={errors} watch={watch} setValue={setValue} />}
         </div>

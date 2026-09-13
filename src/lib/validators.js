@@ -25,6 +25,26 @@ export const customerSignupSchema = z
     path: ["confirmPassword"],
   });
 
+export const sellerSignupSchema = z
+  .object({
+    email: z.string().email("Please enter a valid email address"),
+    password: z
+      .string()
+      .min(8, "Password must be at least 8 characters")
+      .regex(/[A-Z]/, "Must include an uppercase letter")
+      .regex(/[a-z]/, "Must include a lowercase letter")
+      .regex(/[0-9]/, "Must include a number"),
+    confirmPassword: z.string(),
+    storeName: z.string().min(2, "Enter your store name"),
+    fullName: z.string().min(2, "Enter owner/manager name"),
+    phone: z.string().min(10, "Enter a valid phone number"),
+    location: z.string().min(2, "Enter your store location"),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: "Passwords do not match",
+    path: ["confirmPassword"],
+  });
+
 export const mechanicSignupSchema = z
   .object({
     email: z.string().email("Please enter a valid email"),

@@ -14,7 +14,7 @@ import { IncomingJobs } from "@/components/mechanic/IncomingJobs";
 import { EarningsChart } from "@/components/mechanic/EarningsChart";
 import { useAuthStore } from "@/store/authStore";
 import { useTrackingStore } from "@/store/trackingStore";
-import { Briefcase, MapPin, DollarSign, ShoppingBag, X, MessageSquare, PackagePlus, Store } from "lucide-react";
+import { Briefcase, MapPin, DollarSign, ShoppingBag, X, MessageSquare } from "lucide-react";
 import { NotificationBell } from "@/components/ui/NotificationBell";
 import { ConnectionIndicator } from "@/components/ui/ConnectionIndicator";
 import { DashboardShell } from "@/components/ui/DashboardShell";
@@ -23,8 +23,6 @@ import { Logo } from "@/components/ui/Logo";
 import SplashScreen from "@/components/ui/SplashScreen";
 import { NAVIGATION_EVENT } from "@/lib/navigation";
 import { Modal } from "@/components/ui/Modal";
-import { SellerProductForm } from "@/components/marketplace/SellerProductForm";
-import { MyListings } from "@/components/marketplace/MyListings";
 
 const NavigationMap = dynamic(
   () => import("../../../components/dashboard/MapView"),
@@ -36,7 +34,6 @@ const NavigationMap = dynamic(
 
 export default function MechanicDashboard() {
   const user = useAuthStore((s) => s.user);
-  const [sellOpen, setSellOpen] = useState(false);
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
   const _hydrated = useAuthStore((s) => s._hydrated);
   const router = useRouter();
@@ -91,8 +88,6 @@ export default function MechanicDashboard() {
     { icon: Briefcase, label: "Jobs", onClick: () => setActiveTab("jobs") },
     { icon: MapPin, label: "Navigation", onClick: () => setActiveTab("navigation") },
     { icon: DollarSign, label: "Earnings", onClick: () => setActiveTab("earnings") },
-    { icon: PackagePlus, label: "Sell Part", onClick: () => setSellOpen(true) },
-    { icon: Store, label: "My Listings", onClick: () => setActiveTab("mylistings") },
     { icon: ShoppingBag, label: "Parts Store", onClick: () => router.push("/marketplace") },
   ];
 
@@ -212,11 +207,6 @@ export default function MechanicDashboard() {
           </div>
         )}
 
-        {activeTab === "mylistings" && (
-          <div className="space-y-4">
-            <MyListings onAddNew={() => setSellOpen(true)} />
-          </div>
-        )}
       </div>
 
       {/* ── Chat button (appears when a job is active) ──────────────── */}
@@ -242,19 +232,6 @@ export default function MechanicDashboard() {
         </div>
       )}
 
-      {/* ── Sell Part modal (1 tap from sidebar) ─────────────────────── */}
-      <Modal
-        isOpen={sellOpen}
-        onClose={() => setSellOpen(false)}
-        title="Sell a part"
-      >
-        <SellerProductForm
-          onSuccess={() => {
-            setSellOpen(false);
-            setActiveTab("mylistings");
-          }}
-        />
-      </Modal>
     </DashboardShell>
   );
 }

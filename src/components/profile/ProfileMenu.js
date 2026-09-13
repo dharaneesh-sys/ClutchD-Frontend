@@ -19,9 +19,20 @@ import {
   ShieldAlert,
   AlertTriangle,
   Loader2,
+  LayoutDashboard as LayoutDashboardIcon,
+  Store as StoreIcon,
 } from "lucide-react";
 import { useSOS } from "@/components/ui/useSOS";
+import { useAuthStore } from "@/store/authStore";
 import { cn } from "@/lib/utils";
+
+/** Role → dashboard route, shown as the first Activity entry. */
+const DASHBOARD_BY_ROLE = {
+  customer: { icon: LayoutDashboardIcon, label: "My Dashboard", path: "/dashboard/customer" },
+  seller: { icon: StoreIcon, label: "Seller Dashboard", path: "/dashboard/seller" },
+  mechanic: { icon: LayoutDashboardIcon, label: "Provider Dashboard", path: "/dashboard/mechanic" },
+  garage: { icon: LayoutDashboardIcon, label: "Business Dashboard", path: "/dashboard/garage" },
+};
 
 const MENU_SECTIONS = [
   {
@@ -70,6 +81,8 @@ export function ProfileMenu({ className }) {
   const router = useRouter();
   const pathname = usePathname();
   const sos = useSOS();
+  const role = useAuthStore((s) => s.user?.role);
+  const dashboardEntry = DASHBOARD_BY_ROLE[role] || DASHBOARD_BY_ROLE.customer;
   const sosDisabled = sos.loading || sos.status === "sent" || sos.status === "queued";
   const sosLabel =
     sos.loading
@@ -83,6 +96,18 @@ export function ProfileMenu({ className }) {
             : "Emergency SOS";
   return (
     <div className={cn("space-y-5", className)}>
+      {/* Role dashboard entry */}
+      <button
+        onClick={() => router.push(dashboardEntry.path)}
+        className="glass-lux rounded-2xl w-full flex items-center gap-3 px-4 py-3.5 text-left transition-all duration-200 hover:bg-white/[0.03]"
+      >
+        <div className="flex-shrink-0 w-9 h-9 rounded-xl flex items-center justify-center bg-primary/[0.12] text-primary-light">
+          <dashboardEntry.icon size={17} />
+        </div>
+        <span className="flex-1 text-sm font-semibold">{dashboardEntry.label}</span>
+        <ChevronRight size={16} className="flex-shrink-0 text-text-muted" />
+      </button>
+
       {MENU_SECTIONS.map((section) => (
         <div key={section.label}>
           <h3 className="text-xs font-semibold uppercase tracking-wider text-text-muted px-1 mb-2">

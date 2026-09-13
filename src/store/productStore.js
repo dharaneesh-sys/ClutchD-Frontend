@@ -15,9 +15,10 @@ const INITIAL_FILTERS = {
 };
 
 const SELLER_STORAGE_KEY = "seller-products";
-const SELLER_ROLES = ["mechanic", "garage"];
+// Dedicated seller role first-class; mechanic/garage keep their legacy selling ability.
+export const SELLER_ROLES = ["seller", "mechanic", "garage"];
 
-/** Load seller listings from localStorage (SSR-safe). Persists across reloads. */
+/** Load seller listings from localStorage (SSR-safe). Offline fallback only. */
 function loadSellerProducts() {
   if (typeof window === "undefined") return [];
   try {
@@ -46,6 +47,43 @@ function getSellerUser() {
   if (user && SELLER_ROLES.includes(user.role)) return user;
   return null;
 }
+
+/** Build a backend ProductCreate payload from form data. */
+function toProductPayload(data) {
+  return {
+    name: data.name,
+    price: Number(data.price),
+    description: data.description || null,
+    brand: data.brand || null,
+    category: data.category || null,
+    image: data.image || null,
+    availability: data.availability !== false,
+    delivery_time: data.deliveryTime || null,
+  };
+}
+
+/** Local-only listing shape (used when the backend is unreachable). */
+function localListing(user, data) {
+  return {
+    id: `seller-${Date.now()}`,
+    name: data.name,
+    description: data.description,
+    brand: data.brand || "",
+    vendor: user.storeName || user.garageName || user.name || "My Store",
+    vendorId: user.id,
+    price: Number(data.price),
+    rating: 0,
+    image: data.image || "",
+    category: data.category || "",
+    availability: data.availability !== false,
+    deliveryTime: data.deliveryTime || "",
+    createdAt: new Date().toISOString(),
+    isSeller: true,
+    localOnly: true,
+  };
+}
+
+const SELLER_BLOCKED_MSG = "Only sellers, mechanics and garages can sell parts.";
 
 const initialState = {
   sellerProducts: loadSellerProducts(),
@@ -158,103 +196,193 @@ export const useProductStore = create(
       },
 
       /**
-       * Listings created by the current seller (mechanic|garage).
-       * Persisted to localStorage; merged seller-first into products.
+       * Fetch the current seller's listings from the backend.
+       * Falls back to local listings when the server is unreachable.
+       */
+      fetchMyListings: async () => {
+        try {
+          const { data } = await api.get("/products/my-listings");
+          const listings = toCamelCase(data?.products ?? []);
+          set({ sellerProducts: listings });
+          persistSellerProducts(listings);
+          return listings;
+        } catch {
+          // Offline fallback: keep whatever is cached locally.
+          return get().sellerProducts;
+        }
+      },
+
+      /**
+       * Listings created by the current seller.
+       * The cached set comes from /products/my-listings (already scoped to
+       * the caller server-side) plus any localOnly offline entries.
        */
       getMyListings: () => {
         const user = useAuthStore.getState().user;
         if (!user) return [];
-        return get().sellerProducts.filter((p) => p.vendorId === user.id);
+        return [...get().sellerProducts];
       },
 
       /**
-       * Add a seller listing. Role-guarded: mechanic|garage only.
-       * Returns the created product, or null when blocked.
-       * Shape mirrors ProductResponse for future POST /api/marketplace/products.
+       * Add a seller listing — persists to the backend (POST /products).
+       * Falls back to a local-only listing when the server is unreachable.
+       * Returns the created product, or null when blocked/failed.
        */
-      addSellerProduct: (data) => {
+      addSellerProduct: async (data) => {
         const user = getSellerUser();
         if (!user) {
-          useToastStore.getState().error("Only mechanics and garages can sell parts.");
+          useToastStore.getState().error(SELLER_BLOCKED_MSG);
           return null;
         }
-        const now = new Date().toISOString();
-        const product = {
-          id: `seller-${Date.now()}`,
-          name: data.name,
-          description: data.description,
-          brand: data.brand || "",
-          vendor: user.garageName || user.shopName || user.businessName || user.name || "My Store",
-          vendorId: user.id,
-          price: Number(data.price),
-          rating: 0,
-          image: data.image || "",
-          category: data.category || "",
-          availability: data.availability !== false,
-          deliveryTime: data.deliveryTime || "",
-          createdAt: now,
-          isSeller: true,
-        };
-        const next = [product, ...get().sellerProducts];
-        persistSellerProducts(next);
-        set({ sellerProducts: next, products: [product, ...get().products] });
-        useToastStore.getState().success("Part listed successfully.");
-        return product;
+        try {
+          const { data: created } = await api.post("/products", toProductPayload(data));
+          const product = { ...toCamelCase(created), isSeller: true };
+          const next = [product, ...get().sellerProducts];
+          persistSellerProducts(next);
+          set({ sellerProducts: next, products: [product, ...get().products] });
+          useToastStore.getState().success("Part listed successfully.");
+          return product;
+        } catch (error) {
+          if (error.response) {
+            const msg = error.response.data?.detail || "Could not list the part. Please try again.";
+            useToastStore.getState().error(typeof msg === "string" ? msg : "Could not list the part. Please try again.");
+            return null;
+          }
+          // Server unreachable — offline fallback keeps the listing locally.
+          const product = localListing(user, data);
+          const next = [product, ...get().sellerProducts];
+          persistSellerProducts(next);
+          set({ sellerProducts: next, products: [product, ...get().products] });
+          useToastStore.getState().error("Offline — part saved on this device only and will not appear to others until synced.");
+          return product;
+        }
       },
 
       /**
-       * Update one of the current seller's listings. Returns updated product or null.
+       * Update one of the current seller's listings (PATCH /products/{id}).
+       * Local-only listings are updated locally. Returns updated product or null.
        */
-      updateSellerProduct: (id, patch) => {
+      updateSellerProduct: async (id, patch) => {
         const user = getSellerUser();
         if (!user) {
-          useToastStore.getState().error("Only mechanics and garages can sell parts.");
+          useToastStore.getState().error(SELLER_BLOCKED_MSG);
           return null;
         }
         const existing = get().sellerProducts.find((p) => p.id === id);
-        if (!existing || existing.vendorId !== user.id) {
+        if (!existing) {
           useToastStore.getState().error("Listing not found.");
           return null;
         }
-        const updated = {
-          ...existing,
+        // Ownership is enforced server-side (403); the caller check below is
+        // only to avoid pointless calls for other sellers' cached rows.
+        if (!existing.localOnly && existing.vendorId && existing.sellerUserId && existing.sellerUserId !== user.id) {
+          useToastStore.getState().error("Not your listing.");
+          return null;
+        }
+        const applyLocal = (prev) => ({
+          ...prev,
           ...patch,
-          id: existing.id,
-          vendorId: existing.vendorId,
-          price: patch.price === undefined ? existing.price : Number(patch.price),
-        };
-        const next = get().sellerProducts.map((p) => (p.id === id ? updated : p));
-        persistSellerProducts(next);
-        set({
-          sellerProducts: next,
-          products: get().products.map((p) => (p.id === id ? updated : p)),
+          id: prev.id,
+          vendorId: prev.vendorId,
+          price: patch.price === undefined ? prev.price : Number(patch.price),
         });
-        useToastStore.getState().success("Listing updated.");
-        return updated;
+        if (existing.localOnly) {
+          const updated = applyLocal(existing);
+          const next = get().sellerProducts.map((p) => (p.id === id ? updated : p));
+          persistSellerProducts(next);
+          set({
+            sellerProducts: next,
+            products: get().products.map((p) => (p.id === id ? updated : p)),
+          });
+          useToastStore.getState().success("Listing updated.");
+          return updated;
+        }
+        try {
+          const payload = {};
+          if (patch.name !== undefined) payload.name = patch.name;
+          if (patch.price !== undefined) payload.price = Number(patch.price);
+          if (patch.description !== undefined) payload.description = patch.description;
+          if (patch.brand !== undefined) payload.brand = patch.brand;
+          if (patch.image !== undefined) payload.image = patch.image;
+          if (patch.category !== undefined) payload.category = patch.category;
+          if (patch.availability !== undefined) payload.availability = patch.availability;
+          if (patch.deliveryTime !== undefined) payload.delivery_time = patch.deliveryTime;
+          const { data: updatedRaw } = await api.patch(`/products/${id}`, payload);
+          const updated = { ...toCamelCase(updatedRaw), isSeller: true };
+          const next = get().sellerProducts.map((p) => (p.id === id ? updated : p));
+          persistSellerProducts(next);
+          set({
+            sellerProducts: next,
+            products: get().products.map((p) => (p.id === id ? updated : p)),
+          });
+          useToastStore.getState().success("Listing updated.");
+          return updated;
+        } catch (error) {
+          if (error.response) {
+            const msg = error.response.data?.detail || "Could not update the listing.";
+            useToastStore.getState().error(typeof msg === "string" ? msg : "Could not update the listing.");
+            return null;
+          }
+          // Offline: apply locally so the UI stays consistent.
+          const updated = applyLocal(existing);
+          const next = get().sellerProducts.map((p) => (p.id === id ? updated : p));
+          persistSellerProducts(next);
+          set({
+            sellerProducts: next,
+            products: get().products.map((p) => (p.id === id ? updated : p)),
+          });
+          useToastStore.getState().error("Offline — change saved on this device only.");
+          return updated;
+        }
       },
 
       /**
-       * Delete one of the current seller's listings. Returns true on success.
+       * Delete one of the current seller's listings (DELETE /products/{id}).
+       * Returns true on success.
        */
-      removeSellerProduct: (id) => {
+      removeSellerProduct: async (id) => {
         const user = getSellerUser();
         if (!user) {
-          useToastStore.getState().error("Only mechanics and garages can sell parts.");
+          useToastStore.getState().error(SELLER_BLOCKED_MSG);
           return false;
         }
         const existing = get().sellerProducts.find((p) => p.id === id);
-        if (!existing || existing.vendorId !== user.id) {
+        if (!existing) {
           useToastStore.getState().error("Listing not found.");
           return false;
         }
-        const next = get().sellerProducts.filter((p) => p.id !== id);
-        persistSellerProducts(next);
-        set({
-          sellerProducts: next,
-          products: get().products.filter((p) => p.id !== id),
-        });
-        useToastStore.getState().success("Listing removed.");
-        return true;
+        if (!existing.localOnly && existing.sellerUserId && existing.sellerUserId !== user.id) {
+          useToastStore.getState().error("Not your listing.");
+          return false;
+        }
+        const dropLocal = () => {
+          const next = get().sellerProducts.filter((p) => p.id !== id);
+          persistSellerProducts(next);
+          set({
+            sellerProducts: next,
+            products: get().products.filter((p) => p.id !== id),
+          });
+        };
+        if (existing.localOnly) {
+          dropLocal();
+          useToastStore.getState().success("Listing removed.");
+          return true;
+        }
+        try {
+          await api.delete(`/products/${id}`);
+          dropLocal();
+          useToastStore.getState().success("Listing removed.");
+          return true;
+        } catch (error) {
+          if (error.response) {
+            const msg = error.response.data?.detail || "Could not remove the listing.";
+            useToastStore.getState().error(typeof msg === "string" ? msg : "Could not remove the listing.");
+            return false;
+          }
+          dropLocal();
+          useToastStore.getState().error("Offline — listing hidden on this device.");
+          return true;
+        }
       },
 
       /**
