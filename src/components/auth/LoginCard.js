@@ -187,6 +187,7 @@ export function LoginCard() {
 
   const [view, setView] = useState("login");
   const [resetEmail, setResetEmail] = useState("");
+  const [resetNotice, setResetNotice] = useState("");
   const [resetCode, setResetCode] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [resetError, setResetError] = useState("");
@@ -201,7 +202,16 @@ export function LoginCard() {
     setResetLoading(true);
     setResetError("");
     try {
-      await api.post("/auth/forgot-password/request", { email: resetEmail });
+      const { data } = await api.post("/auth/forgot-password/request", { email: resetEmail });
+      // When the server has no email channel it returns the code in the
+      // message with a clear warning — surface it instead of dead-ending.
+      const msg = typeof data?.message === "string" ? data.message : "";
+      if (msg.includes("Dev-mode reset code")) {
+        const match = msg.match(/([A-Za-z0-9_-]{8})\s*$/);
+        setResetNotice(match ? `Server has no email configured — use code: ${match[1]}` : msg);
+      } else {
+        setResetNotice(msg ? `Reset code sent to ${resetEmail}.` : "");
+      }
       setView("forgot_code");
     } catch (err) {
       setResetError(err.response?.data?.detail || err.message || "Request failed");
@@ -228,6 +238,7 @@ export function LoginCard() {
       setResetEmail("");
       setResetCode("");
       setNewPassword("");
+      setResetNotice("");
     } catch (err) {
       setResetError(err.response?.data?.detail || err.message || "Reset failed");
     } finally {
@@ -276,16 +287,21 @@ export function LoginCard() {
       <GlassCard variant="glass-lux-strong" className="w-full max-w-md p-8 pt-10">
         <div className="mb-8 text-center">
           <h2 className="text-2xl font-bold mb-2 tracking-tight text-text-primary">Enter Code</h2>
-          <p className="text-text-muted">Check your terminal logs for the 6-digit code.</p>
+          <p className="text-text-muted">Enter the reset code you received.</p>
         </div>
         <form onSubmit={handleForgotReset} className="space-y-4">
+          {resetNotice && (
+            <div className="p-3 rounded-lg bg-primary/10 border border-primary/20 text-primary-light text-sm">
+              {resetNotice}
+            </div>
+          )}
           <Input 
-            label="6-Digit Reset Code" 
+            label="Reset Code" 
             type="text" 
             value={resetCode} 
             onChange={(e) => setResetCode(e.target.value)} 
-            placeholder="000000" 
-            maxLength={6}
+            placeholder="e.g. xK39fT2a" 
+            maxLength={16}
           />
           <Input 
             label="New Password" 
