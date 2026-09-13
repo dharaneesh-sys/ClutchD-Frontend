@@ -18,8 +18,9 @@ import { PaymentModal } from "@/components/dashboard/PaymentModal";
 import { ReviewModal } from "@/components/dashboard/ReviewModal";
 import { NotificationBell } from "@/components/ui/NotificationBell";
 import { DashboardShell } from "@/components/ui/DashboardShell";
+import { DashboardTabBar } from "@/components/dashboard/DashboardTabBar";
 import { ChatPanel } from "@/components/ui/ChatPanel";
-import { History, Wrench, Calendar, ShoppingBag, MessageSquare, Car, X } from "lucide-react";
+import { MessageSquare, X } from "lucide-react";
 import { SERVICE_STATUS, MAP_DEFAULT_CENTER } from "@/lib/constants";
 import { ScheduleBookingModal } from "@/components/dashboard/ScheduleBookingModal";
 import { ScheduledAppointments } from "@/components/dashboard/ScheduledAppointments";
@@ -57,14 +58,6 @@ const VehicleList = dynamic(
   { ssr: false, loading: () => <div className="flex-1 flex items-center justify-center"><div className="w-8 h-8 border-2 border-t-transparent rounded-full animate-spin border-[#1E29B6] dark:border-primary" /></div> }
 );
 
-const TABS = [
-  { key: "request", icon: Wrench, label: "Service" },
-  { key: "schedule", icon: Calendar, label: "Schedule" },
-  { key: "vehicles", icon: Car, label: "Vehicles" },
-  { key: "store", icon: ShoppingBag, label: "Parts Store" },
-  { key: "history", icon: History, label: "History" },
-];
-
 export default function CustomerDashboard() {
   const user = useAuthStore((s) => s.user);
   const logout = useAuthStore((s) => s.logout);
@@ -79,6 +72,7 @@ export default function CustomerDashboard() {
   const clearError = useServiceStore((s) => s.clearError);
   const mechanicLocation = useTrackingStore((s) => s.mechanicLocation);
   const userLocation = useTrackingStore((s) => s.userLocation);
+
   const updateRequestStatus = useCallback(
     (...args) => useServiceStore.getState().updateRequestStatus(...args),
     []
@@ -104,7 +98,12 @@ export default function CustomerDashboard() {
   const [isReviewOpen, setIsReviewOpen] = useState(false);
   const [reviewProviderName, setReviewProviderName] = useState("the professional");
   const [paymentAmount, setPaymentAmount] = useState(1200);
-  const [activeTab, setActiveTab] = useState("request"); // "request" | "history" | "schedule" | "store"
+  const [activeTab, setActiveTab] = useState(() => {
+    // Deep-link support: /dashboard/customer?tab=history opens that tab.
+    if (typeof window === "undefined") return "request";
+    const t = new URLSearchParams(window.location.search).get("tab");
+    return ["request", "history", "schedule", "store", "vehicles"].includes(t) ? t : "request";
+  }); // "request" | "history" | "schedule" | "vehicles" | "store"
   const [isScheduleModalOpen, setIsScheduleModalOpen] = useState(false);
   const [isScheduleLoading, setIsScheduleLoading] = useState(false);
   const [vehicles, setVehicles] = useState([]);
@@ -405,46 +404,11 @@ export default function CustomerDashboard() {
       />
     </DashboardShell>
 
-    {/* ─── Bottom Tab Bar — All Sizes ────────────────────────────────── */}
-    <nav className="flex fixed bottom-0 left-0 right-0 z-40 bg-bg-card/85 backdrop-blur-2xl border-t border-border-subtle pb-[env(safe-area-inset-bottom)] shadow-[0_-4px_20px_rgba(0,0,0,0.12)]">
-      <div className="flex items-center justify-around h-14 px-1 max-w-lg mx-auto w-full">
-        {TABS.map(({ key, icon: Icon, label }) => {
-          const isActive = activeTab === key;
-          return (
-            <button
-              key={key}
-              onClick={() => setActiveTab(key)}
-              className={cn(
-                "relative flex flex-col items-center justify-center gap-0.5 flex-1 h-full py-1 rounded-xl transition-all duration-200",
-                "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50",
-                isActive && "bg-surface-soft"
-              )}
-              aria-label={label}
-              aria-current={isActive ? "page" : undefined}
-            >
-              <div className={cn(
-                "relative flex items-center justify-center w-7 h-7 rounded-lg transition-colors duration-200",
-                isActive && "text-primary",
-                !isActive && "text-text-muted"
-              )}>
-                <Icon size={22} />
-              </div>
-              <span className={cn(
-                "text-[10px] font-semibold leading-none transition-colors duration-200",
-                isActive && "text-primary",
-                !isActive && "text-text-muted"
-              )}>
-                {label}
-              </span>
-              {/* Active indicator line */}
-              {isActive && (
-                <span className="absolute -top-0.5 left-1/2 -translate-x-1/2 w-6 h-0.5 rounded-full bg-primary" />
-              )}
-            </button>
-          );
-        })}
-      </div>
-    </nav>
+    {/* ─── Bottom Tab Bar — shared component (also used on profile pages) ── */}
+    <DashboardTabBar
+      active={activeTab}
+      onSelect={setActiveTab}
+    />
     {/* SOS lives in BottomNav Menu / ProfileMenu / Safety page — no floating overlay */}
 
     {/* ── Chat button (appears when mechanic is assigned) ──────────── */}

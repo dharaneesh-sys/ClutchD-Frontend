@@ -1,15 +1,23 @@
 "use client";
 
 import { useEffect } from "react";
+import { usePathname } from "next/navigation";
 import { useRouter } from "next/navigation";
 import { ArrowLeft } from "lucide-react";
 import { BottomNav } from "@/components/ui/BottomNav";
+import { DashboardTabBar } from "@/components/dashboard/DashboardTabBar";
 import { useAuthStore } from "@/store/authStore";
 import { NAVIGATION_EVENT } from "@/lib/navigation";
 
 export default function MarketplaceLayout({ children }) {
   const router = useRouter();
+  const pathname = usePathname();
   const user = useAuthStore((s) => s.user);
+
+  // On profile pages, signed-in customers get the regular dashboard tab
+  // bar instead of the marketplace (parts-store) nav.
+  const onProfileRoute = pathname.startsWith("/marketplace/profile");
+  const isCustomer = user?.role === "customer";
 
   // Listen for navigation events from non-React contexts (e.g., axios interceptors)
   useEffect(() => {
@@ -43,7 +51,7 @@ export default function MarketplaceLayout({ children }) {
         <ArrowLeft size={20} className="text-text-muted" />
       </button>
       <main className="flex-1 pt-14 pb-20">{children}</main>
-      <BottomNav />
+      {onProfileRoute && isCustomer ? <DashboardTabBar /> : <BottomNav />}
     </div>
   );
 }

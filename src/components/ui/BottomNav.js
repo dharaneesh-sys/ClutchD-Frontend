@@ -129,7 +129,7 @@ export function BottomNav() {
                   <div
                     ref={popoverRef}
                     className={cn(
-                      "absolute bottom-full left-1/2 -translate-x-1/2 mb-3",
+                      "absolute bottom-full right-0 mb-3",
                       "min-w-[220px]",
                       "bg-bg-card backdrop-blur-2xl",
                       "border border-border-subtle",
