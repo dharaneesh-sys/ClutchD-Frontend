@@ -3,7 +3,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { customerSignupSchema, mechanicSignupSchema, garageSignupSchema } from "@/lib/validators";
 import { useAuthStore } from "@/store/authStore";
-import { UserCircle, Wrench, Building2, UserPlus } from "lucide-react";
+import { UserCircle, Wrench, Building2, UserPlus, Truck } from "lucide-react";
 import { GlassCard } from "@/components/ui/GlassCard";
 import { Button } from "@/components/ui/Button";
 import { CustomerFields } from "@/components/auth/CustomerFields";
@@ -29,7 +29,12 @@ export function SignUpCard() {
     { id: "customer", label: "Customer", icon: UserCircle, desc: "Need repairs" },
     { id: "mechanic", label: "Mechanic", icon: Wrench, desc: "Provide services" },
     { id: "garage", label: "Garage", icon: Building2, desc: "Business owner" },
+    { id: "fleet", label: "Fleet", icon: Truck, desc: "Manage business fleets" },
   ];
+
+  // Fleet is a frontend persona — the account is customer-role on the
+  // backend; company registration happens on the fleet dashboard.
+  const backendRole = selectedRole === "fleet" ? "customer" : selectedRole;
 
   const schemas = {
     customer: customerSignupSchema,
@@ -53,13 +58,14 @@ export function SignUpCard() {
     try {
       // File inputs are outside the zod schema — read them from raw form state
       const raw = getValues();
-      const user = await signup(data, selectedRole);
+      const user = await signup(data, backendRole);
       if (user) {
         // Best-effort KYC upload (mechanic/garage) — never blocks the signup
         if (selectedRole === "mechanic" || selectedRole === "garage") {
           uploadKycDocuments({ aadhaarPhoto: raw.aadhaarPhoto, licensePhoto: raw.licensePhoto }).catch(() => {});
         }
-        if (selectedRole === "customer") router.push("/dashboard/customer");
+        if (selectedRole === "fleet") router.push("/dashboard/fleet");
+        else if (selectedRole === "customer") router.push("/dashboard/customer");
         else if (selectedRole === "mechanic") router.push("/dashboard/mechanic");
         else if (selectedRole === "garage") router.push("/dashboard/garage");
       }
@@ -74,8 +80,8 @@ export function SignUpCard() {
 
   useEffect(() => {
     selectedRoleRef.current = selectedRole;
-    setValue("role", selectedRole);
-  }, [selectedRole, setValue]);
+    setValue("role", backendRole);
+  }, [selectedRole, backendRole, setValue]);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -92,7 +98,7 @@ export function SignUpCard() {
           const credential = resp?.credential;
           if (!credential) return;
 
-          const role = selectedRoleRef.current;
+          const role = selectedRoleRef.current === "fleet" ? "customer" : selectedRoleRef.current;
           let oauthState;
           try {
             const res = await api.get("/auth/oauth/state");
@@ -108,8 +114,9 @@ export function SignUpCard() {
             sessionStorage.removeItem("oauth_state");
           }
           if (!user) return;
-          
+
           if (user.role === "admin") router.push("/admin");
+          else if (selectedRoleRef.current === "fleet") router.push("/dashboard/fleet");
           else router.push(`/dashboard/${user.role}`);
         },
       });
@@ -150,9 +157,10 @@ export function SignUpCard() {
   // Handle Google sign-in when running inside Capacitor native app
   const handleCapacitorGoogleSignIn = async () => {
     try {
-      const user = await loginWithGoogleCapacitor(selectedRole);
+      const user = await loginWithGoogleCapacitor(backendRole);
       if (user) {
         if (user.role === "admin") router.push("/admin");
+        else if (selectedRole === "fleet") router.push("/dashboard/fleet");
         else router.push(`/dashboard/${user.role}`);
       }
     } catch (err) {
@@ -167,7 +175,7 @@ export function SignUpCard() {
         <p className="text-text-muted">Join the ultimate on-demand platform</p>
       </div>
 
-      <div className="grid grid-cols-3 gap-3 mb-8">
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-8">
         {ROLES.map((role) => {
           const Icon = role.icon;
           const isSelected = selectedRole === role.id;
@@ -195,7 +203,7 @@ export function SignUpCard() {
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
         <div className="max-h-[300px] overflow-y-auto px-1 -mx-1 custom-scrollbar">
-          {selectedRole === "customer" && <CustomerFields register={register} errors={errors} />}
+          {(selectedRole === "customer" || selectedRole === "fleet") && <CustomerFields register={register} errors={errors} />}
           {selectedRole === "mechanic" && <MechanicFields register={register} errors={errors} watch={watch} setValue={setValue} />}
           {selectedRole === "garage" && <GarageFields register={register} errors={errors} watch={watch} setValue={setValue} />}
         </div>

@@ -3,7 +3,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { loginSchema } from "@/lib/validators";
 import { useAuthStore } from "@/store/authStore";
-import { Mail, Lock, LogIn, UserCircle, Wrench, Building2 } from "lucide-react";
+import { Mail, Lock, LogIn, UserCircle, Wrench, Building2, Truck } from "lucide-react";
 import { GlassCard } from "@/components/ui/GlassCard";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
@@ -28,7 +28,12 @@ export function LoginCard() {
     { id: "customer", label: "Customer", icon: UserCircle, desc: "Find mechanics & garages" },
     { id: "mechanic", label: "Mechanic", icon: Wrench, desc: "Get on-demand jobs" },
     { id: "garage", label: "Garage", icon: Building2, desc: "Manage services locally" },
+    { id: "fleet", label: "Fleet", icon: Truck, desc: "Manage business fleets" },
   ];
+
+  // Fleet is a frontend persona: accounts are customer-role on the backend,
+  // so OAuth/registration hints must use a backend-known role.
+  const backendRole = selectedRole === "fleet" ? "customer" : selectedRole;
 
   const {
     register,
@@ -49,6 +54,7 @@ export function LoginCard() {
         // causing nestedUpdateCount to accumulate beyond the 50 limit.
         setTimeout(() => {
           if (user.role === "admin") router.push("/admin");
+          else if (selectedRole === "fleet") router.push("/dashboard/fleet");
           else router.push(`/dashboard/${user.role}`);
         }, 0);
       }
@@ -60,15 +66,14 @@ export function LoginCard() {
   const navigateAfterGoogleLogin = useCallback((user) => {
     setTimeout(() => {
       if (user.role === "admin") router.push("/admin");
+      else if (selectedRoleRef.current === "fleet") router.push("/dashboard/fleet");
       else router.push(`/dashboard/${user.role}`);
     }, 0);
   }, [router]);
 
   const handleGoogleCallback = useCallback(async (resp) => {
     const credential = resp?.credential;
-    if (!credential) return;
-
-    const role = selectedRoleRef.current;
+    if (!credential) return;      const role = selectedRoleRef.current === "fleet" ? "customer" : selectedRoleRef.current;
     let oauthState;
     try {
       const res = await api.get("/auth/oauth/state");
@@ -171,7 +176,7 @@ export function LoginCard() {
   const handleCapacitorGoogleSignIn = async () => {
     try {
       setRememberMe(rememberMe);
-      const user = await loginWithGoogleCapacitor(selectedRole);
+      const user = await loginWithGoogleCapacitor(backendRole);
       if (user) navigateAfterGoogleLogin(user);
     } catch (err) {
       console.error("Capacitor Google sign-in failed:", err);
@@ -315,7 +320,7 @@ export function LoginCard() {
         <p className="text-text-muted">Sign in to your ClutchD account</p>
       </div>
 
-      <div className="grid grid-cols-3 gap-3 mb-6">
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
         {ROLES.map((role) => {
           const Icon = role.icon;
           const isSelected = selectedRole === role.id;
