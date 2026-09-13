@@ -25,15 +25,9 @@ function getInitialTheme() {
     } catch {
       // localStorage unavailable
     }
-
-    // No stored preference — check system preference
-    try {
-      const mq = window.matchMedia('(prefers-color-scheme: dark)');
-      if (mq.matches) return 'dark';
-    } catch {
-      // matchMedia unavailable
-    }
   }
+
+  // Startup default is always light — explicit dark is applied only when stored.
   return 'light';
 }
 
@@ -53,14 +47,8 @@ const useThemeStoreZustand = create((set, get) => ({
 
   followSystemTheme: () => {
     try { localStorage.removeItem(STORAGE_KEY); } catch {}
-    if (typeof window !== 'undefined') {
-      try {
-        const mq = window.matchMedia('(prefers-color-scheme: dark)');
-        set({ theme: mq.matches ? 'dark' : 'light' });
-      } catch {
-        set({ theme: 'light' });
-      }
-    }
+    // After clearing the explicit choice, fall back to light for startup consistency.
+    set({ theme: 'light' });
   },
 }));
 
