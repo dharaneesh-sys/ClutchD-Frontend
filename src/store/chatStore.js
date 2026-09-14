@@ -77,6 +77,7 @@ export const useChatStore = create((set, get) => ({
 
   /**
    * Load chat history for a job from the server and replace local messages.
+   * Keeps optimistic messages on failure — never wipes on 403/404.
    */
   fetchHistory: async (jobId) => {
     try {
@@ -90,10 +91,8 @@ export const useChatStore = create((set, get) => ({
       }));
       return messages;
     } catch {
-      set((state) => ({
-        conversations: { ...state.conversations, [jobId]: [] },
-      }));
-      return [];
+      // Keep existing optimistic messages — don't wipe on 403 before assignment
+      return get().conversations[jobId] || [];
     }
   },
 }));

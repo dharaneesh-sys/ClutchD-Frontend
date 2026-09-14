@@ -20,9 +20,9 @@ const MODE_CONFIG = {
   garage: {
     icon: Building2,
     label: "Business Mode",
-    color: "emerald",
-    textClass: "text-emerald-600 dark:text-emerald-300",
-    avatarClass: "bg-emerald-500/15 dark:bg-emerald-500/20 border border-emerald-500/30 text-emerald-600 dark:text-emerald-300",
+    color: "primary",
+    textClass: "text-[#1E29B6] dark:text-blue-300",
+    avatarClass: "bg-[#1E29B6]/15 dark:bg-blue-500/20 border border-[#1E29B6]/30 text-[#1E29B6] dark:text-blue-300",
   },
   mechanic: {
     icon: Wrench,
@@ -128,7 +128,6 @@ export function DashboardShell({
           >
             <ModeIcon size={16} />
           </button>
-
           {/* Mobile menu button — only when sidebar nav is used */}
           {!hideMobileMenu && (
             <button
@@ -189,8 +188,8 @@ export function DashboardShell({
             {/* Profile Link */}
             <button
               onClick={() => {
-                router.push("/marketplace/profile");
                 setMobileMenuOpen(false);
+                router.push("/marketplace/profile");
               }}
               className={cn(
                 "w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-colors mb-2",

@@ -13,9 +13,18 @@ import { useToastStore } from "@/store/toastStore";
  */
 function clearAllStorage() {
   if (typeof window === "undefined") return;
+  // Fire-and-forget Firebase signout — prevents ghost sessions after reinstall.
+  try { import("firebase/auth").then(({ getAuth, signOut }) => { const a = getAuth(); if (a.currentUser) signOut(a).catch(() => {}); }).catch(() => {}); } catch {}
+  try { import("@capacitor-firebase/authentication").then(({ FirebaseAuthentication }) => FirebaseAuthentication.signOut().catch(() => {})).catch(() => {}); } catch {}
   try {
     localStorage.removeItem("auth-storage");
+    localStorage.removeItem("clutchd_access_token");
+    localStorage.removeItem("clutchd_refresh_token");
+    localStorage.removeItem("clutchd_token_expires_at");
+    try { indexedDB.deleteDatabase("firebaseLocalStorageDb"); } catch {}
     sessionStorage.removeItem("demo_token");
+    sessionStorage.removeItem("auth-session");
+    sessionStorage.removeItem("clutchd_access_token");
     // Clear cookies that may contain lingering session markers
     document.cookie.split(";").forEach((c) => {
       const [name] = c.trim().split("=");

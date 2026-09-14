@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Building2,
   Users,
@@ -66,15 +66,14 @@ export function FleetRegistrationForm({ onRegistered }) {
   const [submitted, setSubmitted] = useState(false);
 
   // Check backend availability on mount
-  useState(() => {
+  useEffect(() => {
     const available = BackendHealth.isAvailable();
     setIsBackendAvailable(available);
     // If never checked, kick off a check
     if (available === null) {
       BackendHealth.check().then(setIsBackendAvailable);
     }
-  });
-
+  }, []);
   const validate = () => {
     const newErrors = {};
     if (!form.companyName.trim()) newErrors.companyName = "Company name is required";

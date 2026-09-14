@@ -69,9 +69,17 @@ export function IncomingJobs({ onChat }) {
 
   const acceptJob = async (id) => {
     try {
-      await api.patch(`/service/request/${id}/status`, { status: "en_route" });
-      setJobs(jobs.map(j => j.id === id ? { ...j, status: "accepted" } : j));
-      showSuccess("Job accepted! Navigate to the customer's location.");
+      const res = await api.patch(`/service/request/${id}/status`, { status: "assigned" });
+      // Optimistic: mark assigned locally, then sync fresh so button flips to Navigate
+      const acceptedJob = res?.data;
+      const loc = acceptedJob?.customerLocation || jobs.find((j) => j.id === id)?.customerLocation;
+      if (loc?.lat && loc?.lng) {
+        setNavigationTarget({ lat: loc.lat, lng: loc.lng });
+      }
+      setJobs((prev) => prev.map((j) => (j.id === id ? { ...j, status: "assigned", customerLocation: loc || j.customerLocation } : j)));
+      // Pull fresh from server so status + assignment survive a refetch race
+      fetchJobs();
+      showSuccess("Job accepted! Check Navigation tab for the route.");
     } catch (err) {
       showError(`Failed to accept: ${err.response?.data?.detail || err.message}`);
     }
@@ -226,7 +234,7 @@ export function IncomingJobs({ onChat }) {
                 </div>
                 
                 <div className="flex gap-2">
-                  {(job.status === 'assigned' || job.status === 'pending' || job.status === 'searching') ? (
+                  {(job.status === 'pending' || job.status === 'searching' || (job.status == null && !job.assigned_mechanic_id)) ? (
                     <>
                       <Button variant="ghost" size="sm" onClick={() => rejectJob(job.id)}>Decline</Button>
                       <Button size="sm" onClick={() => acceptJob(job.id)}>Accept Job</Button>

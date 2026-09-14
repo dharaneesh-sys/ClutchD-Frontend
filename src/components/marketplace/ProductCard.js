@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Star, ShoppingCart, Check, Crown, Heart } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -27,6 +28,7 @@ import api from "@/lib/api";
  * @param {string} className - Additional classes
  */
 export function ProductCard({ product, className }) {
+  const router = useRouter();
   const [adding, setAdding] = useState(false);
   const [fav, setFav] = useState(false);
   const [favBusy, setFavBusy] = useState(false);
@@ -87,8 +89,12 @@ export function ProductCard({ product, className }) {
 
   return (
     <div
+      role="button"
+      tabIndex={0}
+      onClick={() => router.push(`/marketplace/product/${id}`)}
+      onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); router.push(`/marketplace/product/${id}`); }}}
       className={cn(
-        "glass-lux-interactive group rounded-2xl overflow-hidden",
+        "glass-lux-interactive group rounded-2xl overflow-hidden cursor-pointer",
         "hover-lift active-press",
         className
       )}
@@ -173,11 +179,11 @@ export function ProductCard({ product, className }) {
           </div>
         )}
 
-        {/* Price + Add to Cart */}
-        <div className="flex items-center justify-between pt-1 gap-2">
-          <div className="flex items-center gap-3 min-w-0">
-            <div className="flex flex-col shrink-0">
-              <span className="text-lg font-bold tracking-tight text-foreground">
+        {/* Price + Add to Cart - stacked on narrow, prevents overlap */}
+        <div className="flex flex-col gap-2 pt-1 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex items-center gap-2 min-w-0">
+            <div className="flex flex-col shrink-0 min-w-0">
+              <span className="text-base sm:text-lg font-bold tracking-tight text-foreground truncate">
                 {isProUser ? formatCurrency(Math.round(safePrice * 0.7)) : formatCurrency(safePrice)}
               </span>
               {isProUser && safePrice > 0 && (
@@ -187,7 +193,7 @@ export function ProductCard({ product, className }) {
               )}
             </div>
             {isProUser && safePrice > 0 && (
-              <span className="inline-flex items-center gap-1 rounded-full bg-purple-500/15 px-2 py-0.5 text-[0.5rem] font-semibold uppercase tracking-wider text-purple-300 whitespace-nowrap">
+              <span className="inline-flex items-center gap-1 rounded-full bg-purple-500/15 px-2 py-0.5 text-[0.5rem] font-semibold uppercase tracking-wider text-purple-300 whitespace-nowrap shrink-0">
                 <Crown size={8} />
                 Pro -30%
               </span>
@@ -198,7 +204,7 @@ export function ProductCard({ product, className }) {
             onClick={handleAddToCart}
             disabled={adding}
             className={cn(
-              "inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-[0.6875rem] font-semibold transition-all duration-200",
+              "inline-flex items-center justify-center gap-1.5 rounded-lg px-3 py-1.5 text-[0.6875rem] font-semibold transition-all duration-200 shrink-0 whitespace-nowrap w-full sm:w-auto",
               "focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/50",
               adding
                 ? "bg-primary/20 text-primary-light cursor-default"
