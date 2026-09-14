@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import {
   User,
@@ -25,12 +25,56 @@ export default function ProfilePage() {
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
   const _hydrated = useAuthStore((s) => s._hydrated);
   const router = useRouter();
+  const [stats, setStats] = useState({ orders: null, active: null, referral: null });
 
   useEffect(() => {
     if (_hydrated && !isAuthenticated) {
       router.push("/auth");
     }
   }, [_hydrated, isAuthenticated, router]);
+
+  // Real quick-stats: orders count, active service jobs, referral earnings.
+  // Each fetch is independent and fails soft — tiles show "—" only when the
+  // request errors, never a fake number.
+  useEffect(() => {
+    if (!isAuthenticated || !user?.id || user?.id?.startsWith?.("demo-")) return;
+    let cancelled = false;
+    (async () => {
+      try {
+        const api = (await import("@/lib/api")).default;
+        const { toCamelCase } = await import("@/lib/utils");
+        const [ordersRes, jobsRes, refRes] = await Promise.allSettled([
+          api.get("/orders"),
+          api.get("/jobs/history"),
+          api.get("/referral/history"),
+        ]);
+        if (cancelled) return;
+        const next = { orders: null, active: null, referral: null };
+        if (ordersRes.status === "fulfilled") {
+          const orders = toCamelCase(ordersRes.value?.data?.orders ?? []);
+          next.orders = orders.length;
+        }
+        if (jobsRes.status === "fulfilled") {
+          const jobs = toCamelCase(
+            Array.isArray(jobsRes.value?.data) ? jobsRes.value.data : jobsRes.value?.data?.jobs ?? [],
+          );
+          next.active = jobs.filter((j) =>
+            ["searching", "assigned", "en_route", "in_progress"].includes(j.status),
+          ).length;
+        }
+        if (refRes.status === "fulfilled") {
+          const totalEarned = refRes.value?.data?.total_earned ?? refRes.value?.data?.totalEarned ?? 0;
+          next.referral = `₹${Number(totalEarned || 0).toLocaleString("en-IN")}`;
+        }
+        setStats(next);
+      } catch {
+        // stats are best-effort — leave nulls ("—")
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [isAuthenticated, user?.id]);
 
   if (!_hydrated) {
     return <SplashScreen />;
@@ -134,7 +178,9 @@ export default function ProfilePage() {
           <div className="w-8 h-8 rounded-lg bg-primary/[0.12] flex items-center justify-center mx-auto mb-2">
             <ShoppingBag size={16} className="text-primary-light" />
           </div>
-          <p className="text-lg font-bold text-foreground">0</p>
+          <p className="text-lg font-bold text-foreground">
+            {stats.orders ?? "—"}
+          </p>
           <p className="text-[10px] font-medium text-text-muted uppercase tracking-wider mt-0.5">
             Orders
           </p>
@@ -143,7 +189,9 @@ export default function ProfilePage() {
           <div className="w-8 h-8 rounded-lg bg-warning/10 flex items-center justify-center mx-auto mb-2">
             <Wrench size={16} className="text-warning" />
           </div>
-          <p className="text-lg font-bold text-foreground">0</p>
+          <p className="text-lg font-bold text-foreground">
+            {stats.active ?? "—"}
+          </p>
           <p className="text-[10px] font-medium text-text-muted uppercase tracking-wider mt-0.5">
             Active
           </p>
@@ -152,7 +200,9 @@ export default function ProfilePage() {
           <div className="w-8 h-8 rounded-lg bg-emerald-500/[0.12] flex items-center justify-center mx-auto mb-2">
             <Gift size={16} className="text-icon-highlight" />
           </div>
-          <p className="text-lg font-bold text-foreground">₹0</p>
+          <p className="text-lg font-bold text-foreground">
+            {stats.referral ?? "—"}
+          </p>
           <p className="text-[10px] font-medium text-text-muted uppercase tracking-wider mt-0.5">
             Referral
           </p>

@@ -210,6 +210,34 @@ export const useFleetStore = create(
         const pricing = get().getPricingBreakdown();
         if (!pricing) return null;
 
+        // Fire-and-forget DB persistence — the booking object below is the
+        // source of truth for the confirmation screen either way.
+        (async () => {
+          try {
+            const api = (await import("@/lib/api")).default;
+            const { useAuthStore } = await import("@/store/authStore");
+            const uid = useAuthStore.getState().user?.id || "";
+            if (!uid || uid.startsWith("demo-") || uid.startsWith("firebase-")) return;
+            await api.post("/fleet/bookings", {
+              scheduledAt: `${selectedDate}T${selectedTime}:00Z`,
+              vehicles: selectedVehicleIds.map((vid) => {
+                const v = vehicles.find((veh) => veh.id === vid);
+                return {
+                  vehicleId: vid,
+                  vehicleName: v ? `${v.make} ${v.model} (${v.plate || ""})` : "Unknown",
+                  serviceType: vehicleServices[vid] || "general_service",
+                };
+              }),
+              subtotal: pricing.subtotal,
+              discountPercent: pricing.effectiveDiscountPercent,
+              total: pricing.total,
+            });
+          } catch (err) {
+            // Backend sync is best-effort; booking still confirmed locally.
+            console.warn("[fleetStore] booking sync skipped:", err?.response?.status || err?.message);
+          }
+        })();
+
         const booking = {
           id: generateId(),
           createdAt: new Date().toISOString(),

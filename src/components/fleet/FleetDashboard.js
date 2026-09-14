@@ -23,9 +23,13 @@ import { EmptyState } from "@/components/ui/EmptyState";
 import { Button } from "@/components/ui/Button";
 import { cn, formatDate } from "@/lib/utils";
 import { formatIndianPlate } from "@/lib/plateFormatter";
+import { useAuthStore } from "@/store/authStore";
+import api from "@/lib/api";
+import { toCamelCase } from "@/lib/utils";
 import {
   getFleetRegistration,
   getFleetVehicles,
+  saveFleetVehicles,
   getFleetServiceHistory,
   initDemoFleet,
   getFleetTier,
@@ -69,7 +73,7 @@ function StatCard({ icon: Icon, label, value, sub, className }) {
   );
 }
 
-function VehicleCard({ vehicle }) {
+function VehicleCard({ vehicle, onRemove }) {
   const [expanded, setExpanded] = useState(false);
   const statusColor =
     vehicle.status === "active"
@@ -106,16 +110,28 @@ function VehicleCard({ vehicle }) {
             </div>
           </div>
         </div>
-        <button
-          type="button"
-          onClick={() => setExpanded((e) => !e)}
-          aria-expanded={expanded}
-          aria-controls={detailsId}
-          aria-label={expanded ? `Collapse details for ${vehicle.make} ${vehicle.model}` : `Expand details for ${vehicle.make} ${vehicle.model}`}
-          className="p-1.5 -m-1.5 rounded-lg text-text-dim hover:text-foreground hover:bg-surface-soft transition-colors shrink-0"
-        >
-          <ChevronRight size={16} className={cn("transition-transform", expanded && "rotate-90")} />
-        </button>
+        <div className="flex flex-col items-end gap-1 shrink-0">
+          <button
+            type="button"
+            onClick={() => setExpanded((e) => !e)}
+            aria-expanded={expanded}
+            aria-controls={detailsId}
+            aria-label={expanded ? `Collapse details for ${vehicle.make} ${vehicle.model}` : `Expand details for ${vehicle.make} ${vehicle.model}`}
+            className="p-1.5 -m-1.5 rounded-lg text-text-dim hover:text-foreground hover:bg-surface-soft transition-colors"
+          >
+            <ChevronRight size={16} className={cn("transition-transform", expanded && "rotate-90")} />
+          </button>
+          {onRemove && (
+            <button
+              type="button"
+              onClick={() => onRemove(vehicle.id)}
+              aria-label={`Remove ${vehicle.make} ${vehicle.model}`}
+              className="text-[11px] text-red-400/80 hover:text-red-300 transition-colors"
+            >
+              Remove
+            </button>
+          )}
+        </div>
       </div>
       {expanded && (
         <div id={detailsId} className="mt-3 pt-3 border-t border-border-subtle/50 grid grid-cols-2 gap-2 text-xs">
@@ -193,21 +209,110 @@ function ServiceRow({ entry, onChat }) {
 
 /**
  * Fleet/B2B dashboard showing fleet vehicles, service history, and bulk discounts.
+ *
+ * Vehicles are DB-backed via GET/POST/DELETE /vehicles (per-user garage) when a
+ * real session exists; localStorage demo fleet is the offline fallback.
  */
 export function FleetDashboard({ onRegisterNew, onStartBooking, onChat }) {
+  const user = useAuthStore((s) => s.user);
+  const isDemoUser = !user?.id || user?.id?.startsWith?.("demo-") || user?.id?.startsWith?.("firebase-");
   const [fleet, setFleet] = useState(null);
   const [vehicles, setVehicles] = useState([]);
   const [serviceHistory, setServiceHistory] = useState([]);
+  const [vehiclesFromBackend, setVehiclesFromBackend] = useState(false);
+  const [showAddVehicle, setShowAddVehicle] = useState(false);
+  const [savingVehicle, setSavingVehicle] = useState(false);
+  const [newVehicle, setNewVehicle] = useState({ make: "", model: "", year: "", plate: "", type: "light_truck" });
+  const [formError, setFormError] = useState("");
 
-  // Load data from localStorage
+  // Load data: localStorage demo first (instant paint), then real API wins.
   useEffect(() => {
     const data = getFleetRegistration() || initDemoFleet();
-    /* eslint-disable react-hooks/set-state-in-effect */
     setFleet(data);
     setVehicles(getFleetVehicles());
     setServiceHistory(getFleetServiceHistory());
-    /* eslint-enable react-hooks/set-state-in-effect */
   }, []);
+
+  // Real vehicles from the backend — overrides demo seed for signed-in users.
+  useEffect(() => {
+    if (isDemoUser) return;
+    let cancelled = false;
+    (async () => {
+      try {
+        const { data } = await api.get("/vehicles");
+        if (cancelled) return;
+        const list = toCamelCase(Array.isArray(data) ? data : data?.vehicles ?? []);
+        // Map backend Vehicle shape → dashboard shape
+        const mapped = list.map((v) => ({
+          id: v.id,
+          make: v.make,
+          model: v.model,
+          year: v.year,
+          plate: v.licensePlate || v.license_plate || "",
+          type: v.type || "sedan",
+          status: "active",
+        }));
+        setVehicles(mapped);
+        setVehiclesFromBackend(true);
+      } catch {
+        // keep demo/localStorage vehicles
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [isDemoUser]);
+
+  const handleAddVehicle = async (e) => {
+    e.preventDefault();
+    setFormError("");
+    if (!newVehicle.make.trim() || !newVehicle.model.trim()) {
+      setFormError("Make and model are required");
+      return;
+    }
+    setSavingVehicle(true);
+    try {
+      if (vehiclesFromBackend && !isDemoUser) {
+        const { data } = await api.post("/vehicles", {
+          make: newVehicle.make.trim(),
+          model: newVehicle.model.trim(),
+          year: newVehicle.year ? parseInt(newVehicle.year, 10) : undefined,
+          license_plate: newVehicle.plate.trim() || undefined,
+        });
+        const v = toCamelCase(data);
+        setVehicles((prev) => [
+          ...prev,
+          { id: v.id, make: v.make, model: v.model, year: v.year, plate: v.licensePlate || "", type: "sedan", status: "active" },
+        ]);
+      } else {
+        const list = [
+          ...vehicles,
+          { id: "fv-" + Date.now(), make: newVehicle.make.trim(), model: newVehicle.model.trim(), year: newVehicle.year ? parseInt(newVehicle.year, 10) : "", plate: newVehicle.plate.trim(), type: newVehicle.type, status: "active" },
+        ];
+        setVehicles(list);
+        saveFleetVehicles(list);
+      }
+      setNewVehicle({ make: "", model: "", year: "", plate: "", type: "light_truck" });
+      setShowAddVehicle(false);
+    } catch (err) {
+      setFormError(err.response?.data?.detail || "Couldn't add vehicle — check connection");
+    } finally {
+      setSavingVehicle(false);
+    }
+  };
+
+  const handleRemoveVehicle = async (id) => {
+    try {
+      if (vehiclesFromBackend && !isDemoUser) {
+        await api.delete(`/vehicles/${id}`);
+      }
+      const list = vehicles.filter((v) => v.id !== id);
+      setVehicles(list);
+      saveFleetVehicles(list);
+    } catch (err) {
+      console.warn("[FleetDashboard] remove vehicle failed:", err?.message);
+    }
+  };
 
   const tierInfo = useMemo(() => {
     if (!fleet) return { name: "bronze", discountRate: 5, label: "Bronze" };
@@ -344,13 +449,61 @@ export function FleetDashboard({ onRegisterNew, onStartBooking, onChat }) {
               <Car size={18} className="text-primary-light" />
               Fleet Vehicles
             </h2>
-            <Badge variant="glass">{vehicles.length} total</Badge>
+            <div className="flex items-center gap-2">
+              <Badge variant="glass">{vehicles.length} total</Badge>
+              <Button variant="primary" size="sm" onClick={() => setShowAddVehicle(true)}>
+                + Add Vehicle
+              </Button>
+            </div>
           </div>
+
+          {showAddVehicle && (
+            <GlassCard variant="glass-lux" className="p-4">
+              <form onSubmit={handleAddVehicle} className="grid grid-cols-2 sm:grid-cols-5 gap-2">
+                <input
+                  className="col-span-2 sm:col-span-1 rounded-lg bg-surface-soft border border-border-subtle px-3 py-2 text-sm text-foreground placeholder:text-text-dim focus:outline-none focus:ring-2 focus:ring-primary/40"
+                  placeholder="Make *"
+                  value={newVehicle.make}
+                  onChange={(e) => setNewVehicle((p) => ({ ...p, make: e.target.value }))}
+                />
+                <input
+                  className="col-span-2 sm:col-span-1 rounded-lg bg-surface-soft border border-border-subtle px-3 py-2 text-sm text-foreground placeholder:text-text-dim focus:outline-none focus:ring-2 focus:ring-primary/40"
+                  placeholder="Model *"
+                  value={newVehicle.model}
+                  onChange={(e) => setNewVehicle((p) => ({ ...p, model: e.target.value }))}
+                />
+                <input
+                  className="rounded-lg bg-surface-soft border border-border-subtle px-3 py-2 text-sm text-foreground placeholder:text-text-dim focus:outline-none focus:ring-2 focus:ring-primary/40"
+                  placeholder="Year"
+                  inputMode="numeric"
+                  value={newVehicle.year}
+                  onChange={(e) => setNewVehicle((p) => ({ ...p, year: e.target.value.replace(/\D/g, "").slice(0, 4) }))}
+                />
+                <input
+                  className="rounded-lg bg-surface-soft border border-border-subtle px-3 py-2 text-sm text-foreground placeholder:text-text-dim focus:outline-none focus:ring-2 focus:ring-primary/40 uppercase"
+                  placeholder="TN38AB1234"
+                  value={newVehicle.plate}
+                  onChange={(e) => setNewVehicle((p) => ({ ...p, plate: e.target.value.toUpperCase().slice(0, 10) }))}
+                />
+                <div className="col-span-2 flex gap-2">
+                  <Button type="submit" variant="primary" size="sm" disabled={savingVehicle} className="flex-1">
+                    {savingVehicle ? "Saving…" : "Save"}
+                  </Button>
+                  <Button type="button" variant="ghost" size="sm" onClick={() => { setShowAddVehicle(false); setFormError(""); }}>
+                    Cancel
+                  </Button>
+                </div>
+                {formError && (
+                  <p className="col-span-2 sm:col-span-5 text-xs text-red-400">{formError}</p>
+                )}
+              </form>
+            </GlassCard>
+          )}
 
           {vehicles.length > 0 ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               {vehicles.map((v) => (
-                <VehicleCard key={v.id} vehicle={v} />
+                <VehicleCard key={v.id} vehicle={v} onRemove={handleRemoveVehicle} />
               ))}
             </div>
           ) : (
