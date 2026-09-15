@@ -16,9 +16,19 @@ import { FirebaseAuthentication } from "@capacitor-firebase/authentication";
  * Sign in with Google via the native Android system dialog (account picker).
  * Returns the Google idToken on success, or null if the user cancelled.
  * The idToken is meant to be sent to the backend's /auth/oauth/google endpoint.
+ *
+ * Always signs out of any cached Google session first — otherwise Credential
+ * Manager silently reuses the previously chosen account and the picker never
+ * shows (the "it signs in without asking" bug).
  */
 export async function getGoogleIdTokenNative() {
   try {
+    // Clear any cached credential so the account picker is always shown.
+    try {
+      await FirebaseAuthentication.signOut();
+    } catch {
+      // No cached session — fine.
+    }
     const result = await FirebaseAuthentication.signInWithGoogle({
       useCredentialManager: false,
     });
