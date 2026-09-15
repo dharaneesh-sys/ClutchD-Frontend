@@ -173,10 +173,23 @@ describe("authStore", () => {
         .getState()
         .loginWithGoogle("bad-cred");
 
-      expect(useAuthStore.getState().error).toBe(
-        "Google sign-in failed. Please try again.",
-      );
+      // Backend error detail surfaces directly — no fake local fallback session.
+      expect(useAuthStore.getState().error).toBe("Google auth failed");
       expect(result).toBeNull();
+      expect(useAuthStore.getState().isAuthenticated).toBe(false);
+    });
+
+    it("sets a network error (no fake session) when backend is unreachable", async () => {
+      mockPost.mockRejectedValueOnce(new Error("Network Error"));
+
+      const result = await useAuthStore
+        .getState()
+        .loginWithGoogle("bad-cred");
+
+      expect(useAuthStore.getState().error).toContain("Server unreachable");
+      expect(result).toBeNull();
+      expect(useAuthStore.getState().isAuthenticated).toBe(false);
+      expect(useAuthStore.getState().user).toBeNull();
     });
   });
 

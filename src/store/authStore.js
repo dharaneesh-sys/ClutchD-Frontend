@@ -191,6 +191,9 @@ export const useAuthStore = create(
           return;
         }
         const isFirebase = uid.startsWith("firebase-");
+        // firebase-* sessions are legacy ghosts from the old silent fallback —
+        // they carry a fake token, so the refresh below fails 401 and drops
+        // them automatically once the backend is reachable.
         try {
           const newToken = await refreshAccessToken();
           if (typeof window !== "undefined" && newToken) {
@@ -333,53 +336,20 @@ export const useAuthStore = create(
           cacheUserProfile(response.data.user);
           return response.data.user;
         } catch (error) {
-          // Backend OAuth failed — fall through to Firebase Auth signInWithCredential
-          // (no popup needed — we already have the credential from GSI)
+          // Backend OAuth failed. We DO NOT create a fake local session here —
+          // a "firebase-local-jwt-token" can never call the real API, so it
+          // just produces a ghost login that can't load anything (worse than
+          // an honest error). Fail loudly so the user retries when the
+          // connection is back.
+          const isNetworkError = !error.response;
+          const msg = isNetworkError
+            ? "Server unreachable — couldn't complete Google sign-in. Check your connection and try again."
+            : error.response?.data?.detail || "Google sign-in failed. Please try again.";
+          set({ isLoading: false, error: msg });
           try {
-            const { signInWithGoogleCredential } = await import(
-              "@/lib/auth/firebaseAuth"
-            );
-            const firebaseUser = await signInWithGoogleCredential(credential);
-
-            if (!firebaseUser) {
-              set({ isLoading: false, error: null });
-              return null;
-            }
-
-            const localUser = {
-              id: `firebase-${firebaseUser.uid}`,
-              name: firebaseUser.displayName || "Google User",
-              email: firebaseUser.email || "",
-              avatar: firebaseUser.photoURL || null,
-              role: safeRole || "customer",
-              provider: "firebase",
-            };
-
-            if (typeof window !== "undefined") {
-              setAccessToken("firebase-local-jwt-token", ACCESS_TTL_MS);
-            }
-            // Explicit fallback (BACKEND_CONTRACTS §1): the backend OAuth
-            // failed, so say so instead of silently logging in locally.
-            useToastStore.getState().warning(
-              "Backend unavailable. Continuing with your Google (Firebase) session — some features may be limited.",
-            );
-
-            applyRememberChoice(opts?.rememberMe ?? get().rememberMe ?? true, localUser);
-            set({
-              user: localUser,
-              isAuthenticated: true,
-              _hydrated: true,
-              isLoading: false,
-              error: null,
-              rememberMe: opts?.rememberMe ?? get().rememberMe ?? true,
-            });
-            cacheUserProfile(localUser);
-            return localUser;
-          } catch (fbError) {
-            const msg = "Google sign-in failed. Please try again.";
-            set({ isLoading: false, error: msg });
-            return null;
-          }
+            useToastStore.getState().error(msg);
+          } catch {}
+          return null;
         }
       },
 
@@ -388,66 +358,10 @@ export const useAuthStore = create(
        * Used as a fallback when the backend is unavailable (503),
        * or as a standalone Firebase-first sign-in path.
        *
-       * Opens a Firebase Auth popup, creates a local user from the
-       * Firebase user data, and sets a local JWT-like token so API
-       * interceptors can recognise the session.
-       *
-       * Returns the user object on success, or null if the popup was
-       * closed or sign-in failed.
+       * DEPRECATED: dead code — never invoked anywhere. Local-only sessions
+       * can't call the real API, so this path only ever produced ghost
+       * logins. Left removed intentionally.
        */
-      firebaseSignIn: async (role = null) => {
-
-        try {
-          const { signInWithGoogle } = await import(
-            "@/lib/auth/firebaseAuth"
-          );
-          const firebaseUser = await signInWithGoogle();
-
-          if (!firebaseUser) {
-            // User closed the popup — quiet exit, no error
-            set({ isLoading: false, error: null });
-            return null;
-          }
-
-          // Build a local user from Firebase profile data
-          const localUser = {
-            id: `firebase-${firebaseUser.uid}`,
-            name: firebaseUser.displayName || "Google User",
-            email: firebaseUser.email || "",
-            avatar: firebaseUser.photoURL || null,
-            role: role || "customer",
-            provider: "firebase",
-          };
-
-          if (typeof window !== "undefined") {
-            setAccessToken("firebase-local-jwt-token", ACCESS_TTL_MS);
-          }
-
-          applyRememberChoice(get().rememberMe ?? true, localUser);
-          set({
-            user: localUser,
-            isAuthenticated: true,
-            _hydrated: true,
-            isLoading: false,
-            error: null,
-          });
-          cacheUserProfile(localUser);
-          return localUser;
-        } catch (error) {
-          if (error.code === "auth/popup-closed-by-user") {
-            set({ isLoading: false, error: null });
-          } else if (error.code === "auth/popup-blocked") {
-            useToastStore.getState().warning(
-              "Pop-up was blocked. Please allow pop-ups for this site and try again.",
-            );
-            set({ isLoading: false, error: null });
-          } else {
-            const msg = "Google sign-in via Firebase failed. Please try again.";
-            set({ isLoading: false, error: msg });
-          }
-          return null;
-        }
-      },
 
       /**
        * Sign in with Google via Capacitor native Firebase Auth plugin.
@@ -458,44 +372,54 @@ export const useAuthStore = create(
         set({ isLoading: true, error: null });
 
         try {
-          const { signInWithGoogleNative } = await import(
+          // 1. Get the Google idToken from the native Android account picker.
+          const { getGoogleIdTokenNative } = await import(
             "@/lib/auth/capacitorAuth"
           );
-          const firebaseUser = await signInWithGoogleNative();
-
-          if (!firebaseUser) {
+          const idToken = await getGoogleIdTokenNative();
+          if (!idToken) {
+            // User cancelled the native picker — quiet exit, no error.
             set({ isLoading: false, error: null });
             return null;
           }
 
-          const localUser = {
-            id: `firebase-${firebaseUser.uid}`,
-            name: firebaseUser.displayName || "Google User",
-            email: firebaseUser.email || "",
-            avatar: firebaseUser.photoURL || null,
-            role: role || "customer",
-            provider: "firebase",
-          };
+          // 2. Verify it against OUR backend — same as the web GIS flow.
+          //    This is the only way the resulting session can call the API.
+          const safeRole = typeof role === "string" ? role.toLowerCase() : null;
+          const response = await api.post("/auth/oauth/google", {
+            credential: idToken,
+            role: safeRole || undefined,
+          });
 
-          if (typeof window !== "undefined") {
-            setAccessToken("firebase-local-jwt-token", ACCESS_TTL_MS);
+          const remember = get().rememberMe ?? true;
+          if (response.data.token && typeof window !== "undefined") {
+            setAccessToken(response.data.token, ACCESS_TTL_MS);
+            setRefreshToken(response.data.refresh_token || null);
+            connectWebSocket(response.data.token);
+            scheduleProactiveRefresh();
+            applyRememberChoice(remember, response.data.user);
           }
 
-          applyRememberChoice(get().rememberMe ?? true, localUser);
           set({
-            user: localUser,
+            user: response.data.user,
             isAuthenticated: true,
             _hydrated: true,
             isLoading: false,
             error: null,
+            rememberMe: remember,
           });
-          cacheUserProfile(localUser);
-          return localUser;
+          cacheUserProfile(response.data.user);
+          return response.data.user;
         } catch (error) {
           console.error("[authStore] loginWithGoogleCapacitor error:", error);
-          const msg =
-            error.message || "Google sign-in failed. Please try again.";
+          const isNetworkError = !error.response;
+          const msg = isNetworkError
+            ? "Server unreachable — couldn't complete Google sign-in. Check your connection and try again."
+            : error.response?.data?.detail || "Google sign-in failed. Please try again.";
           set({ isLoading: false, error: msg });
+          try {
+            useToastStore.getState().error(msg);
+          } catch {}
           return null;
         }
       },

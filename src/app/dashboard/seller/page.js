@@ -39,6 +39,16 @@ export default function SellerDashboardPage() {
     }
   }, [_hydrated, isAuthenticated, router]);
 
+  // Role guard: only sellers (and admins) belong here.
+  useEffect(() => {
+    if (!_hydrated || !isAuthenticated || !user?.id) return;
+    if (user.id.startsWith("demo-")) return;
+    const allowed = ["seller", "admin"];
+    if (!allowed.includes(user.role)) {
+      router.replace(`/dashboard/${user.role || "customer"}`);
+    }
+  }, [_hydrated, isAuthenticated, user?.id, user?.role, router]);
+
   // Listen for navigation events from non-React contexts (axios interceptors)
   useEffect(() => {
     const handleNavigation = (event) => {

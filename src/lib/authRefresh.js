@@ -31,15 +31,17 @@ let inflight = null;
 export function refreshAccessToken() {
   if (inflight) return inflight;
 
-  inflight = api
-    .post(
+  const attempt = () =>
+    api.post(
       "/auth/refresh",
       {},
       {
         headers: { "X-Refresh-Token": getRefreshToken() || "" },
         __noRetry: true, // network-retry interceptor must not replay refreshes
       },
-    )
+    );
+
+  inflight = attempt()
     .then((res) => {
       inflight = null;
       const newToken = res.data?.token;
@@ -54,10 +56,49 @@ export function refreshAccessToken() {
       return newToken;
     })
     .catch((err) => {
-      inflight = null;
-      clearAccessToken();
-      clearRefreshToken();
-      throw err;
+      // A network-level failure (timeout / DNS / no response) means we never
+      // reached the server — the tokens are still VALID, just unverifiable
+      // right now. The funnel path can take 6-8s cold, so one retry first:
+      const isNetworkError = !err.response;
+      if (!isNetworkError) {
+        // Real HTTP error (401/403/etc.) — tokens are genuinely dead.
+        inflight = null;
+        clearAccessToken();
+        clearRefreshToken();
+        throw err;
+      }
+      // Retry once after a short backoff before giving up.
+      return new Promise((resolve, reject) => {
+        setTimeout(() => {
+          attempt()
+            .then((res) => {
+              inflight = null;
+              const newToken = res.data?.token;
+              const newRefresh = res.data?.refresh_token;
+              if (!newToken) {
+                clearAccessToken();
+                clearRefreshToken();
+                reject(new Error("Refresh response missing token"));
+                return;
+              }
+              setAccessToken(newToken, ACCESS_TTL_MS);
+              if (newRefresh) setRefreshToken(newRefresh);
+              resolve(newToken);
+            })
+            .catch((retryErr) => {
+              inflight = null;
+              if (retryErr.response) {
+                // Second attempt reached the server and got rejected.
+                clearAccessToken();
+                clearRefreshToken();
+              }
+              // Pure network failure twice: KEEP tokens — the session is
+              // still valid, just unreachable. Next successful call path
+              // will refresh normally.
+              reject(retryErr);
+            });
+        }, 1500);
+      });
     });
 
   return inflight;

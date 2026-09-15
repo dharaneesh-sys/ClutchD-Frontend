@@ -46,6 +46,19 @@ export default function MechanicDashboard() {
     }
   }, [_hydrated, isAuthenticated, router]);
 
+  // Role guard: only mechanics (and admins) belong here. A customer/garage/
+  // seller that somehow lands on this route would see provider actions that
+  // the backend then rejects ("Providers only") — bounce them to their own
+  // dashboard instead. Demo users keep read access for UI exploration.
+  useEffect(() => {
+    if (!_hydrated || !isAuthenticated || !user?.id) return;
+    if (user.id.startsWith("demo-")) return;
+    const allowed = ["mechanic", "admin"];
+    if (!allowed.includes(user.role)) {
+      router.replace(`/dashboard/${user.role || "customer"}`);
+    }
+  }, [_hydrated, isAuthenticated, user?.id, user?.role, router]);
+
   // Request GPS and continuously watch position for navigation routing
   // Deferred via setTimeout(0) to break React 19's flushSync cascade (#185)
   // — the synchronous store mutations (setState) would otherwise trigger

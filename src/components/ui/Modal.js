@@ -107,19 +107,21 @@ export function Modal({
 
   const modalContent = (
     <>
-      {/* Backdrop */}
+      {/* Backdrop — z-10040: above ALL page chrome (map chips z-400,
+          NotificationBell z-500, ChatWidget z-900, ThemeToggle/FABs z-9999)
+          so nothing bleeds through the dimmed overlay. */}
       <div
         onClick={onClose}
-        className="fixed inset-0 z-[60] backdrop-blur-sm animate-[backdrop-in_0.2s_ease] bg-black/50"
+        className="fixed inset-0 z-[10040] backdrop-blur-sm animate-[backdrop-in_0.2s_ease] bg-black/50"
         aria-hidden="true"
       />
 
-      {/* Modal Container — portals above the BottomNav (z-61 > nav z-40),
-          so no nav-clearing padding. Safe-centering: items-start + my-auto
+      {/* Modal Container — portals above the BottomNav (z-40) and every
+          fixed page widget. Safe-centering: items-start + my-auto
           centers the dialog when it fits, and when the Android keyboard
           shrinks the viewport the container scrolls — nothing is ever
           pushed below the screen or clipped unreachable. */}
-      <div className="fixed inset-0 z-[61] flex items-start justify-center p-4 sm:px-6 overflow-y-auto w-full h-full pointer-events-none">
+      <div className="fixed inset-0 z-[10041] flex items-start justify-center p-4 sm:px-6 overflow-y-auto w-full h-full pointer-events-none">
         <div
           ref={modalRef}
           role={role}
