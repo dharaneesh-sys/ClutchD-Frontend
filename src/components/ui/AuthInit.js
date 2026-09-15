@@ -28,6 +28,24 @@ export function AuthInit() {
     const start = () => {
       if (ran.current) return;
       ran.current = true;
+      // Pre-warm the funnel connection: the TLS handshake through
+      // *.ts.net takes 6-9s cold from Indian ISPs. Starting it during the
+      // splash screen means the first REAL request reuses the warm socket
+      // (axios/React-Native keep-alive) instead of paying the handshake
+      // again. Fire-and-forget with NO timeout games — unlike the previous
+      // broken speed experiment, this cannot fail a request: it only adds
+      // one extra harmless GET that nobody waits on.
+      try {
+        const base = process.env.NEXT_PUBLIC_API_URL;
+        if (base) {
+          fetch(new URL("/health", base).toString(), {
+            method: "GET",
+            cache: "no-store",
+            // Deliberately NO AbortSignal.timeout — an aborted socket is not
+            // reusable, which defeated the whole purpose last time.
+          }).catch(() => {});
+        }
+      } catch {}
       useAuthStore.getState().restoreSession();
       registerOnlineFlush();
     };
