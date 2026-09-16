@@ -180,11 +180,11 @@ export function SubscriptionManager() {
 
       {/* Backend Offline Notice */}
       {showOfflineNotice && !backendOnline && (
-        <GlassCard variant="glass" className="p-4 border border-emerald-500/20 bg-emerald-500/5">
+        <GlassCard variant="glass" className="p-4 border border-[var(--color-primary-rgb)]/30 bg-[var(--color-primary-rgb)]/15">
           <div className="flex items-start gap-3">
             <AlertTriangle size={18} className="text-primary-light flex-shrink-0 mt-0.5" />
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium text-emerald-300">
+              <p className="text-sm font-medium text-[var(--primary-light)]">
                 Payment system offline
               </p>
               <p className="text-xs text-text-muted mt-1">

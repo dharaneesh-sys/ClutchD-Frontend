@@ -292,7 +292,7 @@ export default function MapView({ role = "customer" }) {
           <>
             <Polyline
               positions={routePath}
-              color="#10b981"
+              color="var(--primary)"
               weight={5}
               opacity={0.7}
             >

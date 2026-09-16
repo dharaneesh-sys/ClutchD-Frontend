@@ -155,7 +155,7 @@ export function MaintenanceAlertBanner() {
         "mb-4 overflow-hidden transition-all duration-200",
         top.status === "overdue"
           ? "border-red-500/20"
-          : "border-emerald-500/15"
+          : "border-[var(--color-primary-rgb)]/30"
       )}
     >
       {/* ── Primary alert row ─────────────────────────────────── */}

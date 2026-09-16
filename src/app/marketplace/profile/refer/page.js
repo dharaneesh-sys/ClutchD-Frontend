@@ -34,7 +34,7 @@ function ReferralHero({ referral, onCopy, onShare, copied }) {
       {/* Decorative glow */}
       <div
         className="absolute -top-16 -right-16 w-40 h-40 rounded-full opacity-20 blur-3xl pointer-events-none"
-        style={{ background: "var(--color-primary, #10b981)" }}
+        style={{ background: "var(--color-primary, #1E29B6)" }}
         aria-hidden="true"
       />
 

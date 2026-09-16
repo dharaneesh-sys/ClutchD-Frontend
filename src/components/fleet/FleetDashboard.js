@@ -47,7 +47,7 @@ const VEHICLE_TYPE_LABELS = {
 
 const TIER_COLORS = {
   platinum: { badge: "info", text: "text-blue-300", bg: "bg-blue-500/10" },
-  gold: { badge: "primary", text: "text-emerald-300", bg: "bg-emerald-500/10" },
+  gold: { badge: "primary", text: "text-[var(--primary-light)]", bg: "bg-[var(--color-primary-rgb)]/15" },
   silver: { badge: "default", text: "text-primary-light", bg: "bg-primary/10" },
   bronze: { badge: "glass", text: "text-text-muted", bg: "bg-white/5" },
 };
@@ -79,7 +79,7 @@ function VehicleCard({ vehicle, onRemove }) {
     vehicle.status === "active"
       ? "bg-green-500"
       : vehicle.status === "maintenance"
-        ? "bg-emerald-500"
+        ? "bg-[var(--color-primary-rgb)]/15"
         : "bg-red-500";
 
   const typeLabel = VEHICLE_TYPE_LABELS[vehicle.type] || vehicle.type || "Vehicle";

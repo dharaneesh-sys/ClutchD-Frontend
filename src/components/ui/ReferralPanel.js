@@ -243,7 +243,7 @@ export function ReferralPanel({ className, onNavigateBack }) {
 
         <GlassCard variant="glass" className="p-4">
           <div className="flex items-center gap-2.5">
-            <div className="w-9 h-9 rounded-xl bg-emerald-500/15 flex items-center justify-center shrink-0">
+            <div className="w-9 h-9 rounded-xl bg-[var(--color-primary-rgb)]/15 flex items-center justify-center shrink-0">
               <Coins size={16} className="text-icon-highlight" />
             </div>
             <div>

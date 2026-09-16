@@ -168,7 +168,7 @@ export function ProfileMenu({ className }) {
               </button>
             )}
             {section.label === "Support & Safety" && sos.queuedMsg && (
-              <p className="px-4 py-2 text-xs text-emerald-400 bg-emerald-500/[0.06]">
+              <p className="px-4 py-2 text-xs text-[var(--primary-light)] bg-[var(--color-primary-rgb)]/15[0.06]">
                 {sos.queuedMsg}
               </p>
             )}

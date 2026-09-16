@@ -197,7 +197,7 @@ export default function ProfilePage() {
           </p>
         </div>
         <div className="glass-lux rounded-2xl p-4 text-center">
-          <div className="w-8 h-8 rounded-lg bg-emerald-500/[0.12] flex items-center justify-center mx-auto mb-2">
+          <div className="w-8 h-8 rounded-lg bg-[var(--color-primary-rgb)]/15[0.12] flex items-center justify-center mx-auto mb-2">
             <Gift size={16} className="text-icon-highlight" />
           </div>
           <p className="text-lg font-bold text-foreground">

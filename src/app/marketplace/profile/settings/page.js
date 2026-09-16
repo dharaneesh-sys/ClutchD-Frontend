@@ -703,8 +703,8 @@ export default function SettingsPage() {
               </p>
             </div>
           </div>
-          <span className="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 bg-emerald-500/15 text-emerald-300 text-[0.625rem] font-semibold tracking-wide uppercase">
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+          <span className="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 bg-[var(--color-primary-rgb)]/15 text-[var(--primary-light)] text-[0.625rem] font-semibold tracking-wide uppercase">
+            <span className="w-1.5 h-1.5 rounded-full bg-[var(--color-primary-rgb)]/15" />
             Active
           </span>
         </div>

@@ -392,7 +392,7 @@ export function LoginCard() {
                 type="checkbox"
                 checked={rememberMe}
                 onChange={(e) => setRememberMeChecked(e.target.checked)}
-                className="h-4 w-4 rounded accent-emerald-500"
+                className="h-4 w-4 rounded accent-[var(--primary)]"
               />
               Remember me
             </label>
@@ -406,7 +406,7 @@ export function LoginCard() {
           </div>
         </div>
         {sessionExpired && (
-          <div className="p-3 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-sm">
+          <div className="p-3 rounded-lg bg-[var(--color-primary-rgb)]/15 border border-[var(--color-primary-rgb)]/30 text-[var(--primary-light)] text-sm">
             Your session expired. Please sign in again.
           </div>
         )}

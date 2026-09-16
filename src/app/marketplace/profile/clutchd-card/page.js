@@ -35,10 +35,10 @@ const TIER_CONFIG = {
   gold: {
     icon: Award,
     label: "Gold",
-    color: "text-emerald-300",
-    bg: "bg-emerald-500/10",
-    ring: "ring-emerald-500/30",
-    gradient: "from-emerald-500/20 to-teal-500/10",
+    color: "text-[var(--primary-light)]",
+    bg: "bg-[var(--color-primary-rgb)]/15",
+    ring: "ring-[var(--color-primary-rgb)]/30",
+    gradient: "from-[var(--color-primary-rgb)]/15 to-teal-500/10",
     discount: "30%",
   },
   silver: {
@@ -56,7 +56,7 @@ const TIER_CONFIG = {
     color: "text-lime-300",
     bg: "bg-lime-500/10",
     ring: "ring-lime-500/30",
-    gradient: "from-lime-500/20 to-emerald-500/10",
+    gradient: "from-lime-500/20 to-[var(--color-primary-rgb)]/5",
     discount: "5%",
   },
 };

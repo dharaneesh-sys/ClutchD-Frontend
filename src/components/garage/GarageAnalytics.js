@@ -9,8 +9,8 @@ export function GarageAnalytics() {
     if (typeof document === 'undefined') return fallback;
     return getComputedStyle(document.documentElement).getPropertyValue(name).trim() || fallback;
   };
-  const primaryColor = getCSSVar('--primary', '#10b981');
-  const barColor = getCSSVar('--primary', '#10b981');
+  const primaryColor = getCSSVar('--primary', '#1E29B6');
+  const barColor = getCSSVar('--primary', '#1E29B6');
   const tickColor = getCSSVar('--on-surface-variant', 'rgba(255,255,255,0.4)');
   const gridColor = getCSSVar('--outline-variant', 'rgba(255,255,255,0.05)');
   const tooltipBg = getCSSVar('--surface-container', '#18181b');

@@ -175,8 +175,8 @@ export default function PaymentsPage() {
         </div>
         <div className="glass-lux rounded-2xl p-4">
           <div className="flex items-center gap-2.5">
-            <div className="w-9 h-9 rounded-xl bg-emerald-500/15 flex items-center justify-center shrink-0">
-              <Receipt size={16} className="text-emerald-400" />
+            <div className="w-9 h-9 rounded-xl bg-[var(--color-primary-rgb)]/15 flex items-center justify-center shrink-0">
+              <Receipt size={16} className="text-[var(--primary-light)]" />
             </div>
             <div>
               <p className="text-2xl font-bold tracking-tight text-foreground">

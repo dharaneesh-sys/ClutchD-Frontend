@@ -14,8 +14,8 @@ const MODE_CONFIG = {
     icon: User,
     label: "Customer Mode",
     color: "primary",
-    textClass: "text-[#1E29B6] dark:text-emerald-300",
-    avatarClass: "bg-[#1E29B6]/15 dark:bg-emerald-500/20 border border-[#1E29B6]/30 text-[#1E29B6] dark:text-emerald-300",
+    textClass: "text-[#1E29B6] ",
+    avatarClass: "bg-[#1E29B6]/15 dark:bg-[var(--color-primary-rgb)]/15 border border-[#1E29B6]/30 text-[#1E29B6] ",
   },
   garage: {
     icon: Building2,
@@ -29,7 +29,7 @@ const MODE_CONFIG = {
     label: "Provider Mode",
     color: "primary",
     textClass: "text-primary-light",
-    avatarClass: "bg-primary/15 dark:bg-emerald-500/20 border border-primary/30 text-primary-light",
+    avatarClass: "bg-primary/15 dark:bg-[var(--color-primary-rgb)]/15 border border-primary/30 text-primary-light",
   },
   fleet: {
     icon: Truck,

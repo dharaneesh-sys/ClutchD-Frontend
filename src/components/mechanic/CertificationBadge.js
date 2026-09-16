@@ -6,9 +6,9 @@ import { CERTIFICATIONS } from "@/lib/constants";
 
 const CERT_STYLE = {
   ase: {
-    gradient: "from-emerald-500/25 to-emerald-500/10",
-    text: "text-emerald-300",
-    border: "border-emerald-500/35",
+    gradient: "from-[var(--color-primary-rgb)]/15 to-[var(--color-primary-rgb)]/5",
+    text: "text-[var(--primary-light)]",
+    border: "border-[var(--color-primary-rgb)]/30",
     glow: "rgba(52,211,153,0.15)",
     icon: Award,
   },

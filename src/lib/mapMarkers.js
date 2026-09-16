@@ -16,7 +16,7 @@ const COLORS = {
   green:  { fill: "#22c55e", stroke: "#16a34a", glow: "rgba(34, 197, 94, 0.35)" },
   violet: { fill: "#8b5cf6", stroke: "#7c3aed", glow: "rgba(139, 92, 246, 0.35)" },
   orange: { fill: "#f59e0b", stroke: "#d97706", glow: "rgba(245, 158, 11, 0.35)" },
-  emerald:{ fill: "#10b981", stroke: "#059669", glow: "rgba(16, 185, 129, 0.35)" },
+  emerald:{ fill: "#4aa5f5", stroke: "#2e8ce0", glow: "rgba(74, 165, 245, 0.35)" },
   // Brand pin (indigo rebrand) — distinct from functional warning/orange above
   brand:  { fill: brandPinFill, stroke: "#1a2490", glow: "rgba(30, 41, 182, 0.35)" },
 };

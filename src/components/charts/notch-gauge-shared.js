@@ -2,7 +2,7 @@ import { Children, Fragment, isValidElement } from "react";
 
 export const DEFAULT_ACTIVE_GRADIENT = [
   "#bef264",
-  "#10b981",
+  "#4aa5f5",
 ];
 
 export const DEFAULT_ACTIVE_FILL_OPACITY = 1;

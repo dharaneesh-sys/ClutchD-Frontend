@@ -17,7 +17,7 @@ export default function GlobalError({ error, reset }) {
                 var t = localStorage.getItem('clutchd_theme');
                 var d = t === 'light' ? '#fffbff' : '#0a0a0a';
                 var f = t === 'light' ? '#1c1b1f' : '#fff';
-                var p = '#059669';
+                var p = '#4aa5f5';
                 if (!t) {
                   var m = window.matchMedia('(prefers-color-scheme: light)');
                   if (m.matches) { d = '#fffbff'; f = '#1c1b1f'; }
