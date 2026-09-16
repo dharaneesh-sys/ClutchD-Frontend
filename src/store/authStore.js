@@ -310,11 +310,19 @@ export const useAuthStore = create(
           typeof role === "string" ? role.toLowerCase() : null;
 
         try {
-          const response = await api.post("/auth/oauth/google", {
-            credential,
-            role: safeRole || undefined,
-            state: state || undefined,
-          });
+          // The backend verifies the idToken with Google inside this request,
+          // so it can legitimately take 10-15s+ over the funnel. Mark it
+          // retryable (safe — token exchange, no side effects) and give it a
+          // longer per-attempt timeout than the global default.
+          const response = await api.post(
+            "/auth/oauth/google",
+            {
+              credential,
+              role: safeRole || undefined,
+              state: state || undefined,
+            },
+            { timeout: 45000, __isRetryable: true }
+          );
 
           const remember = opts?.rememberMe ?? get().rememberMe ?? true;
           if (response.data.token && typeof window !== "undefined") {
@@ -342,8 +350,11 @@ export const useAuthStore = create(
           // an honest error). Fail loudly so the user retries when the
           // connection is back.
           const isNetworkError = !error.response;
+          const isTimeout = error.code === "ECONNABORTED";
           const msg = isNetworkError
-            ? "Server unreachable — couldn't complete Google sign-in. Check your connection and try again."
+            ? isTimeout
+              ? "Google sign-in timed out — the server is busy. Tap Google again to retry."
+              : "Server unreachable — couldn't complete Google sign-in. Check your connection and try again."
             : error.response?.data?.detail || "Google sign-in failed. Please try again.";
           set({ isLoading: false, error: msg });
           try {
@@ -385,11 +396,17 @@ export const useAuthStore = create(
 
           // 2. Verify it against OUR backend — same as the web GIS flow.
           //    This is the only way the resulting session can call the API.
+          //    Long timeout + retryable: backend phones home to Google inside
+          //    this request, which is slow over the funnel (see loginWithGoogle).
           const safeRole = typeof role === "string" ? role.toLowerCase() : null;
-          const response = await api.post("/auth/oauth/google", {
-            credential: idToken,
-            role: safeRole || undefined,
-          });
+          const response = await api.post(
+            "/auth/oauth/google",
+            {
+              credential: idToken,
+              role: safeRole || undefined,
+            },
+            { timeout: 45000, __isRetryable: true }
+          );
 
           const remember = get().rememberMe ?? true;
           if (response.data.token && typeof window !== "undefined") {

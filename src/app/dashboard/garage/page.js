@@ -47,6 +47,18 @@ export default function GarageDashboard() {
     }
   }, [_hydrated, isAuthenticated, user?.id, user?.role, router]);
 
+  // Request GPS on every login and check in the garage's position to the
+  // backend (trackingStore.checkInProviderLocation), so customers nearby
+  // discover the garage at its real current location. Same deferred-start
+  // pattern as the mechanic dashboard (React 19 flushSync cascade #185).
+  useEffect(() => {
+    if (!_hydrated || !isAuthenticated) return;
+    const id = setTimeout(() => {
+      useTrackingStore.getState().requestGPSLocation();
+    }, 0);
+    return () => clearTimeout(id);
+  }, [_hydrated, isAuthenticated]);
+
   // Listen for navigation events from non-React contexts (e.g., axios interceptors)
   useEffect(() => {
     const handleNavigation = (event) => {

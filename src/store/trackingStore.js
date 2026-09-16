@@ -3,6 +3,7 @@ import api from "@/lib/api";
 import { MAP_DEFAULT_CENTER } from "@/lib/constants";
 import { cacheLastLocation } from "@/lib/offline/offlineCache";
 import { toCamelCase } from "@/lib/utils";
+import { useAuthStore } from "@/store/authStore";
 
 /**
  * Haversine formula to calculate distance between two GPS coordinates.
@@ -45,10 +46,14 @@ export const useTrackingStore = create((set, get) => ({
   gpsStatus: "idle", // "idle" | "requesting" | "granted" | "denied" | "unavailable"
   estimatedArrival: null, // seconds | null
   providerFilter: "all", // "all" | "mechanic" | "garage"
+  _lastProviderCheckIn: null, // { at, lat, lng } — throttle state for provider check-ins
 
   setUserLocation: (coords) => {
     set({ userLocation: coords });
     cacheLastLocation(coords[0], coords[1]);
+    // Providers check in their new position to the backend on every change
+    // (no-op for customers); then refresh the nearby lists.
+    get().checkInProviderLocation();
     // Automatically refresh providers when location changes
     get().fetchNearbyProviders();
   },
@@ -82,6 +87,7 @@ export const useTrackingStore = create((set, get) => ({
         const coords = [data.lat, data.lon];
         set({ userLocation: coords, gpsStatus: "granted" });
         cacheLastLocation(coords[0], coords[1]);
+        get().checkInProviderLocation();
         get().fetchNearbyProviders();
         return true;
       }
@@ -115,10 +121,9 @@ export const useTrackingStore = create((set, get) => ({
 
     navigator.geolocation.getCurrentPosition(
       (position) => {
-        const coords = [position.coords.latitude, position.coords.longitude];
-        set({ userLocation: coords, gpsStatus: "granted" });
-        cacheLastLocation(coords[0], coords[1]);
-        get().fetchNearbyProviders();
+        // setUserLocation performs the provider check-in + nearby refresh.
+        get().setUserLocation([position.coords.latitude, position.coords.longitude]);
+        set({ gpsStatus: "granted" });
       },
       (error) => {
         console.warn(`Geolocation error (code ${error.code}): ${error.message}`);
@@ -129,6 +134,41 @@ export const useTrackingStore = create((set, get) => ({
       // WiFi/cell positioning: fast, works indoors, ~50m accuracy
       { enableHighAccuracy: false, timeout: 15000, maximumAge: 120000 }
     );
+  },
+
+  /**
+   * Providers (mechanic/garage) check in their current GPS position to the
+   * backend on every login, so the nearby search always sees where they
+   * actually are — not their stale signup location. Customers don't send
+   * anything here; their coordinates are only ever query parameters.
+   *
+   * Throttled: at most one push per 60s, unless the position jumped >100m
+   * since the last push (so genuine movement reports immediately while GPS
+   * jitter never spams the endpoint). Silent best-effort: failures never
+   * block the dashboard.
+   */
+  checkInProviderLocation: async () => {
+    try {
+      const role = useAuthStore.getState().user?.role;
+      if (role !== "mechanic" && role !== "garage") return;
+      const [lat, lng] = get().userLocation;
+      if (lat == null || lng == null) return;
+
+      const now = Date.now();
+      const last = get()._lastProviderCheckIn;
+      if (last) {
+        const movedKm = haversineDistance(last.lat, last.lng, lat, lng);
+        const movedFar = movedKm > 0.1; // >100m since last push
+        const waitedEnough = now - last.at >= 60_000;
+        if (!movedFar && !waitedEnough) return;
+        if (movedFar && now - last.at < 10_000) return; // even big jumps: max 1 push / 10s
+      }
+      set({ _lastProviderCheckIn: { at: now, lat, lng } });
+
+      await api.put("/providers/location", { latitude: lat, longitude: lng });
+    } catch {
+      // Never block login/dashboard on a location check-in failure.
+    }
   },
 
   /**
@@ -145,6 +185,9 @@ export const useTrackingStore = create((set, get) => ({
         const coords = [position.coords.latitude, position.coords.longitude];
         set({ userLocation: coords, gpsStatus: "granted" });
         cacheLastLocation(coords[0], coords[1]);
+        // Continuous check-in while the provider is on the road (watch mode):
+        // throttled inside checkInProviderLocation's callers by GPS jitter.
+        get().checkInProviderLocation();
       },
       (error) => {
         console.warn(`[trackingStore] GPS watchPosition error (code ${error.code}): ${error.message}`);

@@ -154,11 +154,16 @@ describe("authStore", () => {
         .getState()
         .loginWithGoogle("google-credential", "customer");
 
-      expect(mockPost).toHaveBeenCalledWith("/auth/oauth/google", {
-        credential: "google-credential",
-        role: "customer",
-        state: undefined,
-      });
+      expect(mockPost).toHaveBeenCalledWith(
+        "/auth/oauth/google",
+        {
+          credential: "google-credential",
+          role: "customer",
+          state: undefined,
+        },
+        // Google verify is slow over the funnel: long timeout + retryable.
+        { timeout: 45000, __isRetryable: true },
+      );
       expect(useAuthStore.getState().user).toEqual(mockUser);
       expect(useAuthStore.getState().isAuthenticated).toBe(true);
       expect(result).toEqual(mockUser);
