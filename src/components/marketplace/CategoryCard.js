@@ -45,6 +45,12 @@ function resolveIconKey(name) {
 export function CategoryCard({ category, icon, className }) {
   const iconKey = icon || resolveIconKey(category.name);
   const isAccessories = iconKey === "accessories" || iconKey === "spare-parts";
+  // Each photo category gets its own tile image.
+  const categoryImage =
+    iconKey === "spare-parts"
+      ? "/images/marketplace/spare-parts.jpg"
+      : "/images/marketplace/accessories.jpg";
+  const categoryAlt = iconKey === "spare-parts" ? "Spare Parts category" : "Accessories category";
 
   return (
     <Link
@@ -61,8 +67,8 @@ export function CategoryCard({ category, icon, className }) {
         <span className="inline-flex items-center justify-center overflow-hidden rounded-2xl bg-white/10 ring-1 ring-white/10 w-16 h-16">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
-            src="/images/marketplace/spare-parts.jpg"
-            alt="Spare Parts category"
+            src={categoryImage}
+            alt={categoryAlt}
             className="w-full h-full object-cover"
             loading="lazy"
           />
