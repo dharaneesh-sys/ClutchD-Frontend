@@ -22,8 +22,8 @@ android {
         applicationId "com.clutchd.app"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 31
-        versionName "3.1.1"
+        versionCode 32
+        versionName "3.1.2"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         aaptOptions {
              // Files and dirs to omit from the packaged assets dir, modified to accommodate modern web apps.
@@ -42,8 +42,11 @@ android {
     }
     buildTypes {
         release {
-            minifyEnabled true
-            shrinkResources true
+            // Minification OFF: R8 strips Capacitor's reflectively-registered plugin
+            // classes (firebase-auth bridge etc.) -> native login breaks at runtime.
+            // Re-enable only together with device-tested keep rules in proguard-rules.pro.
+            minifyEnabled false
+            shrinkResources false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
             signingConfig signingConfigs.release
         }

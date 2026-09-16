@@ -22,6 +22,17 @@
 
 # --- ClutchD release rules ---
 
+# Minification is currently DISABLED in build.gradle (release parity with debug).
+# If you re-enable minifyEnabled, ALSO test on a device with these keep rules —
+# R8 strips Capacitor's reflectively-registered plugin classes and breaks login.
+
+# Keep Capacitor bridge + all plugins (registered reflectively via annotation).
+-keep class com.getcapacitor.** { *; }
+-keep @com.getcapacitor.CapacitorPlugin class * { *; }
+
+# Keep Cordova plugin shim used by capacitor-cordova-android-plugins.
+-keep class org.apache.cordova.** { *; }
+
 # capacitor-firebase-authentication ships an optional Facebook provider whose SDK
 # isn't bundled (the app only uses Google sign-in). R8 fails on the dangling refs.
 -dontwarn com.facebook.**
