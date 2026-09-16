@@ -8,8 +8,8 @@ export const DASHBOARD_TABS = [
   { key: "request", icon: Wrench, label: "Service" },
   { key: "schedule", icon: Calendar, label: "Schedule" },
   { key: "vehicles", icon: Car, label: "Vehicles" },
-  { key: "store", icon: ShoppingBag, label: "Parts Store" },
   { key: "history", icon: History, label: "History" },
+  { key: "store", icon: ShoppingBag, label: "Parts Store" },
 ];
 
 /**
