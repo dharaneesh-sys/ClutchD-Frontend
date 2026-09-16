@@ -7,7 +7,7 @@ import { Badge } from "@/components/ui/Badge";
 import { Modal } from "@/components/ui/Modal";
 import { ConfirmModal } from "@/components/ui/ConfirmModal";
 import { Input } from "@/components/ui/Input";
-import { Navigation, CheckCircle2, AlertTriangle, MapPin, Clock, IndianRupee, Loader2, MessageSquare } from "lucide-react";
+import { Navigation, CheckCircle2, AlertTriangle, MapPin, Clock, IndianRupee, Loader2, MessageSquare, Banknote } from "lucide-react";
 import { FEE_CONSTANTS } from "@/lib/constants";
 import { useTrackingStore } from "@/store/trackingStore";
 import { useToast } from "@/components/ui/ToastProvider";
@@ -29,6 +29,10 @@ export function IncomingJobs({ onChat }) {
   const [priceError, setPriceError] = useState("");
   const [deleteJob, setDeleteJob] = useState(null);
   const [deleteLoading, setDeleteLoading] = useState(false);
+
+  // --- Collect Cash Modal State (payment_pending jobs) ---
+  const [cashJob, setCashJob] = useState(null); // full job object awaiting cash
+  const [cashLoading, setCashLoading] = useState(false);
 
   const fetchJobs = useCallback(async () => {
     try {
@@ -125,13 +129,39 @@ export function IncomingJobs({ onChat }) {
       await api.post(`/service/request/${completionJobId}/finalize-price`, {
         serviceAmount: amount,
       });
-      setJobs(jobs.filter(j => j.id !== completionJobId));
+      // Keep the job in the queue — it's now payment_pending and shows a
+      // Collect Cash button until the payment is recorded.
       setCompletionModal(false);
       showSuccess(`Invoice of ₹${amount} sent to customer. Awaiting payment.`);
+      fetchJobs();
     } catch (err) {
       setPriceError(err.response?.data?.detail || "Failed to submit price. Please try again.");
     } finally {
       setSubmittingPrice(false);
+    }
+  };
+
+  // Mechanic/garage confirms they received the cash from the customer.
+  const handleCollectCash = async () => {
+    if (!cashJob) return;
+    setCashLoading(true);
+    try {
+      // Backend accepts paise (int). pricing.totalAmount is in rupees;
+      // fall back to the estimate's max if pricing is somehow missing.
+      const totalPaise = Math.round(
+        (cashJob.pricing?.totalAmount ?? cashJob.priceEstimate?.max ?? 0) * 100
+      );
+      await api.post("/payments/cash", {
+        job_id: cashJob.id,
+        amount: totalPaise,
+      });
+      setJobs((prev) => prev.filter((j) => j.id !== cashJob.id));
+      setCashJob(null);
+      showSuccess(`Cash of ₹${(totalPaise / 100).toFixed(2)} recorded. Job completed!`);
+    } catch (err) {
+      showError(err.response?.data?.detail || "Failed to record cash payment.");
+    } finally {
+      setCashLoading(false);
     }
   };
 
@@ -213,10 +243,20 @@ export function IncomingJobs({ onChat }) {
               </div>
               
               <div className="mb-3">
-                <Badge variant={job.status === 'assigned' || job.status === 'pending' ? 'danger' : 'success'} className="mb-2">
-                  {job.issueTag || "Unknown"}
+                <Badge variant={
+                  job.status === 'payment_pending' ? 'success'
+                  : job.status === 'assigned' || job.status === 'pending' ? 'danger'
+                  : 'success'
+                } className="mb-2">
+                  {job.status === 'payment_pending' ? 'Awaiting Payment' : (job.issueTag || "Unknown")}
                 </Badge>
                 <p className="text-sm mb-2 text-text-muted">{job.description || "No description"}</p>
+                {job.pricing?.totalAmount != null && (
+                  <div className="flex items-center text-xs font-medium text-icon-highlight">
+                    <IndianRupee size={12} className="mr-1" />
+                    Billed: ₹{Number(job.pricing.totalAmount).toFixed(2)} — collect from customer
+                  </div>
+                )}
                 {job.mechanic?.distance && (
                    <div className="flex items-center text-xs font-medium text-text-muted">
                       <MapPin size={12} className="mr-1 text-icon-highlight" />
@@ -238,6 +278,17 @@ export function IncomingJobs({ onChat }) {
                     <>
                       <Button variant="ghost" size="sm" onClick={() => rejectJob(job.id)}>Decline</Button>
                       <Button size="sm" onClick={() => acceptJob(job.id)}>Accept Job</Button>
+                    </>
+                  ) : job.status === 'payment_pending' ? (
+                    <>
+                      {onChat && (
+                        <Button variant="ghost" size="sm" onClick={() => onChat(job.id, job.customer)}>
+                          <MessageSquare size={14} className="mr-1" /> Chat
+                        </Button>
+                      )}
+                      <Button size="sm" onClick={() => setCashJob(job)}>
+                        <Banknote size={14} className="mr-1" /> Collect Cash
+                      </Button>
                     </>
                   ) : (
                     <>
@@ -346,6 +397,23 @@ export function IncomingJobs({ onChat }) {
           </Button>
         </div>
       </Modal>
+
+      {/* ── Collect Cash Confirmation Modal ── */}
+      <ConfirmModal
+        isOpen={!!cashJob}
+        onClose={() => setCashJob(null)}
+        onConfirm={handleCollectCash}
+        title="Confirm Cash Received"
+        message={(() => {
+          if (!cashJob) return "";
+          const rupees = Number(
+            cashJob.pricing?.totalAmount ?? cashJob.priceEstimate?.max ?? 0
+          );
+          return `Confirm you have received ₹${rupees.toFixed(2)} in cash from the customer for "${cashJob.issueTag || "this job"}". This completes the job and cannot be undone.`;
+        })()}
+        confirmLabel="Cash Received"
+        isLoading={cashLoading}
+      />
 
       <ConfirmModal
         isOpen={!!deleteJob}

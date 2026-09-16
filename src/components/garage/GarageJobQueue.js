@@ -5,7 +5,7 @@ import { Badge } from "@/components/ui/Badge";
 import { Modal } from "@/components/ui/Modal";
 import { ConfirmModal } from "@/components/ui/ConfirmModal";
 import { Input } from "@/components/ui/Input";
-import { Clock, MapPin, Settings, Loader2, IndianRupee, AlertTriangle, MessageSquare } from "lucide-react";
+import { Clock, MapPin, Settings, Loader2, IndianRupee, AlertTriangle, MessageSquare, Banknote } from "lucide-react";
 import { AssignMechanicModal } from "@/components/garage/AssignMechanicModal";
 import api from "@/lib/api";
 import { FEE_CONSTANTS } from "@/lib/constants";
@@ -28,6 +28,10 @@ export function GarageJobQueue({ onChat }) {
   const [priceError, setPriceError] = useState("");
   const [deleteJob, setDeleteJob] = useState(null);
   const [deleteLoading, setDeleteLoading] = useState(false);
+
+  // --- Collect Cash Modal State (payment_pending jobs) ---
+  const [cashJob, setCashJob] = useState(null);
+  const [cashLoading, setCashLoading] = useState(false);
 
   const fetchJobs = async () => {
     try {
@@ -98,13 +102,38 @@ export function GarageJobQueue({ onChat }) {
       await api.post(`/service/request/${completionJobId}/finalize-price`, {
         serviceAmount: amount,
       });
-      setJobs(jobs.filter(j => j.id !== completionJobId));
+      // Keep the job in the queue — it's now payment_pending and shows a
+      // Collect Cash button until the payment is recorded.
       setCompletionModal(false);
       showSuccess(`Invoice of ₹${amount} sent to customer. Awaiting payment.`);
+      fetchJobs();
     } catch (err) {
       setPriceError(err.response?.data?.detail || "Failed to submit price. Please try again.");
     } finally {
       setSubmittingPrice(false);
+    }
+  };
+
+  // Garage confirms they received cash from the customer.
+  const handleCollectCash = async () => {
+    if (!cashJob) return;
+    setCashLoading(true);
+    try {
+      // Backend accepts paise (int). pricing.totalAmount is in rupees.
+      const totalPaise = Math.round(
+        (cashJob.pricing?.totalAmount ?? cashJob.priceEstimate?.max ?? 0) * 100
+      );
+      await api.post("/payments/cash", {
+        job_id: cashJob.id,
+        amount: totalPaise,
+      });
+      setJobs((prev) => prev.filter((j) => j.id !== cashJob.id));
+      setCashJob(null);
+      showSuccess(`Cash of ₹${(totalPaise / 100).toFixed(2)} recorded. Job completed!`);
+    } catch (err) {
+      showError(err.response?.data?.detail || "Failed to record cash payment.");
+    } finally {
+      setCashLoading(false);
     }
   };
 
@@ -177,6 +206,17 @@ export function GarageJobQueue({ onChat }) {
                        <Button size="sm" onClick={() => openAssignModal(job)}>
                           Dispatch
                        </Button>
+                     ) : job.status === 'payment_pending' ? (
+                       <>
+                         {onChat && (
+                           <Button variant="ghost" size="sm" onClick={() => onChat(job.id, job.customer)}>
+                             <MessageSquare size={14} className="mr-1" /> Chat
+                           </Button>
+                         )}
+                         <Button size="sm" onClick={() => setCashJob(job)}>
+                           <Banknote size={14} className="mr-1" /> Collect Cash
+                         </Button>
+                       </>
                      ) : isActive ? (
                        <>
                          {onChat && (
@@ -296,6 +336,23 @@ export function GarageJobQueue({ onChat }) {
           </Button>
         </div>
       </Modal>
+
+      {/* ── Collect Cash Confirmation Modal ── */}
+      <ConfirmModal
+        isOpen={!!cashJob}
+        onClose={() => setCashJob(null)}
+        onConfirm={handleCollectCash}
+        title="Confirm Cash Received"
+        message={(() => {
+          if (!cashJob) return "";
+          const rupees = Number(
+            cashJob.pricing?.totalAmount ?? cashJob.priceEstimate?.max ?? 0
+          );
+          return `Confirm you have received ₹${rupees.toFixed(2)} in cash from the customer for "${cashJob.issueTag || "this job"}". This completes the job and cannot be undone.`;
+        })()}
+        confirmLabel="Cash Received"
+        isLoading={cashLoading}
+      />
 
       <ConfirmModal
         isOpen={!!deleteJob}
