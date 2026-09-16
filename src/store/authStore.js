@@ -394,7 +394,22 @@ export const useAuthStore = create(
             return null;
           }
 
-          // 2. Verify it against OUR backend — same as the web GIS flow.
+          // 2. CSRF state — same as the web GIS flow: fetch one from the
+          //    backend (stored in Redis, single-use). The backend logs a
+          //    warning when it's missing; sending it keeps both flows
+          //    consistent and silences the "OAuth state parameter missing"
+          //    noise in server logs.
+          let oauthState = null;
+          try {
+            const stateRes = await api.get("/auth/oauth/state");
+            oauthState = stateRes.data?.state || null;
+          } catch {
+            // Server couldn't mint a state — proceed without one; the
+            // backend deliberately fails open when state is absent.
+            oauthState = null;
+          }
+
+          // 3. Verify it against OUR backend — same as the web GIS flow.
           //    This is the only way the resulting session can call the API.
           //    Long timeout + retryable: backend phones home to Google inside
           //    this request, which is slow over the funnel (see loginWithGoogle).
@@ -404,6 +419,7 @@ export const useAuthStore = create(
             {
               credential: idToken,
               role: safeRole || undefined,
+              state: oauthState || undefined,
             },
             { timeout: 45000, __isRetryable: true }
           );
