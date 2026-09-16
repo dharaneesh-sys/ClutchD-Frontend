@@ -77,8 +77,12 @@ export function ChatPanel({ jobId, otherUserName, otherUserRole, onClose }) {
     try {
       const formData = new FormData();
       formData.append("file", file);
+      // Long timeout + retryable — photos on 4G through the funnel are slow
+      // (same class as the Google-login fix).
       const res = await api.post("/uploads", formData, {
         headers: { "Content-Type": "multipart/form-data" },
+        timeout: 60000,
+        __isRetryable: true,
       });
       const imageUrl = res.data?.url || res.data?.imageUrl;
       if (imageUrl) sendChatMessage(jobId, "", imageUrl);

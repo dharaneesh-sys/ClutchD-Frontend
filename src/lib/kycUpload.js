@@ -12,8 +12,13 @@ async function uploadOne(file) {
   const fd = new FormData();
   fd.append("file", file);
   try {
+    // Photos over the funnel on 4G easily exceed the default 30s — long
+    // timeout + retryable (upload is idempotent: worst case stores a second
+    // orphan file, the profile URL write is a separate call).
     const { data } = await api.post("/uploads", fd, {
       headers: { "Content-Type": "multipart/form-data" },
+      timeout: 60000,
+      __isRetryable: true,
     });
     return data?.url || null;
   } catch (err) {

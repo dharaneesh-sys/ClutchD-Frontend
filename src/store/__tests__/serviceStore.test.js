@@ -100,12 +100,16 @@ describe("serviceStore", () => {
 
       const result = await useServiceStore.getState().createRequest(payloadWithFile);
 
-      // First POST → upload
+      // First POST → upload (long timeout + retryable for slow 4G/funnel)
       expect(mockPost).toHaveBeenNthCalledWith(
         1,
         "/uploads",
         expect.any(FormData),
-        { headers: { "Content-Type": "multipart/form-data" } }
+        {
+          headers: { "Content-Type": "multipart/form-data" },
+          timeout: 60000,
+          __isRetryable: true,
+        }
       );
       // Second POST → create request with the returned mediaUrl
       expect(mockPost).toHaveBeenNthCalledWith(2, "/service/request", {

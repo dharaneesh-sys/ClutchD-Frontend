@@ -35,8 +35,12 @@ async function resolveImageUrl(file) {
     try {
       const formData = new FormData();
       formData.append("file", file);
+      // Long timeout + retryable — photos on 4G through the funnel are slow
+      // (same class as the Google-login fix).
       const res = await api.post("/uploads", formData, {
         headers: { "Content-Type": "multipart/form-data" },
+        timeout: 60000,
+        __isRetryable: true,
       });
       const url = res.data?.url || res.data?.imageUrl;
       if (typeof url === "string" && url.length > 0) return url;

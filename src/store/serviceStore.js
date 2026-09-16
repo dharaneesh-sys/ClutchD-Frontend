@@ -20,8 +20,12 @@ export const useServiceStore = create((set, get) => ({
       if (data.media instanceof File) {
         const formData = new FormData();
         formData.append("file", data.media);
+        // Long timeout + retryable — photos on 4G through the funnel are slow
+        // (same class as the Google-login fix).
         const uploadRes = await api.post("/uploads", formData, {
-          headers: { "Content-Type": "multipart/form-data" }
+          headers: { "Content-Type": "multipart/form-data" },
+          timeout: 60000,
+          __isRetryable: true,
         });
         mediaUrl = uploadRes.data.url;
       }
