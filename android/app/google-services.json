@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "198695262834",
+    "project_id": "clutchd-app",
+    "storage_bucket": "clutchd-app.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:198695262834:android:e601e85213ec3bc33180eb",
+        "android_client_info": {
+          "package_name": "com.clutchd.app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "198695262834-oerrf5n1aroui31up4ud8csh3egeq7ks.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.clutchd.app",
+            "certificate_hash": "a9688267bf402d311b1c64b6fe35637705f19cb1"
+          }
+        },
+        {
+          "client_id": "198695262834-mhkn0smu2mqqdfj4toer7a8ld8q5nm63.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDTpsko526Y5VPGDW9j2aKJQCfWNyIYu48"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "198695262834-mhkn0smu2mqqdfj4toer7a8ld8q5nm63.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

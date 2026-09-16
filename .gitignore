@@ -59,7 +59,8 @@ __pycache__/
 *.pyc
 .dockerignore
 
-# Capacitor native platforms (auto-generated, not committed)
-/android/
+# Capacitor native platform — tracked (Capacitor recommends committing it so
+# signing configs, icons and native settings survive; build outputs, gradle
+# caches, keystore and credentials are all ignored by android/.gitignore).
 
 googleauth.txt
