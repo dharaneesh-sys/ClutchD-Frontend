@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { cn } from "@/lib/utils";
+import { resolveMediaUrl } from "@/lib/mediaUrl";
 import { Check, CheckCheck, ImageIcon } from "lucide-react";
 
 // CheckDouble is CheckCheck in lucide-react
@@ -49,7 +50,7 @@ export function ChatBubble({ message, isOwn }) {
           <div className="relative group">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
-              src={message.imageUrl}
+              src={resolveMediaUrl(message.imageUrl)}
               alt="Shared image"
               className="max-w-full rounded-lg object-cover max-h-48 cursor-pointer
                          transition-transform hover:scale-[1.02] active:scale-[0.98]"

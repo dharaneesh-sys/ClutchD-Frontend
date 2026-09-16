@@ -12,6 +12,7 @@ import {
   Image as ImageIcon,
 } from "lucide-react";
 import { cn, formatDate } from "@/lib/utils";
+import { resolveMediaUrl } from "@/lib/mediaUrl";
 import { useAuthStore } from "@/store/authStore";
 import { useToastStore } from "@/store/toastStore";
 import { WarrantyClaimsStore, CLAIM_STATUSES } from "@/lib/warrantyClaimsStore";
@@ -117,7 +118,7 @@ function ClaimDetailModal({ claim, onClose }) {
                   className="aspect-square rounded-lg overflow-hidden bg-surface-soft border border-border-subtle"
                 >
                   <img
-                    src={photo}
+                    src={resolveMediaUrl(photo)}
                     alt={`Claim photo ${idx + 1}`}
                     className="w-full h-full object-cover"
                   />

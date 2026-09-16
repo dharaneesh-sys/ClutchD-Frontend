@@ -9,6 +9,7 @@ import { KycBadge } from "@/components/ui/KycBadge";
 import { useAuthStore } from "@/store/authStore";
 import { useToast } from "@/components/ui/ToastProvider";
 import api from "@/lib/api";
+import { resolveMediaUrl } from "@/lib/mediaUrl";
 
 export function GarageProfile() {
   const user = useAuthStore((s) => s.user);
@@ -63,7 +64,7 @@ export function GarageProfile() {
       <div className="flex items-center gap-4 mb-8 pb-6 border-b border-border-subtle">
         <div className="w-20 h-20 rounded-2xl overflow-hidden flex items-center justify-center border-2 bg-surface-soft border-border-subtle">
           {user?.image ? (
-             <img src={user.image} alt="Garage" className="w-full h-full object-cover" />
+             <img src={resolveMediaUrl(user.image)} alt="Garage" className="w-full h-full object-cover" />
           ) : (
             <Building2 size={32} className="text-icon-highlight" />
           )}

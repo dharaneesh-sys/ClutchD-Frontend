@@ -3,6 +3,7 @@
 import { useState, useCallback } from "react";
 import { ImageIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { resolveMediaUrl } from "@/lib/mediaUrl";
 
 /**
  * Smart product image component with first-letter fallback and glass-morphism placeholder.
@@ -20,7 +21,11 @@ export function ProductImage({ src, alt = "", productName = "", className }) {
 
   const handleError = useCallback(() => setHasError(true), []);
 
-  const showPlaceholder = !src || hasError;
+  // Backend returns relative /static/uploads/... paths — make them absolute
+  // so images load inside the Capacitor APK (document origin is localhost there).
+  const resolvedSrc = resolveMediaUrl(src);
+
+  const showPlaceholder = !resolvedSrc || hasError;
   const firstLetter = productName ? productName.trim().charAt(0).toUpperCase() : null;
 
   return (
@@ -68,7 +73,7 @@ export function ProductImage({ src, alt = "", productName = "", className }) {
       ) : (
         <>
           <img
-            src={src}
+            src={resolvedSrc}
             alt={alt}
             onError={handleError}
             className="h-full w-full object-cover"

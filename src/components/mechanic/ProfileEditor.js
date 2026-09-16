@@ -9,6 +9,7 @@ import { KycBadge } from "@/components/ui/KycBadge";
 import { useAuthStore } from "@/store/authStore";
 import { useToast } from "@/components/ui/ToastProvider";
 import api from "@/lib/api";
+import { resolveMediaUrl } from "@/lib/mediaUrl";
 
 export function ProfileEditor() {
   const user = useAuthStore((s) => s.user);
@@ -70,7 +71,7 @@ export function ProfileEditor() {
       <div className="flex items-center gap-4 mb-8">
         <div className="w-20 h-20 rounded-full overflow-hidden flex items-center justify-center relative group border-2 bg-surface-soft border-border-subtle">
           {user.image ? (
-             <img src={user.image} alt="Profile" className="w-full h-full object-cover" />
+             <img src={resolveMediaUrl(user.image)} alt="Profile" className="w-full h-full object-cover" />
           ) : (
             <span className="text-2xl font-bold text-icon-highlight">
                {displayInitials}

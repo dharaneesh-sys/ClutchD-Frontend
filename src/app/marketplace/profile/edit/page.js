@@ -9,6 +9,7 @@ import { useToastStore } from "@/store/toastStore";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import api, { extractApiError } from "@/lib/api";
+import { resolveMediaUrl } from "@/lib/mediaUrl";
 
 
 
@@ -148,7 +149,7 @@ export default function EditProfilePage() {
             <div className="w-20 h-20 rounded-full bg-gradient-to-br from-primary/30 to-primary/10 ring-2 ring-white/10 flex items-center justify-center overflow-hidden">
               {photoPreview ? (
                 // eslint-disable-next-line @next/next/no-img-element
-                <img src={photoPreview} alt="Profile" className="w-full h-full object-cover" />
+                <img src={resolveMediaUrl(photoPreview)} alt="Profile" className="w-full h-full object-cover" />
               ) : form.name ? (
                 <span className="text-2xl font-bold text-primary-light">
                   {getInitials(form.name)}

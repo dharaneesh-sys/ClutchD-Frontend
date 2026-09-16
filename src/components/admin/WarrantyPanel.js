@@ -13,6 +13,7 @@ import {
   FileText,
 } from "lucide-react";
 import { cn, formatDate } from "@/lib/utils";
+import { resolveMediaUrl } from "@/lib/mediaUrl";
 import { WarrantyClaimsStore, CLAIM_STATUSES } from "@/lib/warrantyClaimsStore";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
@@ -137,13 +138,13 @@ function ReviewClaimModal({ claim, isOpen, onClose, onUpdated }) {
               {claim.photos.map((photo, idx) => (
                 <a
                   key={idx}
-                  href={photo}
+                  href={resolveMediaUrl(photo)}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="aspect-square rounded-lg overflow-hidden bg-surface-soft border border-border-subtle block"
                 >
                   <img
-                    src={photo}
+                    src={resolveMediaUrl(photo)}
                     alt={`Claim photo ${idx + 1}`}
                     className="w-full h-full object-cover hover:opacity-80 transition-opacity"
                   />

@@ -11,6 +11,7 @@ import {
   Loader2,
 } from "lucide-react";
 import { cn, formatCurrency } from "@/lib/utils";
+import { resolveMediaUrl } from "@/lib/mediaUrl";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { ShimmerList } from "@/components/ui/Shimmer";
 import { useRouter } from "next/navigation";
@@ -52,7 +53,7 @@ function FavoriteCard({ item, onRemove, onMoveToCart }) {
       <div className="aspect-[4/3] bg-white/[0.03] flex items-center justify-center relative overflow-hidden">
         {item.product?.image_url ? (
           <img
-            src={item.product.image_url}
+            src={resolveMediaUrl(item.product.image_url)}
             alt={item.product.name}
             className="w-full h-full object-cover"
           />

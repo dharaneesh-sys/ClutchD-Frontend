@@ -8,6 +8,7 @@ import { sendChatMessage, markConversationRead } from "@/lib/chat/chatService";
 import { ChatBubble } from "@/components/ui/ChatBubble";
 import { Modal } from "@/components/ui/Modal";
 import api from "@/lib/api";
+import { resolveMediaUrl } from "@/lib/mediaUrl";
 import {
   X, Send, ImagePlus, ChevronLeft, Loader2, XCircle,
 } from "lucide-react";
@@ -232,7 +233,7 @@ export function ChatPanel({ jobId, otherUserName, otherUserRole, onClose }) {
           <div className="flex flex-col items-center">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
-              src={previewImage}
+              src={resolveMediaUrl(previewImage)}
               alt="Full size preview"
               className="max-w-full max-h-[70vh] rounded-lg object-contain"
             />
