@@ -5,7 +5,7 @@ import { usePathname } from "next/navigation";
 import { useRouter } from "next/navigation";
 import { ArrowLeft } from "lucide-react";
 import { BottomNav } from "@/components/ui/BottomNav";
-import { DashboardTabBar, MECHANIC_TABS } from "@/components/dashboard/DashboardTabBar";
+import { DashboardTabBar, MECHANIC_TABS, GARAGE_TABS } from "@/components/dashboard/DashboardTabBar";
 import { useAuthStore } from "@/store/authStore";
 import { NAVIGATION_EVENT } from "@/lib/navigation";
 
@@ -14,12 +14,12 @@ export default function MarketplaceLayout({ children }) {
   const pathname = usePathname();
   const user = useAuthStore((s) => s.user);
 
-  // On profile pages, signed-in customers get the regular dashboard tab
-  // bar instead of the marketplace (parts-store) nav; mechanics get their
-  // own dashboard tabs for the same reason.
+  // On profile pages, signed-in users get their role's dashboard tab bar
+  // instead of the marketplace (parts-store) nav.
   const onProfileRoute = pathname.startsWith("/marketplace/profile");
   const isCustomer = user?.role === "customer";
   const isMechanic = user?.role === "mechanic" || user?.role === "admin";
+  const isGarage = user?.role === "garage";
 
   // Listen for navigation events from non-React contexts (e.g., axios interceptors)
   useEffect(() => {
@@ -57,6 +57,8 @@ export default function MarketplaceLayout({ children }) {
         <DashboardTabBar />
       ) : onProfileRoute && isMechanic ? (
         <DashboardTabBar tabs={MECHANIC_TABS} />
+      ) : onProfileRoute && isGarage ? (
+        <DashboardTabBar tabs={GARAGE_TABS} />
       ) : (
         <BottomNav />
       )}

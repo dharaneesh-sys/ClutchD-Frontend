@@ -3,7 +3,7 @@
 import { useRouter } from "next/navigation";
 import {
   Wrench, Calendar, Car, ShoppingBag, History,
-  Briefcase, MapPin, DollarSign,
+  Briefcase, MapPin, DollarSign, LayoutDashboard, Users, BarChart3,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -22,6 +22,14 @@ export const MECHANIC_TABS = [
   { key: "jobs", icon: Briefcase, label: "Jobs", path: "/dashboard/mechanic?tab=jobs" },
   { key: "navigation", icon: MapPin, label: "Navigation", path: "/dashboard/mechanic?tab=navigation" },
   { key: "earnings", icon: DollarSign, label: "Earnings", path: "/dashboard/mechanic?tab=earnings" },
+  { key: "store", icon: ShoppingBag, label: "Parts Store", path: "/marketplace" },
+];
+
+/** Garage's tabs — same idea as MECHANIC_TABS for garage profile pages. */
+export const GARAGE_TABS = [
+  { key: "dashboard", icon: LayoutDashboard, label: "Dashboard", path: "/dashboard/garage?tab=dashboard" },
+  { key: "profile", icon: Users, label: "Garage Profile", path: "/dashboard/garage?tab=profile" },
+  { key: "analytics", icon: BarChart3, label: "Analytics", path: "/dashboard/garage?tab=analytics" },
   { key: "store", icon: ShoppingBag, label: "Parts Store", path: "/marketplace" },
 ];
 

@@ -22,7 +22,12 @@ export default function GarageDashboard() {
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
   const _hydrated = useAuthStore((s) => s._hydrated);
   const router = useRouter();
-  const [activeTab, setActiveTab] = useState("dashboard");
+  const [activeTab, setActiveTab] = useState(() => {
+    // Deep-link support: /dashboard/garage?tab=analytics opens that tab.
+    if (typeof window === "undefined") return "dashboard";
+    const t = new URLSearchParams(window.location.search).get("tab");
+    return ["dashboard", "profile", "analytics"].includes(t) ? t : "dashboard";
+  });
 
   useEffect(() => {
     if (_hydrated && !isAuthenticated) {
