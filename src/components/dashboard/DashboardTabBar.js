@@ -1,7 +1,10 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { Wrench, Calendar, Car, ShoppingBag, History } from "lucide-react";
+import {
+  Wrench, Calendar, Car, ShoppingBag, History,
+  Briefcase, MapPin, DollarSign,
+} from "lucide-react";
 import { cn } from "@/lib/utils";
 
 export const DASHBOARD_TABS = [
@@ -10,6 +13,16 @@ export const DASHBOARD_TABS = [
   { key: "vehicles", icon: Car, label: "Vehicles" },
   { key: "history", icon: History, label: "History" },
   { key: "store", icon: ShoppingBag, label: "Parts Store" },
+];
+
+/** Mechanic's tabs — shown on profile pages so mechanics keep their own
+ *  dashboard nav there (instead of the marketplace Parts Store nav).
+ *  Each tab carries an explicit deep-link path. */
+export const MECHANIC_TABS = [
+  { key: "jobs", icon: Briefcase, label: "Jobs", path: "/dashboard/mechanic?tab=jobs" },
+  { key: "navigation", icon: MapPin, label: "Navigation", path: "/dashboard/mechanic?tab=navigation" },
+  { key: "earnings", icon: DollarSign, label: "Earnings", path: "/dashboard/mechanic?tab=earnings" },
+  { key: "store", icon: ShoppingBag, label: "Parts Store", path: "/marketplace" },
 ];
 
 /**
@@ -21,13 +34,16 @@ export const DASHBOARD_TABS = [
  *   regular dashboard nav replaces the marketplace (parts-store) nav
  *   there; taps deep-link back to /dashboard/customer?tab=<key>.
  */
-export function DashboardTabBar({ active, onSelect }) {
+export function DashboardTabBar({ active, onSelect, tabs = DASHBOARD_TABS }) {
   const router = useRouter();
   const linkMode = typeof onSelect !== "function";
 
   const handleSelect = (key) => {
     if (linkMode) {
-      router.push(`/dashboard/customer?tab=${key}`);
+      // Tab may define an explicit deep-link path (e.g. mechanic tabs);
+      // default to the customer dashboard deep-link.
+      const tab = tabs.find((t) => t.key === key);
+      router.push(tab?.path || `/dashboard/customer?tab=${key}`);
     } else {
       onSelect(key);
     }
@@ -45,7 +61,7 @@ export function DashboardTabBar({ active, onSelect }) {
       aria-label="Dashboard"
     >
       <div className="flex items-center justify-around h-14 px-1 max-w-lg mx-auto w-full">
-        {DASHBOARD_TABS.map(({ key, icon: Icon, label }) => {
+        {tabs.map(({ key, icon: Icon, label }) => {
           const isActive = active === key;
           return (
             <button

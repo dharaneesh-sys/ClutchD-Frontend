@@ -37,7 +37,12 @@ export default function MechanicDashboard() {
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
   const _hydrated = useAuthStore((s) => s._hydrated);
   const router = useRouter();
-  const [activeTab, setActiveTab] = useState("jobs");
+  const [activeTab, setActiveTab] = useState(() => {
+    // Deep-link support: /dashboard/mechanic?tab=earnings opens that tab.
+    if (typeof window === "undefined") return "jobs";
+    const t = new URLSearchParams(window.location.search).get("tab");
+    return ["jobs", "navigation", "earnings"].includes(t) ? t : "jobs";
+  });
   const [jobsPanelOpen, setJobsPanelOpen] = useState(true);
 
   useEffect(() => {
