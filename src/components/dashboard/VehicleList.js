@@ -102,7 +102,7 @@ function VehicleCard({
         "relative text-left w-full p-5 rounded-2xl border transition-all duration-200",
         "hover-lift active-press",
         isSelected
-          ? "bg-surface-soft border-border-subtle shadow-[0_0_20px_rgba(234,179,8,0.15)]"
+          ? "bg-surface-soft border-border-subtle shadow-[0_0_20px_rgba(30,41,182,0.15)]"
           : "bg-bg-card border-border-subtle hover:bg-surface-soft"
       )}
     >
@@ -144,7 +144,7 @@ function VehicleCard({
 
       {/* Selection dot */}
       {isSelected && (
-        <span className="absolute top-3 right-3 w-3 h-3 rounded-full bg-primary shadow-[0_0_8px_rgba(234,179,8,0.5)]" />
+        <span className="absolute top-3 right-3 w-3 h-3 rounded-full bg-primary shadow-[0_0_8px_rgba(30,41,182,0.5)]" />
       )}
     </button>
   );

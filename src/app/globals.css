@@ -854,10 +854,10 @@ h1, h2, h3, h4 {
   font-size: 0.8125rem;
 }
 .marker-cluster-medium {
-  background-color: rgba(245, 158, 11, 0.2) !important;
+  background-color: rgba(14, 165, 233, 0.2) !important;
 }
 .marker-cluster-medium div {
-  background-color: rgba(245, 158, 11, 0.5) !important;
+  background-color: rgba(14, 165, 233, 0.5) !important;
   color: #fafafa !important;
   font-weight: 600;
   font-size: 0.8125rem;
@@ -880,10 +880,10 @@ h1, h2, h3, h4 {
   color: #171a2e !important;
 }
 :is(.light, [data-theme="light"]) .marker-cluster-medium {
-  background-color: rgba(245, 158, 11, 0.15) !important;
+  background-color: rgba(14, 165, 233, 0.15) !important;
 }
 :is(.light, [data-theme="light"]) .marker-cluster-medium div {
-  background-color: rgba(245, 158, 11, 0.4) !important;
+  background-color: rgba(14, 165, 233, 0.4) !important;
   color: #171a2e !important;
 }
 :is(.light, [data-theme="light"]) .marker-cluster-large {

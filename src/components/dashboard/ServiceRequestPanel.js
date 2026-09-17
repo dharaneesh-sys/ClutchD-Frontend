@@ -301,7 +301,7 @@ export function ServiceRequestPanel({ onSubmit, isLoading, error, onDismissError
                      className={cn(
                        "flex items-center gap-3 p-3 rounded-xl border cursor-pointer transition-all",
                         selectedVehicleId === v.id 
-                          ? "bg-surface-soft border-border-subtle text-text-primary shadow-[0_0_10px_rgba(234,179,8,0.15)]"
+                          ? "bg-surface-soft border-border-subtle text-text-primary shadow-[0_0_10px_rgba(30,41,182,0.15)]"
                           : "bg-bg-card border-border-subtle text-text-muted hover:bg-surface-soft"
                      )}
                    >

@@ -288,7 +288,7 @@ function PaymentModalContent({ isOpen, onClose, amount, pricing, jobId, onSucces
             onClick={() => { setMethod(id); setQrData(null); setPayState("idle"); }}
             className={`flex items-center gap-4 p-3.5 rounded-xl border cursor-pointer transition-all ${
               method === id
-                ? "bg-surface-soft border-border-subtle shadow-[0_0_10px_rgba(234,179,8,0.12)]"
+                ? "bg-surface-soft border-border-subtle shadow-[0_0_10px_rgba(30,41,182,0.12)]"
                 : "bg-bg-card border-border-subtle hover:bg-surface-soft"
             }`}
           >

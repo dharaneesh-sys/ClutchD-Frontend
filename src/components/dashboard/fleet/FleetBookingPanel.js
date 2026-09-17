@@ -147,7 +147,7 @@ export function FleetBookingPanel() {
                 className={cn(
                   "rounded-2xl border transition-all duration-200 overflow-hidden",
                   isSelected
-                    ? "bg-surface-soft border-border-subtle shadow-[0_0_16px_rgba(234,179,8,0.12)]"
+                    ? "bg-surface-soft border-border-subtle shadow-[0_0_16px_rgba(30,41,182,0.12)]"
                     : "bg-bg-card border-border-subtle hover:bg-surface-soft"
                 )}
               >
@@ -293,7 +293,7 @@ export function FleetBookingPanel() {
                     className={cn(
                       "px-2 py-2 rounded-xl border text-xs font-medium transition-all duration-150",
                       selectedTime === slot.value
-                        ? "bg-surface-soft border-border-subtle text-text-primary shadow-[0_0_10px_rgba(234,179,8,0.15)]"
+                        ? "bg-surface-soft border-border-subtle text-text-primary shadow-[0_0_10px_rgba(30,41,182,0.15)]"
                         : "bg-bg-card border-border-subtle text-text-muted hover:bg-surface-soft hover:text-text-primary"
                     )}
                   >

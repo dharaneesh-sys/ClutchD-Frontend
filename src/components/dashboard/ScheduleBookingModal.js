@@ -132,7 +132,7 @@ export function ScheduleBookingModal({ isOpen, onClose, onSubmit, isLoading, veh
                   className={cn(
                     "relative px-3 py-2.5 rounded-xl border text-sm font-medium transition-all duration-150",
                     selectedTime === slot.value
-                      ? "bg-surface-soft border-border-subtle text-text-primary shadow-[0_0_10px_rgba(234,179,8,0.15)]"
+                      ? "bg-surface-soft border-border-subtle text-text-primary shadow-[0_0_10px_rgba(30,41,182,0.15)]"
                       : "bg-bg-card border-border-subtle text-text-muted hover:bg-surface-soft hover:text-text-primary hover:border-border-subtle"
                   )}
                 >

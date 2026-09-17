@@ -189,7 +189,7 @@ export function SignUpCard() {
                 flex flex-col items-center p-3 sm:p-4 rounded-xl border transition-all text-center group
                 ${
                   isSelected
-                    ? "bg-surface-soft border-border-subtle text-text-primary shadow-[0_0_15px_rgba(234,179,8,0.2)]"
+                    ? "bg-surface-soft border-border-subtle text-text-primary shadow-[0_0_15px_rgba(30,41,182,0.2)]"
                     : "bg-bg-card border-border-subtle text-text-muted hover:bg-surface-soft hover:text-text-primary"
                 }
               `}

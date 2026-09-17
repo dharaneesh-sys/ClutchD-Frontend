@@ -105,7 +105,7 @@ function InteractiveStars({ rating, onChange, size = 36 }) {
               className={cn(
                 "transition-all duration-150",
                 active
-                  ? "fill-warning text-icon-highlight drop-shadow-[0_0_8px_rgba(251,191,36,0.5)]"
+                  ? "fill-warning text-icon-highlight drop-shadow-[0_0_8px_rgba(30,41,182,0.5)]"
                   : "fill-white/10 text-white/30 hover:fill-warning/40 hover:text-icon-highlight/40"
               )}
             />
