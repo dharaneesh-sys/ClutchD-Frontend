@@ -13,14 +13,34 @@ export default function ErrorCard({ error, onRetry, className = "" }) {
         </div>
         <h2 className="text-xl font-bold text-[var(--foreground)] mb-2">Something Went Wrong</h2>
         <p className="text-[var(--foreground)]/60 mb-6 text-sm">{message}</p>
-        {onRetry && (
+        <div className="flex flex-wrap justify-center gap-3">
+          {onRetry && (
+            <button
+              onClick={onRetry}
+              className="px-6 py-3 rounded-xl bg-[var(--primary)] hover:opacity-90 text-white font-semibold text-sm transition-all duration-200"
+            >
+              Try Again
+            </button>
+          )}
           <button
-            onClick={onRetry}
-            className="px-6 py-3 rounded-xl bg-[var(--primary)] hover:opacity-90 text-white font-semibold text-sm transition-all duration-200"
+            onClick={() => window.location.assign("/auth")}
+            className="px-6 py-3 rounded-xl border border-[var(--primary)] text-[var(--primary)] font-semibold text-sm transition-all duration-200 hover:bg-[var(--primary)]/10"
           >
-            Try Again
+            Go to Login
           </button>
-        )}
+        </div>
+        <button
+          onClick={() => {
+            try {
+              localStorage.clear();
+              sessionStorage.clear();
+            } catch {}
+            window.location.assign("/auth");
+          }}
+          className="mt-4 text-xs text-[var(--foreground)]/50 underline hover:text-[var(--foreground)]/80 transition-colors"
+        >
+          Clear app data and restart
+        </button>
       </div>
     </div>
   );
