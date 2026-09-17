@@ -100,6 +100,20 @@ export function Modal({
     return () => window.removeEventListener("keydown", handleEsc);
   }, [isOpen, onClose]);
 
+  // Hardware back / gesture: close this modal instead of navigating while
+  // it is open. BackButtonHandler pops the top entry first, so the most
+  // recently opened dialog closes before any page-level back fires.
+  useEffect(() => {
+    if (!isOpen || typeof window === "undefined") return undefined;
+    const stack = (window.__backEscapeStack = window.__backEscapeStack || []);
+    const entry = { close: onClose };
+    stack.push(entry);
+    return () => {
+      const i = stack.indexOf(entry);
+      if (i >= 0) stack.splice(i, 1);
+    };
+  }, [isOpen, onClose]);
+
   if (!isOpen) return null;
 
   const canPortal =

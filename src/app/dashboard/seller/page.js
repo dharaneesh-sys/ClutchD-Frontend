@@ -17,7 +17,6 @@ import { useAuthStore } from "@/store/authStore";
 import { useProductStore } from "@/store/productStore";
 import { DashboardShell } from "@/components/ui/DashboardShell";
 import SplashScreen from "@/components/ui/SplashScreen";
-import { SellerProductForm } from "@/components/marketplace/SellerProductForm";
 import { MyListings } from "@/components/marketplace/MyListings";
 import { NAVIGATION_EVENT } from "@/lib/navigation";
 import { formatCurrency } from "@/lib/utils";
@@ -26,12 +25,10 @@ export default function SellerDashboardPage() {
   const user = useAuthStore((s) => s.user);
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
   const _hydrated = useAuthStore((s) => s._hydrated);
-  const logout = useAuthStore((s) => s.logout);
   const sellerProducts = useProductStore((s) => s.sellerProducts);
   const fetchMyListings = useProductStore((s) => s.fetchMyListings);
   const router = useRouter();
   const [activeTab, setActiveTab] = useState("dashboard");
-  const [sellOpen, setSellOpen] = useState(false);
 
   useEffect(() => {
     if (_hydrated && !isAuthenticated) {
@@ -86,7 +83,7 @@ export default function SellerDashboardPage() {
   const sidebarItems = [
     { icon: LayoutDashboard, label: "Dashboard", onClick: () => setActiveTab("dashboard") },
     { icon: Store, label: "My Listings", onClick: () => setActiveTab("listings") },
-    { icon: Plus, label: "Upload Part", onClick: () => setSellOpen(true) },
+    { icon: Plus, label: "Upload Part", onClick: () => router.push("/dashboard/seller/upload") },
     { icon: ShoppingBag, label: "Parts Store", onClick: () => router.push("/marketplace") },
   ];
 
@@ -112,7 +109,7 @@ export default function SellerDashboardPage() {
               </p>
               <div className="mt-4 flex flex-wrap gap-3">
                 <button
-                  onClick={() => setSellOpen(true)}
+                  onClick={() => router.push("/dashboard/seller/upload")}
                   className="inline-flex items-center gap-2 rounded-2xl bg-primary px-4 py-2.5 text-sm font-semibold text-white transition-all hover:opacity-90"
                 >
                   <Plus size={16} />
@@ -175,7 +172,7 @@ export default function SellerDashboardPage() {
                     Upload your first spare part or accessory to start selling.
                   </p>
                   <button
-                    onClick={() => setSellOpen(true)}
+                    onClick={() => router.push("/dashboard/seller/upload")}
                     className="mt-4 inline-flex items-center gap-2 rounded-2xl bg-primary px-4 py-2.5 text-sm font-semibold text-white transition-all hover:opacity-90"
                   >
                     <Plus size={16} />
@@ -192,47 +189,17 @@ export default function SellerDashboardPage() {
         {activeTab === "listings" && (
           <div className="space-y-4">
             <button
-              onClick={() => setSellOpen(true)}
+              onClick={() => router.push("/dashboard/seller/upload")}
               className="inline-flex items-center gap-2 rounded-2xl bg-primary px-4 py-2.5 text-sm font-semibold text-white transition-all hover:opacity-90"
             >
               <Plus size={16} />
               Upload a part
             </button>
-            <MyListings onAddNew={() => setSellOpen(true)} />
+            <MyListings onAddNew={() => router.push("/dashboard/seller/upload")} />
           </div>
         )}
       </div>
-
-      {/* Upload Part modal */}
-      {sellOpen && (
-        <UploadModal
-          onClose={() => setSellOpen(false)}
-          onSaved={() => {
-            setSellOpen(false);
-            setActiveTab("listings");
-          }}
-        />
-      )}
     </DashboardShell>
-  );
-}
-
-function UploadModal({ onClose, onSaved }) {
-  return (
-    <div
-      className="fixed inset-0 z-[900] flex items-center justify-center bg-black/60 p-4"
-      onClick={onClose}
-      role="dialog"
-      aria-modal="true"
-      aria-label="Upload a part"
-    >
-      <div
-        className="w-full max-w-md max-h-[88dvh] overflow-y-auto rounded-2xl bg-bg-card p-1"
-        onClick={(e) => e.stopPropagation()}
-      >
-        <SellerProductForm onSuccess={onSaved} />
-      </div>
-    </div>
   );
 }
 
