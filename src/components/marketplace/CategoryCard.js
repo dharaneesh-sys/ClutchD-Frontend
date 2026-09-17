@@ -54,7 +54,7 @@ export function CategoryCard({ category, icon, className }) {
 
   return (
     <Link
-      href={`/marketplace/categories/${category.id}`}
+      href={`/marketplace/categories/id?id=${category.id}`}
       className={cn(
         "glass-lux-interactive rounded-2xl p-3.5",
         "flex flex-col items-center gap-2.5 text-center",

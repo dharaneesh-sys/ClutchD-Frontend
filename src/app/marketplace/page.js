@@ -3,7 +3,7 @@
 import { useEffect, useState, useCallback, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { Search, AlertTriangle, RefreshCw, ChevronRight, Plus } from "lucide-react";
+import { Search, X, AlertTriangle, RefreshCw, ChevronRight, Plus } from "lucide-react";
 import { useProductStore } from "@/store/productStore";
 import { useCategoryStore } from "@/store/categoryStore";
 import { CategoryCard } from "@/components/marketplace/CategoryCard";
@@ -191,9 +191,19 @@ export default function MarketplaceHome() {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search products, brands, categories…"
-              className="input-glass pl-9 pr-4 h-11 type-body-2 text-sm"
+              className="input-glass w-full pl-10 pr-10 h-11 type-body-2 text-sm"
               aria-label="Search marketplace"
             />
+            {searchQuery && (
+              <button
+                type="button"
+                onClick={() => setSearchQuery("")}
+                aria-label="Clear search"
+                className="absolute right-3 top-1/2 -translate-y-1/2 p-1 rounded-lg text-muted hover:text-foreground hover:bg-white/10 transition-colors"
+              >
+                <X size={15} />
+              </button>
+            )}
           </div>
         </form>
       </div>

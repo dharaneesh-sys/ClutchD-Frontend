@@ -270,7 +270,9 @@ function SearchPageContent() {
               placeholder="Search products, brands, categories…"
               className={cn(
                 "w-full rounded-2xl border border-border-subtle",
-                "bg-white/5 pl-11 pr-10 py-3 text-sm text-foreground",
+                // pl-11 clears the left icon; pr-11 reserves room for the X
+                // button so icon and clear control never overlap.
+                "bg-white/5 pl-11 pr-11 py-3 text-sm text-foreground",
                 "placeholder:text-text-dim",
                 "focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20",
                 "transition-all"

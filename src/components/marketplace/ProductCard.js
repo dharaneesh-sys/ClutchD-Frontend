@@ -91,8 +91,8 @@ export function ProductCard({ product, className }) {
     <div
       role="button"
       tabIndex={0}
-      onClick={() => router.push(`/marketplace/product/${id}`)}
-      onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); router.push(`/marketplace/product/${id}`); }}}
+      onClick={() => router.push(`/marketplace/product/id?id=${id}`)}
+      onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); router.push(`/marketplace/product/id?id=${id}`); }}}
       className={cn(
         "glass-lux-interactive group rounded-2xl overflow-hidden cursor-pointer",
         "hover-lift active-press",
@@ -100,7 +100,7 @@ export function ProductCard({ product, className }) {
       )}
     >
       {/* Clickable image section */}
-      <Link href={`/marketplace/product/${id}`}>
+      <Link href={`/marketplace/product/id?id=${id}`}>
         <div className="relative">
           <ProductImage
             src={image}
@@ -156,7 +156,7 @@ export function ProductCard({ product, className }) {
         </div>
 
         {/* Clickable product name */}
-        <Link href={`/marketplace/product/${id}`}>
+        <Link href={`/marketplace/product/id?id=${id}`}>
           <h3 className="text-sm font-semibold leading-snug text-foreground line-clamp-2 group-hover:text-primary-light transition-colors">
             {name}
           </h3>

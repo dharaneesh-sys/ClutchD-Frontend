@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, Suspense } from "react";
+import { useSearchParams } from "next/navigation";
 import { PackageSearch, ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import { useProductStore } from "@/store/productStore";
@@ -81,7 +82,10 @@ function CategoryProductsSkeleton() {
 
 // ─── Page ─────────────────────────────────────────────────────────────
 
-export default function CategoryProductsClient({ id }) {
+export default function CategoryProductsClient({ id: idProp }) {
+  const searchParams = useSearchParams();
+  // Id comes from ?id= (static-export safe) with prop fallback for tests.
+  const id = idProp || searchParams.get("id");
   const { products, isLoading, fetchProducts } = useProductStore();
   const { categories, fetchCategories } = useCategoryStore();
 
@@ -173,5 +177,17 @@ export default function CategoryProductsClient({ id }) {
         </>
       )}
     </div>
+  );
+}
+
+/**
+ * Exported wrapper: useSearchParams requires a Suspense boundary during
+ * static-export prerendering.
+ */
+export function CategoryProductsWithParams(props) {
+  return (
+    <Suspense fallback={<CategoryProductsSkeleton />}>
+      <CategoryProductsClient {...props} />
+    </Suspense>
   );
 }

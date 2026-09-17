@@ -158,7 +158,7 @@ export default function FavoritesPage() {
   const handleMoveToCart = useCallback(
     (productId) => {
       // Navigate to product detail page; user can add to cart from there
-      router.push(`/marketplace/product/${productId}`);
+      router.push(`/marketplace/product/id?id=${productId}`);
       toast.success("Opening product...");
     },
     [router, toast]

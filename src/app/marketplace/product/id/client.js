@@ -1,7 +1,8 @@
 'use client';
 
-import { useEffect, useState, useMemo, useCallback } from 'react';
+import { useEffect, useState, useMemo, useCallback, Suspense } from 'react';
 import Link from 'next/link';
+import { useSearchParams } from 'next/navigation';
 import {
   ArrowLeft,
   Truck,
@@ -72,7 +73,11 @@ function ProductDetailSkeleton() {
  *  Main Page Component
  * ────────────────────────────────────────────────────────────── */
 
-export default function ProductDetailClient({ id }) {
+export default function ProductDetailClient({ id: idProp }) {
+  const searchParams = useSearchParams();
+  // Id comes from ?id= (static-export safe) with prop fallback for tests.
+  const id = idProp || searchParams.get('id');
+
   const {
     products,
     isLoading,
@@ -466,3 +471,16 @@ export default function ProductDetailClient({ id }) {
     </div>
   );
 }
+
+/**
+ * Exported wrapper: useSearchParams requires a Suspense boundary during
+ * static-export prerendering.
+ */
+export function ProductDetailWithParams(props) {
+  return (
+    <Suspense fallback={<ProductDetailSkeleton />}>
+      <ProductDetailClient {...props} />
+    </Suspense>
+  );
+}
+
