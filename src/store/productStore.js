@@ -16,7 +16,7 @@ const INITIAL_FILTERS = {
 
 const SELLER_STORAGE_KEY = "seller-products";
 // Dedicated seller role first-class; mechanic/garage keep their legacy selling ability.
-export const SELLER_ROLES = ["seller", "mechanic", "garage"];
+export const SELLER_ROLES = ["seller", "admin"];
 
 /** Load seller listings from localStorage (SSR-safe). Offline fallback only. */
 function loadSellerProducts() {

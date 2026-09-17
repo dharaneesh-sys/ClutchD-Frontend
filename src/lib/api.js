@@ -146,7 +146,9 @@ api.interceptors.response.use(
 // Registered last so it runs BEFORE the 429 and 401 handlers. Only handles errors
 // those two ignore: no response at all (timeout/DNS/reset) or retryable 5xx/408.
 // Retries idempotent requests (GET/HEAD or __isRetryable) with backoff, max 3.
-// Non-idempotent requests (POST/PUT/PATCH/DELETE) are never auto-retried.
+// Non-idempotent requests (POST/PUT/PATCH/DELETE) are never auto-retried unless
+// the call site marks them __isRetryable (safe when a repeat can't double-charge
+// or double-create — e.g. Google OAuth verify, which only exchanges a token).
 const NETWORK_RETRYABLE_STATUS = new Set([408, 425, 500, 502, 503, 504]);
 const MAX_NETWORK_RETRIES = 3;
 const NETWORK_RETRY_BASE_MS = 1500;

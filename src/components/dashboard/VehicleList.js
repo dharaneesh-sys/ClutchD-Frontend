@@ -6,7 +6,6 @@ import { Button } from "@/components/ui/Button";
 import { Badge } from "@/components/ui/Badge";
 import { VehicleManagerModal } from "@/components/dashboard/VehicleManagerModal";
 import { cacheVehicleData, getCachedVehicles } from "@/lib/offline/offlineCache";
-import { checkMaintenance } from "@/lib/maintenance/reminderEngine";
 import {
   Car,
   Plus,
@@ -85,31 +84,15 @@ function VehicleCard({
   vehicle,
   isSelected,
   lastServiceDate,
-  maintenanceServices,
   onSelect,
 }) {
-  const overdueCount = maintenanceServices?.filter(
-    (s) => s.status === "overdue"
-  ).length;
-  const dueSoonCount = maintenanceServices?.filter(
-    (s) => s.status === "due_soon"
-  ).length;
+  const statusIcon = (
+    <CheckCircle2 size={14} className="text-green-400 shrink-0" />
+  );
 
-  const statusIcon =
-    overdueCount > 0 ? (
-      <AlertTriangle size={14} className="text-red-400 shrink-0" />
-    ) : dueSoonCount > 0 ? (
-      <Clock size={14} className="text-warning shrink-0" />
-    ) : (
-      <CheckCircle2 size={14} className="text-green-400 shrink-0" />
-    );
-
-  const statusText =
-    overdueCount > 0
-      ? `${overdueCount} maintenance ${overdueCount === 1 ? "item" : "items"} overdue`
-      : dueSoonCount > 0
-        ? `${dueSoonCount} maintenance ${dueSoonCount === 1 ? "item" : "items"} due soon`
-        : "Up to date";
+  const statusText = lastServiceDate
+    ? "Serviced recently"
+    : "No service history yet";
 
   return (
     <button
@@ -267,14 +250,6 @@ export function VehicleList() {
     [allJobs]
   );
 
-  const maintenanceMap = useMemo(() => {
-    const map = {};
-    for (const v of vehicles) {
-      map[v.id] = checkMaintenance(v);
-    }
-    return map;
-  }, [vehicles]);
-
   /* ── Loading state ──────────────────────────────────────────── */
   if (loading) {
     return (
@@ -331,7 +306,6 @@ export function VehicleList() {
             vehicle={v}
             isSelected={selectedVehicleId === v.id}
             lastServiceDate={getLastServiceDate(v.id)}
-            maintenanceServices={maintenanceMap[v.id]}
             onSelect={() =>
               setSelectedVehicleId(
                 selectedVehicleId === v.id ? null : v.id

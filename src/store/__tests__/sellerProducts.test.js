@@ -125,15 +125,14 @@ describe("sellerProducts (backend-backed)", () => {
       expect(useProductStore.getState().getProductById(product.id)).toEqual(product);
     });
 
-    it("works for legacy mechanic and garage sellers", async () => {
+    it("blocks legacy mechanic and garage roles from selling", async () => {
       useAuthStore.setState({ user: MECHANIC });
-      mockPost.mockResolvedValueOnce({ data: { ...backendProduct, vendor: "Manny" } });
-      expect(await useProductStore.getState().addSellerProduct(draft)).not.toBeNull();
+      await expect(useProductStore.getState().addSellerProduct(draft)).resolves.toBeNull();
+      expect(mockPost).not.toHaveBeenCalled();
 
-      resetAll();
       useAuthStore.setState({ user: GARAGE });
-      mockPost.mockResolvedValueOnce({ data: { ...backendProduct, vendor: "Joe Motors" } });
-      expect(await useProductStore.getState().addSellerProduct(draft)).not.toBeNull();
+      await expect(useProductStore.getState().addSellerProduct(draft)).resolves.toBeNull();
+      expect(mockPost).not.toHaveBeenCalled();
     });
 
     it("shows a backend error and does not list when the API rejects", async () => {

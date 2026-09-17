@@ -13,7 +13,6 @@ import { ServiceRequestPanel } from "@/components/dashboard/ServiceRequestPanel"
 import { ServiceStatusTracker } from "@/components/dashboard/ServiceStatusTracker";
 import { ETAIndicator } from "@/components/dashboard/ETAIndicator";
 import { ProviderList } from "@/components/dashboard/ProviderList";
-import { MaintenanceAlertBanner } from "@/components/dashboard/MaintenanceAlertBanner";
 import { PaymentModal } from "@/components/dashboard/PaymentModal";
 import { ReviewModal } from "@/components/dashboard/ReviewModal";
 import { NotificationBell } from "@/components/ui/NotificationBell";
@@ -321,7 +320,6 @@ export default function CustomerDashboard() {
       hasBottomNav
     >
 
-      <MaintenanceAlertBanner />
 
       {activeTab === "schedule" ? (
         <div className="flex-1 pb-4 lg:pb-6">

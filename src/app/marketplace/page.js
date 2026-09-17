@@ -62,7 +62,7 @@ export default function MarketplaceHome() {
   const [searchQuery, setSearchQuery] = useState("");
   const [sellOpen, setSellOpen] = useState(false);
   const role = useAuthStore((s) => s.user?.role);
-  const canSell = role === "seller" || role === "mechanic" || role === "garage";
+  const canSell = role === "seller" || role === "admin";
 
   const {
     products,
