@@ -83,7 +83,29 @@ function localListing(user, data) {
   };
 }
 
-const SELLER_BLOCKED_MSG = "Only sellers, mechanics and garages can sell parts.";
+/**
+ * Human-readable message from an axios error. FastAPI validation errors
+ * (422) return `detail` as an array of { loc, msg } objects — join them
+ * so the seller sees the actual reason instead of a generic fallback.
+ */
+function extractApiError(error, fallback) {
+  const detail = error?.response?.data?.detail;
+  if (typeof detail === "string" && detail.trim()) return detail;
+  if (Array.isArray(detail) && detail.length > 0) {
+    const parts = detail
+      .map((d) => {
+        const field = Array.isArray(d.loc) ? d.loc[d.loc.length - 1] : null;
+        const msg = typeof d.msg === "string" ? d.msg.replace(/^Value error,\s*/i, "") : "";
+        return field && msg && !msg.includes(field) ? `${field}: ${msg}` : msg || field;
+      })
+      .filter(Boolean);
+    if (parts.length > 0) return parts.join("; ");
+  }
+  if (detail && typeof detail === "object" && typeof detail.msg === "string") return detail.msg;
+  return fallback;
+}
+
+const SELLER_BLOCKED_MSG = "Only sellers can upload and sell parts.";
 
 const initialState = {
   sellerProducts: loadSellerProducts(),
@@ -244,8 +266,7 @@ export const useProductStore = create(
           return product;
         } catch (error) {
           if (error.response) {
-            const msg = error.response.data?.detail || "Could not list the part. Please try again.";
-            useToastStore.getState().error(typeof msg === "string" ? msg : "Could not list the part. Please try again.");
+            useToastStore.getState().error(extractApiError(error, "Could not list the part. Please try again."));
             return null;
           }
           // Server unreachable — offline fallback keeps the listing locally.
@@ -319,7 +340,7 @@ export const useProductStore = create(
           return updated;
         } catch (error) {
           if (error.response) {
-            const msg = error.response.data?.detail || "Could not update the listing.";
+            const msg = extractApiError(error, "Could not update the listing.");
             useToastStore.getState().error(typeof msg === "string" ? msg : "Could not update the listing.");
             return null;
           }
@@ -375,7 +396,7 @@ export const useProductStore = create(
           return true;
         } catch (error) {
           if (error.response) {
-            const msg = error.response.data?.detail || "Could not remove the listing.";
+            const msg = extractApiError(error, "Could not remove the listing.");
             useToastStore.getState().error(typeof msg === "string" ? msg : "Could not remove the listing.");
             return false;
           }

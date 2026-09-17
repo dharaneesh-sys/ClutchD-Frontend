@@ -115,7 +115,10 @@ export const PRODUCT_IMAGE_MAX_MB = 5;
 
 export const productSchema = z.object({
   name: z.string().min(3, "Enter a part name (min 3 chars)"),
-  price: z.coerce.number({ required_error: "Enter a price" }).min(0, "Price cannot be negative"),
+  // z.coerce turns "" into 0 silently — require a real price above zero.
+  price: z.coerce
+    .number({ required_error: "Enter a price", invalid_type_error: "Enter a valid number" })
+    .positive("Enter a price greater than 0"),
   brand: z.string().optional(),
   category: z.string().optional(),
   description: z.string().min(10, "Describe the part (min 10 chars)"),

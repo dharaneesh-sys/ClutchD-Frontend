@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Pencil, Trash2, Power, Package } from "lucide-react";
 import { cn, formatCurrency } from "@/lib/utils";
 import { useProductStore } from "@/store/productStore";

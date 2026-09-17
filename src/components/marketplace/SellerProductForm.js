@@ -29,9 +29,13 @@ function readAsDataURL(file) {
 }
 
 async function resolveImageUrl(file) {
-  // Backend-first (FormData POST /uploads precedent: serviceStore, ChatPanel),
-  // local data-URL fallback per docs/BACKEND_CONTRACTS.md migration rule.
-  if (BackendHealth.isAvailable() === true) {
+  // Backend-first (FormData POST /uploads precedent: serviceStore, ChatPanel).
+  // A data-URL fallback is ONLY valid in true-offline mode (local-only listing):
+  // the API requires an upload/http URL (≤500 chars), so a base64 blob would be
+  // rejected with a 422 the seller can't decipher. If the backend is reachable
+  // but the upload fails, fail loudly with an actionable message instead.
+  const offline = BackendHealth.isAvailable() === false || navigator.onLine === false;
+  if (!offline) {
     try {
       const formData = new FormData();
       formData.append("file", file);
@@ -44,8 +48,11 @@ async function resolveImageUrl(file) {
       });
       const url = res.data?.url || res.data?.imageUrl;
       if (typeof url === "string" && url.length > 0) return url;
-    } catch {
-      // Fall through to local data URL
+      throw new Error("Photo upload failed. Please try again.");
+    } catch (err) {
+      throw new Error(
+        "Photo upload failed — check your connection and try again."
+      );
     }
   }
   return readAsDataURL(file);
@@ -132,11 +139,12 @@ export function SellerProductForm({ initialProduct = null, onSuccess }) {
       setImageUrl(url);
       setValue("image", url, { shouldValidate: true });
       clearErrors("image");
-    } catch {
+    } catch (err) {
       setPickedFile(null);
       setError("image", {
         type: "validate",
-        message: "Could not read image. Try another file.",
+        message:
+          err?.message || "Could not read image. Try another file.",
       });
     } finally {
       setUploading(false);
@@ -145,7 +153,7 @@ export function SellerProductForm({ initialProduct = null, onSuccess }) {
 
   const onSubmit = async (data) => {
     if (!SELLER_ROLES.includes(role)) {
-      useToastStore.getState().error("Only sellers, mechanics and garages can sell parts.");
+      useToastStore.getState().error("Only sellers can upload and sell parts.");
       return;
     }
     const payload = { ...data, price: Number(data.price) };
