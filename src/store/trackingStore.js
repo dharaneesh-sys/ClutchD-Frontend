@@ -210,9 +210,9 @@ export const useTrackingStore = create((set, get) => ({
         nearbyGarages: toCamelCase(data.garages || []),
       });
     } catch (err) {
+      // Keep the last good lists — a transient failure (poll or GPS-jitter
+      // refetch) must not blank the map. Only surface the error.
       set({
-        nearbyMechanics: [],
-        nearbyGarages: [],
         error:
           err.response?.data?.message ||
           "Couldn't load nearby professionals. Check your connection and try again.",

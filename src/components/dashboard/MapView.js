@@ -142,7 +142,7 @@ function MechanicPopupContent({ name, rating, subtitle }) {
   return (
     <div className="map-popup-glass">
       <div className="map-popup-name">{name}</div>
-      {rating != null && (
+      {rating ? (
         <div className="map-popup-rating">
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -156,6 +156,8 @@ function MechanicPopupContent({ name, rating, subtitle }) {
           </svg>
           <span>{rating}</span>
         </div>
+      ) : (
+        <div className="map-popup-rating"><span className="map-popup-new">New</span></div>
       )}
       {subtitle && <div className="map-popup-subtitle">{subtitle}</div>}
     </div>
@@ -186,6 +188,16 @@ export default function MapView({ role = "customer" }) {
     }, 0);
     return () => clearTimeout(timer);
   }, [fetchNearbyProviders, requestGPSLocation]);
+
+  // Periodic refresh: new mechanics/garages that check in nearby appear on the
+  // map within 45s even when the customer isn't moving. The store's 30s
+  // sessionStorage cache + 2s debounce keep this cheap on the funnel.
+  useEffect(() => {
+    const interval = setInterval(() => {
+      fetchNearbyProviders();
+    }, 45000);
+    return () => clearInterval(interval);
+  }, [fetchNearbyProviders]);
 
   const [routePath, setRoutePath] = useState(null);
   const [routeDistance, setRouteDistance] = useState(null);

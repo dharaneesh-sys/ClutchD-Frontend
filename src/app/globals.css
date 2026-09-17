@@ -841,6 +841,7 @@ h1, h2, h3, h4 {
 
 :is(.light, [data-theme="light"]) .map-popup-name { color: #171a2e; }
 :is(.light, [data-theme="light"]) .map-popup-rating span { color: rgba(130,130,130,0.7); }
+.map-popup-new { font-weight: 500; letter-spacing: 0.02em; }
 :is(.light, [data-theme="light"]) .map-popup-subtitle { color: rgba(130,130,130,0.7); }
 
 /* ─── Marker Cluster Overrides (dark theme) ────────────────────────────── */

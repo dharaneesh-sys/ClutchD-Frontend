@@ -96,9 +96,15 @@ export function ProviderList() {
               <h4 className="font-bold truncate text-text-primary">
                 {provider.name}
               </h4>
-              <div className="flex items-center gap-1 text-sm font-medium text-warning flex-shrink-0 ml-2">
-                <Star size={14} fill="currentColor" />
-                {provider.rating}
+              <div className="flex items-center gap-1 text-sm font-medium flex-shrink-0 ml-2 text-warning">
+                {provider.rating != null ? (
+                  <>
+                    <Star size={14} fill="currentColor" />
+                    {provider.rating}
+                  </>
+                ) : (
+                  <span className="text-xs text-text-muted">New</span>
+                )}
               </div>
             </div>
             
