@@ -15,7 +15,7 @@ const COLORS = {
   red:    { fill: "#ef4444", stroke: "#dc2626", glow: "rgba(239, 68, 68, 0.35)" },
   green:  { fill: "#22c55e", stroke: "#16a34a", glow: "rgba(34, 197, 94, 0.35)" },
   violet: { fill: "#8b5cf6", stroke: "#7c3aed", glow: "rgba(139, 92, 246, 0.35)" },
-  orange: { fill: "#f59e0b", stroke: "#d97706", glow: "rgba(245, 158, 11, 0.35)" },
+  orange: { fill: "#0ea5e9", stroke: "#0284c7", glow: "rgba(14, 165, 233, 0.35)" },
   emerald:{ fill: "#4aa5f5", stroke: "#2e8ce0", glow: "rgba(74, 165, 245, 0.35)" },
   // Brand pin (indigo rebrand) — distinct from functional warning/orange above
   brand:  { fill: brandPinFill, stroke: "#1a2490", glow: "rgba(30, 41, 182, 0.35)" },
@@ -28,7 +28,7 @@ function pinSVG(colorKey, innerHTML = "") {
                  colorKey === "red"    ? "white" :
                  colorKey === "green"  ? "white" :
                  colorKey === "violet" ? "white" :
-                 colorKey === "orange" ? "#1c1917" : "white";
+                 colorKey === "orange" ? "white" : "white";
   return `
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 28 44" width="28" height="44">
       <defs>
@@ -158,7 +158,7 @@ export function createGarageIcon() {
 export function createTargetIcon() {
   return L.divIcon({
     className: "marker-custom",
-    html: pinSVG("orange", targetIcon("#1c1917")),
+    html: pinSVG("orange", targetIcon("#ffffff")),
     iconSize: [28, 44],
     iconAnchor: [14, 44],
     popupAnchor: [0, -44],

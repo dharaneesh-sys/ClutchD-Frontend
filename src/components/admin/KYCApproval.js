@@ -266,7 +266,7 @@ export function KYCApproval() {
                   )}
 
                   {app.kycNote && (
-                    <p className="text-xs text-amber-300/90 bg-amber-500/10 border border-amber-500/25 rounded-lg px-3 py-2 mb-4">
+                    <p className="text-xs text-blue-300/90 bg-blue-500/10 border border-blue-500/25 rounded-lg px-3 py-2 mb-4">
                       <span className="font-medium">Previous review note:</span> {app.kycNote}
                     </p>
                   )}
@@ -315,7 +315,7 @@ export function KYCApproval() {
             </p>
 
             {reviewModal.action === "reject" && (
-              <div className="mb-4 flex items-start gap-2 text-xs text-amber-300/90 bg-amber-500/10 border border-amber-500/25 rounded-lg px-3 py-2">
+              <div className="mb-4 flex items-start gap-2 text-xs text-blue-300/90 bg-blue-500/10 border border-blue-500/25 rounded-lg px-3 py-2">
                 <AlertTriangle size={14} className="shrink-0 mt-0.5" />
                 <span>The provider will see your note and can resubmit documents from their profile.</span>
               </div>

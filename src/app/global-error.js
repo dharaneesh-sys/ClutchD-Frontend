@@ -15,12 +15,12 @@ export default function GlobalError({ error, reset }) {
             __html: `
               (function() {
                 var t = localStorage.getItem('clutchd_theme');
-                var d = t === 'light' ? '#fffbff' : '#0a0a0a';
-                var f = t === 'light' ? '#1c1b1f' : '#fff';
+                var d = t === 'light' ? '#fdfdff' : '#0a0a0a';
+                var f = t === 'light' ? '#171a2e' : '#fff';
                 var p = '#4aa5f5';
                 if (!t) {
                   var m = window.matchMedia('(prefers-color-scheme: light)');
-                  if (m.matches) { d = '#fffbff'; f = '#1c1b1f'; }
+                  if (m.matches) { d = '#fdfdff'; f = '#171a2e'; }
                 }
                 document.body.style.background = d;
                 document.body.style.color = f;
