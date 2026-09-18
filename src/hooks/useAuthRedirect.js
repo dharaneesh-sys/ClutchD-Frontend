@@ -3,8 +3,9 @@
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAuthStore } from "@/store/authStore";
+import { isFleetPersona } from "@/lib/persona";
 
-const KNOWN_ROLES = new Set(["customer", "mechanic", "garage"]);
+const KNOWN_ROLES = new Set(["customer", "mechanic", "garage", "seller"]);
 
 /**
  * Send already-authenticated users straight to their dashboard.
@@ -22,6 +23,12 @@ export function useAuthRedirect() {
   useEffect(() => {
     if (!hydrated || restoring) return;
     if (!isAuthenticated || !user?.id) return;
+    // Fleet persona (login chip) wins over the backend's customer role —
+    // fleet accounts ARE customer-role on the backend by design.
+    if (isFleetPersona()) {
+      router.replace("/dashboard/fleet");
+      return;
+    }
     const dest =
       user.role === "admin"
         ? "/admin"

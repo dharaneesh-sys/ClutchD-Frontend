@@ -3,7 +3,7 @@
 import { useRouter } from "next/navigation";
 import {
   Wrench, Calendar, Car, ShoppingBag, History,
-  Briefcase, MapPin, DollarSign, LayoutDashboard, Users, BarChart3,
+  Briefcase, MapPin, DollarSign, LayoutDashboard, Users, BarChart3, Plus,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -31,6 +31,15 @@ export const GARAGE_TABS = [
   { key: "profile", icon: Users, label: "Garage Profile", path: "/dashboard/garage?tab=profile" },
   { key: "analytics", icon: BarChart3, label: "Analytics", path: "/dashboard/garage?tab=analytics" },
   { key: "store", icon: ShoppingBag, label: "Parts Store", path: "/marketplace" },
+];
+
+/** Seller's tabs — so sellers keep their own dashboard nav on profile pages
+ *  (instead of the marketplace Parts Store nav). */
+export const SELLER_TABS = [
+  { key: "dashboard", icon: LayoutDashboard, label: "Dashboard", path: "/dashboard/seller?tab=dashboard" },
+  { key: "listings", icon: ShoppingBag, label: "My Listings", path: "/dashboard/seller?tab=listings" },
+  { key: "sales", icon: BarChart3, label: "Sales", path: "/dashboard/seller?tab=sales" },
+  { key: "upload", icon: Plus, label: "Upload", path: "/dashboard/seller/upload" },
 ];
 
 /**

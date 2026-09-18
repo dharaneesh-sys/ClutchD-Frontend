@@ -6,7 +6,7 @@ import { Logo } from "@/components/ui/Logo";
 import { ConnectionIndicator } from "@/components/ui/ConnectionIndicator";
 import { NotificationBell } from "@/components/ui/NotificationBell";
 import { useRouter } from "next/navigation";
-import { User, Building2, Wrench, Truck, Gift, Menu, X } from "lucide-react";
+import { User, Building2, Wrench, Truck, Gift, Menu, X, Store } from "lucide-react";
 import { SubscriptionBadge } from "@/components/subscription/SubscriptionBadge";
 
 const MODE_CONFIG = {
@@ -20,6 +20,13 @@ const MODE_CONFIG = {
   garage: {
     icon: Building2,
     label: "Business Mode",
+    color: "primary",
+    textClass: "text-[#1E29B6] dark:text-blue-300",
+    avatarClass: "bg-[#1E29B6]/15 dark:bg-blue-500/20 border border-[#1E29B6]/30 text-[#1E29B6] dark:text-blue-300",
+  },
+  seller: {
+    icon: Store,
+    label: "Seller Mode",
     color: "primary",
     textClass: "text-[#1E29B6] dark:text-blue-300",
     avatarClass: "bg-[#1E29B6]/15 dark:bg-blue-500/20 border border-[#1E29B6]/30 text-[#1E29B6] dark:text-blue-300",

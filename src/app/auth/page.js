@@ -5,7 +5,15 @@ import { LoginCard } from "@/components/auth/LoginCard";
 import { SignUpCard } from "@/components/auth/SignUpCard";
 import { useAuthRedirect } from "@/hooks/useAuthRedirect";
 export default function AuthPage() {
-  const [isLoginView, setIsLoginView] = useState(true);
+  // /auth?mode=signup opens the sign-up view directly — used by the
+  // "Create an account" action on the login card after a 404 (unknown email).
+  // Read at mount only: the primary toggle path is the onNeedSignUp callback,
+  // so no Suspense-wrapped useSearchParams is needed (static-export safe).
+  const [isLoginView, setIsLoginView] = useState(() => {
+    if (typeof window === "undefined") return true;
+    return new URLSearchParams(window.location.search).get("mode") !== "signup";
+  });
+
   useAuthRedirect();
 
   return (
@@ -50,7 +58,7 @@ export default function AuthPage() {
         <div className="order-1 lg:order-2 flex flex-col items-center lg:items-end w-full">
           <div className="w-full flex justify-center lg:justify-end">
             {isLoginView ? (
-              <LoginCard />
+              <LoginCard onNeedSignUp={setIsLoginView} />
             ) : (
               <SignUpCard />
             )}

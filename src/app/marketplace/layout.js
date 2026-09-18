@@ -5,7 +5,7 @@ import { usePathname } from "next/navigation";
 import { useRouter } from "next/navigation";
 import { ArrowLeft } from "lucide-react";
 import { BottomNav } from "@/components/ui/BottomNav";
-import { DashboardTabBar, MECHANIC_TABS, GARAGE_TABS } from "@/components/dashboard/DashboardTabBar";
+import { DashboardTabBar, MECHANIC_TABS, GARAGE_TABS, SELLER_TABS } from "@/components/dashboard/DashboardTabBar";
 import { useAuthStore } from "@/store/authStore";
 import { NAVIGATION_EVENT } from "@/lib/navigation";
 
@@ -20,6 +20,7 @@ export default function MarketplaceLayout({ children }) {
   const isCustomer = user?.role === "customer";
   const isMechanic = user?.role === "mechanic" || user?.role === "admin";
   const isGarage = user?.role === "garage";
+  const isSeller = user?.role === "seller";
 
   // Listen for navigation events from non-React contexts (e.g., axios interceptors)
   useEffect(() => {
@@ -59,6 +60,8 @@ export default function MarketplaceLayout({ children }) {
         <DashboardTabBar tabs={MECHANIC_TABS} />
       ) : onProfileRoute && isGarage ? (
         <DashboardTabBar tabs={GARAGE_TABS} />
+      ) : onProfileRoute && isSeller ? (
+        <DashboardTabBar tabs={SELLER_TABS} />
       ) : (
         <BottomNav />
       )}

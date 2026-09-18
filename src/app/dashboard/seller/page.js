@@ -7,19 +7,22 @@ import {
   Store,
   ShoppingBag,
   Plus,
-  LogOut,
   Package,
   IndianRupee,
   Star,
   TrendingUp,
+  ReceiptText,
 } from "lucide-react";
 import { useAuthStore } from "@/store/authStore";
 import { useProductStore } from "@/store/productStore";
 import { DashboardShell } from "@/components/ui/DashboardShell";
 import SplashScreen from "@/components/ui/SplashScreen";
 import { MyListings } from "@/components/marketplace/MyListings";
+import { SalesList } from "@/components/marketplace/SalesList";
 import { NAVIGATION_EVENT } from "@/lib/navigation";
 import { formatCurrency } from "@/lib/utils";
+
+const VALID_TABS = ["dashboard", "listings", "sales"];
 
 export default function SellerDashboardPage() {
   const user = useAuthStore((s) => s.user);
@@ -27,8 +30,14 @@ export default function SellerDashboardPage() {
   const _hydrated = useAuthStore((s) => s._hydrated);
   const sellerProducts = useProductStore((s) => s.sellerProducts);
   const fetchMyListings = useProductStore((s) => s.fetchMyListings);
+  const fetchSellerSales = useProductStore((s) => s.fetchSellerSales);
   const router = useRouter();
-  const [activeTab, setActiveTab] = useState("dashboard");
+  // Deep-link support: /dashboard/seller?tab=sales opens that tab.
+  const [activeTab, setActiveTab] = useState(() => {
+    if (typeof window === "undefined") return "dashboard";
+    const t = new URLSearchParams(window.location.search).get("tab");
+    return VALID_TABS.includes(t) ? t : "dashboard";
+  });
 
   useEffect(() => {
     if (_hydrated && !isAuthenticated) {
@@ -59,8 +68,9 @@ export default function SellerDashboardPage() {
   useEffect(() => {
     if (_hydrated && isAuthenticated) {
       fetchMyListings();
+      fetchSellerSales();
     }
-  }, [_hydrated, isAuthenticated, fetchMyListings]);
+  }, [_hydrated, isAuthenticated, fetchMyListings, fetchSellerSales]);
 
   const stats = useMemo(() => {
     const total = sellerProducts.length;
@@ -83,6 +93,7 @@ export default function SellerDashboardPage() {
   const sidebarItems = [
     { icon: LayoutDashboard, label: "Dashboard", onClick: () => setActiveTab("dashboard") },
     { icon: Store, label: "My Listings", onClick: () => setActiveTab("listings") },
+    { icon: ReceiptText, label: "Sales", onClick: () => setActiveTab("sales") },
     { icon: Plus, label: "Upload Part", onClick: () => router.push("/dashboard/seller/upload") },
     { icon: ShoppingBag, label: "Parts Store", onClick: () => router.push("/marketplace") },
   ];
@@ -92,7 +103,7 @@ export default function SellerDashboardPage() {
       title="Seller Dashboard"
       subtitle="Seller Mode"
       user={user}
-      mode="customer"
+      mode="seller"
       sidebar={sidebarItems}
     >
       <div className="flex-1 pb-4 lg:pb-6">
@@ -198,6 +209,8 @@ export default function SellerDashboardPage() {
             <MyListings onAddNew={() => router.push("/dashboard/seller/upload")} />
           </div>
         )}
+
+        {activeTab === "sales" && <SalesList />}
       </div>
     </DashboardShell>
   );

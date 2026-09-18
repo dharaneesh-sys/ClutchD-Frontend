@@ -26,6 +26,15 @@ export function SignUpCard() {
   const authError = useAuthStore((s) => s.error);
   const router = useRouter();
 
+  // Consume the login-card handoff email once — it shouldn't leak into
+  // later visits to the sign-up view.
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    try {
+      sessionStorage.removeItem("clutchd-signup-email");
+    } catch {}
+  }, []);
+
   const ROLES = [
     { id: "customer", label: "Customer", icon: UserCircle, desc: "Need repairs" },
     { id: "mechanic", label: "Mechanic", icon: Wrench, desc: "Provide services" },
@@ -53,7 +62,14 @@ export function SignUpCard() {
     formState: { errors },
   } = useForm({
     resolver: zodResolver(schemas[selectedRole]),
-    defaultValues: { role: selectedRole }
+    defaultValues: {
+      role: selectedRole,
+      // Prefill from a "Create an account" handoff on the login card
+      // (unknown-email 404), so the user doesn't retype it.
+      ...(typeof window !== "undefined"
+        ? { email: sessionStorage.getItem("clutchd-signup-email") || "" }
+        : {}),
+    },
   });
 
   const onSubmit = async (data) => {

@@ -3,6 +3,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { loginSchema } from "@/lib/validators";
 import { useAuthStore } from "@/store/authStore";
+import { setFleetPersona } from "@/lib/persona";
 import { Mail, Lock, LogIn, UserCircle, Wrench, Building2, Truck, Store } from "lucide-react";
 import { GlassCard } from "@/components/ui/GlassCard";
 import { Button } from "@/components/ui/Button";
@@ -11,11 +12,14 @@ import api from "@/lib/api";
 
 import { useRouter } from "next/navigation";
 
-export function LoginCard() {
+export function LoginCard({ onNeedSignUp }) {
   const login = useAuthStore((s) => s.login);
   const loginWithGoogle = useAuthStore((s) => s.loginWithGoogle);
   const loginWithGoogleCapacitor = useAuthStore((s) => s.loginWithGoogleCapacitor);
   const authError = useAuthStore((s) => s.error);
+  const signupNeeded = useAuthStore((s) => s._signupNeeded);
+  // Remembers the email last submitted so "Create an account" can prefill it.
+  const lastLoginEmail = useRef("");
   const router = useRouter();
   const setRememberMe = useAuthStore((s) => s.setRememberMe);
   const [rememberMe, setRememberMeChecked] = useState(true);
@@ -46,9 +50,13 @@ export function LoginCard() {
 
   const onSubmit = async (data) => {
     try {
+      lastLoginEmail.current = data.email;
       setRememberMe(rememberMe);
       const user = await login(data.email, data.password, selectedRole, { rememberMe });
       if (user) {
+        // Record the Fleet persona intent (chip = Fleet → fleet dashboard on
+        // cold starts too). Any other chip clears it.
+        setFleetPersona(selectedRole === "fleet");
         // Defer navigation to break React 19's flushSync cascade
         // Without this, router.push() can start a transition render while
         // effects from the authStore set() calls are still flushing,
@@ -64,7 +72,27 @@ export function LoginCard() {
     }
   };
 
+  /** Unknown email (backend 404): send the user to sign-up with the email
+   *  prefilled instead of leaving them on a dead-end error. */
+  const goToSignup = useCallback(
+    (email) => {
+      try {
+        if (email) sessionStorage.setItem("clutchd-signup-email", email);
+      } catch {}
+      if (typeof onNeedSignUp === "function") {
+        // Same-page view switch (auth page owns the login/signup toggle).
+        onNeedSignUp(false);
+      } else {
+        router.push("/auth?mode=signup");
+      }
+    },
+    [router, onNeedSignUp]
+  );
+
   const navigateAfterGoogleLogin = useCallback((user) => {
+    // Persona flag follows the chip the user picked, not the account's
+    // server role — fleet chip keeps opening the fleet dashboard.
+    setFleetPersona(selectedRoleRef.current === "fleet");
     setTimeout(() => {
       if (user.role === "admin") router.push("/admin");
       else if (selectedRoleRef.current === "fleet") router.push("/dashboard/fleet");
@@ -413,6 +441,15 @@ export function LoginCard() {
         {authError && (
           <div className="p-3 rounded-lg bg-red-500/10 border border-red-500/20 text-red-400 text-sm">
             {authError}
+            {signupNeeded && (
+              <button
+                type="button"
+                onClick={() => goToSignup(lastLoginEmail.current)}
+                className="mt-2 w-full py-2 rounded-lg bg-primary text-white text-sm font-semibold hover:opacity-90 transition-opacity"
+              >
+                Create an account
+              </button>
+            )}
           </div>
         )}
         <Button type="submit" className="w-full mt-2" size="lg" isLoading={isSubmitting}>
@@ -450,7 +487,17 @@ export function LoginCard() {
                 )}
               </div>
               <p className="text-xs text-center text-text-dim">
-                Google login will continue as <span className="font-medium text-text-primary">{selectedRole}</span>.
+                {selectedRole === "fleet" ? (
+                  <>
+                    Google login will open <span className="font-medium text-text-primary">Fleet</span>.{" "}
+                  </>
+                ) : (
+                  <>
+                    New Google accounts sign up as{" "}
+                    <span className="font-medium text-text-primary">{selectedRole}</span>.{" "}
+                  </>
+                )}
+                Existing accounts always open in their original role.
               </p>
             </>
           ) : (

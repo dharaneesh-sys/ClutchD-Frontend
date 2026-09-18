@@ -5,6 +5,7 @@ import { connectWebSocket, disconnectWebSocket } from "@/lib/socket";
 import { setAccessToken, getAccessToken, clearAccessToken, setTokenPersistMode, setRefreshToken, clearRefreshToken } from "@/lib/tokenStore";
 import { refreshAccessToken } from "@/lib/authRefresh";
 import { cacheUserProfile } from "@/lib/offline/offlineCache";
+import { setFleetPersona } from "@/lib/persona";
 import { useToastStore } from "@/store/toastStore";
 
 /**
@@ -161,6 +162,10 @@ export const useAuthStore = create(
       rememberMe: true,
       _hydrated: false,
       _isRestoring: true,
+      /** True when the last login failed because the email has no account
+       *  (backend 404). LoginCard watches this to offer sign-up with the
+       *  email prefilled. */
+      _signupNeeded: false,
       isLoading: false,
       error: null,
 
@@ -241,7 +246,8 @@ export const useAuthStore = create(
         clearRefreshToken();
         clearAllStorage();
         writeSessionMirror(null);
-        set({ user: null, isAuthenticated: false, _hydrated: false, _isRestoring: false, error: null, isLoading: false });
+        setFleetPersona(false);
+        set({ user: null, isAuthenticated: false, _hydrated: false, _isRestoring: false, error: null, isLoading: false, _signupNeeded: false });
       },
 
       /**
@@ -295,10 +301,17 @@ export const useAuthStore = create(
           return response.data.user;
 
         } catch (error) {
+          // 404 = unknown email: surface a structured flag so the login UI can
+          // offer sign-up (with the email prefilled) instead of a dead end.
+          if (error.response?.status === 404) {
+            const msg = error.response?.data?.detail || "No account found with this email. Please sign up first.";
+            set({ isLoading: false, error: msg, _signupNeeded: true });
+            return null;
+          }
           const msg =
             error.response?.data?.detail ||
             (error.response ? "Login failed. Please try again." : "Server unreachable. Please check your connection.");
-          set({ isLoading: false, error: msg });
+          set({ isLoading: false, error: msg, _signupNeeded: false });
           return null;
         }
       },
@@ -498,7 +511,8 @@ export const useAuthStore = create(
           disconnectWebSocket();
           writeSessionMirror(null);
         }
-        set({ user: null, isAuthenticated: false, _hydrated: true, error: null });
+        setFleetPersona(false);
+        set({ user: null, isAuthenticated: false, _hydrated: true, error: null, _signupNeeded: false });
       },
 
       clearError: () => set({ error: null }),

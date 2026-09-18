@@ -3,9 +3,9 @@
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { ArrowLeft, Store } from "lucide-react";
-import { useAuthStore } from "@/store/authStore";
-import { useProductStore } from "@/store/productStore";
 import SplashScreen from "@/components/ui/SplashScreen";
+import { useProductStore } from "@/store/productStore";
+import { useAuthStore } from "@/store/authStore";
 import { SellerProductForm } from "@/components/marketplace/SellerProductForm";
 import { BackButton } from "@/components/ui/BackButton";
 import { NAVIGATION_EVENT } from "@/lib/navigation";

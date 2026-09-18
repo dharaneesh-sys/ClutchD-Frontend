@@ -109,6 +109,10 @@ const SELLER_BLOCKED_MSG = "Only sellers can upload and sell parts.";
 
 const initialState = {
   sellerProducts: loadSellerProducts(),
+  /** Orders containing this seller's products (GET /orders/sales). */
+  sellerSales: [],
+  /** True once the first /orders/sales fetch completed (loaded or empty). */
+  sellerSalesLoaded: false,
   products: [],
   filters: { ...INITIAL_FILTERS },
   searchQuery: "",
@@ -231,6 +235,23 @@ export const useProductStore = create(
         } catch {
           // Offline fallback: keep whatever is cached locally.
           return get().sellerProducts;
+        }
+      },
+
+      /**
+       * Fetch orders that contain this seller's products (GET /orders/sales).
+       * Server scopes to the caller — customers calling it get an empty list
+       * (403 → []). Failure keeps the last good list (polling resilience).
+       */
+      fetchSellerSales: async () => {
+        try {
+          const { data } = await api.get("/orders/sales");
+          const sales = toCamelCase(data?.orders ?? []);
+          set({ sellerSales: sales, sellerSalesLoaded: true });
+          return sales;
+        } catch {
+          set({ sellerSalesLoaded: true });
+          return get().sellerSales;
         }
       },
 
