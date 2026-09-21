@@ -58,19 +58,6 @@ function saveItem(key, data) {
   }
 }
 
-function delay(ms = 1000) {
-  return new Promise((resolve) => setTimeout(resolve, ms));
-}
-
-/**
- * Generate a mock payout reference ID.
- */
-function generatePayoutRef() {
-  const ts = Date.now().toString(36).toUpperCase();
-  const rand = Math.random().toString(36).slice(2, 6).toUpperCase();
-  return `POUT-${ts}${rand}`;
-}
-
 /**
  * Compute the next N payout dates based on the schedule configuration.
  */
@@ -140,40 +127,6 @@ function formatPayoutDate(dateStr) {
   });
 }
 
-// ─── Demo payout ledger data ───────────────────────────────────────────────────
-
-function generateDemoLedger() {
-  const now = new Date();
-  const mechanics = [
-    { id: "mech-1", name: "Rajesh M." },
-    { id: "mech-2", name: "Suresh K." },
-    { id: "mech-3", name: "Dinesh R." },
-    { id: "mech-4", name: "Vijay M." },
-    { id: "mech-5", name: "Karthik S." },
-  ];
-
-  return mechanics.map((m, idx) => {
-    const completedJobs = [347, 281, 512, 198, 423][idx];
-    const avgJobValue = [350, 420, 380, 290, 410][idx];
-    const pendingAmount = completedJobs * avgJobValue * 0.15; // 15% platform fee pending
-    const lastPayout = new Date(now);
-    lastPayout.setDate(lastPayout.getDate() - [14, 10, 7, 21, 3][idx]);
-
-    return {
-      mechanicId: m.id,
-      mechanicName: m.name,
-      totalJobs: completedJobs,
-      completedJobs,
-      pendingJobs: Math.floor(completedJobs * 0.05),
-      pendingAmount: Math.round(pendingAmount),
-      totalEarned: completedJobs * avgJobValue,
-      lastPayoutDate: lastPayout.toISOString().split("T")[0],
-      status: pendingAmount >= 500 ? "ready" : "below_threshold",
-      upiId: `mechanic${idx + 1}@paytm`,
-    };
-  });
-}
-
 // ─── Public API ────────────────────────────────────────────────────────────────
 
 export const payoutService = {
@@ -220,36 +173,19 @@ export const payoutService = {
   },
 
   /**
-   * Fetch the payout ledger for all mechanics.
+   * Fetch the payout ledger for all providers (mechanics + garages).
    *
-   * Calls GET /admin/payouts on the backend. If the backend is unreachable
-   * or returns an error, falls back to localStorage (or demo data).
+   * Real data only: GET /admin/payouts computes the ledger from jobs and
+   * captured payments. If the backend is unreachable the caller sees the
+   * error — no demo rows are ever fabricated.
    *
    * @returns {Promise<Array<Object>>}
    */
   getMechanicPayouts: async () => {
-    const backendAvailable = BackendHealth.isAvailable();
-    let ledger = loadItem(LEDGER_KEY);
-
-    if (backendAvailable) {
-      try {
-        const res = await api.get("/admin/payouts");
-        const payouts = res.data.payouts || res.data || [];
-        saveItem(LEDGER_KEY, payouts);
-        return payouts;
-      } catch {
-        // Backend 503 — fall through to localStorage
-      }
-    }
-
-    // Fallback: return saved ledger, or generate demo data
-    if (ledger && ledger.length > 0) {
-      return ledger;
-    }
-
-    const demoData = generateDemoLedger();
-    saveItem(LEDGER_KEY, demoData);
-    return demoData;
+    const res = await api.get("/admin/payouts");
+    const payouts = res.data.payouts || res.data || [];
+    saveItem(LEDGER_KEY, payouts);
+    return payouts;
   },
 
   /**
@@ -298,8 +234,8 @@ export const payoutService = {
   /**
    * Trigger a manual payout for a specific mechanic.
    *
-   * Attempts POST /admin/payouts/manual on the backend.
-   * Falls back to a localStorage mock when backend is unreachable (503).
+   * Backend-only: POST /admin/payouts/manual records the real payout.
+   * Errors propagate to the caller — no mock transactions.
    *
    * @param {string} mechanicId
    * @param {number} amount - Amount in rupees
@@ -307,68 +243,20 @@ export const payoutService = {
    * @returns {Promise<{ success: boolean, payout: Object, backendAvailable: boolean }>}
    */
   triggerManualPayout: async (mechanicId, amount, note = "") => {
-    const backendAvailable = BackendHealth.isAvailable();
-
-    if (backendAvailable) {
-      try {
-        const res = await api.post("/admin/payouts/manual", {
-          mechanic_id: mechanicId,
-          amount,
-          note,
-        });
-        const payout = res.data.payout || res.data;
-
-        // Update local ledger
-        const ledger = loadItem(LEDGER_KEY) || [];
-        const updated = ledger.map((e) => {
-          if (e.mechanicId === mechanicId) {
-            return {
-              ...e,
-              pendingAmount: Math.max(0, e.pendingAmount - amount),
-              lastPayoutDate: new Date().toISOString().split("T")[0],
-              status: "paid",
-            };
-          }
-          return e;
-        });
-        saveItem(LEDGER_KEY, updated);
-
-        return { success: true, payout, backendAvailable: true };
-      } catch {
-        // Backend 503 — fall through to mock
-      }
+    try {
+      const res = await api.post("/admin/payouts/manual", {
+        mechanic_id: mechanicId,
+        amount,
+        note,
+      });
+      const payout = res.data.payout || res.data;
+      return { success: true, payout, backendAvailable: true };
+    } catch (err) {
+      throw new Error(
+        err?.response?.data?.detail ||
+          "Payout could not be recorded (backend unreachable)",
+      );
     }
-
-    // ── Mock path ──────────────────────────────────────────────────────
-    await delay();
-
-    const payoutRef = generatePayoutRef();
-    const payout = {
-      id: payoutRef,
-      mechanicId,
-      amount,
-      status: "completed",
-      processedAt: new Date().toISOString(),
-      note: note || "Manual payout (mock)",
-      transactionRef: `TXN-${payoutRef}`,
-    };
-
-    // Update local ledger
-    const ledger = loadItem(LEDGER_KEY) || [];
-    const updated = ledger.map((e) => {
-      if (e.mechanicId === mechanicId) {
-        return {
-          ...e,
-          pendingAmount: Math.max(0, e.pendingAmount - amount),
-          lastPayoutDate: new Date().toISOString().split("T")[0],
-          status: "paid",
-        };
-      }
-      return e;
-    });
-    saveItem(LEDGER_KEY, updated);
-
-    return { success: true, payout, backendAvailable: false };
   },
 
   /**

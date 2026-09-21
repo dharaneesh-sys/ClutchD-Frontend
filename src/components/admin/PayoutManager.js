@@ -158,9 +158,8 @@ export function PayoutManager() {
         `Manual payout by admin for ${confirmPayout.mechanicName}`
       );
 
-      const backendNote = result.backendAvailable ? "" : " (mock — backend unavailable)";
       showSuccess(
-        `₹${amount.toLocaleString("en-IN")} paid to ${confirmPayout.mechanicName}${backendNote}`
+        `₹${amount.toLocaleString("en-IN")} paid to ${confirmPayout.mechanicName}`
       );
 
       setConfirmPayout(null);
@@ -585,8 +584,7 @@ export function PayoutManager() {
             </div>
 
             <p className="text-sm text-text-muted text-center">
-              This action will process the payout. This is a demo environment
-              — no real money will be transferred.
+              This action records the payout against the provider ledger.
             </p>
 
             <div className="flex gap-3 justify-center">
