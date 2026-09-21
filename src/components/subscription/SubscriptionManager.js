@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import {
   Crown,
   ShieldCheck,
@@ -152,13 +152,22 @@ export function SubscriptionManager() {
 
   // ── Derived ─────────────────────────────────────────────────────────
   const isPaidPlan = currentPlanId && currentPlanId !== "free";
-  const formattedActiveUntil = activeUntil
-    ? new Date(activeUntil).toLocaleDateString("en-IN", {
+  // Guarded: a corrupt stored date must not crash the whole screen
+  // (new Date(garbage).toLocaleDateString throws RangeError).
+  const formattedActiveUntil = useMemo(() => {
+    if (!activeUntil) return null;
+    try {
+      const d = new Date(activeUntil);
+      if (Number.isNaN(d.getTime())) return null;
+      return d.toLocaleDateString("en-IN", {
         day: "numeric",
         month: "short",
         year: "numeric",
-      })
-    : null;
+      });
+    } catch {
+      return null;
+    }
+  }, [activeUntil]);
 
   if (!hydrated) {
     return (

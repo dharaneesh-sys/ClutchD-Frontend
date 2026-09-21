@@ -5,23 +5,15 @@ import { useRouter } from "next/navigation";
 import { GlassCard } from "@/components/ui/GlassCard";
 import { Badge } from "@/components/ui/Badge";
 import { AreaChart, Area } from "@/components/charts/area-chart";
-import { fetchAnalytics, fetchPendingKyc } from "@/services/adminService";
-
-const chartData = [
-  { name: 'Jan', revenue: 4000, users: 240 },
-  { name: 'Feb', revenue: 3000, users: 139 },
-  { name: 'Mar', revenue: 2000, users: 980 },
-  { name: 'Apr', revenue: 2780, users: 390 },
-  { name: 'May', revenue: 1890, users: 480 },
-  { name: 'Jun', revenue: 2390, users: 380 },
-  { name: 'Jul', revenue: 3490, users: 430 },
-];
+import { fetchAnalytics, fetchPendingKyc, fetchGrowthSeries } from "@/services/adminService";
 
 export function AdminOverview() {
   const router = useRouter();
 
   const [stats, setStats] = useState(null);
   const [pendingKyc, setPendingKyc] = useState([]);
+  // Real growth series; chart data derives from it with Date x values.
+  const [chartData, setChartData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -29,12 +21,23 @@ export function AdminOverview() {
     setLoading(true);
     setError(null);
     try {
-      const [analyticsRes, kycApps] = await Promise.all([
+      const [analyticsRes, kycApps, growth] = await Promise.all([
         fetchAnalytics(),
         fetchPendingKyc(),
+        fetchGrowthSeries().catch(() => []),
       ]);
       setStats(analyticsRes);
       setPendingKyc(kycApps);
+      // The chart parses x values as Dates — month-name strings crash it
+      // ("Invalid time value"). Feed real ISO dates from the backend.
+      setChartData(
+        growth.map((p) => ({
+          date: new Date(p.date),
+          month: p.month,
+          revenue: Number(p.revenue) || 0,
+          users: Number(p.users) || 0,
+        })),
+      );
     } catch (err) {
       setError(err?.response?.data?.detail || "Failed to load dashboard data");
     } finally {
@@ -98,10 +101,16 @@ export function AdminOverview() {
          <GlassCard variant="strong" className="col-span-1 lg:col-span-2 p-6 h-[400px] flex flex-col">
             <h3 className={`font-semibold mb-6 ${"text-text-primary"}`}>Platform Growth (Revenue & Users)</h3>
               <div className="flex-1 w-full relative min-w-0 min-h-0">
-                <AreaChart data={chartData} xDataKey="name" className="w-full h-full">
-                  <Area dataKey="revenue" stroke="var(--primary)" fill="var(--primary)" fillOpacity={0.15} yAxisId="left" />
-                  <Area dataKey="users" stroke="#3b82f6" fill="#3b82f6" fillOpacity={0.15} yAxisId="right" />
-                </AreaChart>
+                {chartData.length === 0 ? (
+                  <div className="flex items-center justify-center h-full text-sm text-text-muted">
+                    Growth data unavailable right now.
+                  </div>
+                ) : (
+                  <AreaChart data={chartData} xDataKey="date" className="w-full h-full">
+                    <Area dataKey="revenue" stroke="var(--primary)" fill="var(--primary)" fillOpacity={0.15} yAxisId="left" />
+                    <Area dataKey="users" stroke="#3b82f6" fill="#3b82f6" fillOpacity={0.15} yAxisId="right" />
+                  </AreaChart>
+                )}
               </div>
           </GlassCard>
 

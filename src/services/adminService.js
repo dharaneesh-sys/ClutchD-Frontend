@@ -5,6 +5,13 @@ export async function fetchAnalytics() {
   return res.data;
 }
 
+/** Real 6-month growth series from the backend. Each point carries a
+ *  `date` ISO string; callers convert to Date for the time-series chart. */
+export async function fetchGrowthSeries() {
+  const res = await api.get("/admin/analytics/growth");
+  return res.data?.series || [];
+}
+
 export async function fetchUsers(params = {}) {
   const res = await api.get("/admin/users", { params });
   return res.data.users || [];
