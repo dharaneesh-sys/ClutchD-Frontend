@@ -120,6 +120,20 @@ const initialState = {
   error: null,
 };
 
+/**
+ * Merge two product lists keeping the first occurrence of each id.
+ * Prevents a seller listing that exists both locally (sellerProducts)
+ * and on the server (products) from rendering twice.
+ */
+const mergeUniqueById = (primary, secondary) => {
+  const seen = new Set();
+  return [...primary, ...(secondary || [])].filter((p) => {
+    if (!p || seen.has(p.id)) return false;
+    seen.add(p.id);
+    return true;
+  });
+};
+
 export const useProductStore = create(
   devtools(
     (set, get) => ({
@@ -145,10 +159,11 @@ export const useProductStore = create(
             : '';
           const { data } = await api.get(`/products${queryString}`);
           const products = toCamelCase(data?.products ?? []);
-          const seller = get().sellerProducts;
-          // Seller listings first so a new part is visible immediately.
-          // Shape mirrors ProductResponse for future POST /api/marketplace/products.
-          set({ products: [...seller, ...products], isLoading: false });
+          // Seller listings first so a new part is visible immediately, but
+          // DEDUPED by id: the server already includes the seller's listings
+          // in /products, so blindly prepending sellerProducts made every
+          // seller part appear twice in the store.
+          set({ products: mergeUniqueById(get().sellerProducts, products), isLoading: false });
         } catch (error) {
           const msg =
             error.response?.data?.detail ||
@@ -280,9 +295,13 @@ export const useProductStore = create(
         try {
           const { data: created } = await api.post("/products", toProductPayload(data));
           const product = { ...toCamelCase(created), isSeller: true };
-          const next = [product, ...get().sellerProducts];
+          // Guard against re-adding if the API retried and already inserted it.
+          const next = [product, ...get().sellerProducts.filter((p) => p.id !== product.id)];
           persistSellerProducts(next);
-          set({ sellerProducts: next, products: [product, ...get().products] });
+          set((state) => ({
+            sellerProducts: next,
+            products: [product, ...state.products.filter((p) => p.id !== product.id)],
+          }));
           useToastStore.getState().success("Part listed successfully.");
           return product;
         } catch (error) {

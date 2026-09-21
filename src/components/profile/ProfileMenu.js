@@ -21,6 +21,11 @@ import {
   Loader2,
   LayoutDashboard as LayoutDashboardIcon,
   Store as StoreIcon,
+  Plus,
+  Briefcase,
+  DollarSign,
+  BarChart3,
+  ReceiptText,
 } from "lucide-react";
 import { useSOS } from "@/components/ui/useSOS";
 import { useAuthStore } from "@/store/authStore";
@@ -34,28 +39,42 @@ const DASHBOARD_BY_ROLE = {
   garage: { icon: LayoutDashboardIcon, label: "Business Dashboard", path: "/dashboard/garage" },
 };
 
+/** Which roles each menu entry belongs to. A role only sees entries whose
+ *  list includes it (or entries with no `roles` — shared account/support
+ *  functions every role has). Keeps customer commerce pages (orders,
+ *  services, warranty, favorites, card, referral) out of the seller,
+ *  mechanic and garage menus. */
+const CUSTOMER_ONLY = ["customer"];
 const MENU_SECTIONS = [
   {
     label: "Account",
     items: [
       { icon: User, label: "Account Details", path: "/marketplace/profile/account" },
       { icon: Settings, label: "Edit Profile", path: "/marketplace/profile/edit" },
-      { icon: Crown, label: "Subscription", path: "/marketplace/profile/subscription" },
+      { icon: Crown, label: "Subscription", path: "/marketplace/profile/subscription", roles: CUSTOMER_ONLY },
     ],
   },
   {
     label: "Activity",
     items: [
-      { icon: ShoppingBag, label: "Orders", path: "/marketplace/profile/orders" },
-      { icon: CreditCard, label: "Payments & Bills", path: "/marketplace/profile/payments" },
-      { icon: Wrench, label: "My Services", path: "/marketplace/profile/services" },
-      { icon: ShieldAlert, label: "Warranty Claims", path: "/marketplace/profile/warranty" },
-      { icon: Heart, label: "Favorites", path: "/marketplace/profile/favorites" },
-      { icon: Zap, label: "Quick Actions", path: "/marketplace/profile/quick-actions" },
+      { icon: ShoppingBag, label: "Orders", path: "/marketplace/profile/orders", roles: CUSTOMER_ONLY },
+      { icon: CreditCard, label: "Payments & Bills", path: "/marketplace/profile/payments", roles: CUSTOMER_ONLY },
+      { icon: Wrench, label: "My Services", path: "/marketplace/profile/services", roles: CUSTOMER_ONLY },
+      { icon: ShieldAlert, label: "Warranty Claims", path: "/marketplace/profile/warranty", roles: CUSTOMER_ONLY },
+      { icon: Heart, label: "Favorites", path: "/marketplace/profile/favorites", roles: CUSTOMER_ONLY },
+      { icon: Zap, label: "Quick Actions", path: "/marketplace/profile/quick-actions", roles: CUSTOMER_ONLY },
+      // Role-specific functions — each role's own dashboard entry points.
+      { icon: Plus, label: "Upload a Part", path: "/dashboard/seller/upload", roles: ["seller"] },
+      { icon: ShoppingBag, label: "My Listings", path: "/dashboard/seller?tab=listings", roles: ["seller"] },
+      { icon: ReceiptText, label: "My Sales", path: "/dashboard/seller?tab=sales", roles: ["seller"] },
+      { icon: Briefcase, label: "My Jobs", path: "/dashboard/mechanic?tab=jobs", roles: ["mechanic"] },
+      { icon: DollarSign, label: "Earnings", path: "/dashboard/mechanic?tab=earnings", roles: ["mechanic"] },
+      { icon: BarChart3, label: "Garage Analytics", path: "/dashboard/garage?tab=analytics", roles: ["garage"] },
     ],
   },
   {
     label: "Rewards",
+    roles: CUSTOMER_ONLY,
     items: [
       { icon: CardIcon, label: "ClutchD Card", path: "/marketplace/profile/clutchd-card" },
       { icon: Gift, label: "Refer & Earn", path: "/marketplace/profile/refer" },
@@ -108,13 +127,18 @@ export function ProfileMenu({ className }) {
         <ChevronRight size={16} className="flex-shrink-0 text-text-muted" />
       </button>
 
-      {MENU_SECTIONS.map((section) => (
+      {/* Role-filtered sections: customer commerce pages stay customer-only. */}
+      {MENU_SECTIONS.filter(
+        (section) => !section.roles || section.roles.includes(role),
+      ).map((section) => (
         <div key={section.label}>
           <h3 className="text-xs font-semibold uppercase tracking-wider text-text-muted px-1 mb-2">
             {section.label}
           </h3>
           <div className="glass-lux rounded-2xl overflow-hidden divide-y divide-white/[0.04]">
-            {section.items.map((item) => {
+            {section.items
+              .filter((item) => !item.roles || item.roles.includes(role))
+              .map((item) => {
               const isActive = pathname === item.path;
               return (
                 <button
