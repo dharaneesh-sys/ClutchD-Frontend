@@ -64,3 +64,12 @@ __pycache__/
 # caches, keystore and credentials are all ignored by android/.gitignore).
 
 googleauth.txt
+
+# build artifacts — distribute via GitHub Releases, not git
+*.apk
+*.aab
+
+# signing material — NEVER commit
+keystore.properties
+*.jks
+*.keystore
