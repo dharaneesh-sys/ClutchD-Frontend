@@ -59,7 +59,19 @@ function toProductPayload(data) {
     image: data.image || null,
     availability: data.availability !== false,
     delivery_time: data.deliveryTime || null,
+    // Idempotency: one stable key per logical submission. If this POST is
+    // retried/replayed (slow funnel, offline flush, double-tap), the server
+    // returns the original product instead of inserting a duplicate row.
+    client_request_id: data.clientRequestId || null,
   };
+}
+
+/** Generate a client idempotency key (crypto first, fallback for old WebViews). */
+function generateRequestId() {
+  try {
+    if (typeof crypto !== "undefined" && crypto.randomUUID) return crypto.randomUUID();
+  } catch {}
+  return `req-${Date.now()}-${Math.random().toString(36).slice(2)}`;
 }
 
 /** Local-only listing shape (used when the backend is unreachable). */
@@ -285,6 +297,10 @@ export const useProductStore = create(
        * Add a seller listing — persists to the backend (POST /products).
        * Falls back to a local-only listing when the server is unreachable.
        * Returns the created product, or null when blocked/failed.
+       *
+       * Idempotent end-to-end: the submission carries a clientRequestId; an
+       * offline localOnly listing keeps the same key so the later flush can
+       * never create a second copy of the same part.
        */
       addSellerProduct: async (data) => {
         const user = getSellerUser();
@@ -292,8 +308,12 @@ export const useProductStore = create(
           useToastStore.getState().error(SELLER_BLOCKED_MSG);
           return null;
         }
+        const clientRequestId = data.clientRequestId || generateRequestId();
         try {
-          const { data: created } = await api.post("/products", toProductPayload(data));
+          const { data: created } = await api.post(
+            "/products",
+            toProductPayload({ ...data, clientRequestId }),
+          );
           const product = { ...toCamelCase(created), isSeller: true };
           // Guard against re-adding if the API retried and already inserted it.
           const next = [product, ...get().sellerProducts.filter((p) => p.id !== product.id)];
@@ -309,14 +329,75 @@ export const useProductStore = create(
             useToastStore.getState().error(extractApiError(error, "Could not list the part. Please try again."));
             return null;
           }
-          // Server unreachable — offline fallback keeps the listing locally.
-          const product = localListing(user, data);
+          // Server unreachable — offline fallback keeps the listing locally,
+          // carrying the idempotency key so flushLocalOnlyListings dedupes.
+          const product = { ...localListing(user, data), clientRequestId };
           const next = [product, ...get().sellerProducts];
           persistSellerProducts(next);
           set({ sellerProducts: next, products: [product, ...get().products] });
           useToastStore.getState().error("Offline — part saved on this device only and will not appear to others until synced.");
           return product;
         }
+      },
+
+      /**
+       * Push localOnly (offline-created) listings to the server.
+       * Each listing carries the clientRequestId from its original submission;
+       * if the original POST actually reached the server before the connection
+       * died, the server returns the EXISTING product instead of duplicating.
+       * Safe to call repeatedly — flushed entries lose their localOnly flag.
+       */
+      flushLocalOnlyListings: async () => {
+        const locals = get().sellerProducts.filter(
+          (p) => p.localOnly && p.clientRequestId,
+        );
+        if (locals.length === 0) return 0;
+        let flushed = 0;
+        for (const item of locals) {
+          try {
+            const { data: created } = await api.post(
+              "/products",
+              toProductPayload({
+                name: item.name,
+                price: item.price,
+                description: item.description,
+                brand: item.brand,
+                category: item.category,
+                image: item.image,
+                availability: item.availability,
+                deliveryTime: item.deliveryTime,
+                clientRequestId: item.clientRequestId,
+              }),
+            );
+            const product = { ...toCamelCase(created), isSeller: true };
+            flushed += 1;
+            // Swap the local entry for the server row (ids differ) — keyed by
+            // clientRequestId so a partially-flushed loop never double-adds.
+            const next = [
+              product,
+              ...get().sellerProducts.filter(
+                (p) => !(p.localOnly && p.clientRequestId === item.clientRequestId),
+              ),
+            ];
+            persistSellerProducts(next);
+            set((state) => ({
+              sellerProducts: next,
+              products: [
+                product,
+                ...state.products.filter(
+                  (p) => !(p.localOnly && p.clientRequestId === item.clientRequestId),
+                ),
+              ],
+            }));
+          } catch {
+            // Still offline or server rejected — leave it queued for next time.
+          }
+        }
+        if (flushed > 0) {
+          useToastStore.getState().success(`${flushed} offline listing${flushed > 1 ? "s" : ""} synced.`);
+          get().fetchProducts();
+        }
+        return flushed;
       },
 
       /**

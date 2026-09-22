@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
@@ -55,6 +55,11 @@ async function resolveImageUrl(file) {
       if (typeof url === "string" && url.length > 0) return url;
       throw new Error("Photo upload failed. Please try again.");
     } catch (err) {
+      if (err?.response?.status === 429) {
+        throw new Error(
+          "Too many photo uploads right now — wait a minute and try again."
+        );
+      }
       throw new Error(
         "Photo upload failed — check your connection and try again."
       );
@@ -87,6 +92,10 @@ export function SellerProductForm({ initialProduct = null, onSuccess }) {
   const [pickedFile, setPickedFile] = useState(null);
   const [imageUrl, setImageUrl] = useState(initialProduct?.image || "");
   const [uploading, setUploading] = useState(false);
+  // Lock against double submissions: on a slow funnel the submit can take
+  // seconds, and a second tap (or Enter key) fired a second POST — one of the
+  // root causes of duplicated listings before server-side idempotency.
+  const submitLock = useRef(false);
 
   const {
     register,
@@ -157,15 +166,21 @@ export function SellerProductForm({ initialProduct = null, onSuccess }) {
   };
 
   const onSubmit = async (data) => {
+    if (submitLock.current) return;
     if (!SELLER_ROLES.includes(role)) {
       useToastStore.getState().error("Only sellers can upload and sell parts.");
       return;
     }
-    const payload = { ...data, price: Number(data.price) };
-    const saved = isEdit
-      ? await updateSellerProduct(initialProduct.id, payload)
-      : await addSellerProduct(payload);
-    if (saved && onSuccess) onSuccess(saved);
+    submitLock.current = true;
+    try {
+      const payload = { ...data, price: Number(data.price) };
+      const saved = isEdit
+        ? await updateSellerProduct(initialProduct.id, payload)
+        : await addSellerProduct(payload);
+      if (saved && onSuccess) onSuccess(saved);
+    } finally {
+      submitLock.current = false;
+    }
   };
 
   return (
