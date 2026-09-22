@@ -17,6 +17,7 @@ import { Input } from "@/components/ui/Input";
 import { FileUpload } from "@/components/ui/FileUpload";
 import { ProductImage } from "@/components/marketplace/ProductImage";
 import { BackendHealth } from "@/lib/backendHealth";
+import { compressImage } from "@/lib/imageCompress";
 import api from "@/lib/api";
 
 function readAsDataURL(file) {
@@ -37,14 +38,18 @@ async function resolveImageUrl(file) {
   const offline = BackendHealth.isAvailable() === false || navigator.onLine === false;
   if (!offline) {
     try {
+      // Shrink before sending — camera photos are 3-8MB and take minutes on
+      // 4G through the funnel; compressed they go up in a couple of seconds.
+      const compressed = await compressImage(file);
       const formData = new FormData();
-      formData.append("file", file);
-      // Long timeout + retryable — photos on 4G through the funnel are slow
-      // (same class as the Google-login fix).
+      formData.append("file", compressed);
+      // NOT retryable: a timed-out POST that actually reached the server would
+      // be re-sent from scratch (worst case the exact multi-minute stall being
+      // fixed here). The seller just taps the photo again — that's the retry.
       const res = await api.post("/uploads", formData, {
         headers: { "Content-Type": "multipart/form-data" },
         timeout: 60000,
-        __isRetryable: true,
+        __noRetry: true,
       });
       const url = res.data?.url || res.data?.imageUrl;
       if (typeof url === "string" && url.length > 0) return url;
