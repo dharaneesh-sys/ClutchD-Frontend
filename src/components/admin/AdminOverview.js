@@ -69,6 +69,8 @@ export function AdminOverview() {
   const statCards = [
     { label: "Total Users", val: stats?.totalUsers?.toLocaleString() || "0", trend: "—" },
     { label: "Active Providers", val: stats?.activeProviders?.toLocaleString() || "0", trend: "—" },
+    { label: "Sellers", val: stats?.totalSellers?.toLocaleString() || "0", trend: "—" },
+    { label: "Parts Listed", val: stats?.totalProducts?.toLocaleString() || "0", trend: "—" },
     { label: "Jobs Completed", val: stats?.jobsCompleted?.toLocaleString() || "0", trend: "—" },
     { label: "Platform Revenue", val: `₹${((stats?.totalRevenue || 0) / 100).toLocaleString("en-IN")}`, trend: "—" },
   ];

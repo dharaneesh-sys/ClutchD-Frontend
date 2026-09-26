@@ -98,7 +98,7 @@ const nextConfig = {
                 //   www.gstatic.com             — Firebase SW CDN scripts
                 //   wss:                        — WebSocket connections
                 //                                (dynamic WS_URL per env)
-                `connect-src 'self' http://localhost:8001 https://clutchd-1.tail14cfb9.ts.net https://nominatim.openstreetmap.org https://router.project-osrm.org https://*.tile.openstreetmap.org https://api.razorpay.com https://ip-api.com https://fcm.googleapis.com https://www.gstatic.com wss:`, 
+                `connect-src 'self' http://localhost:8001 https://clutchd.dpdns.org https://clutchd-1.tail14cfb9.ts.net https://nominatim.openstreetmap.org https://router.project-osrm.org https://*.tile.openstreetmap.org https://api.razorpay.com https://ip-api.com https://fcm.googleapis.com https://www.gstatic.com wss:`,
 
                 // ── font-src ────────────────────────────────────────────
                 `font-src 'self' data:`,

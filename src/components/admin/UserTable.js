@@ -84,9 +84,9 @@ export function UserTable() {
   const handleDeleteUser = async (user) => {
     setActionLoading(user.id);
     try {
-      await deleteUser(user.id);
+      const res = await deleteUser(user.id);
       setUsers(prev => prev.filter(u => u.id !== user.id));
-      showSuccess(`User ${user.name} deleted.`);
+      showSuccess(res?.message || `User ${user.name} deleted.`);
       setDeleteConfirm(null);
     } catch (err) {
       showError(err?.response?.data?.detail || "Failed to delete user");
@@ -119,6 +119,7 @@ export function UserTable() {
               <option className="bg-bg-card">Customers</option>
               <option className="bg-bg-card">Mechanics</option>
               <option className="bg-bg-card">Garages</option>
+              <option className="bg-bg-card">Sellers</option>
             </select>
             <select
               value={statusFilter}
@@ -243,6 +244,10 @@ export function UserTable() {
             <div className={`p-4 rounded-xl border ${"bg-bg-card border-border-subtle"}`}>
               <p className={`text-xs uppercase mb-1 ${"text-text-dim"}`}>User ID</p>
               <p className={`font-mono text-sm ${"text-text-primary"}`}>{profileModal.id}</p>
+            </div>
+            <div className={`p-4 rounded-xl border ${"bg-bg-card border-border-subtle"}`}>
+              <p className={`text-xs uppercase mb-1 ${"text-text-dim"}`}>Email</p>
+              <p className={`font-medium break-all ${"text-text-primary"}`}>{profileModal.email}</p>
             </div>
             <div className={`p-4 rounded-xl border ${"bg-bg-card border-border-subtle"}`}>
               <p className={`text-xs uppercase mb-1 ${"text-text-dim"}`}>Role</p>

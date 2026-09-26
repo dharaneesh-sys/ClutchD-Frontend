@@ -110,6 +110,16 @@ export async function verifyGarage(garageId, verified) {
   return res.data;
 }
 
+export async function fetchSellers() {
+  const res = await api.get("/admin/sellers");
+  return res.data.sellers || [];
+}
+
+export async function verifySeller(sellerId, verified) {
+  const res = await api.patch(`/admin/seller/${sellerId}/verify`, { verified });
+  return res.data;
+}
+
 export async function resolveDisputeWithStatus(disputeId, status, resolution = null) {
   return updateDispute(disputeId, { status, resolution });
 }

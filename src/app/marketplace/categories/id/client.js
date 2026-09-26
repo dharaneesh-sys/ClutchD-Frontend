@@ -105,13 +105,13 @@ export default function CategoryProductsClient({ id: idProp }) {
   );
 
   // Filter products by category (Spare Parts = all non-accessory products,
-  // since the backend seeds no dedicated spare-parts category)
+  // including uncategorized ones, so nothing vanishes from navigation)
   const filteredProducts = useMemo(() => {
     if (!id) return [];
     if (isSparePartsTarget(id)) {
       return products.filter((p) => {
         const pc = p.category ?? p.categoryId;
-        return pc && !isAccessoriesProduct(pc);
+        return !pc || !isAccessoriesProduct(pc);
       });
     }
     return products.filter((p) =>

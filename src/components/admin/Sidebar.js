@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { UserCircle, Briefcase, AlertTriangle, BarChart3, Users, FileCheck, Wrench, Building2, CreditCard, Wallet, ShieldCheck, Award, X } from "lucide-react";
+import { UserCircle, Briefcase, AlertTriangle, BarChart3, Users, FileCheck, Wrench, Building2, CreditCard, Wallet, ShieldCheck, Award, Store, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAuthStore } from "@/store/authStore";
 import api from "@/lib/api";
@@ -14,6 +14,7 @@ const NAV_ITEMS = [
   { name: "Mechanics", icon: Wrench, path: "/admin/mechanics" },
   { name: "Certifications", icon: Award, path: "/admin/certifications" },
   { name: "Garages", icon: Building2, path: "/admin/garages" },
+  { name: "Sellers", icon: Store, path: "/admin/sellers" },
   { name: "Active Jobs", icon: Briefcase, path: "/admin/jobs" },
   { name: "Payments", icon: CreditCard, path: "/admin/payments" },
   { name: "Payouts", icon: Wallet, path: "/admin/payouts" },

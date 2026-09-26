@@ -95,6 +95,7 @@ export function ProductCard({ product, className }) {
       onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); router.push(`/marketplace/product/id?id=${id}`); }}}
       className={cn(
         "glass-lux-interactive group rounded-2xl overflow-hidden cursor-pointer",
+        "flex h-full flex-col",
         "hover-lift active-press",
         className
       )}
@@ -147,7 +148,7 @@ export function ProductCard({ product, className }) {
       </Link>
 
       {/* Content section */}
-      <div className="p-4 space-y-2.5">
+      <div className="flex flex-1 flex-col p-4 space-y-2.5">
         {/* Brand */}
         <div className="flex items-center justify-between gap-2">
           <span className="text-[0.6875rem] font-semibold uppercase tracking-wider text-text-dim">
@@ -157,14 +158,14 @@ export function ProductCard({ product, className }) {
 
         {/* Clickable product name */}
         <Link href={`/marketplace/product/id?id=${id}`}>
-          <h3 className="text-sm font-semibold leading-snug text-foreground line-clamp-2 group-hover:text-primary-light transition-colors">
+          <h3 className="min-h-10 text-sm font-semibold leading-snug text-foreground line-clamp-2 group-hover:text-primary-light transition-colors">
             {name}
           </h3>
         </Link>
 
         {/* Short description */}
         {description && (
-          <p className="text-xs text-text-muted leading-relaxed line-clamp-2">
+          <p className="min-h-8 text-xs text-text-muted leading-relaxed line-clamp-2">
             {description}
           </p>
         )}
@@ -180,7 +181,7 @@ export function ProductCard({ product, className }) {
         )}
 
         {/* Price + Add to Cart - stacked on narrow, prevents overlap */}
-        <div className="flex flex-col gap-2 pt-1 sm:flex-row sm:items-center sm:justify-between">
+        <div className="mt-auto flex flex-col gap-2 pt-1 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-center gap-2 min-w-0">
             <div className="flex flex-col shrink-0 min-w-0">
               <span className="text-base sm:text-lg font-bold tracking-tight text-foreground truncate">

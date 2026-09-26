@@ -3,7 +3,7 @@
 import { useEffect, useState, useCallback, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { Search, X, AlertTriangle, RefreshCw, ChevronRight, Plus } from "lucide-react";
+import { Search, X, AlertTriangle, RefreshCw, ChevronRight, Plus, Heart } from "lucide-react";
 import { useProductStore } from "@/store/productStore";
 import { useCategoryStore } from "@/store/categoryStore";
 import { CategoryCard } from "@/components/marketplace/CategoryCard";
@@ -141,6 +141,18 @@ export default function MarketplaceHome() {
     return out.filter((c) => isAccessories(c) || isSpare(c)).slice(0, 2);
   }, [categories]);
 
+  // Tile counts from the real product list (single source of truth):
+  // Accessories = accessory-like category, Spare Parts = everything else
+  // (including uncategorized) so tiles always add up to all products.
+  const tileCounts = useMemo(() => {
+    const norm = (s) => s?.toLowerCase().replace(/[^a-z0-9]/g, "") || "";
+    let acc = 0;
+    for (const p of products) {
+      if (norm(p.category ?? p.categoryId).includes("accessor")) acc += 1;
+    }
+    return { acc, spare: products.length - acc };
+  }, [products]);
+
   return (
     <div className="space-y-5 p-4 pb-8 page-enter">
       {/* ── Error State ── */}
@@ -168,16 +180,25 @@ export default function MarketplaceHome() {
               Auto parts &amp; accessories for every need
             </p>
           </div>
-          {canSell && (
-            <button
-              type="button"
-              onClick={() => setSellOpen(true)}
-              className="inline-flex shrink-0 items-center gap-1.5 px-4 py-2.5 rounded-xl bg-primary text-white text-sm font-medium hover:bg-primary/90 transition-colors"
+          <div className="flex shrink-0 items-center gap-2">
+            <Link
+              href="/marketplace/profile/favorites"
+              aria-label="My favorites"
+              className="inline-flex items-center justify-center w-10 h-10 rounded-xl glass-lux-interactive text-muted hover:text-primary transition-colors"
             >
-              <Plus size={16} />
-              Sell a part
-            </button>
-          )}
+              <Heart size={17} />
+            </Link>
+            {canSell && (
+              <button
+                type="button"
+                onClick={() => setSellOpen(true)}
+                className="inline-flex shrink-0 items-center gap-1.5 px-4 py-2.5 rounded-xl bg-primary text-white text-sm font-medium hover:bg-primary/90 transition-colors"
+              >
+                <Plus size={16} />
+                Sell a part
+              </button>
+            )}
+          </div>
         </div>
 
         <form onSubmit={handleSearch} role="search">
@@ -225,9 +246,16 @@ export default function MarketplaceHome() {
           <CategoryGridSkeleton />
         ) : categories.length > 0 ? (
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-2.5">
-            {categories.map((cat) => (
-              <CategoryCard key={cat.id || cat.value} category={{...cat, id: cat.slug || cat.value || cat.id}} icon={cat.slug} />
-            ))}
+            {categories.map((cat) => {
+              const cNorm = `${cat?.name || ""} ${cat?.slug || ""}`.toLowerCase().replace(/[^a-z0-9]/g, "");
+              const count =
+                products.length > 0
+                  ? (cNorm.includes("accessor") ? tileCounts.acc : tileCounts.spare)
+                  : cat.productCount;
+              return (
+                <CategoryCard key={cat.id || cat.value} category={{...cat, id: cat.slug || cat.value || cat.id, productCount: count}} icon={cat.slug} />
+              );
+            })}
           </div>
         ) : status !== "ERROR" && (
           <div className="glass-lux rounded-2xl py-6 px-4 text-center">
@@ -258,8 +286,8 @@ export default function MarketplaceHome() {
             style={{ scrollbarWidth: "thin" }}
           >
             {featuredProducts.map((product) => (
-              <div key={product.id} className="snap-start shrink-0 w-44">
-                <ProductCard product={product} />
+              <div key={product.id} className="flex snap-start shrink-0 w-44">
+                <ProductCard product={product} className="w-full" />
               </div>
             ))}
           </div>

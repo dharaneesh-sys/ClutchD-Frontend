@@ -82,7 +82,7 @@ export default function RootLayout({ children }) {
               "@type": "Organization",
               name: "ClutchD",
               description: "On-Demand Mechanic Platform",
-              url: process.env.NEXT_PUBLIC_SITE_URL || "https://clutchd-1.tail14cfb9.ts.net", 
+              url: process.env.NEXT_PUBLIC_SITE_URL || "https://clutchd.dpdns.org", 
             }),
           }}
         />

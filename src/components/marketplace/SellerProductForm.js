@@ -173,7 +173,8 @@ export function SellerProductForm({ initialProduct = null, onSuccess }) {
     }
     submitLock.current = true;
     try {
-      const payload = { ...data, price: Number(data.price) };
+      // Uncategorized parts default to Spare Parts so they never vanish from category navigation.
+      const payload = { ...data, category: data.category || "spare-parts", price: Number(data.price) };
       const saved = isEdit
         ? await updateSellerProduct(initialProduct.id, payload)
         : await addSellerProduct(payload);
