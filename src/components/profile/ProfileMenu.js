@@ -118,9 +118,9 @@ export function ProfileMenu({ className }) {
       {/* Role dashboard entry */}
       <button
         onClick={() => router.push(dashboardEntry.path)}
-        className="glass-lux rounded-2xl w-full flex items-center gap-3 px-4 py-3.5 text-left transition-all duration-200 hover:bg-white/[0.03]"
+        className="glass-lux rounded-2xl w-full flex items-center gap-3 px-4 py-3.5 text-left transition-all duration-200 hover:bg-surface-soft"
       >
-        <div className="flex-shrink-0 w-9 h-9 rounded-xl flex items-center justify-center bg-primary/[0.12] text-primary-light">
+        <div className="flex-shrink-0 w-9 h-9 rounded-xl flex items-center justify-center bg-primary-soft text-primary-light">
           <dashboardEntry.icon size={17} />
         </div>
         <span className="flex-1 text-sm font-semibold">{dashboardEntry.label}</span>
@@ -132,10 +132,10 @@ export function ProfileMenu({ className }) {
         (section) => !section.roles || section.roles.includes(role),
       ).map((section) => (
         <div key={section.label}>
-          <h3 className="text-xs font-semibold uppercase tracking-wider text-text-muted px-1 mb-2">
+          <h3 className="type-label-2 uppercase text-muted px-1 mb-2">
             {section.label}
           </h3>
-          <div className="glass-lux rounded-2xl overflow-hidden divide-y divide-white/[0.04]">
+          <div className="glass-lux rounded-2xl overflow-hidden divide-y divide-border-subtle">
             {section.items
               .filter((item) => !item.roles || item.roles.includes(role))
               .map((item) => {
@@ -147,16 +147,16 @@ export function ProfileMenu({ className }) {
                   className={cn(
                     "w-full flex items-center gap-3 px-4 py-3.5 text-left transition-all duration-200",
                     isActive
-                      ? "bg-primary/[0.08] text-primary-light"
-                      : "text-foreground hover:bg-white/[0.03]"
+                      ? "bg-primary-soft text-primary-light"
+                      : "text-foreground hover:bg-surface-soft"
                   )}
                 >
                   <div
                     className={cn(
                       "flex-shrink-0 w-9 h-9 rounded-xl flex items-center justify-center",
                       isActive
-                        ? "bg-primary/[0.15] text-primary-light"
-                        : "bg-white/[0.05] text-text-muted"
+                        ? "bg-primary-mid text-primary-light"
+                        : "bg-surface-soft text-text-muted"
                     )}
                   >
                     <item.icon size={17} />
@@ -178,9 +178,9 @@ export function ProfileMenu({ className }) {
                 onClick={sos.handleSOS}
                 disabled={sosDisabled}
                 aria-label="Emergency SOS"
-                className="w-full flex items-center gap-3 px-4 py-3.5 text-left transition-all duration-200 text-red-400 hover:bg-red-500/[0.06]"
+                className="w-full flex items-center gap-3 px-4 py-3.5 text-left transition-all duration-200 text-danger hover:bg-[var(--danger)]/10"
               >
-                <div className="flex-shrink-0 w-9 h-9 rounded-xl flex items-center justify-center bg-red-500/[0.12] text-red-400">
+                <div className="flex-shrink-0 w-9 h-9 rounded-xl flex items-center justify-center bg-[var(--danger)]/15 text-danger">
                   {sos.loading ? (
                     <Loader2 size={17} className="animate-spin" />
                   ) : (
@@ -188,11 +188,11 @@ export function ProfileMenu({ className }) {
                   )}
                 </div>
                 <span className="flex-1 text-sm font-semibold">{sosLabel}</span>
-                <ChevronRight size={16} className="flex-shrink-0 text-red-400/60" />
+                <ChevronRight size={16} className="flex-shrink-0 text-danger/60" />
               </button>
             )}
             {section.label === "Support & Safety" && sos.queuedMsg && (
-              <p className="px-4 py-2 text-xs text-[var(--primary-light)] bg-[var(--color-primary-rgb)]/15[0.06]">
+              <p className="px-4 py-2 text-xs text-[var(--primary)] bg-primary-soft">
                 {sos.queuedMsg}
               </p>
             )}

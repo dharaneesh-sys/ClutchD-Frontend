@@ -5,6 +5,7 @@ import {
   Route,
   Filter,
   Package,
+  HelpCircle,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -33,28 +34,9 @@ const SIZE_PRESETS = {
 };
 
 /**
- * Fallback icon used when the category is not recognised.
+ * Fallback icon for unrecognised categories (D8: lucide only, no inline SVG).
  */
-function FallbackIcon({ size, className }) {
-  return (
-    <svg
-      width={size}
-      height={size}
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      className={className}
-      aria-hidden="true"
-    >
-      <circle cx="12" cy="12" r="10" />
-      <line x1="12" y1="8" x2="12" y2="16" />
-      <line x1="8" y1="12" x2="16" y2="12" />
-    </svg>
-  );
-}
+const FallbackLucideIcon = HelpCircle;
 
 /**
  * Category icon component.
@@ -74,8 +56,8 @@ export function CategoryIcon({ category, size = "md", className }) {
     <div
       className={cn(
         "inline-flex items-center justify-center rounded-full",
-        "bg-white/10 backdrop-blur-xl",
-        "ring-1 ring-white/10",
+        "bg-surface-soft backdrop-blur-xl",
+        "ring-1 ring-border-subtle",
         className
       )}
       style={{ width: dims.container, height: dims.container }}
@@ -89,9 +71,10 @@ export function CategoryIcon({ category, size = "md", className }) {
           aria-hidden="true"
         />
       ) : (
-        <FallbackIcon
+        <FallbackLucideIcon
           size={dims.icon}
           className="text-text-dim"
+          aria-hidden="true"
         />
       )}
     </div>

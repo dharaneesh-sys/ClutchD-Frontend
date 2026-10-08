@@ -36,7 +36,7 @@ export function WarrantyTerms({ variant = "card" }) {
 
   if (variant === "inline") {
     return (
-      <div className="rounded-xl border p-4 bg-bg-card border-border-subtle">
+      <div className="rounded-2xl border p-4 bg-bg-card border-border-subtle">
         <div className="flex items-start gap-3">
           <div className="w-9 h-9 rounded-full flex items-center justify-center shrink-0 bg-primary/10 text-primary">
             <ShieldCheck size={18} />
@@ -63,7 +63,7 @@ export function WarrantyTerms({ variant = "card" }) {
   }
 
   return (
-    <div className="rounded-xl border p-5 bg-bg-card border-border-subtle">
+    <div className="rounded-2xl border p-5 bg-bg-card border-border-subtle">
       {/* Header */}
       <div className="flex items-start gap-4">
         <div className="w-11 h-11 rounded-full flex items-center justify-center shrink-0 bg-primary/10 text-primary">

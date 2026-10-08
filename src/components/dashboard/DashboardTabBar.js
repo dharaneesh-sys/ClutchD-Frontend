@@ -68,12 +68,12 @@ export function DashboardTabBar({ active, onSelect, tabs = DASHBOARD_TABS }) {
 
   return (
     <nav
+      style={{ boxShadow: "var(--elevation-2)" }}
       className={cn(
         "flex fixed bottom-0 left-0 right-0 z-40",
         "bg-bg-card/85 backdrop-blur-2xl",
         "border-t border-border-subtle",
         "pb-[env(safe-area-inset-bottom)]",
-        "shadow-[0_-4px_20px_rgba(0,0,0,0.12)]"
       )}
       aria-label="Dashboard"
     >
@@ -102,7 +102,7 @@ export function DashboardTabBar({ active, onSelect, tabs = DASHBOARD_TABS }) {
               </div>
               <span
                 className={cn(
-                  "text-[10px] font-semibold leading-none transition-colors duration-200",
+                  "type-label-2 transition-colors duration-200",
                   isActive ? "text-primary" : "text-text-muted"
                 )}
               >

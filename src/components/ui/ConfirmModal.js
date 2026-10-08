@@ -20,9 +20,7 @@ export function ConfirmModal({
           <AlertTriangle
             size={28}
             className={
-              variant === "danger"
-                ? "text-red-500"
-                : "text-warning"
+              variant === "danger" ? "text-danger" : "text-info"
             }
           />
         </div>
@@ -38,12 +36,12 @@ export function ConfirmModal({
           <Button
             onClick={onConfirm}
             isLoading={isLoading}
-            className={`flex-1 ${
+            className={
               variant === "danger"
-                ? "!bg-red-500 hover:!bg-red-600 !text-white"
-                : ""
-            }`}
-          >
+                ? "flex-1 !bg-danger hover:opacity-90 !text-white"
+                : "flex-1"
+            }
+            >
             {confirmLabel}
           </Button>
         </div>

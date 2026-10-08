@@ -127,7 +127,7 @@ function MapLegend() {
               Garage
             </span>
             <span className="map-legend-item">
-              <span className="legend-dot legend-dot-orange" />
+              <span className="legend-dot legend-dot-target" />
               Target
             </span>
           </div>
@@ -260,7 +260,7 @@ export default function MapView({ role = "customer" }) {
   });
 
   return (
-    <div className="w-full h-full rounded-2xl overflow-hidden border border-white/10 relative">
+    <div className="w-full h-full rounded-2xl overflow-hidden border border-border-subtle relative">
       <MapContainer
         center={userLocation}
         zoom={13}

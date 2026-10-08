@@ -7,8 +7,8 @@ export const metadata = {
 export default function NotFound() {
   return (
     <div className="flex items-center justify-center min-h-screen px-4 bg-[var(--background)]">
-      <div className="glass p-8 sm:p-12 text-center max-w-md w-full">
-        <div className="text-6xl font-black bg-gradient-to-r from-[var(--primary)] to-[var(--secondary)] bg-clip-text text-transparent mb-4">
+      <div className="glass-lux rounded-2xl p-8 sm:p-12 text-center max-w-md w-full">
+        <div className="text-6xl font-black bg-gradient-to-r from-[var(--primary)] to-[var(--primary-dark)] bg-clip-text text-transparent mb-4">
           404
         </div>
         <h1 className="text-xl font-bold text-[var(--foreground)] mb-2">Page Not Found</h1>
@@ -17,7 +17,7 @@ export default function NotFound() {
         </p>
         <Link
           href="/auth"
-          className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-[var(--primary)] hover:opacity-90 text-white font-semibold text-sm transition-all duration-200"
+          className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-[var(--primary)] hover:opacity-90 text-[var(--background)] font-semibold text-sm transition-all duration-200"
         >
           Go Home
         </Link>

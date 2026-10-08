@@ -56,9 +56,9 @@ export default function SellerUploadPage() {
   }
 
   return (
-    <div className="min-h-dvh bg-[var(--background)]">
+    <div className="min-h-dvh bg-background">
       {/* Header with visible back button */}
-      <header className="sticky top-0 z-40 border-b border-border-subtle bg-[var(--background)]/90 backdrop-blur-md">
+      <header className="sticky top-0 z-40 border-b border-border-subtle bg-background/90 backdrop-blur-md">
         <div className="mx-auto flex max-w-lg items-center gap-3 px-4 py-3">
           <BackButton fallback="/dashboard/seller" label="Back" />
           <div className="min-w-0 flex-1">

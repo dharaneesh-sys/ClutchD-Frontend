@@ -8,6 +8,14 @@ import { Search, Star, Wrench, MapPin, Phone, ShieldCheck, ShieldOff, Eye, Check
 import { useToast } from "@/components/ui/ToastProvider";
 import { fetchMechanics, verifyMechanic } from "@/services/adminService";
 
+export function filterMechanics(mechanics, searchTerm) {
+  return mechanics.filter((m) =>
+    m.fullName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    m.phone?.includes(searchTerm) ||
+    m.expertise?.some((e) => e.toLowerCase().includes(searchTerm.toLowerCase()))
+  );
+}
+
 export function MechanicsManager() {
   const [searchTerm, setSearchTerm] = useState("");
   const [mechanics, setMechanics] = useState([]);
@@ -48,15 +56,11 @@ export function MechanicsManager() {
     }
   };
 
-  const filtered = mechanics.filter(m =>
-    m.fullName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    m.phone?.includes(searchTerm) ||
-    m.expertise?.some(e => e.toLowerCase().includes(searchTerm.toLowerCase()))
-  );
+  const filtered = filterMechanics(mechanics, searchTerm);
 
   return (
     <>
-      <GlassCard variant="outlined" className="p-4 sm:p-6">
+      <GlassCard className="p-4 sm:p-6">
         <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-4 mb-6">
           <div className="relative w-full sm:w-72">
             <Search size={16} className={`absolute left-3 top-1/2 -translate-y-1/2 ${"text-text-muted"}`} />
@@ -79,46 +83,46 @@ export function MechanicsManager() {
             <table className={`w-full text-left text-sm ${"text-text-primary"}`}>
               <thead className={`text-xs uppercase border-b ${"text-text-dim border-border-subtle"}`}>
                 <tr>
-                  <th className="px-4 pb-3 font-medium">Name</th>
-                  <th className="px-4 pb-3 font-medium">Phone</th>
-                  <th className="px-4 pb-3 font-medium">Skills</th>
-                  <th className="px-4 pb-3 font-medium">Rating</th>
-                  <th className="px-4 pb-3 font-medium">Jobs Done</th>
-                  <th className="px-4 pb-3 font-medium">Verified</th>
-                  <th className="px-4 pb-3 font-medium">Available</th>
-                  <th className="px-4 pb-3 font-medium text-right">Actions</th>
+                  <th className="px-3 pb-2 font-medium">Name</th>
+                  <th className="px-3 pb-2 font-medium">Phone</th>
+                  <th className="px-3 pb-2 font-medium">Skills</th>
+                  <th className="px-3 pb-2 font-medium">Rating</th>
+                  <th className="px-3 pb-2 font-medium">Jobs Done</th>
+                  <th className="px-3 pb-2 font-medium">Verified</th>
+                  <th className="px-3 pb-2 font-medium">Available</th>
+                  <th className="px-3 pb-2 font-medium text-right">Actions</th>
                 </tr>
               </thead>
               <tbody>
                 {filtered.map((m) => (
                   <tr key={m.id} className={`border-b transition-colors ${"border-border-subtle hover:bg-bg-card"}`}>
-                    <td className={`px-4 py-4 font-medium ${"text-text-primary"}`}>{m.fullName}</td>
-                    <td className={`px-4 py-4 ${"text-text-muted"}`}>{m.phone}</td>
-                    <td className="px-4 py-4">
+                    <td className={`px-3 py-3 font-medium ${"text-text-primary"}`}>{m.fullName}</td>
+                    <td className={`px-3 py-3 ${"text-text-muted"}`}>{m.phone}</td>
+                    <td className="px-3 py-3">
                       <div className="flex flex-wrap gap-1">
                         {(m.expertise || []).slice(0, 2).map((s, i) => (
                           <span key={i} className={`text-[10px] px-1.5 py-0.5 rounded ${"bg-surface-soft text-text-primary"}`}>{s}</span>
                         ))}
-                        {(m.expertise || []).length > 2 && <span className="text-[10px] text-stone-400">+{m.expertise.length - 2}</span>}
+                        {(m.expertise || []).length > 2 && <span className="text-[10px] text-text-dim">+{m.expertise.length - 2}</span>}
                       </div>
                     </td>
-                    <td className="px-4 py-4">
+                    <td className="px-3 py-3">
                       <span className="flex items-center gap-1">
                         <Star size={12} className="text-icon-highlight" />
                         {m.rating}
                       </span>
                     </td>
-                    <td className={`px-4 py-4 ${"text-text-primary"}`}>{m.jobsCompleted}</td>
-                    <td className="px-4 py-4">
-                      <Badge variant={m.verified ? "success" : "warning"}>{m.verified ? "Verified" : "Pending"}</Badge>
+                    <td className={`px-3 py-3 ${"text-text-primary"}`}>{m.jobsCompleted}</td>
+                    <td className="px-3 py-3">
+                      <Badge variant={m.verified ? "success" : "pending"}>{m.verified ? "Verified" : "Pending"}</Badge>
                     </td>
-                    <td className="px-4 py-4">
+                    <td className="px-3 py-3">
                       <span className={`flex items-center gap-1 ${m.available ? "text-icon-highlight" : "text-red-500"}`}>
                         <span className={`w-1.5 h-1.5 rounded-full ${m.available ? "bg-green-500" : "bg-red-500"}`} />
                         {m.available ? "Available" : "Busy"}
                       </span>
                     </td>
-                    <td className="px-4 py-4 text-right">
+                    <td className="px-3 py-3 text-right">
                       <div className="flex gap-2 justify-end">
                         <button
                           onClick={() => setProfileModal(m)}
@@ -181,7 +185,7 @@ export function MechanicsManager() {
                         <Wrench size={12} /> {s}
                       </span>
                     ))
-                  : <span className="text-sm text-stone-400">None specified</span>
+                  : <span className="text-sm text-text-dim">None specified</span>
                 }
               </div>
             </div>
@@ -206,7 +210,7 @@ export function MechanicsManager() {
               </div>
             </div>
             <div className="flex gap-3 pt-2">
-              <Badge variant={profileModal.verified ? "success" : "warning"}>{profileModal.verified ? "Verified" : "KYC Pending"}</Badge>
+              <Badge variant={profileModal.verified ? "success" : "pending"}>{profileModal.verified ? "Verified" : "KYC Pending"}</Badge>
               <Badge variant={profileModal.penalized ? "danger" : "default"}>{profileModal.penalized ? "Penalized" : "Clean"}</Badge>
             </div>
           </div>

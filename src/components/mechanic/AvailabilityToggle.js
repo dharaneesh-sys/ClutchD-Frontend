@@ -51,7 +51,7 @@ export function AvailabilityToggle() {
             "w-16 h-16 rounded-full flex items-center justify-center transition-all shadow-lg border-2 relative",
             loading && "opacity-80 cursor-wait",
             isOnline 
-              ? "bg-primary border-primary-light text-white pulse-online" 
+              ? "bg-primary border-primary-light text-[var(--background)]" 
               : "bg-bg-card border-border-subtle text-text-muted"
           )}
         >

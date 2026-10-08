@@ -24,7 +24,7 @@ const KYC_CONFIG = {
     title: "Your identity documents are verified.",
   },
   submitted: {
-    variant: "warning",
+    variant: "pending",
     icon: Clock,
     label: "KYC Under Review",
     title: "Documents received — verification in progress.",

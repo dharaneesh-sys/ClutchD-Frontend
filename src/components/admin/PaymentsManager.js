@@ -9,6 +9,20 @@ import { useToast } from "@/components/ui/ToastProvider";
 import { fetchPayments } from "@/services/adminService";
 import api from "@/lib/api";
 
+export function paymentStatusVariant(status) {
+  switch (status) {
+    case "Captured":
+      return "success";
+    case "Pending":
+      return "pending";
+    case "Failed":
+      return "danger";
+    case "Refunded":
+    default:
+      return "info";
+  }
+}
+
 export function PaymentsManager() {
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("All");
@@ -73,7 +87,7 @@ export function PaymentsManager() {
 
   return (
     <>
-      <GlassCard variant="outlined" className="p-4 sm:p-6">
+      <GlassCard className="p-4 sm:p-6">
         <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-4 mb-6">
           <div className="relative w-full sm:w-72">
             <Search size={16} className={`absolute left-3 top-1/2 -translate-y-1/2 ${"text-text-muted"}`} />
@@ -101,7 +115,7 @@ export function PaymentsManager() {
             <div className="w-8 h-8 border-2 border-t-transparent rounded-full animate-spin border-primary" />
           </div>
         ) : error ? (
-          <div className="py-12 text-center text-red-500">
+          <div className="py-12 text-center text-[var(--danger)]">
             <p>{error}</p>
             <button onClick={loadData} className="mt-3 text-sm underline">Retry</button>
           </div>
@@ -110,46 +124,41 @@ export function PaymentsManager() {
             <table className={`w-full text-left text-sm ${"text-text-primary"}`}>
               <thead className={`text-xs uppercase border-b ${"text-text-dim border-border-subtle"}`}>
                 <tr>
-                  <th className="px-4 pb-3 font-medium">Payment ID</th>
-                  <th className="px-4 pb-3 font-medium">User</th>
-                  <th className="px-4 pb-3 font-medium">Amount</th>
-                  <th className="px-4 pb-3 font-medium">Status</th>
-                  <th className="px-4 pb-3 font-medium">Method</th>
-                  <th className="px-4 pb-3 font-medium">Provider</th>
-                  <th className="px-4 pb-3 font-medium">Date</th>
-                  <th className="px-4 pb-3 font-medium text-right">Actions</th>
+                  <th className="px-3 pb-2 font-medium">Payment ID</th>
+                  <th className="px-3 pb-2 font-medium">User</th>
+                  <th className="px-3 pb-2 font-medium">Amount</th>
+                  <th className="px-3 pb-2 font-medium">Status</th>
+                  <th className="px-3 pb-2 font-medium">Method</th>
+                  <th className="px-3 pb-2 font-medium">Provider</th>
+                  <th className="px-3 pb-2 font-medium">Date</th>
+                  <th className="px-3 pb-2 font-medium text-right">Actions</th>
                 </tr>
               </thead>
               <tbody>
                 {filtered.map((p) => (
                   <tr key={p.id} className={`border-b transition-colors ${"border-border-subtle hover:bg-bg-card"}`}>
-                    <td className={`px-4 py-4 font-mono text-xs ${"text-text-muted"}`}>{p.id?.slice(0, 8)}</td>
-                    <td className={`px-4 py-4 font-medium ${"text-text-primary"}`}>{p.userName}</td>
-                    <td className={`px-4 py-4 font-semibold ${"text-text-primary"}`}>{p.formattedAmount}</td>
-                    <td className="px-4 py-4">
-                      <Badge variant={
-                        p.status === "Captured" ? "success" :
-                        p.status === "Pending" ? "warning" :
-                        p.status === "Failed" ? "danger" :
-                        "info"
-                      }>{p.status}</Badge>
+                    <td className={`px-3 py-3 font-mono text-xs ${"text-text-muted"}`}>{p.id?.slice(0, 8)}</td>
+                    <td className={`px-3 py-3 font-medium ${"text-text-primary"}`}>{p.userName}</td>
+                    <td className={`px-3 py-3 font-semibold ${"text-text-primary"}`}>{p.formattedAmount}</td>
+                    <td className="px-3 py-3">
+                      <Badge variant={paymentStatusVariant(p.status)}>{p.status}</Badge>
                     </td>
-                    <td className="px-4 py-4">
+                    <td className="px-3 py-3">
                       <span className="flex items-center gap-1">
                         <CreditCard size={12} className={"text-text-muted"} />
                         {p.method}
                       </span>
                     </td>
-                    <td className={`px-4 py-4 capitalize ${"text-text-muted"}`}>{p.provider}</td>
-                    <td className={`px-4 py-4 text-xs ${"text-text-muted"}`}>
+                    <td className={`px-3 py-3 capitalize ${"text-text-muted"}`}>{p.provider}</td>
+                    <td className={`px-3 py-3 text-xs ${"text-text-muted"}`}>
                       {p.createdAt ? new Date(p.createdAt).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" }) : "—"}
                     </td>
-                    <td className="px-4 py-4 text-right">
+                    <td className="px-3 py-3 text-right">
                       {p.status === "Captured" && (
                         <button
                           onClick={() => { setRefundModal(p); setRefundAmount(""); }}
                           disabled={actionLoading === "refund"}
-                          className="text-xs flex items-center gap-1 px-2 py-1 rounded border transition-colors bg-bg-card text-red-500 border-border-subtle hover:bg-surface-soft"
+                          className="text-xs flex items-center gap-1 px-2 py-1 rounded border transition-colors bg-bg-card text-[var(--danger)] border-border-subtle hover:bg-surface-soft"
                         >
                           <RefreshCw size={12} /> Refund
                         </button>

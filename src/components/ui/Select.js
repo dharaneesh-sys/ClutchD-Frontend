@@ -19,8 +19,8 @@ export const Select = forwardRef(
             className={cn(
               "appearance-none w-full rounded-xl border pl-4 pr-10 py-3 text-sm transition-all",
               "border-border-subtle bg-surface text-text-primary",
-              "focus:border-primary focus:bg-surface focus:outline-none focus:ring-2 focus:ring-primary/20",
-              error && "border-red-500/50 focus:border-red-500 focus:ring-red-500/20",
+              "focus:border-primary focus:bg-surface focus:ring-2 focus:ring-primary/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--primary)] focus-visible:ring-offset-1 focus-visible:ring-offset-[var(--background)]",
+              error && "border-[var(--danger)] focus:border-[var(--danger)] focus:ring-[color-mix(in_srgb,var(--danger)_30%,transparent)]",
               className
             )}
             aria-invalid={!!error}
@@ -48,7 +48,7 @@ export const Select = forwardRef(
           </div>
         </div>
         {error && (
-          <p id={`${generatedId}-error`} className="mt-1.5 text-xs text-red-400">{error}</p>
+          <p id={`${generatedId}-error`} className="mt-1.5 text-xs text-[var(--danger)]">{error}</p>
         )}
       </div>
     );

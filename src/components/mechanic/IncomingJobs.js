@@ -166,14 +166,14 @@ export function IncomingJobs({ onChat }) {
   };
 
   return (
-    <GlassCard variant="strong" className="p-4 sm:p-6 h-full flex flex-col relative">
+    <GlassCard className="p-4 sm:p-6 h-full flex flex-col relative">
 
       <div className="flex justify-between items-center mb-6">
          <div>
             <h2 className="text-xl font-bold tracking-tight text-text-primary">Job Queue</h2>
             <p className="text-sm text-text-muted">Manage your service requests</p>
          </div>
-        <Badge variant="warning" className="animate-pulse">
+        <Badge variant="pending" className="animate-pulse">
            {pendingOffers.length + jobs.filter(j => j.status === 'pending' || j.status === 'assigned').length} Request(s)
         </Badge>
       </div>
@@ -314,7 +314,7 @@ export function IncomingJobs({ onChat }) {
                   )}
                   <button
                     onClick={() => setDeleteJob(job)}
-                    className={`ml-2 flex items-center justify-center p-1.5 rounded-lg transition-colors text-red-500 hover:bg-red-50 hover:text-red-600 border border-transparent hover:border-red-200`}
+                    className={`ml-2 flex items-center justify-center p-1.5 rounded-lg transition-colors text-danger hover:bg-danger/10 hover:text-danger border border-transparent hover:border-danger/30`}
                     title="Delete Job"
                   >
                     Delete
@@ -348,7 +348,7 @@ export function IncomingJobs({ onChat }) {
         />
 
         {priceError && (
-          <div className="mt-3 flex items-center gap-2 p-3 rounded-xl text-sm bg-red-500/10 border border-red-500/30 text-red-400">
+          <div className="mt-3 flex items-center gap-2 p-3 rounded-xl text-sm bg-danger/10 border border-danger/30 text-danger">
             <AlertTriangle size={14} className="shrink-0" />
             {priceError}
           </div>

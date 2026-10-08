@@ -8,6 +8,14 @@ import { Search, Star, MapPin, Phone, Users, Clock, Wrench, Eye, CheckCircle, XC
 import { useToast } from "@/components/ui/ToastProvider";
 import { fetchGarages, verifyGarage } from "@/services/adminService";
 
+export function filterGarages(garages, searchTerm) {
+  return garages.filter((g) =>
+    g.garageName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    g.ownerName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    g.phone?.includes(searchTerm)
+  );
+}
+
 export function GaragesManager() {
   const [searchTerm, setSearchTerm] = useState("");
   const [garages, setGarages] = useState([]);
@@ -48,15 +56,11 @@ export function GaragesManager() {
     }
   };
 
-  const filtered = garages.filter(g =>
-    g.garageName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    g.ownerName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    g.phone?.includes(searchTerm)
-  );
+  const filtered = filterGarages(garages, searchTerm);
 
   return (
     <>
-      <GlassCard variant="outlined" className="p-4 sm:p-6">
+      <GlassCard className="p-4 sm:p-6">
         <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-4 mb-6">
           <div className="relative w-full sm:w-72">
             <Search size={16} className={`absolute left-3 top-1/2 -translate-y-1/2 ${"text-text-muted"}`} />
@@ -79,34 +83,34 @@ export function GaragesManager() {
             <table className={`w-full text-left text-sm ${"text-text-primary"}`}>
               <thead className={`text-xs uppercase border-b ${"text-text-dim border-border-subtle"}`}>
                 <tr>
-                  <th className="px-4 pb-3 font-medium">Garage Name</th>
-                  <th className="px-4 pb-3 font-medium">Owner</th>
-                  <th className="px-4 pb-3 font-medium">Phone</th>
-                  <th className="px-4 pb-3 font-medium">Rating</th>
-                  <th className="px-4 pb-3 font-medium">Mechanics</th>
-                  <th className="px-4 pb-3 font-medium">Jobs Done</th>
-                  <th className="px-4 pb-3 font-medium">Verified</th>
-                  <th className="px-4 pb-3 font-medium text-right">Actions</th>
+                  <th className="px-3 pb-2 font-medium">Garage Name</th>
+                  <th className="px-3 pb-2 font-medium">Owner</th>
+                  <th className="px-3 pb-2 font-medium">Phone</th>
+                  <th className="px-3 pb-2 font-medium">Rating</th>
+                  <th className="px-3 pb-2 font-medium">Mechanics</th>
+                  <th className="px-3 pb-2 font-medium">Jobs Done</th>
+                  <th className="px-3 pb-2 font-medium">Verified</th>
+                  <th className="px-3 pb-2 font-medium text-right">Actions</th>
                 </tr>
               </thead>
               <tbody>
                 {filtered.map((g) => (
                   <tr key={g.id} className={`border-b transition-colors ${"border-border-subtle hover:bg-bg-card"}`}>
-                    <td className={`px-4 py-4 font-medium ${"text-text-primary"}`}>{g.garageName}</td>
-                    <td className={`px-4 py-4 ${"text-text-primary"}`}>{g.ownerName}</td>
-                    <td className={`px-4 py-4 ${"text-text-muted"}`}>{g.phone}</td>
-                    <td className="px-4 py-4">
+                    <td className={`px-3 py-3 font-medium ${"text-text-primary"}`}>{g.garageName}</td>
+                    <td className={`px-3 py-3 ${"text-text-primary"}`}>{g.ownerName}</td>
+                    <td className={`px-3 py-3 ${"text-text-muted"}`}>{g.phone}</td>
+                    <td className="px-3 py-3">
                       <span className="flex items-center gap-1">
                         <Star size={12} className="text-icon-highlight" />
                         {g.rating}
                       </span>
                     </td>
-                    <td className="px-4 py-4">{g.mechanicCount}</td>
-                    <td className={`px-4 py-4 ${"text-text-primary"}`}>{g.jobsCompleted}</td>
-                    <td className="px-4 py-4">
-                      <Badge variant={g.verified ? "success" : "warning"}>{g.verified ? "Verified" : "Pending"}</Badge>
+                    <td className="px-3 py-3">{g.mechanicCount}</td>
+                    <td className={`px-3 py-3 ${"text-text-primary"}`}>{g.jobsCompleted}</td>
+                    <td className="px-3 py-3">
+                      <Badge variant={g.verified ? "success" : "pending"}>{g.verified ? "Verified" : "Pending"}</Badge>
                     </td>
-                    <td className="px-4 py-4 text-right">
+                    <td className="px-3 py-3 text-right">
                       <div className="flex gap-2 justify-end">
                         <button
                           onClick={() => setProfileModal(g)}
@@ -169,7 +173,7 @@ export function GaragesManager() {
                         <Wrench size={12} /> {s}
                       </span>
                     ))
-                  : <span className="text-sm text-stone-400">None specified</span>
+                  : <span className="text-sm text-text-dim">None specified</span>
                 }
               </div>
             </div>
@@ -200,7 +204,7 @@ export function GaragesManager() {
               </div>
             </div>
             <div className="flex gap-3 pt-2">
-              <Badge variant={profileModal.verified ? "success" : "warning"}>{profileModal.verified ? "Verified" : "KYC Pending"}</Badge>
+              <Badge variant={profileModal.verified ? "success" : "pending"}>{profileModal.verified ? "Verified" : "KYC Pending"}</Badge>
               <Badge variant={profileModal.penalized ? "danger" : "default"}>{profileModal.penalized ? "Penalized" : "Clean"}</Badge>
             </div>
           </div>

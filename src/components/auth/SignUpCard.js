@@ -186,7 +186,7 @@ export function SignUpCard() {
   };
 
   return (
-    <GlassCard variant="glass-lux-strong" className="w-full max-w-xl p-6 sm:p-8 pt-10">
+    <GlassCard variant="glass-lux" className="w-full max-w-xl p-6 sm:p-8 pt-10">
       <div className="mb-8 text-center">
         <h2 className="text-3xl font-bold mb-2 tracking-tight text-text-primary">Create Account</h2>
         <p className="text-text-muted">Join the ultimate on-demand platform</p>
@@ -205,7 +205,7 @@ export function SignUpCard() {
                 flex flex-col items-center p-3 sm:p-4 rounded-xl border transition-all text-center group
                 ${
                   isSelected
-                    ? "bg-surface-soft border-border-subtle text-text-primary shadow-[0_0_15px_rgba(30,41,182,0.2)]"
+                    ? "bg-surface-soft border-border-subtle text-text-primary elevation-1"
                     : "bg-bg-card border-border-subtle text-text-muted hover:bg-surface-soft hover:text-text-primary"
                 }
               `}
@@ -227,7 +227,7 @@ export function SignUpCard() {
         </div>
 
         {authError && (
-          <div className="p-3 rounded-lg bg-red-500/10 border border-red-500/20 text-red-500 text-sm">
+          <div className="p-3 rounded-lg bg-danger/10 border border-danger/20 text-danger text-sm">
             {authError}
           </div>
         )}
@@ -242,7 +242,7 @@ export function SignUpCard() {
              <div className="w-full border-t border-border-subtle"></div>
           </div>
            <div className="relative flex justify-center text-sm">
-              <span className="px-2 bg-primary-soft text-primary-text">Or sign up with</span>
+              <span className="px-2 bg-primary-soft text-muted">Or sign up with</span>
            </div>
         </div>
 

@@ -114,10 +114,10 @@ export function ProductCard({ product, className }) {
           <div className="absolute top-3 left-3">
             <span
               className={cn(
-                "inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[0.6875rem] font-semibold tracking-wide uppercase",
+                "inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 type-label-2 uppercase",
                 availability
                   ? "bg-primary/20 text-primary-light"
-                  : "bg-white/10 text-text-muted"
+                  : "bg-surface-soft text-muted"
               )}
             >
               <span
@@ -139,7 +139,7 @@ export function ProductCard({ product, className }) {
             className={cn(
               "absolute top-3 right-3 inline-flex items-center justify-center w-8 h-8 rounded-full backdrop-blur-xl transition-all active:scale-95",
               "focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/50",
-              fav ? "bg-primary/30 text-white" : "bg-black/30 text-white/80 hover:text-white"
+              fav ? "bg-[var(--color-surface-mid)] text-icon-highlight" : "bg-[var(--surface-container)]/80 text-on-surface-variant hover:text-on-surface"
             )}
           >
             <Heart size={15} className={fav ? "fill-current" : ""} />
@@ -151,14 +151,14 @@ export function ProductCard({ product, className }) {
       <div className="flex flex-1 flex-col p-4 space-y-2.5">
         {/* Brand */}
         <div className="flex items-center justify-between gap-2">
-          <span className="text-[0.6875rem] font-semibold uppercase tracking-wider text-text-dim">
+          <span className="type-label-2 uppercase text-dim">
             {brand || vendor || "Generic"}
           </span>
         </div>
 
         {/* Clickable product name */}
         <Link href={`/marketplace/product/id?id=${id}`}>
-          <h3 className="min-h-10 text-sm font-semibold leading-snug text-foreground line-clamp-2 group-hover:text-primary-light transition-colors">
+          <h3 className="min-h-10 type-title-3 leading-snug text-foreground line-clamp-2 group-hover:text-primary-light transition-colors">
             {name}
           </h3>
         </Link>
@@ -173,7 +173,7 @@ export function ProductCard({ product, className }) {
         {/* Rating — only if real */}
         {Number(rating ?? 0) > 0 && (
           <div className="flex items-center gap-1.5">
-            <Star size={12} className="fill-warning text-icon-highlight" />
+            <Star size={12} className="fill-[var(--color-icon-highlight)] text-icon-highlight" />
             <span className="text-xs font-medium text-text-muted">
               {Number(rating).toFixed(1)}
             </span>
@@ -194,7 +194,7 @@ export function ProductCard({ product, className }) {
               )}
             </div>
             {isProUser && safePrice > 0 && (
-              <span className="inline-flex items-center gap-1 rounded-full bg-purple-500/15 px-2 py-0.5 text-[0.5rem] font-semibold uppercase tracking-wider text-purple-300 whitespace-nowrap shrink-0">
+              <span className="inline-flex items-center gap-1 rounded-full bg-[var(--color-surface-soft)] px-2 py-0.5 text-[0.5rem] font-semibold uppercase tracking-wider text-[var(--primary-light)] whitespace-nowrap shrink-0">
                 <Crown size={8} />
                 Pro -30%
               </span>
@@ -208,8 +208,8 @@ export function ProductCard({ product, className }) {
               "inline-flex items-center justify-center gap-1.5 rounded-lg px-3 py-1.5 text-[0.6875rem] font-semibold transition-all duration-200 shrink-0 whitespace-nowrap w-full sm:w-auto",
               "focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/50",
               adding
-                ? "bg-primary/20 text-primary-light cursor-default"
-                : "bg-primary text-white hover:bg-primary-light active:scale-95"
+                ? "bg-[var(--color-surface-soft)] text-[var(--primary-light)] cursor-default"
+                : "bg-[var(--primary)] text-[var(--background)] hover:bg-[var(--primary-dark)] active:scale-95"
             )}
           >
             {adding ? (

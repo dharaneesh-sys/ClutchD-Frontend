@@ -49,7 +49,7 @@ function FAQAccordion({ faqs, openId, onToggle }) {
               "rounded-2xl border transition-all duration-200 overflow-hidden",
               isOpen
                 ? "glass-lux border-primary/20"
-                : "bg-white/[0.03] border-border-subtle hover:bg-white/[0.05]"
+                : "bg-surface-container-low border-border-subtle hover:bg-surface-soft"
             )}
           >
             <button
@@ -198,11 +198,11 @@ function ReportProblemModal({ isOpen, onClose }) {
                   "shadow-[inset_0_1px_0_rgba(var(--color-white-rgb),0.04)]",
                   "focus:border-primary focus:bg-surface focus:outline-none focus:ring-1 focus:ring-primary/30",
                   "resize-none",
-                  errors.message && "border-red-500/50"
+                  errors.message && "border-danger/50"
                 )}
               />
               {errors.message && (
-                <p className="mt-1.5 text-xs text-red-400">{errors.message}</p>
+                <p className="mt-1.5 text-xs text-danger">{errors.message}</p>
               )}
             </div>
             <Button
@@ -237,7 +237,7 @@ function ContactSupport() {
       label: "Call Support",
       description: "+91 98765 43210",
       href: "tel:+919876543210",
-      color: "bg-blue-500/15 text-blue-400",
+      color: "bg-info/15 text-info",
     },
     {
       icon: MessageCircle,
@@ -258,7 +258,7 @@ function ContactSupport() {
             href={item.href}
             target={item.href.startsWith("http") ? "_blank" : undefined}
             rel={item.href.startsWith("http") ? "noopener noreferrer" : undefined}
-            className="glass-lux rounded-2xl p-4 flex items-center gap-3 hover:bg-white/[0.08] transition-colors"
+            className="glass-lux-interactive rounded-2xl p-4 flex items-center gap-3 transition-colors"
           >
             <div
               className={cn(
@@ -313,7 +313,7 @@ export default function HelpPage() {
       {/* Header */}
       <div className="space-y-1">
         <h1 className="type-headline-3 text-foreground">Help & Support</h1>
-        <p className="type-body-2 text-muted">Find answers and get support</p>
+        <p className="type-body-2 text-text-muted">Find answers and get support</p>
       </div>
 
       {/* Contact Support */}
@@ -329,10 +329,10 @@ export default function HelpPage() {
       <section>
         <button
           onClick={() => setShowReportModal(true)}
-          className="glass-lux rounded-2xl p-4 w-full flex items-center gap-3 hover:bg-white/[0.08] transition-colors text-left"
+          className="glass-lux-interactive rounded-2xl p-4 w-full flex items-center gap-3 transition-colors text-left"
         >
-          <div className="flex-shrink-0 w-10 h-10 rounded-xl bg-red-500/15 flex items-center justify-center">
-            <AlertCircle size={18} className="text-red-400" />
+          <div className="flex-shrink-0 w-10 h-10 rounded-xl bg-danger/15 flex items-center justify-center">
+            <AlertCircle size={18} className="text-danger" />
           </div>
           <div className="flex-1 min-w-0">
             <p className="text-sm font-semibold text-foreground">

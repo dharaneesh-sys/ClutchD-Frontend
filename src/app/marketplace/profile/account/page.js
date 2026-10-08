@@ -76,13 +76,13 @@ export default function AccountDetailsPage() {
   return (
     <div className="p-4 sm:p-5 space-y-5 animate-fade-in-up max-w-2xl">
       <div className="space-y-1">
-        <h1 className="text-lg font-semibold text-foreground">Account Details</h1>
-        <p className="text-sm text-text-muted">Your personal information</p>
+        <h1 className="type-headline-3 text-foreground">Account Details</h1>
+        <p className="type-body-2 text-text-muted">Your personal information</p>
       </div>
 
       {/* Profile Photo & Name */}
       <div className="glass-lux rounded-2xl p-5 flex items-center gap-4">
-        <div className="flex-shrink-0 w-16 h-16 rounded-full bg-gradient-to-br from-primary/30 to-primary/10 ring-2 ring-white/10 flex items-center justify-center">
+        <div className="flex-shrink-0 w-16 h-16 rounded-full bg-gradient-to-br from-primary/30 to-primary/10 ring-2 ring-border-subtle flex items-center justify-center">
           {displayName !== "User" ? (
             <span className="text-lg font-bold text-primary-light">{getInitials(displayName)}</span>
           ) : (
@@ -122,7 +122,7 @@ export default function AccountDetailsPage() {
 function DetailRow({ icon: Icon, label, value }) {
   return (
     <div className="glass-lux rounded-2xl p-4 flex items-center gap-3">
-      <div className="flex-shrink-0 w-9 h-9 rounded-xl bg-white/[0.05] flex items-center justify-center">
+      <div className="flex-shrink-0 w-9 h-9 rounded-xl bg-surface-soft flex items-center justify-center">
         <Icon size={16} className="text-text-muted" />
       </div>
       <div className="flex-1 min-w-0">

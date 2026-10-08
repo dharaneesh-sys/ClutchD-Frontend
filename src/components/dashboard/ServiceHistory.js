@@ -158,7 +158,7 @@ export function ServiceHistory() {
         const isExpanded = expandedInvoice === job.id;
 
         return (
-          <GlassCard key={job.id} variant="strong" className="p-5 flex flex-col">
+          <GlassCard key={job.id} variant="glass-lux" className="p-5 flex flex-col">
             <div className="flex flex-col sm:flex-row gap-4 sm:items-center justify-between">
               <div className="flex-1">
                 <div className="flex items-center gap-3 mb-2">
@@ -204,7 +204,7 @@ export function ServiceHistory() {
                     {!job.isPaid ? (
                       <button 
                         onClick={() => setPaymentJob(job)}
-                        className="flex items-center gap-1.5 px-4 py-1.5 rounded-lg text-xs font-semibold text-white shadow transition-transform active:scale-95 bg-primary-strong hover:bg-primary"
+                        className="flex items-center gap-1.5 px-4 py-1.5 rounded-xl text-xs font-semibold text-[var(--background)] shadow transition-transform active:scale-95 bg-[var(--primary)] hover:bg-[var(--primary-dark)]"
                       >
                         Pay Now
                       </button>
@@ -239,7 +239,7 @@ export function ServiceHistory() {
                   </div>
                   <button
                     onClick={() => setDeleteJob(job)}
-                    className={`ml-2 flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors text-red-500 hover:bg-red-50 hover:text-red-600 border border-red-200`}
+                    className={`ml-2 flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold transition-colors text-[var(--danger)] hover:bg-[color-mix(in_srgb,var(--danger)_12%,transparent)] border border-[color-mix(in_srgb,var(--danger)_35%,transparent)]`}
                   >
                     Delete
                   </button>
@@ -333,7 +333,7 @@ export function ServiceHistory() {
       )}
 
       {errorToast && (
-        <div className="fixed top-4 right-4 z-[100] px-4 py-3 rounded-xl border shadow-2xl text-sm font-medium bg-red-500/10 border-red-500/30 text-red-400">
+        <div className="fixed top-4 right-4 z-[100] px-4 py-3 rounded-xl border shadow-2xl text-sm font-medium bg-[color-mix(in_srgb,var(--danger)_12%,transparent)] border-[color-mix(in_srgb,var(--danger)_35%,transparent)] text-[var(--danger)]">
           {errorToast}
         </div>
       )}

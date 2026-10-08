@@ -26,7 +26,7 @@ export function PlanCard({ plan, isCurrent, onSubscribe, isSubscribing }) {
         "relative flex flex-col p-6 sm:p-7",
         isCurrent
           ? "ring-2 ring-primary/40 shadow-[0_0_30px_rgba(var(--color-primary-rgb),0.12)]"
-          : "ring-1 ring-white/[0.06]"
+          : "ring-1 ring-border-subtle"
       )}
     >
       {/* Badges */}
@@ -37,8 +37,8 @@ export function PlanCard({ plan, isCurrent, onSubscribe, isSubscribing }) {
           </span>
         )}
         {isCurrent && (
-          <span className="inline-flex items-center gap-1.5 rounded-full bg-warning/15 px-3 py-1 text-[0.625rem] font-semibold uppercase tracking-wider text-warning">
-            <span className="w-1.5 h-1.5 rounded-full bg-warning" />
+          <span className="inline-flex items-center gap-1.5 rounded-full bg-pending/15 px-3 py-1 text-[0.625rem] font-semibold uppercase tracking-wider text-pending">
+            <span className="w-1.5 h-1.5 rounded-full bg-pending" />
             Current Plan
           </span>
         )}

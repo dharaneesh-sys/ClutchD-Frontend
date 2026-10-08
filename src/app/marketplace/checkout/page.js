@@ -17,6 +17,7 @@ import {
 import { useCartStore } from "@/store/cartStore";
 import { useOrderStore } from "@/store/orderStore";
 import { Button } from "@/components/ui/Button";
+import { EmptyState } from "@/components/ui/EmptyState";
 import { cn, formatCurrency } from "@/lib/utils";
 
 const DELIVERY_FREE_THRESHOLD = 500;
@@ -148,28 +149,21 @@ export default function CheckoutPage() {
 
   /* ── Redirect if empty cart (only on form step) ───────────────── */
 
-  if (items.length === 0 && step === "form") {
+if (items.length === 0 && step === "form") {
     return (
       <div className="animate-fade-in-up p-4">
         <div className="mx-auto max-w-md">
-          <div className="glass-lux rounded-2xl p-10 text-center">
-            <div className="mx-auto mb-5 flex h-20 w-20 items-center justify-center rounded-full bg-surface-soft">
-              <Package size={36} className="text-icon-highlight" />
-            </div>
-            <h1 className="mb-2 text-2xl font-bold text-text-primary">
-              Nothing to Checkout
-            </h1>
-            <p className="mx-auto mb-6 max-w-xs text-sm text-text-muted">
-              Your cart is empty. Add some items before checking out.
-            </p>
-            <Link
-              href="/marketplace/cart"
-              className="btn-glow inline-flex h-11 items-center gap-2 rounded-xl px-6 text-sm font-medium text-white transition-all hover-lift active-press"
-            >
-              <ChevronLeft size={16} />
-              Back to Cart
-            </Link>
-          </div>
+          <EmptyState
+            icon={Package}
+            title="Nothing to Checkout"
+            description="Your cart is empty. Add some items before checking out."
+            action={
+              <Button onClick={() => router.push("/marketplace/cart")}>
+                <ChevronLeft size={16} className="mr-2" />
+                Back to Cart
+              </Button>
+            }
+          />
         </div>
       </div>
     );
@@ -181,7 +175,7 @@ export default function CheckoutPage() {
     return (
       <div className="animate-fade-in-up p-4">
         <div className="mx-auto max-w-lg">
-          <div className="glass-lux-strong rounded-2xl p-8 text-center">
+          <div className="glass-lux rounded-2xl p-8 text-center">
             <div className="animate-scale-in mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-success/20">
               <CheckCircle size={44} className="text-success" />
             </div>
@@ -220,16 +214,16 @@ export default function CheckoutPage() {
                   ))}
                 </div>
 
-                <div className="border-t border-white/10 pt-3">
+                <div className="border-t border-border-subtle pt-3">
                   <div className="flex items-center justify-between text-sm">
                     <span className="text-text-muted">Total</span>
-                    <span className="tabular-nums text-lg font-bold text-text-primary">
+                    <span className="tabular-nums text-lg font-bold text-primary">
                       {formatCurrency(placedOrder.total)}
                     </span>
                   </div>
                 </div>
 
-                <div className="border-t border-white/10 pt-3">
+                <div className="border-t border-border-subtle pt-3">
                   {placedOrder.address?.shippingMethod === "pickup" ? (
                     <div className="flex items-start gap-2 text-xs text-text-dim">
                       <Store size={14} className="mt-0.5 shrink-0" />
@@ -262,7 +256,7 @@ export default function CheckoutPage() {
 
             <Link
               href="/marketplace"
-              className="btn-glow inline-flex h-11 items-center gap-2 rounded-xl px-8 text-sm font-medium text-white transition-all hover-lift active-press"
+              className="inline-flex h-11 items-center gap-2 rounded-xl bg-gradient-to-b from-[var(--primary-light)] via-[var(--primary)] to-[var(--primary-dark)] px-8 text-sm font-medium text-[var(--background)] shadow-[0_10px_26px_rgba(var(--color-primary-rgb),0.25)] transition-all hover-lift active-press"
             >
               Continue Shopping
             </Link>
@@ -309,7 +303,7 @@ export default function CheckoutPage() {
                     "active-press flex flex-col items-center gap-2 rounded-xl border p-4 text-center transition-all",
                     shippingMethod === "delivery"
                       ? "border-primary/40 bg-primary/10 text-foreground ring-1 ring-primary/30"
-                      : "border-white/10 bg-white/5 text-text-muted hover:border-white/20 hover:bg-white/10 hover:text-foreground",
+                      : "border-border-subtle bg-surface text-text-muted hover:border-outline hover:bg-surface-soft hover:text-foreground",
                   )}
                 >
                   <Truck
@@ -332,7 +326,7 @@ export default function CheckoutPage() {
                     "active-press flex flex-col items-center gap-2 rounded-xl border p-4 text-center transition-all",
                     shippingMethod === "pickup"
                       ? "border-primary/40 bg-primary/10 text-foreground ring-1 ring-primary/30"
-                      : "border-white/10 bg-white/5 text-text-muted hover:border-white/20 hover:bg-white/10 hover:text-foreground",
+                      : "border-border-subtle bg-surface text-text-muted hover:border-outline hover:bg-surface-soft hover:text-foreground",
                   )}
                 >
                   <Store
@@ -447,7 +441,7 @@ export default function CheckoutPage() {
                         "active-press flex flex-col items-center gap-2 rounded-xl border p-4 text-center transition-all",
                         isActive
                           ? "border-primary/40 bg-primary/10 text-foreground ring-1 ring-primary/30"
-                          : "border-white/10 bg-white/5 text-text-muted hover:border-white/20 hover:bg-white/10 hover:text-foreground",
+                          : "border-border-subtle bg-surface text-text-muted hover:border-outline hover:bg-surface-soft hover:text-foreground",
                       )}
                     >
                       <Icon
@@ -469,7 +463,7 @@ export default function CheckoutPage() {
 
           {/* ── Right: Order Summary ────────────────────────────────── */}
           <div className="w-full lg:w-80 xl:w-96">
-            <div className="glass-lux-strong lg:sticky lg:top-4 space-y-5 rounded-2xl p-6">
+            <div className="glass-lux lg:sticky lg:top-4 space-y-5 rounded-2xl p-6">
               <h2 className="text-lg font-semibold text-foreground">
                 Order Summary
               </h2>
@@ -494,7 +488,7 @@ export default function CheckoutPage() {
                 ))}
               </div>
 
-              <div className="space-y-3 border-t border-white/10 pt-3 text-sm">
+              <div className="space-y-3 border-t border-border-subtle pt-3 text-sm">
                 <SummaryRow
                   label="Subtotal"
                   value={formatCurrency(subtotal)}
@@ -536,11 +530,11 @@ export default function CheckoutPage() {
                   />
                 )}
 
-                <div className="border-t border-white/10 pt-3">
+                <div className="border-t border-border-subtle pt-3">
                   <SummaryRow
                     label={<span className="font-semibold text-foreground">Total</span>}
                     value={
-                      <span className="text-lg font-bold text-text-primary tabular-nums">
+                      <span className="text-lg font-bold text-primary tabular-nums">
                         {formatCurrency(total)}
                       </span>
                     }
@@ -596,14 +590,14 @@ function PickupLocationSelector({ selected, onChange, error }) {
               "w-full flex items-start gap-3 rounded-xl border p-4 text-left transition-all",
               selected === store.id
                 ? "border-primary/40 bg-primary/10 ring-1 ring-primary/30"
-                : "border-white/10 bg-white/5 hover:border-white/20 hover:bg-white/10",
-              error && !selected && "border-red-500/50",
+                : "border-border-subtle bg-surface hover:border-outline hover:bg-surface-soft",
+              error && !selected && "border-danger/50",
             )}
           >
             <div
               className={cn(
                 "mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded-full border-2",
-                selected === store.id ? "border-primary" : "border-white/30",
+                selected === store.id ? "border-primary" : "border-outline",
               )}
             >
               {selected === store.id && (
@@ -619,7 +613,7 @@ function PickupLocationSelector({ selected, onChange, error }) {
           </button>
         ))}
       </div>
-      {error && <p className="mt-1 text-xs text-red-400">{error}</p>}
+      {error && <p className="mt-1 text-xs text-danger">{error}</p>}
     </div>
   );
 }
@@ -640,12 +634,12 @@ function FormField({ label, value, error, placeholder, onChange, type = "text", 
           "w-full rounded-2xl border bg-surface px-4 py-3 text-sm text-text-primary transition-all placeholder:text-text-dim",
           "focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary/30",
           error
-            ? "border-red-500/50 focus:border-red-500 focus:ring-red-500/20"
+            ? "border-danger/50 focus:border-danger focus:ring-danger/20"
             : "border-border-subtle",
         )}
       />
       {error && (
-        <p className="mt-1 text-xs text-red-400">{error}</p>
+        <p className="mt-1 text-xs text-danger">{error}</p>
       )}
     </label>
   );

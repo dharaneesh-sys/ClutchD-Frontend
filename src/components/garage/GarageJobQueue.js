@@ -138,14 +138,14 @@ export function GarageJobQueue({ onChat }) {
   };
 
   return (
-    <GlassCard variant="strong" className="p-6 h-full flex flex-col relative">
+    <GlassCard className="p-6 h-full flex flex-col relative">
 
       <div className="flex justify-between items-center mb-6">
          <div>
             <h2 className="text-xl font-bold tracking-tight text-text-primary">Garage Queue</h2>
             <p className="text-sm text-text-muted">Dispatch to your staff</p>
          </div>
-        <Badge variant="warning" className="animate-pulse">
+        <Badge variant="pending" className="animate-pulse">
            {jobs.filter(j => j.status === 'searching' || j.status === 'assigned_to_garage').length} Unassigned
         </Badge>
       </div>

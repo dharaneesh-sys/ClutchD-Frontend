@@ -26,37 +26,37 @@ const TIER_CONFIG = {
   platinum: {
     icon: Crown,
     label: "Platinum",
-    color: "text-sky-300",
-    bg: "bg-sky-500/10",
-    ring: "ring-sky-500/30",
-    gradient: "from-sky-500/20 to-blue-500/10",
+    color: "text-info",
+    bg: "bg-info/15",
+    ring: "ring-info/30",
+    gradient: "from-info/20 to-primary/10",
     discount: "50%",
   },
   gold: {
     icon: Award,
     label: "Gold",
-    color: "text-[var(--primary-light)]",
-    bg: "bg-[var(--color-primary-rgb)]/15",
-    ring: "ring-[var(--color-primary-rgb)]/30",
-    gradient: "from-[var(--color-primary-rgb)]/15 to-teal-500/10",
+    color: "text-primary-light",
+    bg: "bg-primary/15",
+    ring: "ring-primary/30",
+    gradient: "from-primary/15 to-primary/5",
     discount: "30%",
   },
   silver: {
     icon: Star,
     label: "Silver",
-    color: "text-zinc-300",
-    bg: "bg-zinc-500/10",
-    ring: "ring-zinc-500/30",
-    gradient: "from-zinc-500/20 to-gray-500/10",
+    color: "text-text-muted",
+    bg: "bg-surface-soft",
+    ring: "ring-border-subtle",
+    gradient: "from-surface-soft to-surface-mid",
     discount: "15%",
   },
   bronze: {
     icon: Zap,
     label: "Bronze",
-    color: "text-lime-300",
-    bg: "bg-lime-500/10",
-    ring: "ring-lime-500/30",
-    gradient: "from-lime-500/20 to-[var(--color-primary-rgb)]/5",
+    color: "text-pending",
+    bg: "bg-pending/15",
+    ring: "ring-pending/30",
+    gradient: "from-pending/20 to-primary/5",
     discount: "5%",
   },
 };
@@ -245,8 +245,8 @@ export default function ClutchDCardPage() {
 
       {/* Error Banner */}
       {error && (
-        <div className="flex items-start gap-3 glass-lux rounded-2xl p-4 border border-red-500/20 bg-red-500/5">
-          <p className="text-sm text-red-300 flex-1">{error}</p>
+        <div className="flex items-start gap-3 glass-lux rounded-2xl p-4 border border-[var(--danger)]/25 bg-[var(--danger)]/10">
+          <p className="text-sm text-danger flex-1">{error}</p>
           <button
             onClick={fetchData}
             className="text-xs font-medium text-primary-light hover:text-primary shrink-0"
@@ -267,15 +267,15 @@ export default function ClutchDCardPage() {
         )}
       >
         {/* Decorative elements */}
-        <div className="absolute -top-10 -right-10 w-32 h-32 rounded-full bg-white/[0.03] blur-2xl" />
-        <div className="absolute -bottom-10 -left-10 w-32 h-32 rounded-full bg-white/[0.03] blur-2xl" />
+        <div className="absolute -top-10 -right-10 w-32 h-32 rounded-full bg-primary/10 blur-2xl" />
+        <div className="absolute -bottom-10 -left-10 w-32 h-32 rounded-full bg-primary/10 blur-2xl" />
 
         <div className="relative space-y-4">
           {/* Card Header */}
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <CreditCard size={20} className="text-white/70" />
-              <span className="text-xs font-medium text-white/70 uppercase tracking-wider">
+              <CreditCard size={20} className="text-text-muted" />
+              <span className="text-xs font-medium text-text-muted uppercase tracking-wider">
                 ClutchD
               </span>
             </div>
@@ -288,7 +288,7 @@ export default function ClutchDCardPage() {
           {/* Card Number */}
           <div>
             <div className="flex items-center gap-2">
-              <span className="text-lg font-mono font-bold text-white tracking-widest">
+              <span className="text-lg font-mono font-bold text-foreground tracking-widest">
                 {card.card_number}
               </span>
               <CopyButton text={card.card_number} />
@@ -298,18 +298,18 @@ export default function ClutchDCardPage() {
           {/* Stats Row */}
           <div className="grid grid-cols-2 gap-4 pt-2">
             <div>
-              <p className="text-[10px] font-medium text-white/60 uppercase tracking-wider">
+              <p className="text-[10px] font-medium text-text-muted uppercase tracking-wider">
                 Reward Points
               </p>
-              <p className="text-xl font-bold text-white mt-0.5">
+              <p className="text-xl font-bold text-foreground mt-0.5">
                 {card.reward_points.toLocaleString()}
               </p>
             </div>
             <div>
-              <p className="text-[10px] font-medium text-white/60 uppercase tracking-wider">
+              <p className="text-[10px] font-medium text-text-muted uppercase tracking-wider">
                 Total Spent
               </p>
-              <p className="text-xl font-bold text-white mt-0.5">
+              <p className="text-xl font-bold text-foreground mt-0.5">
                 {formatCurrency(card.total_spent)}
               </p>
             </div>
@@ -330,7 +330,7 @@ export default function ClutchDCardPage() {
         </div>
 
         {/* Progress Bar */}
-        <div className="relative h-2.5 rounded-full bg-white/5 overflow-hidden">
+        <div className="relative h-2.5 rounded-full bg-surface-soft overflow-hidden">
           <div
             className={cn(
               "absolute inset-y-0 left-0 rounded-full transition-all duration-500",
@@ -353,11 +353,11 @@ export default function ClutchDCardPage() {
 
         {/* Member stats */}
         <div className="grid grid-cols-2 gap-3 pt-2">
-          <div className="bg-white/[0.03] rounded-xl p-3 text-center">
+          <div className="bg-surface-soft rounded-xl p-3 text-center">
             <p className="text-xs text-text-muted">Orders</p>
             <p className="text-lg font-bold text-foreground mt-0.5">{card.total_orders}</p>
           </div>
-          <div className="bg-white/[0.03] rounded-xl p-3 text-center">
+          <div className="bg-surface-soft rounded-xl p-3 text-center">
             <p className="text-xs text-text-muted">Discount</p>
             <p className="text-lg font-bold text-primary-light mt-0.5">{tier.discount}</p>
           </div>

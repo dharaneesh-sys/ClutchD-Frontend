@@ -150,13 +150,13 @@ describe("ProviderList selectors — #185 regression", () => {
     mockState._mechs = [mechA, mechB];
     mockState._garages = [garageA];
 
-    let prevMechs = useTrackingStore((s) => s.nearbyMechanics);
-    let prevGarages = useTrackingStore((s) => s.nearbyGarages);
+    let prevMechs = useTrackingStore.getState().nearbyMechanics;
+    let prevGarages = useTrackingStore.getState().nearbyGarages;
 
     // Simulate 10 sequential render cycles — like the cascade from #185
     for (let i = 0; i < 10; i++) {
-      const mechs = useTrackingStore((s) => s.nearbyMechanics);
-      const garages = useTrackingStore((s) => s.nearbyGarages);
+      const mechs = useTrackingStore.getState().nearbyMechanics;
+      const garages = useTrackingStore.getState().nearbyGarages;
 
       // Every read must return the SAME reference (Object.is stable)
       expect(mechs).toBe(prevMechs);

@@ -78,8 +78,8 @@ export function ProfileEditor() {
             </span>
           )}
           {isEditing && (
-             <div className="absolute inset-0 bg-black/60 flex items-center justify-center cursor-pointer">
-                <span className="text-xs text-white">Change</span>
+             <div className="absolute inset-0 bg-[rgba(0,0,0,0.32)] flex items-center justify-center cursor-pointer">
+                <span className="text-xs text-[var(--background)]">Change</span>
              </div>
           )}
         </div>

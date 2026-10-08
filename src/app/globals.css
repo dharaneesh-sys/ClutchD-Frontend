@@ -11,7 +11,11 @@
   --primary-light: #2e3bd1;
   --accent: #1E29B6;
   --danger: #ef4444;
-  --warning: #3b82f6;
+  --info: #3b82f6;
+  --pending: #f59e0b;
+  --pending-bg: rgba(245,158,11,0.14);
+  --pending-text: #b45309;
+  --warning: var(--info); /* deprecated one-release alias (D7) */
   --success: #22c55e;
 
   --color-primary-rgb: 30, 41, 182;
@@ -96,7 +100,11 @@
   --primary-light: #8cc3f5;
   --accent: #4aa5f5;
   --danger: #ef4444;
-  --warning: #60a5fa;
+  --info: #60a5fa;
+  --pending: #fbbf24;
+  --pending-bg: rgba(251,191,36,0.16);
+  --pending-text: #fcd34d;
+  --warning: var(--info); /* deprecated one-release alias (D7) */
   --success: #22c55e;
 
   --color-primary-rgb: 74, 165, 245;
@@ -188,7 +196,8 @@
   --color-primary-light: var(--primary-light);
   --color-accent: var(--accent);
   --color-danger: var(--danger);
-  --color-warning: var(--warning);
+  --color-info: var(--info);
+  --color-pending: var(--pending);
   --color-success: var(--success);
   --color-surface: var(--surface);
   --color-surface-dim: var(--surface-dim);
@@ -277,25 +286,18 @@ h1, h2, h3, h4 {
   letter-spacing: -0.02em;
 }
 
-.glass {
-  background: var(--glass-bg);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid var(--glass-border);
-  border-radius: 1rem;
-}
-
-.glass-strong {
-  background: rgba(24, 24, 27, 0.6);
-  backdrop-filter: blur(24px);
-  -webkit-backdrop-filter: blur(24px);
-  border: 1px solid rgba(var(--color-white-rgb), 0.1);
-  border-radius: 1.25rem;
-}
-
-.glass-hover:hover {
-  background: var(--glass-hover);
-  border-color: rgba(var(--color-white-rgb), 0.12);
+/* Deprecated one-release aliases (D5, Wave-1): collapse onto glass-lux. Banned for new code. */
+.glass,
+.glass-strong,
+.surface-elevated,
+.surface-filled,
+.surface-outlined {
+  background: var(--glass-lux-bg);
+  backdrop-filter: blur(20px) saturate(1.3);
+  -webkit-backdrop-filter: blur(20px) saturate(1.3);
+  border: 1px solid var(--glass-lux-border);
+  border-radius: var(--glass-lux-radius);
+  box-shadow: var(--glass-lux-shadow);
 }
 
 /* Glass-Lux System — clean, no pseudo-element gradients */
@@ -308,15 +310,6 @@ h1, h2, h3, h4 {
   box-shadow: var(--glass-lux-shadow);
 }
 
-.glass-lux-strong {
-  background: var(--glass-lux-bg-strong);
-  backdrop-filter: blur(32px) saturate(1.4);
-  -webkit-backdrop-filter: blur(32px) saturate(1.4);
-  border: 1px solid rgba(var(--color-white-rgb), 0.08);
-  border-color: var(--glass-lux-border-accent);
-  border-radius: var(--glass-lux-radius);
-  box-shadow: var(--glass-lux-shadow), inset 0 1px 0 rgba(var(--color-white-rgb), 0.05);
-}
 
 .glass-lux-interactive {
   background: var(--glass-lux-bg);
@@ -338,24 +331,7 @@ h1, h2, h3, h4 {
   transform: scale(0.99);
 }
 
-/* M3 Surface Card Variants */
-.surface-elevated {
-  background: var(--surface-container-low);
-  border: 1px solid var(--outline-variant);
-  box-shadow: var(--elevation-1);
-  border-radius: 0.75rem;
-}
-
-.surface-filled {
-  background: var(--surface-container);
-  border-radius: 0.75rem;
-}
-
-.surface-outlined {
-  background: transparent;
-  border: 1px solid var(--outline);
-  border-radius: 0.75rem;
-}
+/* M3 surface roles resolve to tokens and the glass-lux alias group above (D4, D5, D15.1). */
 
 /* M3 Elevation Classes */
 .elevation-1 { box-shadow: var(--elevation-1); }
@@ -365,9 +341,6 @@ h1, h2, h3, h4 {
 .elevation-5 { box-shadow: var(--elevation-5); }
 
 /* M3 Type Scale Utilities */
-.type-display {
-  font-size: 3.5625rem; line-height: 1.15; font-weight: 400; letter-spacing: -0.015em;
-}
 .type-headline-1 {
   font-size: 2rem; line-height: 1.25; font-weight: 400;
 }
@@ -560,11 +533,11 @@ h1, h2, h3, h4 {
   }
 }
 
-.status-searching { color: #3b82f6; }
-.status-assigned { color: #3b82f6; }
-.status-enroute { color: #8b5cf6; }
+.status-searching { color: var(--info); }
+.status-assigned { color: var(--info); }
+.status-enroute { color: var(--pending); }
 .status-inprogress { color: var(--primary); }
-.status-completed { color: #22c55e; }
+.status-completed { color: var(--success); }
 
 /* Leaflet map overrides */
 .leaflet-container {
@@ -576,7 +549,7 @@ h1, h2, h3, h4 {
   background: rgba(24, 24, 27, 0.95) !important;
   backdrop-filter: blur(10px);
   border: 1px solid rgba(var(--color-white-rgb), 0.15);
-  border-radius: 0.75rem !important;
+  border-radius: 1rem !important;
   color: #fafafa !important;
 }
 .leaflet-popup-tip { background: rgba(24, 24, 27, 0.95) !important; }
@@ -793,11 +766,11 @@ h1, h2, h3, h4 {
   flex-shrink: 0;
   box-shadow: 0 1px 2px rgba(0,0,0,0.3);
 }
-.legend-dot-blue    { background: #3b82f6; }
-.legend-dot-red     { background: #ef4444; }
-.legend-dot-green   { background: #22c55e; }
-.legend-dot-violet  { background: #8b5cf6; }
-.legend-dot-orange  { background: #0ea5e9; }
+.legend-dot-blue    { background: var(--primary); }
+.legend-dot-red     { background: var(--danger); }
+.legend-dot-green   { background: var(--success); }
+.legend-dot-violet  { background: var(--pending); }
+.legend-dot-target  { background: var(--info); }
 
 :is(.light, [data-theme="light"]) .map-legend {
   background: rgba(255, 255, 255, 0.9);
@@ -827,7 +800,7 @@ h1, h2, h3, h4 {
   align-items: center;
   gap: 4px;
   font-size: 0.6875rem;
-  color: #3b82f6;
+  color: var(--info);
   margin-bottom: 2px;
 }
 .map-popup-rating span {
@@ -846,19 +819,19 @@ h1, h2, h3, h4 {
 
 /* ─── Marker Cluster Overrides (dark theme) ────────────────────────────── */
 .marker-cluster-small {
-  background-color: rgba(16, 185, 129, 0.2) !important;
+  background-color: rgba(34, 197, 94, 0.2) !important;
 }
 .marker-cluster-small div {
-  background-color: rgba(16, 185, 129, 0.5) !important;
+  background-color: rgba(34, 197, 94, 0.5) !important;
   color: #fafafa !important;
   font-weight: 600;
   font-size: 0.8125rem;
 }
 .marker-cluster-medium {
-  background-color: rgba(14, 165, 233, 0.2) !important;
+  background-color: rgba(59, 130, 246, 0.2) !important;
 }
 .marker-cluster-medium div {
-  background-color: rgba(14, 165, 233, 0.5) !important;
+  background-color: rgba(59, 130, 246, 0.5) !important;
   color: #fafafa !important;
   font-weight: 600;
   font-size: 0.8125rem;
@@ -881,10 +854,10 @@ h1, h2, h3, h4 {
   color: #171a2e !important;
 }
 :is(.light, [data-theme="light"]) .marker-cluster-medium {
-  background-color: rgba(14, 165, 233, 0.15) !important;
+  background-color: rgba(59, 130, 246, 0.15) !important;
 }
 :is(.light, [data-theme="light"]) .marker-cluster-medium div {
-  background-color: rgba(14, 165, 233, 0.4) !important;
+  background-color: rgba(59, 130, 246, 0.4) !important;
   color: #171a2e !important;
 }
 :is(.light, [data-theme="light"]) .marker-cluster-large {
@@ -913,11 +886,6 @@ h1, h2, h3, h4 {
   box-shadow: 0 1px 3px rgba(0,0,0,0.03), 0 8px 32px rgba(0,0,0,0.06);
 }
 
-:is(.light, [data-theme="light"]) .glass-hover:hover {
-  background: #fff;
-  border-color: rgba(30,41,182,0.2);
-  box-shadow: 0 1px 3px rgba(0,0,0,0.03), 0 12px 40px rgba(30,41,182,0.08);
-}
 
 :is(.light, [data-theme="light"]) .glass-lux {
   background: rgba(255, 249, 235, 0.85);
@@ -927,13 +895,6 @@ h1, h2, h3, h4 {
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04), 0 1px 4px rgba(0, 0, 0, 0.03), inset 0 1px 0 rgba(255, 255, 255, 0.8);
 }
 
-:is(.light, [data-theme="light"]) .glass-lux-strong {
-  background: rgba(255, 249, 235, 0.92);
-  backdrop-filter: blur(32px) saturate(1.3);
-  -webkit-backdrop-filter: blur(32px) saturate(1.3);
-  border: 1px solid rgba(30, 41, 182, 0.12);
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05), 0 1px 6px rgba(0, 0, 0, 0.03), inset 0 1px 0 rgba(255, 255, 255, 0.9);
-}
 
 :is(.light, [data-theme="light"]) .glass-lux-interactive {
   background: rgba(255, 249, 235, 0.85);
@@ -991,7 +952,7 @@ h1, h2, h3, h4 {
 /* Mobile-first — touch targets, density */
 @media (max-width: 640px) {
   button, a, [role="button"] { min-height: 44px; }
-  .glass, .glass-strong { border-radius: 0.875rem; }
+  .glass-lux, .glass-lux-interactive, .glass, .glass-strong { border-radius: 0.875rem; }
 }
 
 /* Print styles */
@@ -1006,7 +967,7 @@ h1, h2, h3, h4 {
     -webkit-print-color-adjust: exact;
     print-color-adjust: exact;
   }
-  .glass, .glass-strong {
+  .glass-lux, .glass-lux-interactive, .glass, .glass-strong {
     background: white !important;
     border: 1px solid #ddd !important;
     box-shadow: none !important;
@@ -1020,26 +981,4 @@ h1, h2, h3, h4 {
   a { color: #111 !important; text-decoration: underline; }
 }
 
-.dark {
-  --chart-1: oklch(1 0 none);
-  --chart-2: oklch(0.73 0 none);
-  --chart-3: oklch(0.51 0 none);
-  --chart-4: oklch(0.39 0 none);
-  --chart-5: oklch(0.32 0 none);
-  --chart-background: oklch(0.145 0 0);
-  --chart-foreground: oklch(0.45 0 0);
-  --chart-foreground-muted: oklch(0.65 0.01 260);
-  --chart-crosshair: oklch(0.45 0 0);
-  --chart-grid: oklch(0.25 0 0);
-  --chart-brush-border: var(--chart-grid);
-  --chart-marker-background: oklch(0.25 0.01 260);
-  --chart-marker-border: oklch(0.4 0.01 260);
-  --chart-marker-foreground: oklch(0.9 0 0);
-  --chart-label: oklch(0.75 0.01 260);
-  --chart-scale-01: oklch(0.28 0.03 270);
-  --chart-scale-02: oklch(0.38 0.04 270);
-  --chart-scale-03: oklch(0.48 0.05 270);
-  --chart-scale-04: oklch(0.58 0.06 270);
-  --chart-scale-05: oklch(0.68 0.07 270);
-  --chart-scale-pattern-color: oklch(0.145 0 0);
-}
+/* Dark theme lives under [data-theme="dark"] above (D1/D2). No .dark block. */

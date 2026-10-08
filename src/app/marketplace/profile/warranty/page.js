@@ -28,7 +28,12 @@ import { WarrantyTerms } from "@/components/dashboard/WarrantyTerms";
 
 function ClaimStatusBadge({ status }) {
   const config = CLAIM_STATUSES[status] || { label: status, color: "default" };
-  return <Badge variant={config.color}>{config.label}</Badge>;
+  // D7: only sanctioned variants reach Badge. Legacy mapping is
+  // "warning" ? "pending", with any other unknown store color also
+  // falling back to pending amber at this boundary.
+  const sanctioned = ["info", "pending", "success", "danger", "default"];
+  const variant = sanctioned.includes(config.color) ? config.color : "pending";
+  return <Badge variant={variant}>{config.label}</Badge>;
 }
 
 // ─── Claim Card ────────────────────────────────────────────────────────────
@@ -37,7 +42,7 @@ function ClaimCard({ claim, onViewDetails }) {
   return (
     <button
       onClick={() => onViewDetails(claim)}
-      className="w-full glass-lux rounded-2xl p-4 space-y-3 text-left hover:bg-white/[0.02] transition-colors animate-fade-in-up"
+      className="w-full glass-lux-interactive rounded-2xl p-4 space-y-3 text-left animate-fade-in-up"
     >
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0 flex-1">
@@ -236,14 +241,13 @@ function NewClaimForm({ isOpen, onClose, onSubmitted, completedServices }) {
             className={cn(
               "w-full rounded-2xl border px-4 py-3 text-sm transition-all resize-none",
               "border-border-subtle bg-surface text-text-primary placeholder:text-text-dim",
-              "shadow-[inset_0_1px_0_rgba(var(--color-white-rgb),0.04)]",
               "focus:border-primary focus:bg-surface focus:outline-none focus:ring-1 focus:ring-primary/30",
-              errors.description && "border-red-500/50 focus:border-red-500 focus:ring-red-500/20"
+              errors.description && "border-[var(--danger)]/50 focus:border-[var(--danger)] focus:ring-[var(--danger)]/20"
             )}
             aria-invalid={!!errors.description}
           />
           {errors.description && (
-            <p className="mt-1.5 text-xs text-red-400">{errors.description}</p>
+            <p className="mt-1.5 text-xs text-danger">{errors.description}</p>
           )}
         </div>
 
@@ -400,7 +404,7 @@ export default function WarrantyClaimsPage() {
                 "flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-semibold transition-all whitespace-nowrap border",
                 isActive
                   ? "bg-primary/10 text-foreground border-primary/30 shadow-sm"
-                  : "bg-white/5 text-text-muted border-transparent hover:bg-white/10 hover:text-foreground"
+                  : "bg-surface-soft text-text-muted border-transparent hover:bg-surface-mid hover:text-foreground"
               )}
             >
               <Icon size={14} />
@@ -411,7 +415,7 @@ export default function WarrantyClaimsPage() {
                     "ml-1 text-[10px] px-1.5 py-0.5 rounded-full",
                     isActive
                       ? "bg-primary/20 text-primary-light"
-                      : "bg-white/10 text-text-dim"
+                      : "bg-surface-soft text-text-dim"
                   )}
                 >
                   {count}
@@ -430,9 +434,9 @@ export default function WarrantyClaimsPage() {
               key={i}
               className="glass-lux rounded-2xl p-4 animate-pulse space-y-3"
             >
-              <div className="h-4 bg-white/5 rounded w-1/3" />
-              <div className="h-3 bg-white/5 rounded w-2/3" />
-              <div className="h-3 bg-white/5 rounded w-1/4" />
+              <div className="h-4 bg-surface-soft rounded w-1/3" />
+              <div className="h-3 bg-surface-soft rounded w-2/3" />
+              <div className="h-3 bg-surface-soft rounded w-1/4" />
             </div>
           ))}
         </div>

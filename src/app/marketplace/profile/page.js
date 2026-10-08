@@ -93,12 +93,12 @@ export default function ProfilePage() {
       {/* Profile Header Card */}
       <div className="glass-lux rounded-2xl p-5 relative overflow-hidden">
         {/* Decorative gradient */}
-        <div className="absolute -top-20 -right-20 w-40 h-40 rounded-full bg-primary/[0.06] blur-3xl pointer-events-none" />
+        <div className="absolute -top-20 -right-20 w-40 h-40 rounded-full bg-surface-soft blur-3xl pointer-events-none" />
 
         <div className="flex items-start gap-4 relative">
           {/* Avatar */}
           <div className="flex-shrink-0">
-            <div className="w-16 h-16 rounded-full bg-gradient-to-br from-primary/30 to-primary/10 ring-2 ring-white/10 flex items-center justify-center">
+            <div className="w-16 h-16 rounded-full bg-gradient-to-br from-primary/30 to-primary/10 ring-2 ring-border-subtle flex items-center justify-center">
               {user?.name ? (
                 <span className="text-lg font-bold text-primary-light">
                   {getInitials(user.name)}
@@ -111,7 +111,7 @@ export default function ProfilePage() {
 
           {/* Info */}
           <div className="flex-1 min-w-0">
-            <h2 className="text-lg font-bold text-foreground truncate">
+            <h2 className="type-headline-3 text-foreground truncate">
               {displayName}
             </h2>
             <div className="flex flex-col gap-1 mt-1.5">
@@ -144,14 +144,14 @@ export default function ProfilePage() {
               "flex-shrink-0 inline-flex items-center gap-1.5 rounded-full px-2.5 py-1",
               "text-[0.625rem] font-semibold tracking-wide uppercase",
               isAuthenticated
-                ? "bg-warning/15 text-warning"
-                : "bg-warning/15 text-warning"
+                ? "bg-success/15 text-success"
+                : "bg-pending/15 text-pending"
             )}
           >
             <span
               className={cn(
                 "w-1.5 h-1.5 rounded-full",
-                isAuthenticated ? "bg-warning" : "bg-warning"
+                isAuthenticated ? "bg-success" : "bg-pending"
               )}
             />
             {isAuthenticated ? "Active" : "Guest"}
@@ -175,7 +175,7 @@ export default function ProfilePage() {
       {/* Quick Stats — values sourced from real API data */}
       <div className="grid grid-cols-3 gap-3">
         <div className="glass-lux rounded-2xl p-4 text-center">
-          <div className="w-8 h-8 rounded-lg bg-primary/[0.12] flex items-center justify-center mx-auto mb-2">
+          <div className="w-8 h-8 rounded-lg bg-primary-soft flex items-center justify-center mx-auto mb-2">
             <ShoppingBag size={16} className="text-primary-light" />
           </div>
           <p className="text-lg font-bold text-foreground">
@@ -186,8 +186,8 @@ export default function ProfilePage() {
           </p>
         </div>
         <div className="glass-lux rounded-2xl p-4 text-center">
-          <div className="w-8 h-8 rounded-lg bg-warning/10 flex items-center justify-center mx-auto mb-2">
-            <Wrench size={16} className="text-warning" />
+          <div className="w-8 h-8 rounded-lg bg-primary-mid flex items-center justify-center mx-auto mb-2">
+            <Wrench size={16} className="text-primary-light" />
           </div>
           <p className="text-lg font-bold text-foreground">
             {stats.active ?? "—"}
@@ -197,7 +197,7 @@ export default function ProfilePage() {
           </p>
         </div>
         <div className="glass-lux rounded-2xl p-4 text-center">
-          <div className="w-8 h-8 rounded-lg bg-[var(--color-primary-rgb)]/15[0.12] flex items-center justify-center mx-auto mb-2">
+          <div className="w-8 h-8 rounded-lg bg-primary-soft flex items-center justify-center mx-auto mb-2">
             <Gift size={16} className="text-icon-highlight" />
           </div>
           <p className="text-lg font-bold text-foreground">
@@ -212,14 +212,14 @@ export default function ProfilePage() {
       {/* Quick Action: View Account Details */}
       <button
         onClick={() => router.push("/marketplace/profile/account")}
-        className="glass-lux rounded-2xl p-4 w-full flex items-center gap-3 hover:bg-white/[0.03] transition-colors text-left"
+        className="glass-lux-interactive rounded-2xl p-4 w-full flex items-center gap-3 text-left"
       >
-        <div className="w-10 h-10 rounded-xl bg-primary/[0.12] flex items-center justify-center flex-shrink-0">
+        <div className="w-10 h-10 rounded-xl bg-primary-soft flex items-center justify-center flex-shrink-0">
           <User size={18} className="text-primary-light" />
         </div>
         <div className="flex-1 min-w-0">
           <p className="text-sm font-semibold text-foreground">Account Details</p>
-          <p className="text-xs text-text-muted mt-0.5">View and manage your account information</p>
+          <p className="type-body-2 text-text-muted mt-0.5">View and manage your account information</p>
         </div>
         <ChevronRight size={18} className="text-text-muted flex-shrink-0" />
       </button>

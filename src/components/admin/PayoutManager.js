@@ -22,20 +22,20 @@ import {
 
 // ─── Status badge variant mapper ───────────────────────────────────────────
 
-function statusBadge(status) {
+export function statusBadge(status) {
   switch (status) {
     case "ready":
-      return "success";
+      return "pending";
     case "paid":
-      return "info";
+      return "success";
     case "below_threshold":
-      return "warning";
+      return "pending";
     default:
       return "default";
   }
 }
 
-function statusLabel(status) {
+export function statusLabel(status) {
   switch (status) {
     case "ready":
       return "Ready";
@@ -194,9 +194,9 @@ export function PayoutManager() {
     <>
       {/* ── Stats row ────────────────────────────────────────────────── */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-        <GlassCard variant="outlined" className="p-4">
+        <GlassCard className="p-4">
           <div className="flex items-center gap-3">
-            <div className="p-2.5 rounded-xl bg-green-500/15 text-green-400">
+            <div className="p-2.5 rounded-xl bg-[var(--pending-bg)] text-[var(--pending-text)]">
               <Wallet size={20} />
             </div>
             <div>
@@ -210,9 +210,9 @@ export function PayoutManager() {
           </div>
         </GlassCard>
 
-        <GlassCard variant="outlined" className="p-4">
+        <GlassCard className="p-4">
           <div className="flex items-center gap-3">
-            <div className="p-2.5 rounded-xl bg-blue-500/15 text-blue-400">
+            <div className="p-2.5 rounded-xl bg-[color-mix(in_srgb,var(--success)_14%,transparent)] text-[var(--success)]">
               <CheckCircle size={20} />
             </div>
             <div>
@@ -226,9 +226,9 @@ export function PayoutManager() {
           </div>
         </GlassCard>
 
-        <GlassCard variant="outlined" className="p-4">
+        <GlassCard className="p-4">
           <div className="flex items-center gap-3">
-            <div className="p-2.5 rounded-xl bg-warning/15 text-warning">
+            <div className="p-2.5 rounded-xl bg-[var(--pending-bg)] text-[var(--pending-text)]">
               <Calendar size={20} />
             </div>
             <div>
@@ -242,9 +242,9 @@ export function PayoutManager() {
           </div>
         </GlassCard>
 
-        <GlassCard variant="outlined" className="p-4">
+        <GlassCard className="p-4">
           <div className="flex items-center gap-3">
-            <div className="p-2.5 rounded-xl bg-purple-500/15 text-purple-400">
+            <div className="p-2.5 rounded-xl bg-[color-mix(in_srgb,var(--info)_14%,transparent)] text-[var(--info)]">
               <DollarSign size={20} />
             </div>
             <div>
@@ -261,7 +261,7 @@ export function PayoutManager() {
 
       {/* ── Schedule config + upcoming dates ─────────────────────────── */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-6">
-        <GlassCard variant="outlined" className="p-4 lg:col-span-1">
+        <GlassCard className="p-4 lg:col-span-1">
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-sm font-semibold text-text-primary flex items-center gap-2">
               <Settings size={16} />
@@ -296,7 +296,7 @@ export function PayoutManager() {
           </div>
         </GlassCard>
 
-        <GlassCard variant="outlined" className="p-4 lg:col-span-2">
+        <GlassCard className="p-4 lg:col-span-2">
           <h3 className="text-sm font-semibold text-text-primary flex items-center gap-2 mb-4">
             <Calendar size={16} />
             Upcoming Payout Dates
@@ -329,7 +329,7 @@ export function PayoutManager() {
       </div>
 
       {/* ── Mechanic payout table ────────────────────────────────────── */}
-      <GlassCard variant="outlined" className="p-4 sm:p-6">
+      <GlassCard className="p-4 sm:p-6">
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-sm font-semibold text-text-primary">
             Mechanic Payout Ledger
@@ -349,7 +349,7 @@ export function PayoutManager() {
             <div className="w-8 h-8 border-2 border-t-transparent rounded-full animate-spin border-primary" />
           </div>
         ) : error ? (
-          <div className="py-12 text-center text-red-500">
+          <div className="py-12 text-center text-[var(--danger)]">
             <AlertCircle size={24} className="mx-auto mb-2" />
             <p className="text-sm">{error}</p>
             <button onClick={loadData} className="mt-3 text-xs underline">
@@ -366,12 +366,12 @@ export function PayoutManager() {
             <table className="w-full text-left text-sm text-text-primary">
               <thead className="text-xs uppercase border-b border-border-subtle text-text-dim">
                 <tr>
-                  <th className="px-4 pb-3 font-medium">Mechanic</th>
-                  <th className="px-4 pb-3 font-medium text-right">Jobs Done</th>
-                  <th className="px-4 pb-3 font-medium text-right">Pending Amount</th>
-                  <th className="px-4 pb-3 font-medium">Next Payout</th>
-                  <th className="px-4 pb-3 font-medium">Status</th>
-                  <th className="px-4 pb-3 font-medium text-right">Action</th>
+                  <th className="px-3 pb-2 font-medium">Mechanic</th>
+                  <th className="px-3 pb-2 font-medium text-right">Jobs Done</th>
+                  <th className="px-3 pb-2 font-medium text-right">Pending Amount</th>
+                  <th className="px-3 pb-2 font-medium">Next Payout</th>
+                  <th className="px-3 pb-2 font-medium">Status</th>
+                  <th className="px-3 pb-2 font-medium text-right">Action</th>
                 </tr>
               </thead>
               <tbody>
@@ -380,14 +380,14 @@ export function PayoutManager() {
                     key={m.mechanicId}
                     className="border-b border-border-subtle transition-colors hover:bg-bg-card"
                   >
-                    <td className="px-4 py-4 font-medium">{m.mechanicName}</td>
-                    <td className="px-4 py-4 text-right text-text-muted">
+                    <td className="px-3 py-3 font-medium">{m.mechanicName}</td>
+                    <td className="px-3 py-3 text-right text-text-muted">
                       {m.completedJobs}
                     </td>
-                    <td className="px-4 py-4 text-right font-semibold">
+                    <td className="px-3 py-3 text-right font-semibold">
                       ₹{m.pendingAmount.toLocaleString("en-IN")}
                     </td>
-                    <td className="px-4 py-4">
+                    <td className="px-3 py-3">
                       {m.nextPayoutDate ? (
                         <span className="flex items-center gap-1.5 text-xs">
                           <Calendar size={12} className="text-text-muted" />
@@ -400,12 +400,12 @@ export function PayoutManager() {
                         </span>
                       )}
                     </td>
-                    <td className="px-4 py-4">
+                    <td className="px-3 py-3">
                       <Badge variant={statusBadge(m.status)}>
                         {statusLabel(m.status)}
                       </Badge>
                     </td>
-                    <td className="px-4 py-4 text-right">
+                    <td className="px-3 py-3 text-right">
                       <Button
                         size="sm"
                         variant="tonal"
@@ -529,9 +529,9 @@ export function PayoutManager() {
               />
             </div>
 
-            <div className="flex items-start gap-2 p-3 rounded-xl bg-blue-500/10 border border-blue-500/20">
-              <AlertCircle size={16} className="shrink-0 mt-0.5 text-warning" />
-              <p className="text-xs text-blue-300/80">
+            <div className="flex items-start gap-2 p-3 rounded-xl bg-[color-mix(in_srgb,var(--info)_10%,transparent)] border border-[color-mix(in_srgb,var(--info)_25%,transparent)]">
+              <AlertCircle size={16} className="shrink-0 mt-0.5 text-[var(--info)]" />
+              <p className="text-xs text-[color-mix(in_srgb,var(--info)_75%,var(--foreground))]">
                 This will process a manual payout. The amount will be deducted
                 from the mechanic&apos;s pending balance. Backend will be used if
                 available; otherwise it will be recorded locally.

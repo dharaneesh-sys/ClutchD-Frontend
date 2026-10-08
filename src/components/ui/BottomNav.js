@@ -131,9 +131,8 @@ export function BottomNav() {
                     className={cn(
                       "absolute bottom-full right-0 mb-3",
                       "min-w-[220px]",
-                      "bg-bg-card backdrop-blur-2xl",
-                      "border border-border-subtle",
-                      "rounded-xl shadow-2xl",
+                      "glass-lux",
+                      "rounded-2xl",
                       "p-3 z-[9999]",
                       "animate-scale-in"
                     )}
@@ -143,21 +142,21 @@ export function BottomNav() {
                     <div className="flex flex-col gap-0.5 mb-2 pb-2 border-b border-border-subtle">
                       <button
                         onClick={(e) => { e.stopPropagation(); router.push("/marketplace/profile"); setIsSettingsOpen(false); }}
-                        className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-white/5 transition-colors"
+                        className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-surface-soft transition-colors"
                       >
                         <UserCircle size={18} className="text-text-muted" />
                         <span className="text-sm font-medium text-foreground">My Profile</span>
                       </button>
                       <button
                         onClick={(e) => { e.stopPropagation(); router.push("/marketplace/profile/orders"); setIsSettingsOpen(false); }}
-                        className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-white/5 transition-colors"
+                        className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-surface-soft transition-colors"
                       >
                         <Package size={18} className="text-text-muted" />
                         <span className="text-sm font-medium text-foreground">Orders</span>
                       </button>
                       <button
                         onClick={(e) => { e.stopPropagation(); router.push("/marketplace/profile/favorites"); setIsSettingsOpen(false); }}
-                        className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-white/5 transition-colors"
+                        className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-surface-soft transition-colors"
                       >
                         <Heart size={18} className="text-text-muted" />
                         <span className="text-sm font-medium text-foreground">Favorites</span>
@@ -171,15 +170,15 @@ export function BottomNav() {
                         sos.handleSOS();
                       }}
                       disabled={sos.loading || sos.status === "sent" || sos.status === "queued"}
-                      className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-red-500/10 transition-colors text-left"
+                      className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-danger/10 transition-colors text-left"
                       aria-label="Emergency SOS"
                     >
                       {sos.loading ? (
-                        <Loader2 size={18} className="text-red-400 animate-spin" />
+                        <Loader2 size={18} className="text-danger animate-spin" />
                       ) : (
-                        <AlertTriangle size={18} className="text-red-400" />
+                        <AlertTriangle size={18} className="text-danger" />
                       )}
-                      <span className="text-sm font-semibold text-red-400">
+                      <span className="text-sm font-semibold text-danger">
                         {sos.loading
                           ? "Sending SOS..."
                           : sos.status === "sent"
@@ -201,7 +200,7 @@ export function BottomNav() {
                         e.stopPropagation();
                         toggleTheme();
                       }}
-                      className="w-full flex items-center justify-between px-3 py-2.5 rounded-lg hover:bg-white/5 transition-colors"
+                      className="w-full flex items-center justify-between px-3 py-2.5 rounded-lg hover:bg-surface-soft transition-colors"
                     >
                       <span className="text-sm font-medium text-foreground">Theme</span>
                       <span className="flex items-center gap-2 text-sm text-text-muted">
@@ -231,7 +230,12 @@ export function BottomNav() {
               aria-label={label}
               aria-current={active ? "page" : undefined}
             >
-              <div className="relative">
+              <div
+                className={cn(
+                  "relative flex h-8 w-16 items-center justify-center rounded-full transition-colors duration-200",
+                  active && "bg-surface-soft"
+                )}
+              >
                 <Icon
                   size={22}
                   className={cn(

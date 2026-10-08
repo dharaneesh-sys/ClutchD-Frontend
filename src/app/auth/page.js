@@ -22,8 +22,8 @@ export default function AuthPage() {
         <div className="order-2 lg:order-1 flex flex-col justify-center text-center lg:text-left lg:pr-12">
           <div>
               <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full mb-6 backdrop-blur-md hidden sm:inline-flex bg-primary-soft border border-subtle">
-              <span className="w-2 h-2 rounded-full bg-[var(--color-icon-highlight)]" />
-              <span className="text-xs font-medium text-[var(--color-badge-text)]">Now live in Coimbatore</span>
+              <span className="w-2 h-2 rounded-full bg-primary" />
+              <span className="text-xs font-medium text-muted">Now live in Coimbatore</span>
             </div>
 
             <h1 className="text-5xl lg:text-7xl font-extrabold tracking-tight mb-6 leading-[1.1] text-foreground">

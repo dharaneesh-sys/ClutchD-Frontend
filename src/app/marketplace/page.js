@@ -163,7 +163,7 @@ export default function MarketplaceHome() {
           <p className="text-sm text-muted mb-5">We couldn&apos;t reach the marketplace.</p>
           <button
             onClick={handleRetry}
-            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-primary text-white text-sm font-medium hover:bg-primary/90 transition-colors"
+            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[var(--primary)] text-[var(--background)] text-sm font-medium hover:bg-[var(--primary-dark)] transition-colors"
           >
             <RefreshCw size={16} />
             Retry
@@ -192,7 +192,7 @@ export default function MarketplaceHome() {
               <button
                 type="button"
                 onClick={() => setSellOpen(true)}
-                className="inline-flex shrink-0 items-center gap-1.5 px-4 py-2.5 rounded-xl bg-primary text-white text-sm font-medium hover:bg-primary/90 transition-colors"
+                className="inline-flex shrink-0 items-center gap-1.5 px-4 py-2.5 rounded-xl bg-[var(--primary)] text-[var(--background)] text-sm font-medium hover:bg-[var(--primary-dark)] transition-colors"
               >
                 <Plus size={16} />
                 Sell a part
@@ -212,7 +212,7 @@ export default function MarketplaceHome() {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search products, brands, categories…"
-              className="input-glass w-full pl-10 pr-10 h-11 type-body-2 text-sm"
+              className="w-full pl-10 pr-10 h-11 type-body-2 rounded-xl border border-border-subtle bg-surface-container-low text-foreground placeholder:text-text-dim focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all"
               aria-label="Search marketplace"
             />
             {searchQuery && (
@@ -220,7 +220,7 @@ export default function MarketplaceHome() {
                 type="button"
                 onClick={() => setSearchQuery("")}
                 aria-label="Clear search"
-                className="absolute right-3 top-1/2 -translate-y-1/2 p-1 rounded-lg text-muted hover:text-foreground hover:bg-white/10 transition-colors"
+                className="absolute right-3 top-1/2 -translate-y-1/2 p-1 rounded-lg text-muted hover:text-foreground hover:bg-surface-soft transition-colors"
               >
                 <X size={15} />
               </button>

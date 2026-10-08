@@ -4,30 +4,32 @@ import { Loader2 } from "lucide-react";
 
 export const Button = forwardRef(
   ({ className, variant = "primary", size = "md", isLoading, children, ...props }, ref) => {
-    const baseClass = "inline-flex items-center justify-center rounded-xl font-medium transition-all focus:outline-none disabled:opacity-50 disabled:pointer-events-none";
+    const baseClass = "inline-flex items-center justify-center rounded-xl font-medium transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--primary)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--background)] disabled:opacity-50 disabled:pointer-events-none";
     
     const variants = {
       primary:
-        "bg-gradient-to-b from-primary via-primary to-primary-dark text-white " +
+        "bg-gradient-to-b from-[var(--primary-light)] via-[var(--primary)] to-[var(--primary-dark)] text-[var(--background)] " +
         "shadow-[0_10px_26px_rgba(var(--color-primary-rgb),0.25)] " +
         "ring-1 ring-primary/25 hover:ring-primary/35 " +
         "hover:shadow-[0_16px_40px_rgba(var(--color-primary-rgb),0.22)] hover-lift",
       secondary:
-        "bg-gradient-to-b from-white/10 to-white/5 text-primary-light " +
-        "border border-white/15 ring-1 ring-white/10 hover:bg-white/15 hover:border-white/25",
+        "bg-[var(--surface-container)] text-[var(--primary)] " +
+        "border border-[var(--color-border-subtle)] hover:bg-[var(--surface-container-high)]",
       tonal:
-        "bg-primary/20 text-primary-light " +
-        "hover:bg-primary/30 hover:text-primary " +
+        "bg-[var(--color-surface-soft)] text-[var(--primary)] " +
+        "hover:bg-[var(--color-surface-mid)] " +
         "shadow-none",
       outline:
-        "border-2 border-primary/70 text-primary-light " +
-        "bg-transparent hover:bg-primary/10 hover:border-primary/80 " +
-        "shadow-[0_0_0_1px_rgba(var(--color-primary-rgb),0.18)]",
-      ghost: "hover:bg-white/10 text-primary-light border border-transparent hover:border-white/10",
+        "border-2 border-[var(--primary)] text-[var(--primary)] " +
+        "bg-transparent hover:bg-[var(--color-surface-soft)] " +
+        "shadow-none",
+      ghost:
+        "text-[var(--primary)] border border-transparent " +
+        "hover:bg-[var(--color-surface-soft)] hover:border-[var(--color-border-subtle)]",
       danger:
-        "bg-gradient-to-b from-red-500 via-red-500 to-red-600 text-white " +
-        "shadow-[0_10px_26px_rgba(239,68,68,0.22)] ring-1 ring-red-300/20 " +
-        "hover:shadow-[0_16px_40px_rgba(239,68,68,0.20)] hover-lift",
+        "bg-[var(--danger)] text-white " +
+        "shadow-[0_10px_26px_color-mix(in_srgb,var(--danger)_30%,transparent)] ring-1 ring-danger/25 " +
+        "hover:brightness-110 hover-lift",
     };
 
     const sizes = {

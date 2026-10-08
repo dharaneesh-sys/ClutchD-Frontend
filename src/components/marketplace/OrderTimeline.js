@@ -67,32 +67,32 @@ function TimelineStep({ step, state, timestamp, isLast }) {
 
   const stateClasses = {
     completed: {
-      dot: "bg-success border-success shadow-[0_0_8px_var(--color-success)]",
+      dot: "bg-success border-success",
       line: "bg-success/60",
       text: "text-success",
       icon: "text-success",
       desc: "",
     },
     current: {
-      dot: "bg-primary border-primary shadow-[0_0_12px_rgba(var(--color-primary-rgb),0.55)]",
+      dot: "bg-primary border-primary ring-2 ring-primary/30",
       line: "bg-primary/40",
       text: "text-primary-light",
       icon: "text-primary",
       desc: "text-text-muted font-medium",
     },
     pending: {
-      dot: "bg-surface-container border-white/15",
-      line: "bg-white/8",
+      dot: "bg-surface-container border-outline-variant",
+      line: "bg-border-subtle",
       text: "text-text-dim",
       icon: "text-text-dim/40",
       desc: "text-text-dim/60",
     },
     cancelled: {
-      dot: "bg-rose-500/30 border-rose-500/50",
-      line: "bg-rose-500/20",
-      text: "text-rose-400",
-      icon: "text-rose-400",
-      desc: "text-rose-400/60",
+      dot: "bg-danger/20 border-danger/50",
+      line: "bg-danger/20",
+      text: "text-danger",
+      icon: "text-danger",
+      desc: "text-danger/60",
     },
   };
 
@@ -106,8 +106,7 @@ function TimelineStep({ step, state, timestamp, isLast }) {
         <div
           className={cn(
             "relative z-10 flex items-center justify-center w-8 h-8 rounded-full border-2 transition-all duration-300",
-            s.dot,
-            state === "current" && "animate-pulse-ring"
+            s.dot
           )}
         >
           <Icon
@@ -235,37 +234,15 @@ export function OrderTimeline({
 
         {/* Cancelled banner */}
         {isCancelled && (
-          <div className="flex items-center gap-2 mt-2 ml-11 rounded-lg bg-rose-500/10 px-3 py-2 border border-rose-500/20">
-            <XCircle size={14} className="shrink-0 text-rose-400" />
-            <span className="text-xs font-medium text-rose-300">
+          <div className="flex items-center gap-2 mt-2 ml-11 rounded-lg bg-danger/10 px-3 py-2 border border-danger/20">
+            <XCircle size={14} className="shrink-0 text-danger" />
+            <span className="text-xs font-medium text-danger">
               Order cancelled
             </span>
           </div>
         )}
       </div>
 
-      {/* Pulse ring animation keyframes — injected once */}
-      <style jsx>{`
-        @keyframes pulse-ring {
-          0% {
-            box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.5);
-          }
-          40% {
-            box-shadow: 0 0 0 8px rgba(16, 185, 129, 0);
-          }
-          100% {
-            box-shadow: 0 0 0 0 rgba(16, 185, 129, 0);
-          }
-        }
-        .animate-pulse-ring {
-          animation: pulse-ring 2s ease-out infinite;
-        }
-        @media (prefers-reduced-motion: reduce) {
-          .animate-pulse-ring {
-            animation: none;
-          }
-        }
-      `}</style>
     </div>
   );
 }

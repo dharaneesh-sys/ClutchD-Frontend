@@ -181,7 +181,7 @@ export function VehicleSelector({ onVehicleChange, className, initialVehicle }) 
           <button
             type="button"
             onClick={handleClear}
-            className="inline-flex items-center gap-1 rounded-lg px-2.5 py-1.5 text-[0.6875rem] font-medium text-text-muted transition-colors hover:bg-white/5 hover:text-text-primary"
+            className="inline-flex items-center gap-1 rounded-lg px-2.5 py-1.5 text-[0.6875rem] font-medium text-text-muted transition-colors hover:bg-surface-soft hover:text-text-primary"
             title="Clear vehicle selection"
           >
             <RotateCcw size={13} />

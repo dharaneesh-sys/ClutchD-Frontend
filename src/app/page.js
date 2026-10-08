@@ -52,14 +52,14 @@ export default function Home() {
             <div className="flex flex-col sm:flex-row gap-5 justify-center lg:justify-start">
               <Link
                 href="/auth"
-                className="inline-flex items-center justify-center gap-2 px-8 py-4 rounded-2xl bg-gradient-to-r from-primary to-primary-light text-white font-bold text-lg shadow-xl shadow-[0_0_20px_rgba(var(--color-primary-rgb),0.25)] hover:shadow-[0_0_30px_rgba(var(--color-primary-rgb),0.4)] hover:scale-[1.02] active:scale-[0.98] transition-all duration-200"
+                className="inline-flex items-center justify-center gap-2 px-8 py-4 rounded-2xl bg-gradient-to-r from-primary to-primary-light text-[var(--background)] font-bold text-lg shadow-lg hover-lift active:scale-[0.98] transition-all duration-200"
               >
                 {t('hero.getStarted')}
                 <ArrowRight size={20} />
               </Link>
               <Link
                 href="/auth"
-                className="glass-lux-interactive inline-flex items-center justify-center gap-2 px-8 py-4 rounded-2xl text-foreground font-semibold text-lg hover:bg-white/10 active:scale-[0.98] transition-all duration-200"
+                className="glass-lux-interactive inline-flex items-center justify-center gap-2 px-8 py-4 rounded-2xl text-foreground font-semibold text-lg hover:bg-[var(--color-surface-soft)] active:scale-[0.98] transition-all duration-200"
               >
                 {t('hero.signIn')}
               </Link>
@@ -67,10 +67,10 @@ export default function Home() {
           </div>
 
           <div className="flex justify-center">
-            <div className="glass-lux-strong w-full max-w-md p-8 sm:p-10 rounded-3xl">
+            <div className="glass-lux w-full max-w-md p-8 sm:p-10 rounded-2xl">
               <div className="mb-8">
-                <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-primary-light to-primary flex items-center justify-center mb-5 shadow-lg shadow-[0_0_20px_rgba(var(--color-primary-rgb),0.3)]">
-                  <Zap size={28} className="text-white" />
+                <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-primary-light to-primary flex items-center justify-center mb-5 shadow-lg">
+                  <Zap size={28} className="text-[var(--background)]" />
                 </div>
                 <h3 className="text-2xl font-bold text-foreground mb-3">
                   {t('howItWorks.title')}
@@ -88,7 +88,7 @@ export default function Home() {
                 ].map((step) => (
                   <div
                     key={step.num}
-                    className="flex items-start gap-4 glass-lux-interactive p-4 rounded-xl hover:bg-white/5 transition-colors"
+                    className="flex items-start gap-4 glass-lux-interactive p-4 rounded-xl hover:bg-[var(--color-surface-soft)] transition-colors"
                   >
                      <span className="text-primary-light font-mono font-bold text-lg leading-none mt-0.5">
                        {step.num}

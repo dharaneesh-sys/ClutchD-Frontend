@@ -64,7 +64,7 @@ export function CategoryCard({ category, icon, className }) {
       )}
     >
       {isAccessories ? (
-        <span className="inline-flex items-center justify-center overflow-hidden rounded-2xl bg-white/10 ring-1 ring-white/10 w-16 h-16">
+        <span className="inline-flex items-center justify-center overflow-hidden rounded-2xl bg-surface-soft ring-1 ring-border-subtle w-16 h-16">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={categoryImage}
@@ -76,11 +76,11 @@ export function CategoryCard({ category, icon, className }) {
       ) : (
         <CategoryIcon category={iconKey} size="md" />
       )}
-      <span className="text-sm font-medium text-on-surface leading-snug break-words max-w-full">
+      <span className="type-title-3 text-on-surface leading-snug break-words max-w-full">
         {category.name}
       </span>
       {category.productCount != null && (
-        <span className="text-[0.6875rem] text-muted font-medium">
+        <span className="type-label-2 text-muted">
           {category.productCount} item{category.productCount !== 1 ? "s" : ""}
         </span>
       )}

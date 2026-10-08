@@ -34,7 +34,7 @@ function FilterCheckbox({ label, checked, onChange }) {
   return (
     <label
       onClick={onChange}
-      className="flex items-center gap-2.5 rounded-lg px-2 py-1.5 cursor-pointer hover:bg-white/5 transition-colors group"
+      className="flex items-center gap-2.5 rounded-lg px-2 py-1.5 cursor-pointer hover:bg-surface-soft transition-colors group"
     >
       <div
         className={cn(
@@ -66,7 +66,7 @@ function FilterChip({ label, active, onClick }) {
         "w-full rounded-lg px-3 py-1.5 text-xs font-medium transition-all text-left",
         active
           ? "bg-primary/20 text-primary-light ring-1 ring-primary/30"
-          : "text-text-muted hover:bg-white/5 hover:text-foreground"
+          : "text-text-muted hover:bg-surface-soft hover:text-foreground"
       )}
     >
       {label}
@@ -137,7 +137,7 @@ export function SearchFilters({
             <button
               type="button"
               onClick={onMobileClose}
-              className="lg:hidden p-1 rounded-lg hover:bg-white/10 transition-colors text-text-dim"
+              className="lg:hidden p-1 rounded-lg hover:bg-surface-soft transition-colors text-text-dim"
               aria-label="Close filters"
             >
               <X size={16} />
@@ -196,12 +196,12 @@ export function SearchFilters({
 
         {/* Availability */}
         <FilterSection title="Availability">
-          <label className="flex items-center justify-between rounded-lg px-2 py-2 cursor-pointer hover:bg-white/5 transition-colors">
+          <label className="flex items-center justify-between rounded-lg px-2 py-2 cursor-pointer hover:bg-surface-soft transition-colors">
             <span className="text-xs font-medium text-text-muted">In stock only</span>
             <div
               className={cn(
                 "relative w-9 h-5 rounded-full transition-colors",
-                filters.availability ? "bg-primary" : "bg-white/10"
+                filters.availability ? "bg-primary" : "bg-surface-container-high"
               )}
             >
               <div
@@ -229,7 +229,7 @@ export function SearchFilters({
           <button
             type="button"
             onClick={onMobileClose}
-            className="w-full rounded-xl bg-primary text-white font-semibold text-sm py-3 hover:bg-primary-dark transition-colors"
+            className="w-full rounded-xl bg-[var(--primary)] text-[var(--background)] font-semibold text-sm py-3 hover:bg-[var(--primary-dark)] transition-colors"
           >
             Apply Filters
           </button>
@@ -249,10 +249,10 @@ export function SearchFilters({
       {isMobileOpen && (
         <div className="fixed inset-0 z-50 lg:hidden">
           <div
-            className="absolute inset-0 bg-black/50 backdrop-blur-sm"
+            className="absolute inset-0 bg-[rgba(0,0,0,0.32)] backdrop-blur-sm"
             onClick={onMobileClose}
           />
-          <div className="absolute bottom-0 left-0 right-0 max-h-[85dvh] flex flex-col glass-lux-strong rounded-t-2xl overflow-hidden animate-fade-in-up">
+          <div className="absolute bottom-0 left-0 right-0 max-h-[85dvh] flex flex-col glass-lux rounded-t-2xl overflow-hidden animate-fade-in-up">
             {content}
           </div>
         </div>

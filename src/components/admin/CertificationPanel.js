@@ -22,9 +22,14 @@ import { formatDate } from "@/lib/utils";
 
 // ─── Status Badge ──────────────────────────────────────────────────────────
 
+export function certStatusVariant(status) {
+  const s = CERT_STATUSES[status] || CERT_STATUSES.pending;
+  return s.color === CERT_STATUSES.pending.color ? "pending" : s.color;
+}
+
 function StatusBadge({ status }) {
   const s = CERT_STATUSES[status] || CERT_STATUSES.pending;
-  return <Badge variant={s.color}>{s.label}</Badge>;
+  return <Badge variant={certStatusVariant(status)}>{s.label}</Badge>;
 }
 
 // ─── Stats Card ────────────────────────────────────────────────────────────
@@ -38,7 +43,7 @@ function StatsCard({ icon: Icon, label, value, color }) {
             "w-10 h-10 rounded-lg flex items-center justify-center",
             color === "primary" && "bg-primary/10 text-primary-light",
             color === "success" && "bg-green-500/10 text-green-400",
-            color === "warning" && "bg-warning/10 text-warning",
+            color === "pending" && "bg-[var(--pending-bg)] text-[var(--pending-text)]",
             color === "danger" && "bg-red-500/10 text-red-400",
             color === "default" && "bg-white/10 text-text-dim"
           )}
@@ -234,7 +239,7 @@ export function CertificationPanel() {
       {/* Stats */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
         <StatsCard icon={Award} label="Total" value={stats.total} color="default" />
-        <StatsCard icon={Clock} label="Pending" value={stats.pending} color="warning" />
+        <StatsCard icon={Clock} label="Pending" value={stats.pending} color="pending" />
         <StatsCard icon={CheckCircle2} label="Verified" value={stats.verified} color="success" />
         <StatsCard icon={XCircle} label="Rejected" value={stats.rejected} color="danger" />
       </div>
@@ -325,7 +330,7 @@ export function CertificationPanel() {
                       <Award size={14} className="text-primary-light shrink-0" />
                       <span className="text-sm text-text-primary">{cert.badgeName}</span>
                       {String(cert.id || "").startsWith("cert-demo-") && (
-                        <span className="rounded-full border border-warning/40 px-1.5 py-0.5 text-[10px] font-semibold text-warning">
+                        <span className="rounded-full border border-[color-mix(in_srgb,var(--pending)_40%,transparent)] px-1.5 py-0.5 text-[10px] font-semibold text-[var(--pending-text)]">
                           Demo
                         </span>
                       )}

@@ -23,23 +23,38 @@ import { EmptyState } from "@/components/ui/EmptyState";
 
 // ─── Status Badge ──────────────────────────────────────────────────────────
 
+export function warrantyStatusVariant(status) {
+  switch (status) {
+    case "submitted":
+      return "info";
+    case "under_review":
+      return "pending";
+    case "approved":
+      return "success";
+    case "rejected":
+      return "danger";
+    default:
+      return "default";
+  }
+}
+
 function StatusBadge({ status }) {
   const config = CLAIM_STATUSES[status] || { label: status, color: "default" };
-  return <Badge variant={config.color}>{config.label}</Badge>;
+  return <Badge variant={warrantyStatusVariant(status)}>{config.label}</Badge>;
 }
 
 // ─── Claim Row (table row for admin view) ──────────────────────────────────
 
 function ClaimRow({ claim, onReview }) {
   return (
-    <tr className="border-b border-border-subtle/50 hover:bg-white/[0.02] transition-colors">
+    <tr className="border-b border-border-subtle hover:bg-surface-soft transition-colors">
       <td className="py-3 px-3">
         <span className="text-xs font-mono text-text-dim">
           #{claim.id?.slice(-10)}
         </span>
       </td>
       <td className="py-3 px-3">
-        <span className="text-sm font-medium text-foreground">
+        <span className="text-sm font-medium text-text-primary">
           {claim.userName}
         </span>
       </td>
@@ -104,7 +119,7 @@ function ReviewClaimModal({ claim, isOpen, onClose, onUpdated }) {
         <div className="grid grid-cols-2 gap-4">
           <div>
             <p className="text-[11px] uppercase tracking-wider text-text-muted mb-1">Customer</p>
-            <p className="text-sm font-medium text-foreground">{claim.userName}</p>
+            <p className="text-sm font-medium text-text-primary">{claim.userName}</p>
           </div>
           <div>
             <p className="text-[11px] uppercase tracking-wider text-text-muted mb-1">Status</p>
@@ -112,7 +127,7 @@ function ReviewClaimModal({ claim, isOpen, onClose, onUpdated }) {
           </div>
           <div>
             <p className="text-[11px] uppercase tracking-wider text-text-muted mb-1">Service</p>
-            <p className="text-sm font-medium text-foreground">{claim.serviceLabel}</p>
+            <p className="text-sm font-medium text-text-primary">{claim.serviceLabel}</p>
           </div>
           <div>
             <p className="text-[11px] uppercase tracking-wider text-text-muted mb-1">Submitted</p>
@@ -143,6 +158,7 @@ function ReviewClaimModal({ claim, isOpen, onClose, onUpdated }) {
                   rel="noopener noreferrer"
                   className="aspect-square rounded-lg overflow-hidden bg-surface-soft border border-border-subtle block"
                 >
+                  {/* eslint-disable-next-line @next/next/no-img-element -- external claim photo URLs, same pattern as KYCApproval DocThumb */}
                   <img
                     src={resolveMediaUrl(photo)}
                     alt={`Claim photo ${idx + 1}`}
@@ -167,7 +183,6 @@ function ReviewClaimModal({ claim, isOpen, onClose, onUpdated }) {
             className={cn(
               "w-full rounded-2xl border px-4 py-3 text-sm transition-all resize-none",
               "border-border-subtle bg-surface text-text-primary placeholder:text-text-dim",
-              "shadow-[inset_0_1px_0_rgba(var(--color-white-rgb),0.04)]",
               "focus:border-primary focus:bg-surface focus:outline-none focus:ring-1 focus:ring-primary/30"
             )}
           />
@@ -224,16 +239,16 @@ function StatsCard({ icon: Icon, label, value, color }) {
           className={cn(
             "w-10 h-10 rounded-lg flex items-center justify-center",
             color === "primary" && "bg-primary/10 text-primary-light",
-            color === "success" && "bg-green-500/10 text-green-400",
-            color === "warning" && "bg-warning/10 text-warning",
-            color === "danger" && "bg-red-500/10 text-red-400",
-            color === "default" && "bg-white/10 text-text-dim"
+            color === "success" && "bg-[color-mix(in_srgb,var(--success)_14%,transparent)] text-[var(--success)]",
+            color === "pending" && "bg-[var(--pending-bg)] text-[var(--pending-text)]",
+            color === "danger" && "bg-[color-mix(in_srgb,var(--danger)_14%,transparent)] text-[var(--danger)]",
+            color === "default" && "bg-surface-soft text-text-dim"
           )}
         >
           <Icon size={18} />
         </div>
         <div>
-          <p className="text-2xl font-bold text-foreground">{value}</p>
+          <p className="text-2xl font-bold text-text-primary">{value}</p>
           <p className="text-xs text-text-muted">{label}</p>
         </div>
       </div>
@@ -302,7 +317,7 @@ export function WarrantyPanel() {
       {/* Stats */}
       <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
         <StatsCard icon={FileText} label="Total" value={stats.total} color="default" />
-        <StatsCard icon={Clock} label="Submitted" value={stats.submitted} color="warning" />
+        <StatsCard icon={Clock} label="Submitted" value={stats.submitted} color="pending" />
         <StatsCard icon={Loader2} label="Under Review" value={stats.underReview} color="primary" />
         <StatsCard icon={CheckCircle2} label="Approved" value={stats.approved} color="success" />
         <StatsCard icon={XCircle} label="Rejected" value={stats.rejected} color="danger" />
@@ -348,7 +363,7 @@ export function WarrantyPanel() {
       {isLoading ? (
         <div className="space-y-3">
           {[1, 2, 3].map((i) => (
-            <div key={i} className="h-12 bg-white/5 rounded-xl animate-pulse" />
+            <div key={i} className="h-12 bg-surface-soft rounded-xl animate-pulse" />
           ))}
         </div>
       ) : filtered.length > 0 ? (

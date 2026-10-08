@@ -48,14 +48,14 @@ function CategoryProductsSkeleton() {
   return (
     <div className="space-y-5">
       {/* Back link skeleton */}
-      <div className="h-3.5 w-24 bg-white/5 rounded animate-pulse" />
+      <Shimmer variant="text" className="!h-3.5 !w-24" />
 
       {/* Title skeleton */}
       <div className="flex items-center gap-3">
-        <div className="h-12 w-12 rounded-full bg-white/5 shrink-0 animate-pulse" />
+        <Shimmer variant="avatar" className="!h-12 !w-12 shrink-0" />
         <div className="space-y-2 flex-1">
-          <div className="h-6 w-48 bg-white/5 rounded animate-pulse" />
-          <div className="h-3.5 w-32 bg-white/5 rounded animate-pulse" />
+          <Shimmer variant="title" className="!w-48" />
+          <Shimmer variant="text" className="!h-3.5 !w-32" />
         </div>
       </div>
 

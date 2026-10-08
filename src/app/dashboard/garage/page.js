@@ -161,8 +161,8 @@ export default function GarageDashboard() {
           <button
             onClick={() => setChatOpen((o) => !o)}
             className="w-14 h-14 rounded-full flex items-center justify-center transition-all active-press
-                       shadow-[0_8px_32px_rgba(var(--color-primary-rgb),0.3)]
-                       bg-primary text-white hover:shadow-[0_12px_40px_rgba(var(--color-primary-rgb),0.4)] hover-lift"
+                       shadow-lg
+                       bg-primary text-[var(--background)] hover-lift"
             aria-label={chatOpen ? "Close chat" : "Chat with customer"}
           >
             <MessageSquare size={22} />

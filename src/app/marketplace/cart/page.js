@@ -7,6 +7,7 @@ import { ShoppingCart, Minus, Plus, Trash2, Tag } from "lucide-react";
 import { useCartStore } from "@/store/cartStore";
 import { ProductImage } from "@/components/marketplace/ProductImage";
 import { Button } from "@/components/ui/Button";
+import { EmptyState } from "@/components/ui/EmptyState";
 import { formatCurrency } from "@/lib/utils";
 
 const DELIVERY_FREE_THRESHOLD = 500;
@@ -65,29 +66,21 @@ export default function CartPage() {
 
   /* ── Empty State ───────────────────────────────────────────────── */
 
-  if (items.length === 0) {
+if (items.length === 0) {
     return (
       <div className="p-4 animate-fade-in-up">
         <div className="mx-auto max-w-md">
-          <div className="glass-lux rounded-2xl p-10 text-center">
-            <div className="mx-auto mb-5 flex h-20 w-20 items-center justify-center rounded-full bg-surface-soft">
-              <ShoppingCart size={36} className="text-icon-highlight" />
-            </div>
-            <h1 className="mb-2 text-2xl font-bold text-text-primary">
-              Your Cart is Empty
-            </h1>
-            <p className="mx-auto mb-6 max-w-xs text-sm text-text-muted">
-              Looks like you haven&apos;t added anything yet. Browse our
-              marketplace to find great products.
-            </p>
-            <Link
-              href="/marketplace"
-              className="btn-glow inline-flex h-11 items-center gap-2 rounded-xl px-6 text-sm font-medium text-white transition-all hover-lift active-press"
-            >
-              <ShoppingCart size={16} />
-              Start Shopping
-            </Link>
-          </div>
+          <EmptyState
+            icon={ShoppingCart}
+            title="Your Cart is Empty"
+            description="Looks like you haven't added anything yet. Browse our marketplace to find great products."
+            action={
+              <Button onClick={() => router.push("/marketplace")}>
+                <ShoppingCart size={16} className="mr-2" />
+                Start Shopping
+              </Button>
+            }
+          />
         </div>
       </div>
     );
@@ -152,7 +145,7 @@ export default function CartPage() {
                               item.quantity - 1,
                             )
                           }
-                          className="flex h-8 w-8 items-center justify-center rounded-lg border border-white/10 bg-white/5 text-text-muted transition-all hover:bg-white/10 hover:text-foreground active:scale-95"
+                          className="flex h-8 w-8 items-center justify-center rounded-xl border border-border-subtle bg-surface text-text-muted transition-all hover:bg-surface-soft hover:text-foreground active:scale-95"
                           aria-label="Decrease quantity"
                         >
                           <Minus size={14} />
@@ -169,7 +162,7 @@ export default function CartPage() {
                               item.quantity + 1,
                             )
                           }
-                          className="flex h-8 w-8 items-center justify-center rounded-lg border border-white/10 bg-white/5 text-text-muted transition-all hover:bg-white/10 hover:text-foreground active:scale-95"
+                          className="flex h-8 w-8 items-center justify-center rounded-xl border border-border-subtle bg-surface text-text-muted transition-all hover:bg-surface-soft hover:text-foreground active:scale-95"
                           aria-label="Increase quantity"
                         >
                           <Plus size={14} />
@@ -198,7 +191,7 @@ export default function CartPage() {
 
           {/* ── Summary Sidebar ────────────────────────────────────────── */}
           <div className="w-full lg:w-80 xl:w-96">
-            <div className="glass-lux-strong lg:sticky lg:top-4 space-y-5 rounded-2xl p-6">
+            <div className="glass-lux lg:sticky lg:top-4 space-y-5 rounded-2xl p-6">
               <h2 className="text-lg font-semibold text-foreground">
                 Order Summary
               </h2>
@@ -233,11 +226,11 @@ export default function CartPage() {
                   }
                 />
 
-                <div className="border-t border-white/10 pt-3">
+                <div className="border-t border-border-subtle pt-3">
                   <SummaryRow
                     label={<span className="font-semibold">Total</span>}
                     value={
-                      <span className="text-lg font-bold text-text-primary tabular-nums">
+                      <span className="text-lg font-bold text-primary tabular-nums">
                         {formatCurrency(total)}
                       </span>
                     }
@@ -284,7 +277,7 @@ export default function CartPage() {
                           setCouponError("");
                         }}
                         placeholder="Enter coupon code"
-                        className="flex-1 h-10 rounded-xl border border-white/10 bg-white/5 px-3 text-sm text-foreground placeholder:text-text-dim transition-all focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary/30"
+                        className="flex-1 h-10 rounded-xl border border-border-subtle bg-surface px-3 text-sm text-foreground placeholder:text-text-dim transition-all focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary/30"
                         onKeyDown={(e) =>
                           e.key === "Enter" && handleApplyCoupon()
                         }
@@ -297,7 +290,7 @@ export default function CartPage() {
                       </button>
                     </div>
                     {couponError && (
-                      <p className="mt-1.5 text-xs text-red-400">
+                      <p className="mt-1.5 text-xs text-danger">
                         {couponError}
                       </p>
                     )}

@@ -8,6 +8,13 @@ import { Search, MoreVertical, Eye, ShieldOff, ShieldCheck, Trash2 } from "lucid
 import { useToast } from "@/components/ui/ToastProvider";
 import { fetchUsers, toggleUserStatus, deleteUser } from "@/services/adminService";
 
+export function filterUsers(users, searchTerm) {
+  return users.filter((u) =>
+    u.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    u.id?.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+}
+
 export function UserTable() {
   const [searchTerm, setSearchTerm] = useState("");
   const [roleFilter, setRoleFilter] = useState("All Roles");
@@ -57,10 +64,7 @@ export function UserTable() {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  const filteredUsers = users.filter(u =>
-    u.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    u.id?.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const filteredUsers = filterUsers(users, searchTerm);
 
   const handleToggleStatus = async (user) => {
     setActionLoading(user.id);
@@ -98,7 +102,7 @@ export function UserTable() {
 
   return (
     <>
-      <GlassCard variant="outlined" className="p-4 sm:p-6">
+      <GlassCard className="p-4 sm:p-6">
         <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-4 mb-6">
           <div className="relative w-full sm:w-72">
             <Search size={16} className={`absolute left-3 top-1/2 -translate-y-1/2 ${"text-text-muted"}`} />
@@ -148,30 +152,30 @@ export function UserTable() {
             <table className={`w-full text-left text-sm ${"text-text-primary"}`}>
               <thead className={`text-xs uppercase border-b ${"text-text-dim border-border-subtle"}`}>
                 <tr>
-                  <th className="px-4 pb-3 font-medium">User ID</th>
-                  <th className="px-4 pb-3 font-medium">Name</th>
-                  <th className="px-4 pb-3 font-medium">Role</th>
-                  <th className="px-4 pb-3 font-medium">Status</th>
-                  <th className="px-4 pb-3 font-medium">Joined Date</th>
-                  <th className="px-4 pb-3 font-medium text-right">Actions</th>
+                  <th className="px-3 pb-2 font-medium">User ID</th>
+                  <th className="px-3 pb-2 font-medium">Name</th>
+                  <th className="px-3 pb-2 font-medium">Role</th>
+                  <th className="px-3 pb-2 font-medium">Status</th>
+                  <th className="px-3 pb-2 font-medium">Joined Date</th>
+                  <th className="px-3 pb-2 font-medium text-right">Actions</th>
                 </tr>
               </thead>
               <tbody>
                 {filteredUsers.map((user) => (
                   <tr key={user.id} className={`border-b transition-colors ${"border-border-subtle hover:bg-bg-card"}`}>
-                    <td className={`px-4 py-4 font-mono text-xs ${"text-text-muted"}`}>{user.id?.slice(0, 8)}</td>
-                    <td className={`px-4 py-4 font-medium ${"text-text-primary"}`}>{user.name}</td>
-                    <td className="px-4 py-4">{user.role}</td>
-                    <td className="px-4 py-4">
+                    <td className={`px-3 py-3 font-mono text-xs ${"text-text-muted"}`}>{user.id?.slice(0, 8)}</td>
+                    <td className={`px-3 py-3 font-medium ${"text-text-primary"}`}>{user.name}</td>
+                    <td className="px-3 py-3">{user.role}</td>
+                    <td className="px-3 py-3">
                       <Badge variant={
                         user.status === 'Active' ? 'success' :
-                        user.status === 'Suspended' ? 'danger' : 'warning'
+                        user.status === 'Suspended' ? 'danger' : 'pending'
                       }>
                         {user.status}
                       </Badge>
                     </td>
-                    <td className={`px-4 py-4 ${"text-text-muted"}`}>{user.joined}</td>
-                    <td className="px-4 py-4 text-right relative">
+                    <td className={`px-3 py-3 ${"text-text-muted"}`}>{user.joined}</td>
+                    <td className="px-3 py-3 text-right relative">
                       <button
                         onClick={() => setOpenDropdown(openDropdown === user.id ? null : user.id)}
                         className={`p-1 rounded transition-colors ${"hover:bg-bg-card text-text-muted hover:text-text-primary"}`}
@@ -257,7 +261,7 @@ export function UserTable() {
               <p className={`text-xs uppercase mb-1 ${"text-text-dim"}`}>Status</p>
               <Badge variant={
                 profileModal.status === 'Active' ? 'success' :
-                profileModal.status === 'Suspended' ? 'danger' : 'warning'
+                profileModal.status === 'Suspended' ? 'danger' : 'pending'
               }>{profileModal.status}</Badge>
             </div>
             <div className={`p-4 rounded-xl border ${"bg-bg-card border-border-subtle"}`}>

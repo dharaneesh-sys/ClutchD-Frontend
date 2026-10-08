@@ -100,7 +100,7 @@ export function AdminOverview() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-         <GlassCard variant="strong" className="col-span-1 lg:col-span-2 p-6 h-[400px] flex flex-col">
+         <GlassCard className="col-span-1 lg:col-span-2 p-6 h-[400px] flex flex-col">
             <h3 className={`font-semibold mb-6 ${"text-text-primary"}`}>Platform Growth (Revenue & Users)</h3>
               <div className="flex-1 w-full relative min-w-0 min-h-0">
                 {chartData.length === 0 ? (
@@ -110,7 +110,7 @@ export function AdminOverview() {
                 ) : (
                   <AreaChart data={chartData} xDataKey="date" className="w-full h-full">
                     <Area dataKey="revenue" stroke="var(--primary)" fill="var(--primary)" fillOpacity={0.15} yAxisId="left" />
-                    <Area dataKey="users" stroke="#3b82f6" fill="#3b82f6" fillOpacity={0.15} yAxisId="right" />
+                    <Area dataKey="users" stroke="var(--info)" fill="var(--info)" fillOpacity={0.15} yAxisId="right" />
                   </AreaChart>
                 )}
               </div>
@@ -119,7 +119,7 @@ export function AdminOverview() {
          <GlassCard className="col-span-1 p-6 flex flex-col">
             <div className="flex justify-between items-center mb-6">
               <h3 className={`font-semibold ${"text-text-primary"}`}>Pending KYC</h3>
-              <Badge variant="warning">{pendingKyc.length} Awaiting</Badge>
+              <Badge variant="pending">{pendingKyc.length} Awaiting</Badge>
             </div>
 
             <div className="flex-1 space-y-3">

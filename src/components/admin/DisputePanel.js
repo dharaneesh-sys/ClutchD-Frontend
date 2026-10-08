@@ -8,6 +8,10 @@ import { AlertCircle, FileText, CheckCircle2, DollarSign, AlertTriangle, Message
 import { useToast } from "@/components/ui/ToastProvider";
 import { fetchDisputes, resolveDisputeWithStatus, refundDispute, penalizeProvider, messageDisputeParties } from "@/services/adminService";
 
+export function disputeStatusVariant(status) {
+  return status === "Open" ? "danger" : "pending";
+}
+
 export function DisputePanel() {
   const [disputes, setDisputes] = useState([]);
   const [selectedDispute, setSelectedDispute] = useState(null);
@@ -122,7 +126,7 @@ export function DisputePanel() {
 
   if (error) {
     return (
-      <div className="flex flex-col items-center justify-center h-full text-red-500">
+      <div className="flex flex-col items-center justify-center h-full text-[var(--danger)]">
         <p>{error}</p>
         <button onClick={loadDisputes} className="mt-3 text-sm underline">Retry</button>
       </div>
@@ -147,15 +151,15 @@ export function DisputePanel() {
                   onClick={() => setSelectedDispute(d)}
                   className={`p-4 rounded-xl border transition-all cursor-pointer ${
                     selectedDispute?.id === d.id
-                      ? 'bg-surface-soft border-red-500/30 shadow-[0_0_10px_rgba(239,68,68,0.1)]'
+                      ? 'bg-surface-soft border-[color-mix(in_srgb,var(--danger)_35%,transparent)]'
                       : 'bg-bg-card border-border-subtle hover:bg-bg-card'
                   }`}
                 >
                   <div className="flex justify-between items-start mb-2">
-                    <Badge variant={d.status === 'Open' ? 'danger' : 'warning'} className="mb-2">{d.status}</Badge>
+                    <Badge variant={disputeStatusVariant(d.status)} className="mb-2">{d.status}</Badge>
                     <span className={`text-xs ${"text-text-dim"}`}>{d.date || "—"}</span>
                   </div>
-                  <h4 className={`font-medium mb-1 ${"text-text-primary"}`}><AlertCircle size={14} className="inline mr-1 text-red-500 mb-0.5" />{d.reason}</h4>
+                  <h4 className={`font-medium mb-1 ${"text-text-primary"}`}><AlertCircle size={14} className="inline mr-1 text-[var(--danger)] mb-0.5" />{d.reason}</h4>
                   <p className={`text-sm ${"text-text-muted"}`}>{d.customer} vs {d.provider}</p>
                 </div>
               ))
@@ -190,7 +194,7 @@ export function DisputePanel() {
               <div className="mb-6">
                 <p className={`font-medium mb-2 ${"text-text-primary"}`}>Customer Complaint</p>
                 <div className="p-4 rounded-xl border text-sm leading-relaxed relative bg-surface-soft border-border-subtle text-text-primary">
-                  <AlertCircle className="absolute -left-2 -top-2 rounded-full text-red-500 bg-bg-card" size={20} />
+                  <AlertCircle className="absolute -left-2 -top-2 rounded-full text-[var(--danger)] bg-bg-card" size={20} />
                   &quot;{selectedDispute.desc}&quot;
                 </div>
               </div>
@@ -207,7 +211,7 @@ export function DisputePanel() {
                   </Button>
                   <Button
                     variant="outline"
-                    className="border-border-subtle text-red-500 hover:bg-surface-soft"
+                    className="border-border-subtle text-[var(--danger)] hover:bg-surface-soft"
                     onClick={() => setConfirmModal({ dispute: selectedDispute, action: "penalize" })}
                   >
                     <AlertTriangle size={14} className="mr-1" /> Penalize

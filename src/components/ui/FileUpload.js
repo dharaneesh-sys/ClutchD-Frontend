@@ -56,9 +56,10 @@ export const FileUpload = forwardRef(
         {!hasFile ? (
           <div 
             className={cn(
-              "relative flex flex-col items-center justify-center w-full min-h-[120px] rounded-xl border border-dashed px-4 py-6 text-center transition-all cursor-pointer",
-              "border-border-subtle bg-surface-soft hover:bg-surface-mid hover:border-primary/50",
-              error && "border-red-500/50 bg-red-500/5",
+              "relative flex flex-col items-center justify-center w-full min-h-[120px] rounded-xl border border-dashed px-4 py-6 text-center transition-all duration-200 cursor-pointer",
+              "border-[var(--color-border-subtle)] bg-[var(--color-surface-soft)] hover:bg-[var(--color-surface-mid)] hover:border-[var(--primary)]",
+              "focus-within:outline-none focus-within:ring-2 focus-within:ring-[var(--primary)] focus-within:ring-offset-1 focus-within:ring-offset-[var(--background)]",
+              error && "border-[var(--danger)] bg-[color-mix(in_srgb,var(--danger)_8%,transparent)]",
               className
             )}
           >
@@ -96,7 +97,7 @@ export const FileUpload = forwardRef(
           </div>
         )}
         
-        {error && <p id={`${generatedId}-error`} className="mt-1.5 text-xs text-red-500">{error}</p>}
+        {error && <p id={`${generatedId}-error`} className="mt-1.5 text-xs text-[var(--danger)]">{error}</p>}
       </div>
     );
   }

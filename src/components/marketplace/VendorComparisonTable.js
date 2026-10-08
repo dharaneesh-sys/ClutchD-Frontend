@@ -160,7 +160,7 @@ export function VendorComparisonTable({ productId, product }) {
             onChange={(e) => setVendorSearch(e.target.value)}
             placeholder="Search vendor..."
             className={cn(
-              "w-full rounded-lg border border-border-subtle bg-white/5",
+              "w-full rounded-lg border border-border-subtle bg-surface-container-low",
               "pl-9 pr-3 py-2 text-xs text-foreground",
               "placeholder:text-text-dim",
               "focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/20",
@@ -190,7 +190,7 @@ export function VendorComparisonTable({ productId, product }) {
             className={cn(
               "flex items-center gap-2 rounded-lg border border-border-subtle",
               "px-3 py-2 text-xs font-medium text-text-muted",
-              "hover:bg-white/5 hover:text-foreground transition-colors",
+              "hover:bg-surface-soft hover:text-foreground transition-colors",
               "min-w-[150px] justify-between",
             )}
           >
@@ -208,7 +208,7 @@ export function VendorComparisonTable({ productId, product }) {
           </button>
 
           {sortMenuOpen && (
-            <div className="absolute right-0 top-full mt-1.5 z-20 min-w-[190px] glass-lux-strong rounded-xl overflow-hidden animate-scale-in">
+            <div className="absolute right-0 top-full mt-1.5 z-20 min-w-[190px] glass-lux rounded-xl overflow-hidden animate-scale-in">
               {SORT_OPTIONS.map((option) => (
                 <button
                   key={option.value}
@@ -221,7 +221,7 @@ export function VendorComparisonTable({ productId, product }) {
                     "w-full text-left px-4 py-2.5 text-xs font-medium transition-colors",
                     sortBy === option.value
                       ? "bg-primary/20 text-primary-light"
-                      : "text-text-muted hover:bg-white/5 hover:text-foreground",
+                      : "text-text-muted hover:bg-surface-soft hover:text-foreground",
                   )}
                 >
                   {option.label}
@@ -273,7 +273,7 @@ export function VendorComparisonTable({ productId, product }) {
                   </th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-white/[0.04]">
+              <tbody className="divide-y divide-border-subtle">
                 {sorted.map((entry) => {
                   const isBestPrice = entry.price === bestPrice;
                   const isBestRating = entry.vendor.rating === bestRating;
@@ -282,7 +282,7 @@ export function VendorComparisonTable({ productId, product }) {
                     <tr
                       key={entry.vendorId}
                       className={cn(
-                        "transition-colors hover:bg-white/[0.03]",
+                        "transition-colors hover:bg-surface-soft",
                         isBestPrice && "bg-icon-highlight/[0.04]",
                         isBestRating && "bg-icon-highlight/[0.04]",
                       )}
@@ -333,8 +333,8 @@ export function VendorComparisonTable({ productId, product }) {
                             size={11}
                             className={
                               isBestRating
-                                ? "fill-warning text-icon-highlight"
-                                : "fill-warning/50 text-icon-highlight/50"
+                                ? "fill-[var(--color-icon-highlight)] text-icon-highlight"
+                                : "fill-transparent text-text-dim"
                             }
                           />
                           <span
@@ -372,7 +372,7 @@ export function VendorComparisonTable({ productId, product }) {
                               "inline-flex items-center gap-1 text-xs font-medium",
                               entry.stock > 0
                                 ? "text-success"
-                                : "text-red-400",
+                                : "text-danger",
                             )}
                           >
                             {entry.stock > 0 ? (
@@ -429,8 +429,8 @@ export function VendorComparisonTable({ productId, product }) {
                 <div
                   key={entry.vendorId}
                   className={cn(
-                    "rounded-xl border border-white/[0.06] bg-white/[0.03] p-4",
-                    "transition-colors hover:bg-white/[0.05]",
+                    "rounded-xl border border-border-subtle bg-surface-container-low p-4",
+                    "transition-colors hover:bg-surface-soft",
                     isBestPrice && "border-icon-highlight/20",
                   )}
                 >
@@ -449,8 +449,8 @@ export function VendorComparisonTable({ productId, product }) {
                             size={10}
                             className={cn(
                               isBestRating
-                                ? "fill-warning text-icon-highlight"
-                                : "fill-warning/50 text-icon-highlight/50",
+                                ? "fill-[var(--color-icon-highlight)] text-icon-highlight"
+                                : "fill-transparent text-text-dim",
                             )}
                           />
                           <span className={cn(
@@ -513,7 +513,7 @@ export function VendorComparisonTable({ productId, product }) {
                       <span
                         className={cn(
                           "inline-flex items-center gap-1 text-xs font-medium",
-                          entry.stock > 0 ? "text-success" : "text-red-400",
+                          entry.stock > 0 ? "text-success" : "text-danger",
                         )}
                       >
                         {entry.stock > 0 ? (

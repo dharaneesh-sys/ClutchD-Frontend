@@ -259,7 +259,7 @@ export default function ProductDetailClient({ id: idProp }) {
               "inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-medium",
               product.availability
                 ? "bg-primary/15 text-primary-light ring-1 ring-primary/20"
-                : "bg-white/5 text-text-muted ring-1 ring-white/10"
+                : "bg-surface-container-low text-text-muted ring-1 ring-border-subtle"
             )}>
               <span className={cn(
                 "w-1.5 h-1.5 rounded-full",
@@ -268,7 +268,7 @@ export default function ProductDetailClient({ id: idProp }) {
               {product.availability ? "In Stock" : "Out of Stock"}
             </span>
             {product.deliveryTime && (
-              <span className="inline-flex items-center gap-1.5 rounded-full bg-white/5 px-3 py-1 text-xs font-medium text-text-muted ring-1 ring-white/10">
+              <span className="inline-flex items-center gap-1.5 rounded-full bg-surface-container-low px-3 py-1 text-xs font-medium text-text-muted ring-1 ring-border-subtle">
                 <Truck size={12} />
                 {product.deliveryTime}
               </span>
@@ -278,7 +278,7 @@ export default function ProductDetailClient({ id: idProp }) {
           {/* Rating — only if real */}
           {hasRating && (
             <div className="flex items-center gap-1.5">
-              <Star size={16} className="fill-warning text-icon-highlight" />
+              <Star size={16} className="fill-[var(--color-icon-highlight)] text-icon-highlight" />
               <span className="text-sm font-medium text-text-muted">
                 {Number(product.rating).toFixed(1)}
               </span>
@@ -343,7 +343,7 @@ export default function ProductDetailClient({ id: idProp }) {
                   "overflow-hidden transition-all duration-300",
                   fitmentResult.compatible
                     ? "border-success/30 bg-success/[0.04]"
-                    : "border-red-500/30 bg-red-500/[0.04]",
+                    : "border-[color-mix(in_srgb,var(--danger)_35%,transparent)] bg-[color-mix(in_srgb,var(--danger)_14%,transparent)]",
                 )}
               >
                 <div className="flex items-start gap-4 p-5">
@@ -351,7 +351,7 @@ export default function ProductDetailClient({ id: idProp }) {
                     "flex h-10 w-10 shrink-0 items-center justify-center rounded-xl",
                     fitmentResult.compatible
                       ? "bg-icon-highlight/15 text-icon-highlight"
-                      : "bg-red-500/15 text-red-400",
+                      : "bg-[color-mix(in_srgb,var(--danger)_14%,transparent)] text-danger",
                   )}>
                     {fitmentResult.compatible
                       ? <CheckCircle2 size={22} />
@@ -361,7 +361,7 @@ export default function ProductDetailClient({ id: idProp }) {
                   <div className="min-w-0 flex-1">
                     <h4 className={cn(
                       "text-base font-semibold",
-                      fitmentResult.compatible ? "text-success" : "text-red-300",
+                      fitmentResult.compatible ? "text-success" : "text-danger",
                     )}>
                       {fitmentResult.compatible ? "Compatible" : "Not Compatible"}
                     </h4>
@@ -376,14 +376,14 @@ export default function ProductDetailClient({ id: idProp }) {
                       <div className="mt-2 space-y-1.5">
                         {fitmentResult.nonFittingParts.map((msg, i) => (
                           <p key={i} className="flex items-start gap-2 text-sm text-text-muted">
-                            <AlertTriangle size={14} className="mt-0.5 shrink-0 text-red-400" />
+                            <AlertTriangle size={14} className="mt-0.5 shrink-0 text-danger" />
                             {msg}
                           </p>
                         ))}
                       </div>
                     )}
                     {fitmentResult.source === "demo" && (
-                      <span className="mt-3 inline-flex items-center gap-1 rounded-full border border-warning/20 bg-warning/10 px-2.5 py-0.5 text-[0.6875rem] font-medium text-warning">
+                      <span className="mt-3 inline-flex items-center gap-1 rounded-full border border-[color-mix(in_srgb,var(--pending)_40%,transparent)] bg-[var(--pending-bg)] px-2.5 py-0.5 text-[0.6875rem] font-medium text-[var(--pending-text)]">
                         <AlertTriangle size={11} />
                         Demo check
                       </span>
@@ -401,7 +401,7 @@ export default function ProductDetailClient({ id: idProp }) {
         <h2 className="mb-5 text-lg font-semibold text-text-primary">
           Product Details
         </h2>
-        <dl className="divide-y divide-white/[0.06]">
+        <dl className="divide-y divide-border-subtle">
           {product.brand && (
             <div className="flex items-center justify-between gap-4 py-3">
               <dt className="text-sm text-text-muted">Brand</dt>
@@ -459,7 +459,7 @@ export default function ProductDetailClient({ id: idProp }) {
           <h2 className="mb-4 text-lg font-semibold text-text-primary">
             Related Products
           </h2>
-          <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-thin scrollbar-thumb-white/10 scrollbar-track-transparent">
+          <div className="flex gap-4 overflow-x-auto pb-4">
             {relatedProducts.map((rp) => (
               <div key={rp.id} className="w-48 shrink-0">
                 <ProductCard product={rp} />

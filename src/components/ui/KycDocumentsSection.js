@@ -60,7 +60,7 @@ export function KycDocumentsSection({ role }) {
   const docLabel = role === "garage" ? "Business License / GST Photo" : "Driving License Photo";
 
   return (
-    <GlassCard variant="strong" className="p-4 sm:p-6">
+    <GlassCard className="p-4 sm:p-6">
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-lg font-bold tracking-tight text-text-primary">KYC Documents</h2>
         <KycBadge user={user} />
@@ -77,7 +77,7 @@ export function KycDocumentsSection({ role }) {
       </p>
 
       {status === "rejected" && user.kycNote && (
-        <div className="mb-5 flex items-start gap-2 text-sm text-red-300/90 bg-red-500/10 border border-red-500/25 rounded-xl px-4 py-3">
+        <div className="mb-5 flex items-start gap-2 text-sm text-danger bg-[var(--danger)]/10 border border-[var(--danger)]/25 rounded-2xl px-4 py-3">
           <AlertTriangle size={16} className="shrink-0 mt-0.5" />
           <span>
             <span className="font-medium">Reason:</span> {user.kycNote}

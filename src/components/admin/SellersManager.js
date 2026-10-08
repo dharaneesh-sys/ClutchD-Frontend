@@ -9,6 +9,15 @@ import { Search, Star, Phone, ShieldCheck, ShieldOff, Eye, Package } from "lucid
 import { useToast } from "@/components/ui/ToastProvider";
 import { fetchSellers, verifySeller } from "@/services/adminService";
 
+export function filterSellers(sellers, searchTerm) {
+  return sellers.filter((s) =>
+    s.storeName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    s.ownerName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    s.phone?.includes(searchTerm) ||
+    s.email?.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+}
+
 export function SellersManager() {
   const [searchTerm, setSearchTerm] = useState("");
   const [sellers, setSellers] = useState([]);
@@ -49,16 +58,11 @@ export function SellersManager() {
     }
   };
 
-  const filtered = sellers.filter(s =>
-    s.storeName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    s.ownerName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    s.phone?.includes(searchTerm) ||
-    s.email?.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const filtered = filterSellers(sellers, searchTerm);
 
   return (
     <>
-      <GlassCard variant="outlined" className="p-4 sm:p-6">
+      <GlassCard className="p-4 sm:p-6">
         <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-4 mb-6">
           <div className="relative w-full sm:w-72">
             <Search size={16} className={`absolute left-3 top-1/2 -translate-y-1/2 ${"text-text-muted"}`} />
@@ -81,41 +85,41 @@ export function SellersManager() {
             <table className={`w-full text-left text-sm ${"text-text-primary"}`}>
               <thead className={`text-xs uppercase border-b ${"text-text-dim border-border-subtle"}`}>
                 <tr>
-                  <th className="px-4 pb-3 font-medium">Store</th>
-                  <th className="px-4 pb-3 font-medium">Owner</th>
-                  <th className="px-4 pb-3 font-medium">Phone</th>
-                  <th className="px-4 pb-3 font-medium">Rating</th>
-                  <th className="px-4 pb-3 font-medium">Listings</th>
-                  <th className="px-4 pb-3 font-medium">Verified</th>
-                  <th className="px-4 pb-3 font-medium">Status</th>
-                  <th className="px-4 pb-3 font-medium text-right">Actions</th>
+                  <th className="px-3 pb-2 font-medium">Store</th>
+                  <th className="px-3 pb-2 font-medium">Owner</th>
+                  <th className="px-3 pb-2 font-medium">Phone</th>
+                  <th className="px-3 pb-2 font-medium">Rating</th>
+                  <th className="px-3 pb-2 font-medium">Listings</th>
+                  <th className="px-3 pb-2 font-medium">Verified</th>
+                  <th className="px-3 pb-2 font-medium">Status</th>
+                  <th className="px-3 pb-2 font-medium text-right">Actions</th>
                 </tr>
               </thead>
               <tbody>
                 {filtered.map((s) => (
                   <tr key={s.id} className={`border-b transition-colors ${"border-border-subtle hover:bg-bg-card"}`}>
-                    <td className={`px-4 py-4 font-medium ${"text-text-primary"}`}>{s.storeName}</td>
-                    <td className={`px-4 py-4 ${"text-text-muted"}`}>{s.ownerName || "—"}</td>
-                    <td className={`px-4 py-4 ${"text-text-muted"}`}>{s.phone || "—"}</td>
-                    <td className="px-4 py-4">
+                    <td className={`px-3 py-3 font-medium ${"text-text-primary"}`}>{s.storeName}</td>
+                    <td className={`px-3 py-3 ${"text-text-muted"}`}>{s.ownerName || "—"}</td>
+                    <td className={`px-3 py-3 ${"text-text-muted"}`}>{s.phone || "—"}</td>
+                    <td className="px-3 py-3">
                       <span className="flex items-center gap-1">
                         <Star size={12} className="text-icon-highlight" />
                         {Number(s.rating || 0).toFixed(1)}
                       </span>
                     </td>
-                    <td className="px-4 py-4">
+                    <td className="px-3 py-3">
                       <span className="flex items-center gap-1">
                         <Package size={12} className="text-text-muted" />
                         {s.listings ?? 0}
                       </span>
                     </td>
-                    <td className="px-4 py-4">
-                      <Badge variant={s.verified ? "success" : "warning"}>{s.verified ? "Verified" : "Pending"}</Badge>
+                    <td className="px-3 py-3">
+                      <Badge variant={s.verified ? "success" : "pending"}>{s.verified ? "Verified" : "Pending"}</Badge>
                     </td>
-                    <td className="px-4 py-4">
+                    <td className="px-3 py-3">
                       <Badge variant={s.isActive === false ? "danger" : "success"}>{s.isActive === false ? "Suspended" : "Active"}</Badge>
                     </td>
-                    <td className="px-4 py-4 text-right">
+                    <td className="px-3 py-3 text-right">
                       <div className="flex justify-end gap-1">
                         <button
                           onClick={() => setProfileModal(s)}
@@ -167,7 +171,7 @@ export function SellersManager() {
             <div className={`p-4 rounded-xl border ${"bg-bg-card border-border-subtle"}`}>
               <p className={`text-xs uppercase mb-1 ${"text-text-dim"}`}>Status</p>
               <div className="flex gap-2">
-                <Badge variant={profileModal.verified ? "success" : "warning"}>{profileModal.verified ? "Verified" : "Pending"}</Badge>
+                <Badge variant={profileModal.verified ? "success" : "pending"}>{profileModal.verified ? "Verified" : "Pending"}</Badge>
                 <Badge variant={profileModal.isActive === false ? "danger" : "success"}>{profileModal.isActive === false ? "Suspended" : "Active"}</Badge>
               </div>
             </div>

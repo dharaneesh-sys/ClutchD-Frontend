@@ -234,7 +234,7 @@ export function SellerProductForm({ initialProduct = null, onSuccess }) {
           ))}
         </select>
         {errors.category?.message && (
-          <p className="mt-1.5 text-xs text-red-500">{errors.category.message}</p>
+          <p className="mt-1.5 text-xs text-[var(--danger)]">{errors.category.message}</p>
         )}
       </div>
 
@@ -254,7 +254,7 @@ export function SellerProductForm({ initialProduct = null, onSuccess }) {
           {...register("description")}
         />
         {errors.description?.message && (
-          <p className="mt-1.5 text-xs text-red-500">{errors.description.message}</p>
+          <p className="mt-1.5 text-xs text-[var(--danger)]">{errors.description.message}</p>
         )}
       </div>
 
@@ -272,7 +272,7 @@ export function SellerProductForm({ initialProduct = null, onSuccess }) {
           <input
             id="seller-product-availability"
             type="checkbox"
-            className="h-4 w-4 accent-[var(--color-primary)]"
+            className="h-4 w-4 accent-[var(--primary)]"
             {...register("availability")}
           />
           {availability ? "In stock" : "Out of stock"}

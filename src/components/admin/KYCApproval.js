@@ -28,14 +28,14 @@ function docUrl(url) {
   return `${API_BASE_URL.replace(/\/api\/?$/, "")}${url.startsWith("/") ? "" : "/"}${url}`;
 }
 
-const STATUS_META = {
-  pending: { label: "Pending", variant: "default", Icon: Clock },
-  submitted: { label: "Under Review", variant: "warning", Icon: FileText },
+export const STATUS_META = {
+  pending: { label: "Pending", variant: "pending", Icon: Clock },
+  submitted: { label: "Under Review", variant: "info", Icon: FileText },
   verified: { label: "Verified", variant: "success", Icon: CheckCircle },
   rejected: { label: "Rejected", variant: "danger", Icon: XCircle },
 };
 
-const STATUS_FILTERS = [
+export const STATUS_FILTERS = [
   { key: "", label: "Action Queue" },
   { key: "submitted", label: "Under Review" },
   { key: "pending", label: "Pending" },
@@ -231,7 +231,7 @@ export function KYCApproval() {
                 license || { kind: "license", label: "Driving License", url: null },
               ];
               return (
-                <GlassCard key={`${app.profileType}-${app.id}`} variant="elevated" className="p-5 sm:p-6 flex flex-col h-full">
+                <GlassCard key={`${app.profileType}-${app.id}`} className="p-5 sm:p-6 flex flex-col h-full">
                   <div className="flex justify-between items-start mb-3">
                     <div className="min-w-0">
                       <h3 className="text-lg font-bold text-text-primary truncate">{app.name}</h3>
@@ -266,7 +266,7 @@ export function KYCApproval() {
                   )}
 
                   {app.kycNote && (
-                    <p className="text-xs text-blue-300/90 bg-blue-500/10 border border-blue-500/25 rounded-lg px-3 py-2 mb-4">
+                    <p className="text-xs text-[color-mix(in_srgb,var(--info)_70%,var(--foreground))] bg-[color-mix(in_srgb,var(--info)_10%,transparent)] border border-[color-mix(in_srgb,var(--info)_25%,transparent)] rounded-lg px-3 py-2 mb-4">
                       <span className="font-medium">Previous review note:</span> {app.kycNote}
                     </p>
                   )}
@@ -315,7 +315,7 @@ export function KYCApproval() {
             </p>
 
             {reviewModal.action === "reject" && (
-              <div className="mb-4 flex items-start gap-2 text-xs text-blue-300/90 bg-blue-500/10 border border-blue-500/25 rounded-lg px-3 py-2">
+              <div className="mb-4 flex items-start gap-2 text-xs text-[color-mix(in_srgb,var(--info)_70%,var(--foreground))] bg-[color-mix(in_srgb,var(--info)_10%,transparent)] border border-[color-mix(in_srgb,var(--info)_25%,transparent)] rounded-lg px-3 py-2">
                 <AlertTriangle size={14} className="shrink-0 mt-0.5" />
                 <span>The provider will see your note and can resubmit documents from their profile.</span>
               </div>

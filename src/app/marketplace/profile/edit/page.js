@@ -13,7 +13,7 @@ import { resolveMediaUrl } from "@/lib/mediaUrl";
 
 
 
-function validateForm({ name, phone, address }) {
+export function validateForm({ name, phone, address }) {
   const errors = {};
   if (!name || name.trim().length < 2) {
     errors.name = "Name must be at least 2 characters";
@@ -138,15 +138,15 @@ export default function EditProfilePage() {
   return (
     <div className="p-4 sm:p-5 space-y-5 animate-fade-in-up max-w-2xl">
       <div className="space-y-1">
-        <h1 className="text-lg font-semibold text-foreground">Edit Profile</h1>
-        <p className="text-sm text-text-muted">Update your personal information</p>
+        <h1 className="type-headline-3 text-foreground">Edit Profile</h1>
+        <p className="type-body-2 text-text-muted">Update your personal information</p>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-5">
         {/* Profile Photo */}
         <div className="glass-lux rounded-2xl p-5 flex flex-col items-center gap-3">
           <div className="relative">
-            <div className="w-20 h-20 rounded-full bg-gradient-to-br from-primary/30 to-primary/10 ring-2 ring-white/10 flex items-center justify-center overflow-hidden">
+            <div className="w-20 h-20 rounded-full bg-gradient-to-br from-primary/30 to-primary/10 ring-2 ring-border-subtle flex items-center justify-center overflow-hidden">
               {photoPreview ? (
                 // eslint-disable-next-line @next/next/no-img-element
                 <img src={resolveMediaUrl(photoPreview)} alt="Profile" className="w-full h-full object-cover" />
@@ -214,16 +214,15 @@ export default function EditProfilePage() {
               placeholder="Enter your address"
               rows={3}
               className={cn(
-                "w-full rounded-2xl border px-4 py-3 text-sm transition-all",
-                "border-white/[0.08] bg-surface text-foreground placeholder:text-text-dim",
-                "shadow-[inset_0_1px_0_rgba(var(--color-white-rgb),0.04)]",
+                "w-full rounded-xl border px-4 py-3 text-sm transition-all",
+                "border-subtle bg-surface text-foreground placeholder:text-text-dim",
                 "focus:border-primary focus:bg-surface focus:outline-none",
                 "focus:ring-1 focus:ring-primary/30",
-                errors.address && "border-red-500/50 focus:border-red-500 focus:ring-red-500/20"
+                errors.address && "border-[var(--danger)] focus:border-[var(--danger)] focus:ring-[color-mix(in_srgb,var(--danger)_30%,transparent)]"
               )}
             />
             {errors.address && (
-              <p className="mt-1.5 text-xs text-red-400">{errors.address}</p>
+              <p className="mt-1.5 text-xs text-[var(--danger)]">{errors.address}</p>
             )}
           </div>
         </div>

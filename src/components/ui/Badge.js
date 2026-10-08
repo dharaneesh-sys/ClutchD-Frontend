@@ -3,23 +3,21 @@ import { cn } from "@/lib/utils";
 export function Badge({ children, className, variant = "default" }) {
   const variants = {
     default:
-      "bg-gradient-to-b from-primary/25 to-primary/10 text-primary-light border-primary/35",
+      "bg-[var(--color-badge-bg)] text-[var(--color-badge-text)] border-[color-mix(in_srgb,var(--primary)_35%,transparent)]",
     success:
-      "bg-gradient-to-b from-green-500/25 to-green-500/10 text-green-300 border-green-500/35",
-    warning:
-      "bg-gradient-to-b from-[#1E29B6]/25 to-[#2e3bd1]/10 text-[#1E29B6] border-[#1E29B6]/35",
+      "bg-[color-mix(in_srgb,var(--success)_14%,transparent)] text-[color-mix(in_srgb,var(--success)_70%,var(--foreground))] border-[color-mix(in_srgb,var(--success)_35%,transparent)]",
     danger:
-      "bg-gradient-to-b from-red-500/25 to-red-500/10 text-red-300 border-red-500/35",
+      "bg-[color-mix(in_srgb,var(--danger)_14%,transparent)] text-[color-mix(in_srgb,var(--danger)_70%,var(--foreground))] border-[color-mix(in_srgb,var(--danger)_35%,transparent)]",
     info:
-      "bg-gradient-to-b from-blue-500/25 to-blue-500/10 text-blue-300 border-blue-500/35",
-    glass: "bg-gradient-to-b from-white/15 to-white/5 text-white/90 border-white/25",
+      "bg-[color-mix(in_srgb,var(--info)_14%,transparent)] text-[color-mix(in_srgb,var(--info)_70%,var(--foreground))] border-[color-mix(in_srgb,var(--info)_35%,transparent)]",
+    pending:
+      "bg-[var(--pending-bg)] text-[var(--pending-text)] border-[color-mix(in_srgb,var(--pending)_40%,transparent)]",
   };
 
   return (
     <span
       className={cn(
         "inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold",
-        "backdrop-blur-xl shadow-[0_10px_30px_rgba(var(--color-black-rgb),0.25)]",
         variants[variant],
         className
       )}

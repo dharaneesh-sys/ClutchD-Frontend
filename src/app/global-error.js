@@ -14,19 +14,19 @@ export default function GlobalError({ error, reset }) {
           dangerouslySetInnerHTML={{
             __html: `
               (function() {
-                var t = localStorage.getItem('clutchd_theme');
-                var d = t === 'light' ? '#fdfdff' : '#0a0a0a';
-                var f = t === 'light' ? '#171a2e' : '#fff';
-                var p = '#4aa5f5';
-                if (!t) {
-                  var m = window.matchMedia('(prefers-color-scheme: light)');
-                  if (m.matches) { d = '#fdfdff'; f = '#171a2e'; }
-                }
+var t = localStorage.getItem('clutchd_theme');
+                var mq = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)');
+                var isDark = t === 'dark' || (!t && !!(mq && mq.matches));
+                var d = isDark ? '#09090b' : '#f4f6fc';
+                var f = isDark ? '#fafafa' : '#171a2e';
+                var p = isDark ? '#4aa5f5' : '#1E29B6';
+                var oc = isDark ? '#0B1030' : '#FFFFFF';
                 document.body.style.background = d;
                 document.body.style.color = f;
                 document.documentElement.style.setProperty('--bg', d);
                 document.documentElement.style.setProperty('--fg', f);
                 document.documentElement.style.setProperty('--p', p);
+                document.documentElement.style.setProperty('--oc', oc);
               })();
             `,
           }}
@@ -45,7 +45,7 @@ export default function GlobalError({ error, reset }) {
                 padding: "0.75rem 1.5rem",
                 borderRadius: "0.75rem",
                 background: "var(--p)",
-                color: "#fff",
+                color: "var(--oc)",
                 border: "none",
                 fontWeight: 600,
                 fontSize: "0.875rem",

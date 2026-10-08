@@ -20,7 +20,7 @@ import api from "@/lib/api";
 
 const STATUS_CONFIG = {
   completed: { variant: "success", label: "Paid" },
-  pending: { variant: "warning", label: "Pending" },
+  pending: { variant: "pending", label: "Pending" },
   failed: { variant: "danger", label: "Failed" },
   refunded: { variant: "info", label: "Refunded" },
 };
@@ -54,7 +54,7 @@ function PaymentCard({ payment, onDownload }) {
       {/* Header: Method + Status */}
       <div className="flex items-start justify-between gap-3">
         <div className="flex items-center gap-3 min-w-0">
-          <div className="flex-shrink-0 w-10 h-10 rounded-xl bg-white/10 ring-1 ring-white/10 flex items-center justify-center">
+          <div className="flex-shrink-0 w-10 h-10 rounded-xl bg-surface-soft ring-1 ring-border-subtle flex items-center justify-center">
             <MethodIcon size={18} className="text-primary-light" />
           </div>
           <div className="min-w-0">
@@ -175,8 +175,8 @@ export default function PaymentsPage() {
         </div>
         <div className="glass-lux rounded-2xl p-4">
           <div className="flex items-center gap-2.5">
-            <div className="w-9 h-9 rounded-xl bg-[var(--color-primary-rgb)]/15 flex items-center justify-center shrink-0">
-              <Receipt size={16} className="text-[var(--primary-light)]" />
+            <div className="w-9 h-9 rounded-xl bg-pending/15 flex items-center justify-center shrink-0">
+              <Receipt size={16} className="text-pending" />
             </div>
             <div>
               <p className="text-2xl font-bold tracking-tight text-foreground">

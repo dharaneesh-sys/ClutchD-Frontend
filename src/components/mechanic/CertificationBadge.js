@@ -9,28 +9,24 @@ const CERT_STYLE = {
     gradient: "from-[var(--color-primary-rgb)]/15 to-[var(--color-primary-rgb)]/5",
     text: "text-[var(--primary-light)]",
     border: "border-[var(--color-primary-rgb)]/30",
-    glow: "rgba(52,211,153,0.15)",
     icon: Award,
   },
   toyota: {
-    gradient: "from-red-500/25 to-red-500/10",
-    text: "text-red-300",
-    border: "border-red-500/35",
-    glow: "rgba(239,68,68,0.15)",
+    gradient: "from-danger/25 to-danger/10",
+    text: "text-danger",
+    border: "border-danger/35",
     icon: ShieldCheck,
   },
   honda: {
-    gradient: "from-blue-500/25 to-blue-500/10",
-    text: "text-blue-300",
-    border: "border-blue-500/35",
-    glow: "rgba(59,130,246,0.15)",
+    gradient: "from-info/25 to-info/10",
+    text: "text-info",
+    border: "border-info/35",
     icon: Wrench,
   },
   bosch: {
     gradient: "from-primary/25 to-primary/10",
     text: "text-primary-light",
     border: "border-primary/35",
-    glow: "rgba(16,185,129,0.15)",
     icon: Hexagon,
   },
 };
@@ -77,16 +73,14 @@ export function CertificationBadge({ certification, issuedDate, expiryDate, show
       <span
         className={cn(
           "inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[11px] font-semibold leading-none",
-          "backdrop-blur-xl shadow-[0_10px_30px_rgba(var(--color-black-rgb),0.25)]",
+          "backdrop-blur-xl shadow-lg",
           "transition-all duration-200 hover:scale-105",
           style.gradient,
           style.text,
           style.border,
           expired && "opacity-50 grayscale-[0.3]"
         )}
-        style={{
-          boxShadow: expired ? undefined : `0 4px 12px ${style.glow}`,
-        }}
+        style={expired ? undefined : { boxShadow: "var(--elevation-2)" }}
       >
         <Icon size={12} className="shrink-0" />
         <span>{certDef.label}</span>
@@ -110,39 +104,39 @@ export function CertificationBadge({ certification, issuedDate, expiryDate, show
             "z-50 w-56"
           )}
         >
-          <div className="rounded-xl border bg-[#1c1c1f]/95 backdrop-blur-xl p-3 shadow-2xl border-white/10">
+          <div className="rounded-xl border glass-lux backdrop-blur-xl p-3 shadow-2xl border-border-subtle">
             <div className="flex items-center gap-2 mb-1.5">
               <Icon size={14} className={style.text} />
-              <span className="text-xs font-bold text-white">{certDef.label}</span>
+              <span className="text-xs font-bold text-foreground">{certDef.label}</span>
             </div>
-            <p className="text-[11px] text-white/60 mb-2">{certDef.issuer}</p>
+            <p className="text-[11px] text-text-muted mb-2">{certDef.issuer}</p>
             {displayIssued && (
-              <div className="flex justify-between text-[10px] text-white/40">
+              <div className="flex justify-between text-[10px] text-text-dim">
                 <span>Issued: {displayIssued}</span>
               </div>
             )}
             {displayExpiry && (
-              <div className="flex justify-between text-[10px] text-white/40">
+              <div className="flex justify-between text-[10px] text-text-dim">
                 <span>
                   Expires: {displayExpiry}
                   {expired && (
-                    <span className="text-red-400 ml-1">(Expired)</span>
+                    <span className="text-danger ml-1">(Expired)</span>
                   )}
                 </span>
               </div>
             )}
             {expiresIn !== null && expiresIn > 0 && !expired && (
-              <div className="mt-1.5 h-1 rounded-full bg-white/10 overflow-hidden">
+              <div className="mt-1.5 h-1 rounded-full bg-surface-soft overflow-hidden">
                 <div
                   className={cn(
                     "h-full rounded-full transition-all",
-                    expiresIn > 180 ? "bg-success" : expiresIn > 60 ? "bg-warning" : "bg-danger"
+                    expiresIn > 180 ? "bg-success" : expiresIn > 60 ? "bg-pending" : "bg-danger"
                   )}
                   style={{ width: `${Math.min(100, (expiresIn / 1095) * 100)}%` }}
                 />
               </div>
             )}
-            <div className="mt-1 text-[9px] text-white/30 text-center">{certDef.description}</div>
+            <div className="mt-1 text-[9px] text-text-dim text-center">{certDef.description}</div>
           </div>
         </div>
       )}

@@ -42,14 +42,14 @@ const STATUS_LABELS = {
 };
 
 const STATUS_BADGE_VARIANT = {
-  searching: "warning",
+  searching: "info",
   assigned: "info",
   en_route: "info",
   in_progress: "default",
-  payment_pending: "warning",
+  payment_pending: "pending",
   completed: "success",
   cancelled: "danger",
-  pending: "warning",
+  pending: "pending",
 };
 
 const UPCOMING_STATUSES = ["searching", "assigned", "en_route", "in_progress", "payment_pending", "pending"];
@@ -135,7 +135,7 @@ function ServiceCard({ service, onViewDetails, onRebook, onCancel }) {
           onClick={() => onViewDetails(service)}
           className={cn(
             "inline-flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-lg",
-            "bg-white/10 text-text-muted hover:bg-white/15 hover:text-foreground transition-colors"
+            "bg-surface-soft text-text-muted hover:bg-surface-mid hover:text-foreground transition-colors"
           )}
         >
           <Eye size={13} />
@@ -147,7 +147,7 @@ function ServiceCard({ service, onViewDetails, onRebook, onCancel }) {
             onClick={() => onRebook(service)}
             className={cn(
               "inline-flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-lg",
-              "bg-primary/10 text-primary-light hover:bg-primary/20 transition-colors"
+              "bg-primary-soft text-primary-light hover:bg-primary-mid transition-colors"
             )}
           >
             <RotateCcw size={13} />
@@ -160,7 +160,7 @@ function ServiceCard({ service, onViewDetails, onRebook, onCancel }) {
             onClick={() => onCancel(service)}
             className={cn(
               "inline-flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-lg ml-auto",
-              "bg-red-500/10 text-red-400 hover:bg-red-500/20 transition-colors"
+              "bg-danger/10 text-danger hover:bg-danger/20 transition-colors"
             )}
           >
             <XCircle size={13} />
@@ -344,7 +344,7 @@ export default function ServicesPage() {
                 "flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-semibold transition-all whitespace-nowrap border",
                 isActive
                   ? "bg-primary/10 text-foreground border-primary/30 shadow-sm"
-                  : "bg-white/5 text-text-muted border-transparent hover:bg-white/10 hover:text-foreground"
+                  : "bg-surface-container-low text-text-muted border-transparent hover:bg-surface-soft hover:text-foreground"
               )}
             >
               <Icon size={14} />
@@ -355,7 +355,7 @@ export default function ServicesPage() {
                     "ml-1 text-[10px] px-1.5 py-0.5 rounded-full",
                     isActive
                       ? "bg-primary/20 text-primary-light"
-                      : "bg-white/10 text-text-dim"
+                    : "bg-surface-soft text-text-dim"
                   )}
                 >
                   {count}
@@ -397,7 +397,7 @@ export default function ServicesPage() {
             activeTab === "upcoming" ? (
               <button
                 onClick={() => router.push(`/dashboard/${user?.role ?? "customer"}`)}
-                className="btn-glow inline-flex h-11 items-center gap-2 rounded-xl px-6 text-sm font-medium text-white transition-all hover-lift active-press"
+                className="inline-flex h-11 items-center gap-2 rounded-xl bg-primary px-6 text-sm font-medium text-white transition-all hover-lift active-press"
               >
                 Request Service
               </button>

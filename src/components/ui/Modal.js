@@ -122,11 +122,11 @@ export function Modal({
   const modalContent = (
     <>
       {/* Backdrop — z-10040: above ALL page chrome (map chips z-400,
-          NotificationBell z-500, ChatWidget z-900, ThemeToggle/FABs z-9999)
-          so nothing bleeds through the dimmed overlay. */}
+          NotificationBell z-500, ChatWidget z-900) so nothing bleeds
+          through the dimmed overlay. No floating chrome exists (D9.3). */}
       <div
         onClick={onClose}
-        className="fixed inset-0 z-[10040] backdrop-blur-sm animate-[backdrop-in_0.2s_ease] bg-black/50"
+        className="fixed inset-0 z-[10040] backdrop-blur-sm animate-[backdrop-in_0.2s_ease] bg-[rgba(0,0,0,0.32)]"
         aria-hidden="true"
       />
 
@@ -145,7 +145,7 @@ export function Modal({
           className={cn(
             "relative w-full rounded-2xl border pointer-events-auto animate-[modal-in_0.25s_ease]",
             "p-6 backdrop-blur-3xl my-auto",
-            "border-border-subtle bg-surface shadow-[0_30px_80px_rgba(var(--color-black-rgb),0.35)] ring-1 ring-primary/10",
+            "glass-lux",
             maxWidth,
             className
           )}

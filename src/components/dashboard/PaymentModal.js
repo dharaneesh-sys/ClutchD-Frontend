@@ -229,7 +229,7 @@ function PaymentModalContent({ isOpen, onClose, amount, pricing, jobId, onSucces
     <Modal isOpen={isOpen} onClose={onClose} title="Complete Payment">
       <div className="text-center mb-4">
         <p className="text-sm mb-1 text-text-muted">Total Amount Due</p>
-        <p className="text-4xl font-bold tracking-tight text-text-primary">₹{Number(displayAmount).toFixed(2)}</p>
+        <p className="text-4xl font-bold tracking-tight text-primary tabular-nums">₹{Number(displayAmount).toFixed(2)}</p>
       </div>
 
       {/* Itemized breakdown toggle */}
@@ -288,7 +288,7 @@ function PaymentModalContent({ isOpen, onClose, amount, pricing, jobId, onSucces
             onClick={() => { setMethod(id); setQrData(null); setPayState("idle"); }}
             className={`flex items-center gap-4 p-3.5 rounded-xl border cursor-pointer transition-all ${
               method === id
-                ? "bg-surface-soft border-border-subtle shadow-[0_0_10px_rgba(30,41,182,0.12)]"
+                ? "bg-surface-soft border-border-subtle"
                 : "bg-bg-card border-border-subtle hover:bg-surface-soft"
             }`}
           >

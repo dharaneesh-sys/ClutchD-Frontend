@@ -122,7 +122,7 @@ export function ReferralPanel({ className, onNavigateBack }) {
         {onNavigateBack && (
           <button
             onClick={onNavigateBack}
-            className="p-2 -ml-2 rounded-xl hover:bg-white/10 transition-colors text-text-muted hover:text-text-primary"
+            className="p-2 -ml-2 rounded-xl hover:bg-surface-container transition-colors text-text-muted hover:text-text-primary"
             aria-label="Go back"
           >
             <ChevronRight size={18} className="rotate-180" />
@@ -143,7 +143,7 @@ export function ReferralPanel({ className, onNavigateBack }) {
         {/* Decorative glow */}
         <div
           className="absolute -top-12 -right-12 w-32 h-32 rounded-full opacity-20 blur-3xl pointer-events-none"
-          style={{ background: "var(--color-primary, #a78bfa)" }}
+          style={{ background: "var(--primary)" }}
           aria-hidden="true"
         />
 
@@ -174,7 +174,7 @@ export function ReferralPanel({ className, onNavigateBack }) {
                     "flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold transition-all",
                     copied
                       ? "bg-primary/20 text-primary-light border border-primary/30"
-                      : "bg-white/10 text-text-primary hover:bg-white/15 border border-white/10 hover:border-white/20"
+                      : "bg-surface-container text-text-primary hover:bg-surface-container-high border border-subtle"
                   )}
                   aria-label={copied ? "Copied" : "Copy referral link"}
                 >
@@ -225,7 +225,7 @@ export function ReferralPanel({ className, onNavigateBack }) {
 
       {/* Stats Grid */}
       <div className="grid grid-cols-2 gap-3">
-        <GlassCard variant="glass" className="p-4">
+        <GlassCard variant="glass-lux" className="p-4">
           <div className="flex items-center gap-2.5">
             <div className="w-9 h-9 rounded-xl bg-primary/15 flex items-center justify-center shrink-0">
               <Users size={16} className="text-primary-light" />
@@ -241,9 +241,9 @@ export function ReferralPanel({ className, onNavigateBack }) {
           </div>
         </GlassCard>
 
-        <GlassCard variant="glass" className="p-4">
+        <GlassCard variant="glass-lux" className="p-4">
           <div className="flex items-center gap-2.5">
-            <div className="w-9 h-9 rounded-xl bg-[var(--color-primary-rgb)]/15 flex items-center justify-center shrink-0">
+            <div className="w-9 h-9 rounded-xl bg-primary/15 flex items-center justify-center shrink-0">
               <Coins size={16} className="text-icon-highlight" />
             </div>
             <div>
@@ -260,7 +260,7 @@ export function ReferralPanel({ className, onNavigateBack }) {
       </div>
 
       {/* How It Works / Progress Card */}
-      <GlassCard variant="glass" className="p-4">
+      <GlassCard variant="glass-lux" className="p-4">
         <div className="flex items-center gap-2 mb-3">
           <Sparkles size={14} className="text-icon-highlight" />
           <span className="text-sm font-semibold text-text-primary">
@@ -301,7 +301,7 @@ export function ReferralPanel({ className, onNavigateBack }) {
         </div>
 
         {/* Reward progress bar */}
-        <div className="mt-4 pt-3 border-t border-white/5">
+        <div className="mt-4 pt-3 border-t border-subtle/50">
           <div className="flex items-center justify-between mb-1.5">
             <span className="text-xs text-text-muted">Reward progress</span>
             <span className="text-xs font-medium text-text-primary">
@@ -310,13 +310,13 @@ export function ReferralPanel({ className, onNavigateBack }) {
               {stats.maxRewards.toLocaleString("en-IN")}
             </span>
           </div>
-          <div className="w-full h-1.5 rounded-full bg-white/5 overflow-hidden">
+          <div className="w-full h-1.5 rounded-full bg-surface-container overflow-hidden">
             <div
               className="h-full rounded-full transition-all duration-500"
               style={{
                 width: `${Math.min(100, (stats.rewardsEarned / stats.maxRewards) * 100)}%`,
                 background:
-                  "linear-gradient(90deg, var(--color-primary, #a78bfa), var(--color-primary-light, #c4b5fd))",
+                  "linear-gradient(90deg, var(--primary), var(--primary-light))",
               }}
             />
           </div>

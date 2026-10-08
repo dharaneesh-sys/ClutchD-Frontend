@@ -28,7 +28,7 @@ const NavigationMap = dynamic(
   () => import("../../../components/dashboard/MapView"),
   { 
     ssr: false,
-    loading: () => <div className="w-full h-full bg-stone-100 dark:bg-zinc-900 rounded-2xl animate-pulse" />
+    loading: () => <div className="w-full h-full bg-surface-soft rounded-2xl animate-pulse" />
   }
 );
 
@@ -162,8 +162,8 @@ export default function MechanicDashboard() {
               
               <div className="h-[250px] sm:h-[300px] rounded-2xl overflow-hidden relative shadow-2xl border">
                 <NavigationMap role="mechanic" />
-                <div className="absolute top-4 left-4 z-[400] backdrop-blur-md px-3 py-1.5 rounded-full border text-xs font-semibold flex items-center gap-2 bg-white/80 dark:bg-black/60 border-slate-200 dark:border-white/10 text-slate-700 dark:text-white">
-                  <span className="w-2 h-2 rounded-full bg-blue-400 animate-pulse" />
+                <div className="absolute top-4 left-4 z-[400] glass-lux px-3 py-1.5 rounded-full border border-border-subtle text-xs font-semibold flex items-center gap-2 text-foreground">
+                  <span className="w-2 h-2 rounded-full bg-info animate-pulse" />
                   Navigation
                 </div>
               </div>
@@ -185,13 +185,13 @@ export default function MechanicDashboard() {
               
               {/* Collapsible jobs panel */}
               <div className={`absolute top-4 right-4 z-[400] w-80 sm:w-96 transition-all duration-300 ${jobsPanelOpen ? "opacity-100" : "opacity-0 pointer-events-none"}`}>
-                <div className="backdrop-blur-xl bg-black/70 rounded-2xl border border-white/10 shadow-2xl overflow-hidden max-h-[55vh]">
-                  <div className="flex items-center justify-between px-4 py-3 border-b border-white/10">
+                <div className="glass-lux rounded-2xl border border-border-subtle shadow-2xl overflow-hidden max-h-[55vh]">
+                  <div className="flex items-center justify-between px-4 py-3 border-b border-border-subtle">
                     <div className="flex items-center gap-2">
                       <Briefcase size={15} className="text-icon-highlight" />
-                      <span className="text-sm font-semibold text-white">Job Queue</span>
+                      <span className="text-sm font-semibold text-foreground">Job Queue</span>
                     </div>
-                    <button onClick={() => setJobsPanelOpen(false)} className="p-1.5 rounded-lg hover:bg-white/10 text-white/50 hover:text-white transition-colors">
+                    <button onClick={() => setJobsPanelOpen(false)} className="p-1.5 rounded-lg hover:bg-surface-soft text-text-muted hover:text-foreground transition-colors">
                       <X size={14} />
                     </button>
                   </div>
@@ -203,7 +203,7 @@ export default function MechanicDashboard() {
               
               {/* Toggle button when panel is closed */}
               {!jobsPanelOpen && (
-                <button onClick={() => setJobsPanelOpen(true)} className="absolute top-4 right-4 z-[400] backdrop-blur-xl bg-black/70 rounded-xl border border-white/10 shadow-2xl px-4 py-3 text-white hover:bg-black/80 transition-all flex items-center gap-2">
+                <button onClick={() => setJobsPanelOpen(true)} className="absolute top-4 right-4 z-[400] glass-lux rounded-xl border border-border-subtle shadow-2xl px-4 py-3 text-foreground hover:bg-surface-soft transition-all flex items-center gap-2">
                   <Briefcase size={16} className="text-icon-highlight" />
                   <span className="text-sm font-medium">Jobs</span>
                 </button>
@@ -241,8 +241,8 @@ export default function MechanicDashboard() {
           <button
             onClick={() => setChatOpen((o) => !o)}
             className="w-14 h-14 rounded-full flex items-center justify-center transition-all active-press
-                       shadow-[0_8px_32px_rgba(var(--color-primary-rgb),0.3)]
-                       bg-primary text-white hover:shadow-[0_12px_40px_rgba(var(--color-primary-rgb),0.4)] hover-lift"
+                       shadow-lg
+                       bg-primary text-[var(--background)] hover-lift"
             aria-label={chatOpen ? "Close chat" : "Chat with customer"}
           >
             <MessageSquare size={22} />

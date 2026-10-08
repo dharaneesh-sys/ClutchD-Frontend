@@ -193,7 +193,7 @@ export function ServiceStatusTracker({ request, onComplete, onCancel, onReleaseP
   };
 
   return (
-    <GlassCard variant="strong" className="w-full p-6 flex flex-col flex-shrink-0">
+    <GlassCard variant="glass-lux" className="w-full p-6 flex flex-col flex-shrink-0">
       <div className="mb-8">
         <h2 className="text-2xl font-bold mb-1 text-text-primary">Service Status</h2>
         <p className="text-sm text-text-muted">Track your request in real-time</p>
@@ -219,9 +219,9 @@ export function ServiceStatusTracker({ request, onComplete, onCancel, onReleaseP
                 <div 
                   className={`relative w-10 h-10 rounded-full flex items-center justify-center border-2 transition-all duration-300 ${
                     isCurrent 
-                      ? "bg-primary-strong border-primary text-primary-text shadow-[0_0_15px_rgba(16,185,129,0.4)]"
+                      ? "bg-[var(--primary)] border-[var(--primary)] text-[var(--background)]"
                       : isCompleted
-                        ? "bg-primary border-primary text-white"
+                        ? "bg-primary border-primary text-[var(--background)]"
                         : "bg-bg-card border-border-subtle text-text-dim"
                   }`}
                 >
@@ -330,7 +330,7 @@ export function ServiceStatusTracker({ request, onComplete, onCancel, onReleaseP
            <button
              type="button"
              onClick={onCancel}
-             className="text-sm text-red-400 hover:text-red-300 transition-colors"
+             className="text-sm text-[var(--danger)] hover:brightness-110 transition-colors"
            >
               Cancel Request
            </button>

@@ -90,7 +90,7 @@ function ExpandableSection({ icon: Icon, title, content, defaultOpen = false }) 
         "rounded-2xl border transition-all duration-200 overflow-hidden",
         isOpen
           ? "glass-lux border-primary/20"
-          : "bg-white/[0.03] border-border-subtle hover:bg-white/[0.05]"
+          : "bg-surface-container-low border-border-subtle hover:bg-surface-soft"
       )}
     >
       <button
@@ -198,7 +198,7 @@ export default function SafetyPage() {
       {/* Header */}
       <div className="space-y-1">
         <h1 className="type-headline-3 text-foreground">Safety & Legal</h1>
-        <p className="type-body-2 text-muted">
+        <p className="type-body-2 text-text-muted">
           Privacy, terms, and emergency information
         </p>
       </div>
@@ -232,15 +232,15 @@ export default function SafetyPage() {
 
       {/* Send SOS — inline 2-tap confirm, no overlay */}
       <section>
-        <div className="rounded-2xl border border-red-500/25 bg-red-500/[0.06] p-4">
+        <div className="rounded-2xl border border-danger/25 bg-danger/10 p-4">
           <div className="flex items-center gap-3">
-            <div className="flex-shrink-0 w-10 h-10 rounded-xl bg-red-500/15 flex items-center justify-center">
+            <div className="flex-shrink-0 w-10 h-10 rounded-xl bg-danger/15 flex items-center justify-center">
               {sos.loading ? (
-                <Loader2 size={18} className="text-red-400 animate-spin" />
+                <Loader2 size={18} className="text-danger animate-spin" />
               ) : sos.status === "queued" ? (
-                <WifiOff size={18} className="text-[var(--primary-light)]" />
+                <WifiOff size={18} className="text-pending" />
               ) : (
-                <AlertTriangle size={18} className="text-red-400" />
+                <AlertTriangle size={18} className="text-danger" />
               )}
             </div>
             <div className="flex-1 min-w-0">
@@ -258,17 +258,17 @@ export default function SafetyPage() {
             onClick={sos.handleSOS}
             disabled={sosDisabled}
             className={cn(
-              "mt-3 w-full bg-red-600 hover:bg-red-700 text-white font-semibold",
+              "mt-3 w-full bg-danger hover:opacity-90 text-white font-semibold",
               sos.status === "confirming" && "animate-pulse",
             )}
           >
             {sosLabel}
           </Button>
           {sos.queuedMsg && (
-            <p className="mt-2 text-xs text-[var(--primary-light)]">{sos.queuedMsg}</p>
+            <p className="mt-2 text-xs text-pending">{sos.queuedMsg}</p>
           )}
           {!sos.isOnline && sos.status === "idle" && (
-            <p className="mt-2 text-xs text-[var(--primary-light)]">
+            <p className="mt-2 text-xs text-pending">
               You appear offline — SOS will be queued.
             </p>
           )}
@@ -288,10 +288,10 @@ export default function SafetyPage() {
               <a
                 key={contact.label}
                 href={`tel:${contact.number.replace(/\s/g, "")}`}
-                className="glass-lux rounded-2xl p-4 flex items-center gap-3 hover:bg-white/[0.08] transition-colors"
+                className="glass-lux-interactive rounded-2xl p-4 flex items-center gap-3 transition-colors"
               >
-                <div className="flex-shrink-0 w-10 h-10 rounded-xl bg-red-500/15 flex items-center justify-center">
-                  <Icon size={18} className="text-red-400" />
+                <div className="flex-shrink-0 w-10 h-10 rounded-xl bg-danger/15 flex items-center justify-center">
+                  <Icon size={18} className="text-danger" />
                 </div>
                 <div className="min-w-0">
                   <p className="text-sm font-semibold text-foreground">
@@ -311,10 +311,10 @@ export default function SafetyPage() {
       <section>
         <button
           onClick={handleReportSafetyIssue}
-          className="glass-lux rounded-2xl p-4 w-full flex items-center gap-3 hover:bg-white/[0.08] transition-colors text-left"
+          className="glass-lux-interactive rounded-2xl p-4 w-full flex items-center gap-3 transition-colors text-left"
         >
-          <div className="flex-shrink-0 w-10 h-10 rounded-xl bg-[var(--color-primary-rgb)]/15 flex items-center justify-center">
-            <AlertTriangle size={18} className="text-warning" />
+          <div className="flex-shrink-0 w-10 h-10 rounded-xl bg-primary/15 flex items-center justify-center">
+            <AlertTriangle size={18} className="text-pending" />
           </div>
           <div className="flex-1 min-w-0">
             <p className="text-sm font-semibold text-foreground">

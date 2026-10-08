@@ -6,9 +6,9 @@ import { useProductStore } from "@/store/productStore";
 import { formatCurrency } from "@/lib/utils";
 
 const STATUS_STYLES = {
-  confirmed: "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20",
-  pending: "bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20",
-  cancelled: "bg-red-500/10 text-red-600 dark:text-red-400 border-red-500/20",
+  confirmed: "bg-success/10 text-success border-success/20",
+  pending: "bg-pending/10 text-pending border-pending/20",
+  cancelled: "bg-danger/10 text-danger border-danger/20",
 };
 
 function statusStyle(status) {
@@ -95,7 +95,7 @@ export function SalesList() {
               Revenue
             </span>
           </div>
-          <p className="mt-2 text-xl font-bold text-text-primary">
+          <p className="mt-2 text-xl font-bold text-primary tabular-nums">
             {formatCurrency(totalRevenue)}
           </p>
         </div>

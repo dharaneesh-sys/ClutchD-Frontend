@@ -16,7 +16,7 @@ import { useProductStore } from "@/store/productStore";
 import { SORT_OPTIONS } from "@/lib/constants";
 import { ProductCard } from "@/components/marketplace/ProductCard";
 import { SearchFilters } from "@/components/marketplace/SearchFilters";
-import { ShimmerCard } from "@/components/ui/Shimmer";
+import { Shimmer, ShimmerCard } from "@/components/ui/Shimmer";
 import { EmptyState } from "@/components/ui/EmptyState";
 
 /* ────────────────────────────────────────────────────────────────────
@@ -89,12 +89,12 @@ function SearchSkeleton() {
   return (
     <div className="p-4 space-y-6">
       {/* Search bar skeleton */}
-      <div className="h-12 rounded-2xl bg-white/5 animate-pulse" />
+      <Shimmer className="!h-12 !w-full !rounded-2xl" />
 
       {/* Sort bar skeleton */}
       <div className="flex items-center justify-between">
-        <div className="h-4 w-40 bg-white/5 rounded animate-pulse" />
-        <div className="h-9 w-44 bg-white/5 rounded-xl animate-pulse" />
+        <Shimmer variant="text" className="!h-4 !w-40" />
+        <Shimmer variant="button" className="!h-9 !w-44 !rounded-xl" />
       </div>
 
       {/* Results grid skeleton */}
@@ -256,7 +256,7 @@ function SearchPageContent() {
   return (
     <div className="min-h-dvh">
       {/* ─── Search Header ─────────────────────────────────── */}
-      <div className="sticky top-0 z-30 glass-lux-strong rounded-none border-b border-border-subtle">
+      <div className="sticky top-0 z-30 glass-lux rounded-none border-b border-border-subtle">
         <div className="max-w-7xl mx-auto px-4 py-3">
           <div className="relative">
             <Search
@@ -272,7 +272,7 @@ function SearchPageContent() {
                 "w-full rounded-2xl border border-border-subtle",
                 // pl-11 clears the left icon; pr-11 reserves room for the X
                 // button so icon and clear control never overlap.
-                "bg-white/5 pl-11 pr-11 py-3 text-sm text-foreground",
+                "bg-surface-container-low pl-11 pr-11 py-3 text-sm text-foreground",
                 "placeholder:text-text-dim",
                 "focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20",
                 "transition-all"
@@ -283,7 +283,7 @@ function SearchPageContent() {
               <button
                 type="button"
                 onClick={handleClearSearch}
-                className="absolute right-3 top-1/2 -translate-y-1/2 p-1 rounded-lg hover:bg-white/10 transition-colors text-text-dim"
+                className="absolute right-3 top-1/2 -translate-y-1/2 p-1 rounded-lg hover:bg-surface-soft transition-colors text-text-dim"
                 aria-label="Clear search"
               >
                 <X size={16} />
@@ -299,8 +299,8 @@ function SearchPageContent() {
       {searchState === "ERROR" && (
         <div className="max-w-7xl mx-auto px-4 py-16">
           <div className="flex flex-col items-center justify-center text-center">
-            <div className="w-14 h-14 rounded-2xl bg-rose-500/15 flex items-center justify-center mb-4">
-              <AlertTriangle size={26} className="text-rose-400" />
+            <div className="w-14 h-14 rounded-2xl bg-[color-mix(in_srgb,var(--danger)_14%,transparent)] flex items-center justify-center mb-4">
+              <AlertTriangle size={26} className="text-danger" />
             </div>
             <h2 className="text-lg font-semibold text-foreground mb-1">
               Couldn&rsquo;t load search results
@@ -311,7 +311,7 @@ function SearchPageContent() {
             <button
               type="button"
               onClick={handleRetry}
-              className="inline-flex items-center gap-2 rounded-xl bg-primary px-5 py-2.5 text-sm font-semibold text-white hover:bg-primary-dark transition-colors"
+              className="inline-flex items-center gap-2 rounded-xl bg-[var(--primary)] px-5 py-2.5 text-sm font-semibold text-[var(--background)] hover:bg-[var(--primary-dark)] transition-colors"
             >
               Try Again
             </button>
@@ -322,7 +322,7 @@ function SearchPageContent() {
       {searchState === "NO_QUERY" && (
         <div className="max-w-7xl mx-auto px-4 py-16">
           <div className="flex flex-col items-center justify-center text-center">
-            <div className="w-14 h-14 rounded-2xl bg-white/5 flex items-center justify-center mb-4">
+            <div className="w-14 h-14 rounded-2xl bg-surface-soft flex items-center justify-center mb-4">
               <Search size={26} className="text-text-dim" />
             </div>
             <h2 className="text-lg font-semibold text-foreground mb-1">
@@ -396,7 +396,7 @@ function SearchPageContent() {
                     className={cn(
                       "lg:hidden flex items-center gap-2 rounded-xl border border-border-subtle",
                       "px-3.5 py-2 text-xs font-medium text-text-muted",
-                      "hover:bg-white/5 hover:text-foreground transition-colors"
+                      "hover:bg-surface-soft hover:text-foreground transition-colors"
                     )}
                   >
                     <SlidersHorizontal size={14} />
@@ -416,7 +416,7 @@ function SearchPageContent() {
                       className={cn(
                         "flex items-center gap-2 rounded-xl border border-border-subtle",
                         "px-3.5 py-2 text-xs font-medium text-text-muted",
-                        "hover:bg-white/5 hover:text-foreground transition-colors",
+                        "hover:bg-surface-soft hover:text-foreground transition-colors",
                         "min-w-[140px] justify-between"
                       )}
                     >
@@ -434,7 +434,7 @@ function SearchPageContent() {
                     </button>
 
                     {showSortDropdown && (
-                      <div className="absolute right-0 top-full mt-1.5 z-20 min-w-[180px] glass-lux-strong rounded-xl overflow-hidden animate-scale-in">
+                      <div className="absolute right-0 top-full mt-1.5 z-20 min-w-[180px] glass-lux rounded-xl overflow-hidden animate-scale-in">
                         {SORT_OPTIONS.map((option) => (
                           <button
                             key={option.value}
@@ -447,7 +447,7 @@ function SearchPageContent() {
                               "w-full text-left px-4 py-2.5 text-xs font-medium transition-colors",
                               sortBy === option.value
                                 ? "bg-primary/20 text-primary-light"
-                                : "text-text-muted hover:bg-white/5 hover:text-foreground"
+                                : "text-text-muted hover:bg-surface-soft hover:text-foreground"
                             )}
                           >
                             {option.label}

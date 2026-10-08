@@ -18,14 +18,14 @@ export function Shimmer({ className, variant = "text", children, ...props }) {
       aria-hidden="true"
       tabIndex={-1}
       className={cn(
-        "relative overflow-hidden rounded-xl",
+        "relative overflow-hidden rounded-xl bg-[var(--surface-container-high)]",
         shimmerVariants[variant] || shimmerVariants.text,
         className
       )}
       {...props}
     >
       <div
-        className="absolute inset-0 rounded-[inherit] bg-gradient-to-r from-transparent via-white/[0.06] to-transparent"
+        className="absolute inset-0 rounded-[inherit] bg-gradient-to-r from-transparent via-[rgba(var(--color-primary-rgb),0.10)] to-transparent"
         style={{
           animation: "shimmer-pulse 2s ease-in-out infinite",
           backgroundSize: "200% 100%",
@@ -63,7 +63,7 @@ export function ShimmerCard({ className, lines = 3, hasAvatar = true, hasActions
       </div>
 
       {hasActions && (
-        <div className="flex justify-between pt-3 border-t border-white/[0.06]">
+        <div className="flex justify-between pt-3 border-t border-[var(--color-border-subtle)]">
           <Shimmer variant="button" />
           <Shimmer variant="button" className="w-20" />
         </div>
@@ -78,7 +78,7 @@ export function ShimmerList({ count = 4, className }) {
       {Array.from({ length: count }).map((_, i) => (
         <div
           key={i}
-          className="glass-lux rounded-xl p-4 flex items-center gap-4"
+          className="glass-lux rounded-2xl p-4 flex items-center gap-4"
         >
           <Shimmer variant="avatar" />
           <div className="flex-1 space-y-2">

@@ -37,14 +37,14 @@ const MapView = dynamic(
   {
     ssr: false,
     loading: () => (
-      <div className="w-full h-full bg-stone-100 dark:bg-zinc-900 rounded-2xl animate-pulse" />
+      <div className="w-full h-full bg-surface-container-low rounded-2xl animate-pulse" />
     ),
   }
 );
 
 const ServiceHistory = dynamic(
   () => import("../../../components/dashboard/ServiceHistory").then(m => ({ default: m.ServiceHistory })),
-  { ssr: false, loading: () => <div className="flex-1 flex items-center justify-center"><div className="w-8 h-8 border-2 border-t-transparent rounded-full animate-spin border-[#1E29B6] dark:border-primary" /></div> }
+  { ssr: false, loading: () => <div className="flex-1 flex items-center justify-center"><div className="w-8 h-8 border-2 border-t-transparent rounded-full animate-spin border-[var(--primary)]" /></div> }
 );
 
 const MarketplaceHome = dynamic(
@@ -54,7 +54,7 @@ const MarketplaceHome = dynamic(
 
 const VehicleList = dynamic(
   () => import("../../../components/dashboard/VehicleList").then(m => ({ default: m.VehicleList })),
-  { ssr: false, loading: () => <div className="flex-1 flex items-center justify-center"><div className="w-8 h-8 border-2 border-t-transparent rounded-full animate-spin border-[#1E29B6] dark:border-primary" /></div> }
+  { ssr: false, loading: () => <div className="flex-1 flex items-center justify-center"><div className="w-8 h-8 border-2 border-t-transparent rounded-full animate-spin border-[var(--primary)]" /></div> }
 );
 
 export default function CustomerDashboard() {
@@ -349,7 +349,7 @@ export default function CustomerDashboard() {
             <MapView role="customer" />
 
             <div className="absolute top-4 left-4 z-[400] glass-lux px-3 py-1.5 rounded-full text-xs font-semibold flex items-center gap-2 text-foreground">
-              <span className="w-2 h-2 rounded-full bg-[#1E29B6] dark:bg-primary-light" />
+              <span className="w-2 h-2 rounded-full bg-[var(--primary)]" />
               Live Area Map
             </div>
           </div>
@@ -438,8 +438,8 @@ export default function CustomerDashboard() {
             "w-14 h-14 rounded-full flex items-center justify-center transition-all active-press",
             "shadow-[0_8px_32px_rgba(var(--color-primary-rgb),0.3)]",
             chatOpen
-              ? "bg-red-500/20 border border-red-400/30 text-red-400 rotate-45"
-              : "bg-primary text-white hover:shadow-[0_12px_40px_rgba(var(--color-primary-rgb),0.4)] hover-lift"
+              ? "bg-[color-mix(in_srgb,var(--danger)_14%,transparent)] border border-[color-mix(in_srgb,var(--danger)_35%,transparent)] text-[var(--danger)] rotate-45"
+              : "bg-[var(--primary)] text-[var(--background)] hover:shadow-[0_12px_40px_rgba(var(--color-primary-rgb),0.4)] hover-lift"
           )}
           aria-label={chatOpen ? "Close chat" : "Chat with mechanic"}
         >

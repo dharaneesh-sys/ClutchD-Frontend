@@ -276,7 +276,7 @@ export function LoginCard({ onNeedSignUp }) {
 
   if (view === "forgot_email") {
     return (
-      <GlassCard variant="glass-lux-strong" className="w-full max-w-md p-8 pt-10">
+      <GlassCard variant="glass-lux" className="w-full max-w-md p-8 pt-10">
         <div className="mb-8 text-center">
           <h2 className="text-2xl font-bold mb-2 tracking-tight text-text-primary">Reset Password</h2>
           <p className="text-text-muted">Enter your email to receive a recovery code.</p>
@@ -291,7 +291,7 @@ export function LoginCard({ onNeedSignUp }) {
             placeholder="name@example.com" 
           />
           {resetError && (
-             <div className="p-3 rounded-lg bg-red-500/10 border border-red-500/20 text-red-400 text-sm">
+             <div className="p-3 rounded-lg bg-danger/10 border border-danger/20 text-danger text-sm">
                {resetError}
              </div>
           )}
@@ -312,7 +312,7 @@ export function LoginCard({ onNeedSignUp }) {
 
    if (view === "forgot_code") {
     return (
-      <GlassCard variant="glass-lux-strong" className="w-full max-w-md p-8 pt-10">
+      <GlassCard variant="glass-lux" className="w-full max-w-md p-8 pt-10">
         <div className="mb-8 text-center">
           <h2 className="text-2xl font-bold mb-2 tracking-tight text-text-primary">Enter Code</h2>
           <p className="text-text-muted">Enter the reset code you received.</p>
@@ -340,7 +340,7 @@ export function LoginCard({ onNeedSignUp }) {
             placeholder="••••••••" 
           />
           {resetError && (
-             <div className="p-3 rounded-lg bg-red-500/10 border border-red-500/20 text-red-400 text-sm">
+             <div className="p-3 rounded-lg bg-danger/10 border border-danger/20 text-danger text-sm">
                {resetError}
              </div>
           )}
@@ -360,7 +360,7 @@ export function LoginCard({ onNeedSignUp }) {
    }
 
    return (
-    <GlassCard variant="glass-lux-strong" className="w-full max-w-md p-8 pt-10">
+    <GlassCard variant="glass-lux" className="w-full max-w-md p-8 pt-10">
       <div className="mb-8 text-center">
         <h2 className="text-3xl font-bold mb-2 tracking-tight text-text-primary">Welcome Back</h2>
         <p className="text-text-muted">Sign in to your ClutchD account</p>
@@ -379,7 +379,7 @@ export function LoginCard({ onNeedSignUp }) {
                 flex flex-col items-center p-3 rounded-xl border transition-all text-center group
                 ${
                   isSelected
-                    ? "bg-surface-soft border-border-subtle text-text-primary shadow-[0_0_15px_rgba(30,41,182,0.2)]"
+                    ? "bg-surface-soft border-border-subtle text-text-primary elevation-1"
                     : "bg-bg-card border-border-subtle text-text-muted hover:bg-surface-soft hover:text-text-primary"
                 }
               `}
@@ -434,18 +434,18 @@ export function LoginCard({ onNeedSignUp }) {
           </div>
         </div>
         {sessionExpired && (
-          <div className="p-3 rounded-lg bg-[var(--color-primary-rgb)]/15 border border-[var(--color-primary-rgb)]/30 text-[var(--primary-light)] text-sm">
+          <div className="p-3 rounded-lg bg-info/10 border border-info/20 text-[var(--primary)] text-sm">
             Your session expired. Please sign in again.
           </div>
         )}
         {authError && (
-          <div className="p-3 rounded-lg bg-red-500/10 border border-red-500/20 text-red-400 text-sm">
+          <div className="p-3 rounded-lg bg-danger/10 border border-danger/20 text-danger text-sm">
             {authError}
             {signupNeeded && (
               <button
                 type="button"
                 onClick={() => goToSignup(lastLoginEmail.current)}
-                className="mt-2 w-full py-2 rounded-lg bg-primary text-white text-sm font-semibold hover:opacity-90 transition-opacity"
+                className="mt-2 w-full py-2 rounded-lg bg-primary text-[var(--background)] text-sm font-semibold hover:opacity-90 transition-opacity"
               >
                 Create an account
               </button>
@@ -462,7 +462,7 @@ export function LoginCard({ onNeedSignUp }) {
             <div className="w-full border-t border-border-subtle"></div>
           </div>
            <div className="relative flex justify-center text-sm">
-             <span className="px-2 bg-primary-soft text-primary-text">Or continue with</span>
+             <span className="px-2 bg-primary-soft text-muted">Or continue with</span>
            </div>
         </div>
 

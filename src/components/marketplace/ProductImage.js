@@ -122,7 +122,7 @@ export function ProductImage({ src, alt = "", productName = "", className }) {
               cy="100"
               r="72"
               stroke="currentColor"
-              className="text-white/5"
+              className="text-[var(--outline-variant)] opacity-50"
               strokeWidth="1.5"
             />
             <circle
@@ -130,7 +130,7 @@ export function ProductImage({ src, alt = "", productName = "", className }) {
               cy="100"
               r="52"
               stroke="currentColor"
-              className="text-white/[0.03]"
+              className="text-[var(--outline-variant)] opacity-30"
               strokeWidth="1"
             />
           </svg>
@@ -147,7 +147,7 @@ export function ProductImage({ src, alt = "", productName = "", className }) {
             className="h-full w-full object-cover"
           />
           {/* Subtle inner border overlay */}
-          <div className="pointer-events-none absolute inset-0 rounded-xl ring-1 ring-inset ring-white/5" />
+          <div className="pointer-events-none absolute inset-0 rounded-xl ring-1 ring-inset ring-border-subtle" />
         </>
       )}
     </div>

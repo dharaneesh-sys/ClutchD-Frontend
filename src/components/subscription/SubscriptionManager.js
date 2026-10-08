@@ -17,8 +17,18 @@ import { BackendHealth } from "@/lib/backendHealth";
 import { GlassCard } from "@/components/ui/GlassCard";
 import { PlanCard } from "@/components/subscription/PlanCard";
 import { ConfirmModal } from "@/components/ui/ConfirmModal";
+import { Badge } from "@/components/ui/Badge";
 import { useToastStore } from "@/store/toastStore";
 import { useSubscriptionStore } from "@/store/subscriptionStore";
+
+// D7 shared status language: info/pending/success/danger only.
+// No warning token (renamed to info/pending), no red/white hardcodes — Badge owns the tokens.
+export function getSubscriptionStatusChip(status) {
+  if (status === "active") return { variant: "success", label: "Active" };
+  if (status === "cancelled") return { variant: "danger", label: "Cancelled" };
+  if (status === "expired") return { variant: "pending", label: "Expired" };
+  return { variant: "info", label: "Free" };
+}
 
 /**
  * SubscriptionManager renders the full subscription UI:
@@ -189,11 +199,11 @@ export function SubscriptionManager() {
 
       {/* Backend Offline Notice */}
       {showOfflineNotice && !backendOnline && (
-        <GlassCard variant="glass" className="p-4 border border-[var(--color-primary-rgb)]/30 bg-[var(--color-primary-rgb)]/15">
+        <GlassCard variant="glass-lux" className="p-4 border border-primary/30 bg-primary-soft">
           <div className="flex items-start gap-3">
             <AlertTriangle size={18} className="text-primary-light flex-shrink-0 mt-0.5" />
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium text-[var(--primary-light)]">
+              <p className="text-sm font-medium text-primary-light">
                 Payment system offline
               </p>
               <p className="text-xs text-text-muted mt-1">
@@ -203,7 +213,7 @@ export function SubscriptionManager() {
             </div>
             <button
               onClick={dismissOfflineNotice}
-              className="flex-shrink-0 p-1 rounded-full hover:bg-white/10 transition-colors"
+              className="flex-shrink-0 p-1 rounded-full hover:bg-surface-soft transition-colors"
               aria-label="Dismiss notice"
             >
               <X size={16} className="text-text-muted" />
@@ -213,7 +223,7 @@ export function SubscriptionManager() {
       )}
 
       {/* Current Plan Status */}
-      <GlassCard variant="glass-lux" className="p-5">
+      <GlassCard variant="glass-lux" className="p-5 rounded-2xl">
         <div className="flex items-start gap-4">
           <div className="flex-shrink-0 w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center">
             <Crown size={24} className="text-primary-light" />
@@ -223,18 +233,9 @@ export function SubscriptionManager() {
               <h2 className="text-base font-bold text-foreground">
                 {currentPlan?.name || "Free"} Plan
               </h2>
-              <span
-                className={`inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-[0.625rem] font-semibold uppercase tracking-wider ${
-                  status === "active"
-                    ? "bg-success/15 text-success"
-                    : status === "cancelled"
-                    ? "bg-red-500/15 text-red-300"
-                    : "bg-white/10 text-text-muted"
-                }`}
-              >
-                <CheckCircle2 size={10} />
-                {status === "active" ? "Active" : status === "cancelled" ? "Cancelled" : "Free"}
-              </span>
+              <Badge variant={getSubscriptionStatusChip(status).variant}>
+                {getSubscriptionStatusChip(status).label}
+              </Badge>
               {currentPlan?.badge && status === "active" && (
                 <span className="inline-flex items-center rounded-full bg-primary/15 px-2.5 py-0.5 text-[0.625rem] font-semibold uppercase tracking-wider text-primary-light">
                   {currentPlan.badge}
@@ -258,11 +259,11 @@ export function SubscriptionManager() {
 
         {/* Cancel subscription button (only for paid active plans) */}
         {isPaidPlan && status === "active" && (
-          <div className="mt-3 pt-3 border-t border-white/[0.06] flex justify-end">
+          <div className="mt-3 pt-3 border-t border-subtle flex justify-end">
             <button
               onClick={() => setCancelTarget(true)}
               disabled={isCancelling}
-              className="inline-flex items-center gap-1.5 text-xs font-medium text-red-400 hover:text-red-300 transition-colors disabled:opacity-50"
+              className="inline-flex items-center gap-1.5 text-xs font-medium text-danger/80 hover:text-danger transition-colors disabled:opacity-50"
             >
               {isCancelling ? (
                 <Loader2 size={12} className="animate-spin" />
@@ -276,7 +277,7 @@ export function SubscriptionManager() {
 
         {/* Benefit highlights row */}
         {currentPlan && currentPlan.features.length > 0 && (
-          <div className="mt-4 pt-4 border-t border-white/[0.06]">
+          <div className="mt-4 pt-4 border-t border-subtle">
             <div className="flex items-center gap-1.5 mb-3">
               <ShieldCheck size={14} className="text-primary-light" />
               <span className="text-xs font-semibold text-text-muted uppercase tracking-wider">
@@ -309,14 +310,14 @@ export function SubscriptionManager() {
       </div>
 
       {/* Upgrade vs Downgrade hint */}
-      <GlassCard variant="glass" className="p-4">
+      <GlassCard variant="glass-lux" className="p-4">
         <div className="flex items-start gap-3">
           <ArrowUp size={16} className="text-icon-highlight flex-shrink-0 mt-0.5" />
-          <ArrowDown size={16} className="text-warning flex-shrink-0 mt-0.5" />
+          <ArrowDown size={16} className="text-pending flex-shrink-0 mt-0.5" />
           <p className="text-xs text-text-muted leading-relaxed">
             <span className="text-icon-highlight font-medium">Upgrade</span> anytime to unlock more features.
             {" "}
-            <span className="text-warning font-medium">Downgrade</span> at any time — changes apply at the
+            <span className="text-pending font-medium">Downgrade</span> at any time — changes apply at the
             start of your next billing cycle. Cancel anytime with no hidden fees.
           </p>
         </div>

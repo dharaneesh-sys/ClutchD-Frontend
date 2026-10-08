@@ -16,12 +16,13 @@ import {
 import { cn } from "@/lib/utils";
 import { useAuthStore } from "@/store/authStore";
 import api from "@/lib/api";
+import { EmptyState } from "@/components/ui/EmptyState";
 
 const APP_SHORTCUTS = [
-  { icon: Wrench, label: "Request Service", path: "/dashboard/customer", color: "text-primary-light" },
   { icon: ShoppingBag, label: "Browse Parts", path: "/marketplace", color: "text-icon-highlight" },
-  { icon: History, label: "Order History", path: "/marketplace/profile/orders", color: "text-blue-400" },
-  { icon: Calendar, label: "Schedule Booking", path: "/dashboard/customer", color: "text-violet-400" },
+  { icon: Wrench, label: "Request Service", path: "/dashboard/customer", color: "text-primary-light" },
+  { icon: History, label: "Order History", path: "/marketplace/profile/orders", color: "text-info" },
+  { icon: Calendar, label: "Schedule Booking", path: "/dashboard/customer", color: "text-primary-light" },
 ];
 
 export default function QuickActionsPage() {
@@ -62,8 +63,8 @@ export default function QuickActionsPage() {
   return (
     <div className="p-4 sm:p-5 space-y-5 animate-fade-in-up max-w-2xl">
       <div className="space-y-1">
-        <h1 className="text-lg font-semibold text-foreground">Quick Actions</h1>
-        <p className="text-sm text-text-muted">Shortcuts and recent activity</p>
+        <h1 className="type-headline-3 text-foreground">Quick Actions</h1>
+        <p className="type-body-2 text-muted">Shortcuts and recent activity</p>
       </div>
 
       {/* App Shortcuts */}
@@ -76,9 +77,9 @@ export default function QuickActionsPage() {
             <button
               key={shortcut.label}
               onClick={() => router.push(shortcut.path)}
-              className="glass-lux rounded-2xl p-4 flex flex-col items-center gap-2 hover:bg-white/[0.03] transition-colors text-center"
+              className="glass-lux-interactive rounded-2xl p-4 flex flex-col items-center gap-2 transition-colors text-center"
             >
-              <div className="w-10 h-10 rounded-xl bg-white/[0.05] flex items-center justify-center">
+              <div className="w-10 h-10 rounded-xl bg-surface-soft flex items-center justify-center">
                 <shortcut.icon size={20} className={shortcut.color} />
               </div>
               <span className="text-xs font-medium text-foreground">
@@ -94,15 +95,19 @@ export default function QuickActionsPage() {
         <h2 className="text-xs font-semibold uppercase tracking-wider text-text-muted px-1 mb-3">
           Saved Providers
         </h2>
-        <div className="space-y-2">
-          <p className="text-sm text-text-muted px-1">No saved providers yet</p>
-          <button
-            onClick={() => router.push("/marketplace")}
-            className="w-full text-xs font-medium text-primary-light hover:text-primary transition-colors py-2 text-center"
-          >
-            Browse providers
-          </button>
-        </div>
+        <EmptyState
+          icon={Star}
+          title="No saved providers yet"
+          description="Providers you save will appear here for quick access."
+          action={
+            <button
+              onClick={() => router.push("/marketplace")}
+              className="text-xs font-medium text-primary-light hover:text-primary transition-colors"
+            >
+              Browse providers
+            </button>
+          }
+        />
       </div>
 
       {/* Recently Used Services */}
@@ -112,14 +117,18 @@ export default function QuickActionsPage() {
         </h2>
         <div className="space-y-2">
           {recentServices.length === 0 ? (
-            <p className="text-sm text-text-muted px-1">No recent services</p>
+            <EmptyState
+              icon={Clock}
+              title="No recent services"
+              description="Your recently used services will appear here."
+            />
           ) : (
             recentServices.map((svc) => (
               <div
                 key={svc.id}
                 className="glass-lux rounded-2xl p-4 flex items-center gap-3"
               >
-                <div className="flex-shrink-0 w-9 h-9 rounded-lg bg-primary/[0.1] flex items-center justify-center">
+                <div className="flex-shrink-0 w-9 h-9 rounded-lg bg-primary-soft flex items-center justify-center">
                   <Clock size={16} className="text-primary-light" />
                 </div>
                 <div className="flex-1 min-w-0">
@@ -131,8 +140,8 @@ export default function QuickActionsPage() {
                 <span className={cn(
                   "text-[10px] font-medium px-2 py-0.5 rounded-full uppercase tracking-wider",
                   svc.status === "completed"
-                    ? "bg-warning/15 text-warning"
-                    : "bg-warning/15 text-warning"
+                    ? "bg-success/15 text-success"
+                    : "bg-pending/15 text-pending"
                 )}>
                   {svc.status}
                 </span>

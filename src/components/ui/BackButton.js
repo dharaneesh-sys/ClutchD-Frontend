@@ -51,7 +51,7 @@ export function BackButton({
       type="button"
       onClick={goBack}
       aria-label={label || "Go back"}
-      className={`inline-flex items-center justify-center gap-1.5 rounded-xl p-2 text-text-muted transition-colors hover:bg-surface-soft hover:text-text-primary active:scale-95 ${className}`}
+      className={`inline-flex min-h-[44px] min-w-[44px] items-center justify-center gap-1.5 rounded-xl p-2 text-text-muted transition-colors hover:bg-surface-soft hover:text-text-primary active:scale-95 ${className}`}
     >
       <ArrowLeft size={size} />
       {label ? <span className="text-sm font-semibold">{label}</span> : null}

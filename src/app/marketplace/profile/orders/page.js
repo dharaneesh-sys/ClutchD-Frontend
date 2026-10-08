@@ -17,6 +17,7 @@ import { cn, toCamelCase, formatCurrency, formatDate, formatTime } from "@/lib/u
 import { EmptyState } from "@/components/ui/EmptyState";
 import { ShimmerList } from "@/components/ui/Shimmer";
 import { Badge } from "@/components/ui/Badge";
+import { Button } from "@/components/ui/Button";
 import { useAuthStore } from "@/store/authStore";
 import api from "@/lib/api";
 import { downloadOrderReceipt } from "@/lib/documentDownload";
@@ -31,7 +32,7 @@ const TABS = [
 
 // ─── Status mapping ──────────────────────────────────────────────────
 
-const STATUS_LABELS = {
+export const STATUS_LABELS = {
   searching: "Searching",
   assigned: "Assigned",
   en_route: "En Route",
@@ -41,14 +42,14 @@ const STATUS_LABELS = {
   pending: "Pending",
 };
 
-const STATUS_BADGE_VARIANT = {
-  searching: "warning",
+export const STATUS_BADGE_VARIANT = {
+  searching: "info",
   assigned: "info",
-  en_route: "info",
+  en_route: "pending",
   in_progress: "default",
   completed: "success",
   cancelled: "danger",
-  pending: "warning",
+  pending: "pending",
 };
 
 const ACTIVE_STATUSES = ["searching", "assigned", "en_route", "in_progress", "pending"];
@@ -72,7 +73,7 @@ function getIssueLabel(tag) {
   return ISSUE_LABELS[tag] || tag || "Service";
 }
 
-function getStatusTab(status) {
+export function getStatusTab(status) {
   if (ACTIVE_STATUSES.includes(status)) return "current";
   if (status === "completed") return "completed";
   if (status === "cancelled") return "cancelled";
@@ -153,7 +154,7 @@ function OrderCard({ order, onViewDetails, onDownloadReceipt }) {
           onClick={() => onViewDetails(order)}
           className={cn(
             "inline-flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-lg",
-            "bg-white/5 text-text-muted hover:bg-white/10 hover:text-foreground transition-colors"
+            "bg-surface-soft text-text-muted hover:bg-surface-mid hover:text-foreground transition-colors"
           )}
         >
           <Eye size={13} />
@@ -375,7 +376,7 @@ export default function OrdersPage() {
                 "flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-semibold transition-all whitespace-nowrap border",
                 isActive
                   ? "bg-primary/10 text-foreground border-primary/30 shadow-sm"
-                  : "bg-white/5 text-text-muted border-transparent hover:bg-white/10 hover:text-foreground"
+                  : "bg-surface-soft text-text-muted border-transparent hover:bg-surface-mid hover:text-foreground"
               )}
             >
               <Icon size={14} />
@@ -386,7 +387,7 @@ export default function OrdersPage() {
                     "ml-1 text-[10px] px-1.5 py-0.5 rounded-full",
                     isActive
                       ? "bg-primary/20 text-primary-light"
-                      : "bg-white/10 text-text-dim"
+                      : "bg-surface-soft text-text-dim"
                   )}
                 >
                   {count}
@@ -425,12 +426,13 @@ export default function OrdersPage() {
           }
           action={
             activeTab === "current" ? (
-              <button
+              <Button
+                variant="primary"
+                size="md"
                 onClick={() => router.push(`/dashboard/${user?.role ?? "customer"}`)}
-                className="btn-glow inline-flex h-11 items-center gap-2 rounded-xl px-6 text-sm font-medium text-white transition-all hover-lift active-press"
               >
                 Request Service
-              </button>
+              </Button>
             ) : undefined
           }
         />

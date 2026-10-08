@@ -46,10 +46,10 @@ const VEHICLE_TYPE_LABELS = {
 };
 
 const TIER_COLORS = {
-  platinum: { badge: "info", text: "text-blue-300", bg: "bg-blue-500/10" },
+  platinum: { badge: "info", text: "text-info", bg: "bg-info/10" },
   gold: { badge: "primary", text: "text-[var(--primary-light)]", bg: "bg-[var(--color-primary-rgb)]/15" },
   silver: { badge: "default", text: "text-primary-light", bg: "bg-primary/10" },
-  bronze: { badge: "glass", text: "text-text-muted", bg: "bg-white/5" },
+  bronze: { badge: "glass", text: "text-text-muted", bg: "bg-surface-soft" },
 };
 
 function StatCard({ icon: Icon, label, value, sub, className }) {
@@ -77,10 +77,10 @@ function VehicleCard({ vehicle, onRemove }) {
   const [expanded, setExpanded] = useState(false);
   const statusColor =
     vehicle.status === "active"
-      ? "bg-green-500"
+      ? "bg-success"
       : vehicle.status === "maintenance"
         ? "bg-[var(--color-primary-rgb)]/15"
-        : "bg-red-500";
+        : "bg-danger";
 
   const typeLabel = VEHICLE_TYPE_LABELS[vehicle.type] || vehicle.type || "Vehicle";
   const detailsId = `vehicle-details-${vehicle.id}`;
@@ -101,8 +101,8 @@ function VehicleCard({ vehicle, onRemove }) {
               <span className="text-[10px] text-text-dim">{typeLabel} • {vehicle.year}</span>
               <span className={cn(
                 "inline-flex items-center gap-1 text-[10px] font-medium",
-                vehicle.status === "active" ? "text-green-400" :
-                vehicle.status === "maintenance" ? "text-primary-light" : "text-red-400"
+                vehicle.status === "active" ? "text-success" :
+                vehicle.status === "maintenance" ? "text-primary-light" : "text-danger"
               )}>
                 <span className={cn("w-1.5 h-1.5 rounded-full", statusColor)} />
                 {vehicle.status}
@@ -126,7 +126,7 @@ function VehicleCard({ vehicle, onRemove }) {
               type="button"
               onClick={() => onRemove(vehicle.id)}
               aria-label={`Remove ${vehicle.make} ${vehicle.model}`}
-              className="text-[11px] text-red-400/80 hover:text-red-300 transition-colors"
+              className="text-[11px] text-danger/80 hover:text-danger transition-colors"
             >
               Remove
             </button>
@@ -494,7 +494,7 @@ export function FleetDashboard({ onRegisterNew, onStartBooking, onChat }) {
                   </Button>
                 </div>
                 {formError && (
-                  <p className="col-span-2 sm:col-span-5 text-xs text-red-400">{formError}</p>
+                  <p className="col-span-2 sm:col-span-5 text-xs text-danger">{formError}</p>
                 )}
               </form>
             </GlassCard>
@@ -530,7 +530,7 @@ export function FleetDashboard({ onRegisterNew, onStartBooking, onChat }) {
               </div>
               <div className="flex items-center justify-between py-1.5 border-b border-border-subtle/50">
                 <span>Priority dispatch</span>
-                <span className="font-semibold text-green-400 flex items-center gap-1">
+                <span className="font-semibold text-success flex items-center gap-1">
                   <Shield size={12} />
                   Active
                 </span>

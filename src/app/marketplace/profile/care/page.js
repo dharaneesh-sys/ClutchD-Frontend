@@ -43,7 +43,7 @@ const CATEGORIES = [
 
 const TICKET_STATUS_CONFIG = {
   open: { variant: "info", label: "Open" },
-  in_progress: { variant: "warning", label: "In Progress" },
+  in_progress: { variant: "pending", label: "In Progress" },
   resolved: { variant: "success", label: "Resolved" },
   closed: { variant: "default", label: "Closed" },
 };
@@ -68,8 +68,8 @@ function LiveChatModal({ isOpen, onClose }) {
             "border-border-subtle bg-surface shadow-[0_30px_80px_rgba(var(--color-black-rgb),0.35)] ring-1 ring-primary/10"
           )}
         >
-          <div className="w-14 h-14 mx-auto mb-4 rounded-full bg-[var(--color-primary-rgb)]/15 flex items-center justify-center">
-            <MessageCircle size={28} className="text-warning" />
+          <div className="w-14 h-14 mx-auto mb-4 rounded-full bg-primary/15 flex items-center justify-center">
+            <MessageCircle size={28} className="text-primary-light" />
           </div>
           <h3 className="text-lg font-semibold text-foreground mb-2">
             Live Chat is Offline
@@ -217,11 +217,11 @@ function RaiseTicketModal({ isOpen, onClose, onTicketCreated }) {
                   "shadow-[inset_0_1px_0_rgba(var(--color-white-rgb),0.04)]",
                   "focus:border-primary focus:bg-surface focus:outline-none focus:ring-1 focus:ring-primary/30",
                   "resize-none",
-                  errors.message && "border-red-500/50"
+                  errors.message && "border-danger/50"
                 )}
               />
               {errors.message && (
-                <p className="mt-1.5 text-xs text-red-400">{errors.message}</p>
+                <p className="mt-1.5 text-xs text-danger">{errors.message}</p>
               )}
             </div>
             <Button
@@ -248,12 +248,12 @@ function ContactCard({ icon: Icon, label, description, href, color }) {
       href={href}
       target={href.startsWith("http") && !href.startsWith("tel") && !href.startsWith("mailto") ? "_blank" : undefined}
       rel={href.startsWith("http") && !href.startsWith("tel") && !href.startsWith("mailto") ? "noopener noreferrer" : undefined}
-      className="glass-lux rounded-2xl p-4 flex items-center gap-3 hover:bg-white/[0.08] transition-colors"
+      className="glass-lux-interactive rounded-2xl p-4 flex items-center gap-3 transition-colors"
     >
       <div
         className={cn(
           "flex-shrink-0 w-10 h-10 rounded-xl flex items-center justify-center",
-          color || "bg-white/10"
+          color || "bg-surface-soft"
         )}
       >
         <Icon size={18} />
@@ -370,7 +370,7 @@ export default function CarePage() {
       label: "Call Us",
       description: `${CONTACT_INFO.phone} | ${CONTACT_INFO.hours}`,
       href: `tel:${CONTACT_INFO.phone.replace(/\s/g, "")}`,
-      color: "bg-blue-500/15 text-blue-400",
+      color: "bg-info/15 text-info",
     },
     {
       icon: Mail,
@@ -386,7 +386,7 @@ export default function CarePage() {
       {/* Header */}
       <div className="space-y-1">
         <h1 className="type-headline-3 text-foreground">ClutchD Care</h1>
-        <p className="type-body-2 text-muted">
+        <p className="type-body-2 text-text-muted">
           We&apos;re here to help. Reach out anytime.
         </p>
       </div>
@@ -394,7 +394,7 @@ export default function CarePage() {
       {/* Live Chat Button */}
       <button
         onClick={() => setShowLiveChat(true)}
-        className="glass-lux rounded-2xl p-4 w-full flex items-center gap-3 hover:bg-white/[0.08] transition-colors text-left"
+        className="glass-lux-interactive rounded-2xl p-4 w-full flex items-center gap-3 transition-colors text-left"
       >
         <div className="flex-shrink-0 w-12 h-12 rounded-xl bg-primary/15 flex items-center justify-center">
           <MessageCircle size={22} className="text-primary-light" />
@@ -427,10 +427,10 @@ export default function CarePage() {
       <section>
         <button
           onClick={() => setShowRaiseTicket(true)}
-          className="glass-lux rounded-2xl p-4 w-full flex items-center gap-3 hover:bg-white/[0.08] transition-colors text-left"
+          className="glass-lux-interactive rounded-2xl p-4 w-full flex items-center gap-3 transition-colors text-left"
         >
-          <div className="flex-shrink-0 w-10 h-10 rounded-xl bg-indigo-500/15 flex items-center justify-center">
-            <Ticket size={18} className="text-indigo-400" />
+          <div className="flex-shrink-0 w-10 h-10 rounded-xl bg-primary/15 flex items-center justify-center">
+            <Ticket size={18} className="text-primary-light" />
           </div>
           <div className="flex-1 min-w-0">
             <p className="text-sm font-semibold text-foreground">
@@ -459,7 +459,7 @@ export default function CarePage() {
               placeholder="Enter ticket number (e.g., TKT-001)"
               className={cn(
                 "flex-1 h-11 rounded-xl border px-4 text-sm transition-all",
-                "border-border-subtle bg-white/5 text-foreground placeholder:text-text-dim",
+                "border-border-subtle bg-surface-container-low text-foreground placeholder:text-text-dim",
                 "focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary/30"
               )}
               onKeyDown={(e) => e.key === "Enter" && handleTrackTicket()}

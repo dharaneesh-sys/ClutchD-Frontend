@@ -28,7 +28,7 @@ import api from "@/lib/api";
 function VehicleServiceJobCard({ job }) {
   const pricing = job.pricing;
   return (
-    <GlassCard variant="strong" className="p-4">
+    <GlassCard variant="glass-lux" className="p-4">
       <div className="flex items-center justify-between gap-4">
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 mb-1">
@@ -41,7 +41,7 @@ function VehicleServiceJobCard({ job }) {
                   ? "success"
                   : job.status === "cancelled"
                     ? "danger"
-                    : "warning"
+                    : "info"
               }
             >
               {job.status.toUpperCase()}
@@ -87,7 +87,7 @@ function VehicleCard({
   onSelect,
 }) {
   const statusIcon = (
-    <CheckCircle2 size={14} className="text-green-400 shrink-0" />
+    <CheckCircle2 size={14} className="text-[var(--success)] shrink-0" />
   );
 
   const statusText = lastServiceDate
@@ -102,7 +102,7 @@ function VehicleCard({
         "relative text-left w-full p-5 rounded-2xl border transition-all duration-200",
         "hover-lift active-press",
         isSelected
-          ? "bg-surface-soft border-border-subtle shadow-[0_0_20px_rgba(30,41,182,0.15)]"
+          ? "bg-surface-soft border-border-subtle ring-1 ring-primary/30"
           : "bg-bg-card border-border-subtle hover:bg-surface-soft"
       )}
     >
@@ -144,7 +144,7 @@ function VehicleCard({
 
       {/* Selection dot */}
       {isSelected && (
-        <span className="absolute top-3 right-3 w-3 h-3 rounded-full bg-primary shadow-[0_0_8px_rgba(30,41,182,0.5)]" />
+        <span className="absolute top-3 right-3 w-3 h-3 rounded-full bg-primary" />
       )}
     </button>
   );

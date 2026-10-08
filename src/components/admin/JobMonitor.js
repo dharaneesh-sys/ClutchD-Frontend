@@ -28,6 +28,25 @@ const Popup = dynamic(
   { ssr: false }
 );
 
+export function jobStatusVariant(status) {
+  switch (status) {
+    case "Searching":
+      return "info";
+    case "En Route":
+    case "Nearing Completion":
+      return "pending";
+    case "Completed":
+      return "success";
+    case "In Progress":
+    default:
+      return "default";
+  }
+}
+
+export function filterJobs(jobs, filter) {
+  return jobs.filter((j) => filter === "All" || j.status === filter);
+}
+
 export function JobMonitor() {
   useEffect(() => { import("leaflet/dist/leaflet.css"); }, []);
   const [filter, setFilter] = useState("All");
@@ -108,7 +127,7 @@ export function JobMonitor() {
 
   return (
     <>
-      <GlassCard variant="elevated" className="h-full flex flex-col overflow-hidden">
+      <GlassCard className="h-full flex flex-col overflow-hidden">
         <div className={`p-4 border-b flex gap-2 overflow-x-auto custom-scrollbar ${"border-border-subtle"}`}>
           {statusFilters.map(f => (
             <button
@@ -131,7 +150,7 @@ export function JobMonitor() {
                 <div className="w-8 h-8 border-2 border-t-transparent rounded-full animate-spin border-primary" />
               </div>
             ) : error ? (
-            <div className="flex flex-col items-center py-12 text-red-500">
+            <div className="flex flex-col items-center py-12 text-[var(--danger)]">
               <p>{error}</p>
               <button onClick={loadJobs} className="mt-3 text-sm underline">Retry</button>
             </div>
@@ -140,7 +159,7 @@ export function JobMonitor() {
               No jobs found.
             </div>
           ) : (
-            jobs.filter(j => filter === "All" || j.status === filter).map(job => (
+            filterJobs(jobs, filter).map(job => (
               <div key={job.id} className={`p-4 rounded-xl border flex flex-col lg:flex-row gap-4 lg:items-center justify-between ${"bg-bg-card border-border-subtle"}`}>
                 <div className="grid grid-cols-2 lg:flex gap-4 lg:gap-8 flex-1">
                    <div>
@@ -168,10 +187,7 @@ export function JobMonitor() {
                 </div>
 
                 <div className="flex flex-col sm:flex-row lg:flex-col items-center lg:items-end gap-2 shrink-0">
-                   <Badge variant={
-                     job.status === 'Searching' ? 'warning' :
-                     job.status === 'In Progress' ? 'success' : 'info'
-                   }>
+                   <Badge variant={jobStatusVariant(job.status)}>
                      {job.status}
                    </Badge>
 
@@ -179,7 +195,7 @@ export function JobMonitor() {
                      {job.status === 'Searching' && (
                        <button
                          onClick={() => { setForceAssignModal(job); setSelectedProvider(""); setProviderType("mechanic"); }}
-                          className="text-xs flex items-center gap-1 px-2 py-1 rounded border bg-bg-card text-red-500 border-border-subtle hover:bg-surface-soft"
+                          className="text-xs flex items-center gap-1 px-2 py-1 rounded border bg-bg-card text-[var(--danger)] border-border-subtle hover:bg-surface-soft"
                        >
                          <AlertTriangle size={12} /> Force Assign
                        </button>

@@ -22,7 +22,7 @@ import api from "@/lib/api";
 
 const REWARD_STATUS_CONFIG = {
   credited: { variant: "success", label: "Credited" },
-  pending: { variant: "warning", label: "Pending" },
+  pending: { variant: "pending", label: "Pending" },
   expired: { variant: "danger", label: "Expired" },
 };
 
@@ -34,7 +34,7 @@ function ReferralHero({ referral, onCopy, onShare, copied }) {
       {/* Decorative glow */}
       <div
         className="absolute -top-16 -right-16 w-40 h-40 rounded-full opacity-20 blur-3xl pointer-events-none"
-        style={{ background: "var(--color-primary, #1E29B6)" }}
+        style={{ background: "var(--primary)" }}
         aria-hidden="true"
       />
 
@@ -63,7 +63,7 @@ function ReferralHero({ referral, onCopy, onShare, copied }) {
                 "flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold transition-all border",
                 copied
                   ? "bg-primary/20 text-primary-light border-primary/30"
-                  : "bg-white/10 text-foreground hover:bg-white/15 border-white/10 hover:border-white/20"
+                  : "bg-surface-soft text-foreground hover:bg-surface-mid border-border-subtle"
               )}
               aria-label={copied ? "Copied" : "Copy referral code"}
             >
@@ -127,8 +127,8 @@ function StatsCards({ balance, totalReferrals }) {
       </div>
       <div className="glass-lux rounded-2xl p-4">
         <div className="flex items-center gap-2.5">
-          <div className="w-9 h-9 rounded-xl bg-indigo-500/15 flex items-center justify-center shrink-0">
-            <Users size={16} className="text-indigo-400" />
+          <div className="w-9 h-9 rounded-xl bg-info/15 flex items-center justify-center shrink-0">
+            <Users size={16} className="text-info" />
           </div>
           <div>
             <p className="text-2xl font-bold tracking-tight text-foreground">

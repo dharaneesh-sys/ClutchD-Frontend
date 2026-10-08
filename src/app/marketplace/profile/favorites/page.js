@@ -14,6 +14,7 @@ import { cn, formatCurrency } from "@/lib/utils";
 import { resolveMediaUrl } from "@/lib/mediaUrl";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { ShimmerList } from "@/components/ui/Shimmer";
+import { Button } from "@/components/ui/Button";
 import { useRouter } from "next/navigation";
 import { useToastStore } from "@/store/toastStore";
 import api from "@/lib/api";
@@ -28,9 +29,9 @@ function StarRating({ rating }) {
   return (
     <div className="flex items-center gap-0.5">
       {Array.from({ length: full }).map((_, i) => (
-        <Star key={`full-${i}`} size={12} className="fill-warning text-icon-highlight" />
+        <Star key={`full-${i}`} size={12} className="fill-pending text-pending" />
       ))}
-      {half && <StarHalf size={12} className="fill-warning text-icon-highlight" />}
+      {half && <StarHalf size={12} className="fill-pending text-pending" />}
       <span className="text-[11px] text-text-muted ml-1">{Number(rating).toFixed(1)}</span>
     </div>
   );
@@ -50,7 +51,7 @@ function FavoriteCard({ item, onRemove, onMoveToCart }) {
   return (
     <div className="glass-lux rounded-2xl overflow-hidden transition-all duration-200 hover:shadow-lg group">
       {/* Product Image Placeholder */}
-      <div className="aspect-[4/3] bg-white/[0.03] flex items-center justify-center relative overflow-hidden">
+      <div className="aspect-[4/3] bg-surface-soft flex items-center justify-center relative overflow-hidden">
         {item.product?.image_url ? (
           <img
             src={resolveMediaUrl(item.product.image_url)}
@@ -69,8 +70,8 @@ function FavoriteCard({ item, onRemove, onMoveToCart }) {
           disabled={removing}
           className={cn(
             "absolute top-2 right-2 w-8 h-8 rounded-full flex items-center justify-center",
-            "bg-black/60 backdrop-blur-sm text-red-400 opacity-0 group-hover:opacity-100 transition-opacity",
-            "hover:bg-red-500/20"
+            "bg-black/60 backdrop-blur-sm text-danger opacity-0 group-hover:opacity-100 transition-opacity",
+            "hover:bg-danger/10"
           )}
           aria-label="Remove from favorites"
         >
@@ -190,8 +191,8 @@ export default function FavoritesPage() {
 
       {/* Error Banner */}
       {error && (
-        <div className="flex items-start gap-3 glass-lux rounded-2xl p-4 border border-red-500/20 bg-red-500/5">
-          <p className="text-sm text-red-300 flex-1">{error}</p>
+        <div className="flex items-start gap-3 glass-lux rounded-2xl p-4 border border-[var(--danger)]/25 bg-[var(--danger)]/10">
+          <p className="text-sm text-danger flex-1">{error}</p>
           <button
             onClick={fetchFavorites}
             className="text-xs font-medium text-primary-light hover:text-primary shrink-0"
@@ -208,12 +209,14 @@ export default function FavoritesPage() {
           title="No favorites yet"
           description="Products you like will appear here. Browse the marketplace and tap the heart icon to save items."
           action={
-            <button
+            <Button
+              variant="tonal"
+              size="sm"
               onClick={() => router.push("/marketplace/search")}
-              className="mt-3 px-4 py-2 rounded-xl bg-primary/20 text-primary-light text-sm font-semibold hover:bg-primary/30 transition-colors"
+              className="mt-3"
             >
               Browse Products
-            </button>
+            </Button>
           }
         />
       ) : (

@@ -91,7 +91,7 @@ function ToggleSwitch({ enabled, onChange }) {
       className={cn(
         "relative inline-flex h-6 w-11 shrink-0 cursor-pointer items-center rounded-full transition-colors duration-200",
         "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 focus-visible:ring-offset-1",
-        enabled ? "bg-primary" : "bg-white/10"
+        enabled ? "bg-primary" : "bg-surface-soft"
       )}
     >
       <span
@@ -113,19 +113,19 @@ function SectionHeader({ icon: Icon, title, danger }) {
         className={cn(
           "flex-shrink-0 w-9 h-9 rounded-xl flex items-center justify-center",
           danger
-            ? "bg-red-500/10 ring-1 ring-red-500/20"
-            : "bg-white/10 ring-1 ring-white/10"
+            ? "bg-[var(--danger)]/10 ring-1 ring-[var(--danger)]/20"
+            : "bg-surface-soft ring-1 ring-border-subtle"
         )}
       >
         <Icon
           size={18}
-          className={danger ? "text-red-400" : "text-text-dim"}
+          className={danger ? "text-danger" : "text-text-dim"}
         />
       </div>
       <h2
         className={cn(
           "text-base font-semibold",
-          danger ? "text-red-400" : "text-foreground"
+          danger ? "text-danger" : "text-foreground"
         )}
       >
         {title}
@@ -336,12 +336,12 @@ export default function SettingsPage() {
 
       {/* ── Error Banner ─────────────────────────────────────────────── */}
       {error && (
-        <div className="flex items-start gap-3 glass-lux rounded-2xl p-4 border border-red-500/20 bg-red-500/5">
+        <div className="flex items-start gap-3 glass-lux rounded-2xl p-4 border border-[var(--danger)]/25 bg-[var(--danger)]/10">
           <AlertTriangle
             size={18}
-            className="mt-0.5 shrink-0 text-red-400"
+            className="mt-0.5 shrink-0 text-danger"
           />
-          <p className="text-sm text-red-300 flex-1">{error}</p>
+          <p className="text-sm text-danger flex-1">{error}</p>
           <button
             onClick={fetchSettings}
             className="text-xs font-medium text-primary-light hover:text-primary shrink-0"
@@ -368,7 +368,7 @@ export default function SettingsPage() {
         {/* Change Password */}
         <div className="flex items-center justify-between py-2">
           <div className="flex items-center gap-3 flex-1 min-w-0">
-            <div className="w-9 h-9 rounded-lg bg-white/5 flex items-center justify-center shrink-0">
+            <div className="w-9 h-9 rounded-xl bg-surface-soft flex items-center justify-center shrink-0">
               <Lock size={16} className="text-text-dim" />
             </div>
             <div className="min-w-0">
@@ -389,13 +389,13 @@ export default function SettingsPage() {
           </Button>
         </div>
 
-        <div className="h-px bg-white/5" />
+        <div className="h-px bg-border-subtle" />
 
         {/* Logout */}
         <div className="flex items-center justify-between py-2">
           <div className="flex items-center gap-3 flex-1 min-w-0">
-            <div className="w-9 h-9 rounded-lg bg-red-500/10 flex items-center justify-center shrink-0">
-              <LogOut size={16} className="text-red-400" />
+            <div className="w-9 h-9 rounded-xl bg-[var(--danger)]/10 flex items-center justify-center shrink-0">
+              <LogOut size={16} className="text-danger" />
             </div>
             <div className="min-w-0">
               <p className="text-sm font-medium text-foreground">Log Out</p>
@@ -407,20 +407,20 @@ export default function SettingsPage() {
           <Button
             variant="ghost"
             size="sm"
-            className="!text-red-400 hover:!bg-red-500/10"
+            className="!text-danger hover:!bg-danger/10"
             onClick={() => setLogoutConfirmOpen(true)}
           >
             Logout
           </Button>
         </div>
 
-        <div className="h-px bg-white/5" />
+        <div className="h-px bg-border-subtle" />
 
         {/* Delete Account */}
         <div className="flex items-center justify-between py-2">
           <div className="flex items-center gap-3 flex-1 min-w-0">
-            <div className="w-9 h-9 rounded-lg bg-red-500/10 flex items-center justify-center shrink-0">
-              <Trash2 size={16} className="text-red-400" />
+            <div className="w-9 h-9 rounded-xl bg-[var(--danger)]/10 flex items-center justify-center shrink-0">
+              <Trash2 size={16} className="text-danger" />
             </div>
             <div className="min-w-0">
               <p className="text-sm font-medium text-foreground">
@@ -449,9 +449,9 @@ export default function SettingsPage() {
 
         <div className="space-y-1">
           {/* Push Notifications */}
-          <div className="flex items-center justify-between py-3 px-1 rounded-xl hover:bg-white/[0.02] transition-colors">
+          <div className="flex items-center justify-between py-3 px-1 rounded-xl hover:bg-surface-soft transition-colors">
             <div className="flex items-center gap-3">
-              <div className="w-9 h-9 rounded-lg bg-white/5 flex items-center justify-center shrink-0">
+              <div className="w-9 h-9 rounded-xl bg-surface-soft flex items-center justify-center shrink-0">
                 <BellRing size={16} className="text-text-dim" />
               </div>
               <div>
@@ -474,12 +474,12 @@ export default function SettingsPage() {
             />
           </div>
 
-          <div className="h-px bg-white/5" />
+          <div className="h-px bg-border-subtle" />
 
           {/* SMS Notifications */}
-          <div className="flex items-center justify-between py-3 px-1 rounded-xl hover:bg-white/[0.02] transition-colors">
+          <div className="flex items-center justify-between py-3 px-1 rounded-xl hover:bg-surface-soft transition-colors">
             <div className="flex items-center gap-3">
-              <div className="w-9 h-9 rounded-lg bg-white/5 flex items-center justify-center shrink-0">
+              <div className="w-9 h-9 rounded-xl bg-surface-soft flex items-center justify-center shrink-0">
                 <MessageSquare size={16} className="text-text-dim" />
               </div>
               <div>
@@ -503,12 +503,12 @@ export default function SettingsPage() {
             />
           </div>
 
-          <div className="h-px bg-white/5" />
+          <div className="h-px bg-border-subtle" />
 
           {/* Email Notifications */}
-          <div className="flex items-center justify-between py-3 px-1 rounded-xl hover:bg-white/[0.02] transition-colors">
+          <div className="flex items-center justify-between py-3 px-1 rounded-xl hover:bg-surface-soft transition-colors">
             <div className="flex items-center gap-3">
-              <div className="w-9 h-9 rounded-lg bg-white/5 flex items-center justify-center shrink-0">
+              <div className="w-9 h-9 rounded-xl bg-surface-soft flex items-center justify-center shrink-0">
                 <Mail size={16} className="text-text-dim" />
               </div>
               <div>
@@ -551,7 +551,7 @@ export default function SettingsPage() {
                 "border text-center",
                 themePref === value
                   ? "border-primary/30 bg-primary/10 ring-1 ring-primary/20"
-                  : "border-white/10 bg-white/[0.03] hover:bg-white/[0.06] hover:border-white/20"
+                  : "border-subtle bg-surface-soft hover:bg-primary-mid"
               )}
             >
               <Icon
@@ -586,7 +586,7 @@ export default function SettingsPage() {
       <section className="glass-lux rounded-2xl p-6 space-y-4 opacity-60 pointer-events-none select-none">
         <div className="flex items-center justify-between mb-5">
           <SectionHeader icon={Globe} title="Language" />
-          <span className="rounded-full bg-white/10 px-2.5 py-0.5 text-[0.625rem] font-medium text-text-muted uppercase tracking-wider">
+          <span className="rounded-full bg-surface-soft border border-subtle px-2.5 py-0.5 text-[0.625rem] font-medium text-text-muted uppercase tracking-wider">
             Coming soon
           </span>
         </div>
@@ -604,7 +604,7 @@ export default function SettingsPage() {
                 "border",
                 language === value
                   ? "border-primary/30 bg-primary/10 ring-1 ring-primary/20"
-                  : "border-white/10 bg-white/[0.03]"
+                  : "border-subtle bg-surface-soft"
               )}
             >
               <span className="text-lg">{flag}</span>
@@ -631,7 +631,7 @@ export default function SettingsPage() {
         <SectionHeader icon={Shield} title="Privacy" />
 
         {/* Manage Permissions */}
-        <div className="rounded-xl border border-white/10 bg-white/[0.02] p-4 space-y-3">
+        <div className="rounded-xl border border-subtle bg-card p-4 space-y-3">
           <div className="flex items-center gap-2">
             <Shield size={16} className="text-primary-light" />
             <p className="text-sm font-medium text-foreground">
@@ -646,7 +646,7 @@ export default function SettingsPage() {
             ].map(({ icon: PermIcon, label }) => (
               <div
                 key={label}
-                className="flex flex-col items-center gap-1.5 rounded-lg bg-white/[0.03] py-3"
+                className="flex flex-col items-center gap-1.5 rounded-xl bg-surface-soft py-3"
               >
                 <PermIcon size={16} className="text-text-dim" />
                 <span className="text-[0.625rem] text-text-muted">
@@ -662,16 +662,16 @@ export default function SettingsPage() {
           </p>
         </div>
 
-        <div className="h-px bg-white/5" />
+        <div className="h-px bg-border-subtle" />
 
         {/* Data Download */}
         <button
           type="button"
           onClick={handleDataDownload}
-          className="flex items-center justify-between w-full py-3 px-1 rounded-xl hover:bg-white/[0.02] transition-colors text-left"
+          className="flex items-center justify-between w-full py-3 px-1 rounded-xl hover:bg-surface-soft transition-colors text-left"
         >
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-lg bg-white/5 flex items-center justify-center shrink-0">
+            <div className="w-9 h-9 rounded-xl bg-surface-soft flex items-center justify-center shrink-0">
               <Download size={16} className="text-text-dim" />
             </div>
             <div>
@@ -686,12 +686,12 @@ export default function SettingsPage() {
           <ChevronRight size={16} className="text-text-dim shrink-0" />
         </button>
 
-        <div className="h-px bg-white/5" />
+        <div className="h-px bg-border-subtle" />
 
         {/* Account Visibility */}
         <div className="flex items-center justify-between py-3 px-1 rounded-xl">
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-lg bg-white/5 flex items-center justify-center shrink-0">
+            <div className="w-9 h-9 rounded-xl bg-surface-soft flex items-center justify-center shrink-0">
               <Eye size={16} className="text-text-dim" />
             </div>
             <div>
@@ -703,8 +703,8 @@ export default function SettingsPage() {
               </p>
             </div>
           </div>
-          <span className="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 bg-[var(--color-primary-rgb)]/15 text-[var(--primary-light)] text-[0.625rem] font-semibold tracking-wide uppercase">
-            <span className="w-1.5 h-1.5 rounded-full bg-[var(--color-primary-rgb)]/15" />
+          <span className="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 bg-primary-soft text-primary-light text-[0.625rem] font-semibold tracking-wide uppercase">
+            <span className="w-1.5 h-1.5 rounded-full bg-primary" />
             Active
           </span>
         </div>

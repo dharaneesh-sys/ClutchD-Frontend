@@ -10,6 +10,7 @@ import { ConfirmModal } from "@/components/ui/ConfirmModal";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { ProductImage } from "@/components/marketplace/ProductImage";
 import { SellerProductForm } from "@/components/marketplace/SellerProductForm";
+import { Badge } from "@/components/ui/Badge";
 
 /**
  * Current seller's listings with edit / delete / stock toggle.
@@ -76,19 +77,12 @@ export function MyListings({ onAddNew }) {
             <p className="text-sm font-semibold text-foreground truncate">
               {product.name}
             </p>
-            <p className="text-sm font-bold text-primary-light">
+            <p className="text-sm font-bold text-primary">
               {formatCurrency(product.price ?? 0)}
             </p>
-            <span
-              className={cn(
-                "inline-flex items-center gap-1.5 rounded-full px-2 py-0.5 text-[0.6875rem] font-semibold uppercase tracking-wide",
-                product.availability
-                  ? "bg-primary/20 text-primary-light"
-                  : "bg-white/10 text-text-muted"
-              )}
-            >
+            <Badge variant={product.availability ? "success" : "pending"}>
               {product.availability ? "In Stock" : "Out of Stock"}
-            </span>
+            </Badge>
           </div>
 
           <div className="flex flex-col gap-1.5 shrink-0">
@@ -96,7 +90,7 @@ export function MyListings({ onAddNew }) {
               type="button"
               onClick={() => setEditing(product)}
               aria-label={`Edit ${product.name}`}
-              className="p-2 rounded-lg text-text-muted hover:text-foreground hover:bg-white/10 transition-colors"
+              className="min-h-[44px] min-w-[44px] inline-flex items-center justify-center p-2 rounded-lg text-text-muted hover:text-foreground hover:bg-surface-soft transition-colors"
             >
               <Pencil size={16} />
             </button>
@@ -105,10 +99,10 @@ export function MyListings({ onAddNew }) {
               onClick={() => handleToggleStock(product)}
               aria-label={`Toggle stock for ${product.name}`}
               className={cn(
-                "p-2 rounded-lg transition-colors",
+                "min-h-[44px] min-w-[44px] inline-flex items-center justify-center p-2 rounded-lg transition-colors",
                 product.availability
-                  ? "text-primary-light hover:bg-primary/10"
-                  : "text-text-muted hover:text-foreground hover:bg-white/10"
+                  ? "text-primary hover:bg-surface-soft"
+                  : "text-text-muted hover:text-foreground hover:bg-surface-soft"
               )}
             >
               <Power size={16} />
@@ -117,7 +111,7 @@ export function MyListings({ onAddNew }) {
               type="button"
               onClick={() => setDeleting(product)}
               aria-label={`Delete ${product.name}`}
-              className="p-2 rounded-lg text-text-muted hover:text-red-400 hover:bg-red-500/10 transition-colors"
+              className="min-h-[44px] min-w-[44px] inline-flex items-center justify-center p-2 rounded-lg text-text-muted hover:text-[var(--danger)] hover:bg-[color-mix(in_srgb,var(--danger)_12%,transparent)] transition-colors"
             >
               <Trash2 size={16} />
             </button>

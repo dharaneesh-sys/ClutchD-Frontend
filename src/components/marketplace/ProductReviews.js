@@ -68,8 +68,8 @@ function ReadOnlyStars({ rating, size = 14 }) {
           className={cn(
             "transition-colors",
             i <= rating
-              ? "fill-warning text-icon-highlight"
-              : "fill-white/10 text-white/30"
+              ? "fill-[var(--color-icon-highlight)] text-icon-highlight"
+              : "fill-transparent text-text-dim"
           )}
           aria-hidden="true"
         />
@@ -105,8 +105,8 @@ function InteractiveStars({ rating, onChange, size = 36 }) {
               className={cn(
                 "transition-all duration-150",
                 active
-                  ? "fill-warning text-icon-highlight drop-shadow-[0_0_8px_rgba(30,41,182,0.5)]"
-                  : "fill-white/10 text-white/30 hover:fill-warning/40 hover:text-icon-highlight/40"
+                  ? "fill-[var(--color-icon-highlight)] text-icon-highlight"
+                  : "fill-transparent text-text-dim hover:text-icon-highlight"
               )}
             />
           </button>
@@ -121,7 +121,7 @@ function InteractiveStars({ rating, onChange, size = 36 }) {
  */
 function ReviewCard({ review }) {
   return (
-    <div className="rounded-xl border border-border-subtle bg-surface-container-low p-4 transition-all hover:border-white/15">
+    <div className="rounded-xl border border-border-subtle bg-surface-container-low p-4 transition-all hover:border-primary/30">
       <div className="flex items-start justify-between gap-3 mb-2">
         <div className="flex items-center gap-2.5 min-w-0">
           {/* Avatar circle with initial */}
@@ -150,7 +150,7 @@ function ReviewCard({ review }) {
 
         {/* Verified badge */}
         {review.verified && (
-          <span className="flex-shrink-0 inline-flex items-center gap-1 rounded-full border border-green-500/30 bg-green-500/10 px-2 py-0.5 text-[11px] font-medium text-green-400 backdrop-blur-sm">
+          <span className="flex-shrink-0 inline-flex items-center gap-1 rounded-full border border-[color-mix(in_srgb,var(--success)_35%,transparent)] bg-[color-mix(in_srgb,var(--success)_14%,transparent)] px-2 py-0.5 text-[11px] font-medium text-[color-mix(in_srgb,var(--success)_70%,var(--foreground))] backdrop-blur-sm">
             <CheckCircle size={12} />
             Verified
           </span>
@@ -175,12 +175,12 @@ function DistributionRow({ star, percentage, count }) {
       </span>
       <Star
         size={12}
-        className="fill-warning text-icon-highlight shrink-0"
+        className="fill-[var(--color-icon-highlight)] text-icon-highlight shrink-0"
         aria-hidden="true"
       />
-      <div className="relative flex-1 h-2 rounded-full overflow-hidden bg-white/5">
+      <div className="relative flex-1 h-2 rounded-full overflow-hidden bg-surface-container-high">
         <div
-          className="absolute inset-y-0 left-0 rounded-full bg-gradient-to-r from-[#1E29B6] to-[#2e3bd1] transition-all duration-500"
+          className="absolute inset-y-0 left-0 rounded-full bg-[var(--primary)] transition-all duration-500"
           style={{ width: `${percentage}%` }}
         />
       </div>
@@ -284,13 +284,13 @@ function ReviewFormModal({ isOpen, onClose, onSubmit }) {
               "bg-bg-card placeholder:text-text-dim",
               "text-text-primary focus:outline-none focus:ring-2",
               error
-                ? "border-red-500/50 focus:border-red-500 focus:ring-red-500/20"
+                ? "border-[color-mix(in_srgb,var(--danger)_35%,transparent)] focus:border-danger focus:ring-danger/20"
                 : "border-border-subtle focus:border-primary focus:ring-primary/20"
             )}
             disabled={submitting}
           />
           {error && (
-            <p className="text-xs text-red-400 mt-1">{error}</p>
+            <p className="text-xs text-danger mt-1">{error}</p>
           )}
         </div>
 

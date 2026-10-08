@@ -16,6 +16,19 @@ import { Shield, CheckCheck, AlertTriangle, ArrowRight, ThumbsUp } from "lucide-
  * correctly — all state transitions are managed optimistically in the
  * parent store so the UI works fully offline/demo.
  */
+export function escrowStatusVariant(status) {
+  switch (status) {
+    case SERVICE_STATUS.PAYMENT_ESCROW:
+      return "pending";
+    case SERVICE_STATUS.PAYMENT_RELEASED:
+      return "success";
+    case SERVICE_STATUS.PAYMENT_DISPUTE:
+      return "danger";
+    default:
+      return "default";
+  }
+}
+
 export function EscrowStatus({ status, paymentAmount, onRelease, onDispute }) {
   const [disputeReason, setDisputeReason] = useState("Issue with service");
   const isBackendUnavailable = BackendHealth.isAvailable() === false;
@@ -23,9 +36,9 @@ export function EscrowStatus({ status, paymentAmount, onRelease, onDispute }) {
   switch (status) {
     case SERVICE_STATUS.PAYMENT_ESCROW:
       return (
-        <div className="rounded-xl border p-5 bg-bg-card border-border-subtle">
+        <div className="rounded-2xl border p-5 bg-bg-card border-border-subtle">
           <div className="flex items-start gap-4">
-            <div className="w-11 h-11 rounded-full flex items-center justify-center shrink-0 bg-warning/10 text-warning">
+            <div className="w-11 h-11 rounded-full flex items-center justify-center shrink-0 bg-pending/10 text-pending">
               <Shield size={22} />
             </div>
             <div className="flex-1 min-w-0">
@@ -53,7 +66,7 @@ export function EscrowStatus({ status, paymentAmount, onRelease, onDispute }) {
                       id="escrow-dispute-reason"
                       value={disputeReason}
                       onChange={(e) => setDisputeReason(e.target.value)}
-                      className="w-full rounded-lg bg-white/[0.04] border border-white/10 px-3 py-2 text-sm text-foreground" 
+                      className="w-full rounded-xl bg-surface border border-border-subtle px-3 py-2 text-sm text-foreground"
                     >
                       <option value="Issue with service">Issue with service</option>
                       <option value="Service not completed">Service not completed</option>
@@ -64,7 +77,7 @@ export function EscrowStatus({ status, paymentAmount, onRelease, onDispute }) {
                     <button
                       type="button"
                       onClick={() => onDispute(disputeReason)}
-                      className="w-full text-sm text-red-400 hover:text-red-300 transition-colors py-2 rounded-lg hover:bg-red-500/5"
+                      className="w-full text-sm text-danger hover:bg-danger/5 transition-colors py-2 rounded-xl"
                     >
                       <AlertTriangle size={14} className="inline mr-1.5 -mt-0.5" />
                       Raise a Dispute
@@ -73,7 +86,7 @@ export function EscrowStatus({ status, paymentAmount, onRelease, onDispute }) {
                 )}
               </div>
               {isBackendUnavailable && (
-                <p className="text-[10px] mt-3 text-warning/70 flex items-center gap-1">
+                <p className="text-[10px] mt-3 text-pending flex items-center gap-1">
                   <ArrowRight size={10} />
                   Offline mode — state managed locally
                 </p>
@@ -85,7 +98,7 @@ export function EscrowStatus({ status, paymentAmount, onRelease, onDispute }) {
 
     case SERVICE_STATUS.PAYMENT_RELEASED:
       return (
-        <div className="rounded-xl border p-5 bg-bg-card border-border-subtle">
+        <div className="rounded-2xl border p-5 bg-bg-card border-border-subtle">
           <div className="flex items-start gap-4">
             <div className="w-11 h-11 rounded-full flex items-center justify-center shrink-0 bg-primary/10 text-primary">
               <CheckCheck size={22} />
@@ -98,7 +111,7 @@ export function EscrowStatus({ status, paymentAmount, onRelease, onDispute }) {
                 Payment released to the mechanic. Thank you for your business!
               </p>
               {isBackendUnavailable && (
-                <p className="text-[10px] mt-3 text-warning/70 flex items-center gap-1">
+                <p className="text-[10px] mt-3 text-pending flex items-center gap-1">
                   <ArrowRight size={10} />
                   Offline mode — state managed locally
                 </p>
@@ -110,9 +123,9 @@ export function EscrowStatus({ status, paymentAmount, onRelease, onDispute }) {
 
     case SERVICE_STATUS.PAYMENT_DISPUTE:
       return (
-        <div className="rounded-xl border p-5 bg-bg-card border-border-subtle">
+        <div className="rounded-2xl border p-5 bg-bg-card border-border-subtle">
           <div className="flex items-start gap-4">
-            <div className="w-11 h-11 rounded-full flex items-center justify-center shrink-0 bg-red-500/10 text-red-400">
+            <div className="w-11 h-11 rounded-full flex items-center justify-center shrink-0 bg-danger/10 text-danger">
               <AlertTriangle size={22} />
             </div>
             <div className="flex-1 min-w-0">
@@ -123,7 +136,7 @@ export function EscrowStatus({ status, paymentAmount, onRelease, onDispute }) {
                 Dispute raised — your payment is secure while we review the case.
               </p>
               {isBackendUnavailable && (
-                <p className="text-[10px] mt-3 text-warning/70 flex items-center gap-1">
+                <p className="text-[10px] mt-3 text-pending flex items-center gap-1">
                   <ArrowRight size={10} />
                   Offline mode — state managed locally
                 </p>

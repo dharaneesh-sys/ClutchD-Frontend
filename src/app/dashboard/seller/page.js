@@ -21,6 +21,7 @@ import { MyListings } from "@/components/marketplace/MyListings";
 import { SalesList } from "@/components/marketplace/SalesList";
 import { NAVIGATION_EVENT } from "@/lib/navigation";
 import { formatCurrency } from "@/lib/utils";
+import { Button } from "@/components/ui/Button";
 
 const VALID_TABS = ["dashboard", "listings", "sales"];
 
@@ -112,27 +113,28 @@ export default function SellerDashboardPage() {
             {/* Welcome + quick actions */}
             <div className="glass-lux rounded-2xl p-5">
               <h2 className="text-lg font-bold text-text-primary">
-                Welcome{user?.name ? `, ${user.name}` : ""} 👋
+                Welcome{user?.name ? `, ${user.name}` : ""}
               </h2>
               <p className="mt-1 text-sm text-text-muted">
                 Upload spare parts and accessories — your listings go live in the
                 Parts Store instantly.
               </p>
               <div className="mt-4 flex flex-wrap gap-3">
-                <button
+                <Button
                   onClick={() => router.push("/dashboard/seller/upload")}
-                  className="inline-flex items-center gap-2 rounded-2xl bg-primary px-4 py-2.5 text-sm font-semibold text-white transition-all hover:opacity-90"
+                  className="gap-2"
                 >
                   <Plus size={16} />
                   Upload a part
-                </button>
-                <button
+                </Button>
+                <Button
+                  variant="secondary"
                   onClick={() => router.push("/marketplace")}
-                  className="inline-flex items-center gap-2 rounded-2xl border border-border-subtle bg-surface px-4 py-2.5 text-sm font-semibold text-text-primary transition-all hover:bg-surface-soft"
+                  className="gap-2"
                 >
                   <ShoppingBag size={16} />
                   Open Parts Store
-                </button>
+                </Button>
               </div>
             </div>
 
@@ -182,13 +184,13 @@ export default function SellerDashboardPage() {
                   <p className="mt-1 text-sm text-text-muted">
                     Upload your first spare part or accessory to start selling.
                   </p>
-                  <button
+                  <Button
                     onClick={() => router.push("/dashboard/seller/upload")}
-                    className="mt-4 inline-flex items-center gap-2 rounded-2xl bg-primary px-4 py-2.5 text-sm font-semibold text-white transition-all hover:opacity-90"
+                    className="mt-4 gap-2"
                   >
                     <Plus size={16} />
                     Upload a part
-                  </button>
+                  </Button>
                 </div>
               ) : (
                 <MyListings />
@@ -199,13 +201,13 @@ export default function SellerDashboardPage() {
 
         {activeTab === "listings" && (
           <div className="space-y-4">
-            <button
+            <Button
               onClick={() => router.push("/dashboard/seller/upload")}
-              className="inline-flex items-center gap-2 rounded-2xl bg-primary px-4 py-2.5 text-sm font-semibold text-white transition-all hover:opacity-90"
+              className="gap-2"
             >
               <Plus size={16} />
               Upload a part
-            </button>
+            </Button>
             <MyListings onAddNew={() => router.push("/dashboard/seller/upload")} />
           </div>
         )}
@@ -221,7 +223,7 @@ function StatCard({ icon: Icon, label, value }) {
     <div className="glass-lux rounded-2xl p-4">
       <div className="flex items-center gap-2 text-text-muted">
         <Icon size={16} />
-        <span className="text-[11px] font-semibold uppercase tracking-wider">
+        <span className="type-label-2 uppercase">
           {label}
         </span>
       </div>
