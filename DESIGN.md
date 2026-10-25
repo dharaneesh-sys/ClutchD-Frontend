@@ -1,9 +1,326 @@
-# ClutchD App Redesign, Token Contract (DESIGN.md)
+# ClutchD App — Design Contract (DESIGN.md)
 
-**Status:** ENFORCEABLE. This file is the single design contract all later waves implement against.
-**Scope:** ClutchD-App (Next.js + Capacitor + Tailwind v4), 43 screens, whole-product overhaul.
-**Direction:** Blue compulsory. Light-first default with dark toggle. No new screens, no new features, no new dependencies.
-**Rule of conflict:** If code disagrees with this file, code is wrong. Update code, not this file, unless the contract is amended here first.
+**Status: AUTHORITATIVE — flat-blue pilot contract.** Effective 2026-10-25 on branch `redesign/blue-pilot`.
+**Scope:** ClutchD-App (Next.js 16 + Capacitor + Tailwind v4). The pilot covers customer, mechanic and garage in full; marketplace receives tokens/navigation; seller, fleet and admin receive tokens/shell only.
+**Reference direction:** `/home/dinusus/Downloads/ClutchD Blue Two-Wheeler Service App Showcase.png` (the plan's `~/Pictures/...` path is stale). The image is a north star to improve, not a screen-by-screen spec.
+**Rule of conflict:** §0 wins over every rule below and over code. If code disagrees, code is wrong. The historical contract (D1–D16) is retained for audit only.
+
+> **This contract supersedes the old indigo/glass rules.** It retires `#1E29B6`, `#162086`, `#2e3bd1`, Instrument Serif headings, `glass-lux` content cards and the six-item marketplace nav. Conflicting historical sections are tagged `SUPERSEDED` inline with the reason and the replacement section.
+
+---
+
+## 0. Flat-blue pilot contract (AUTHORITATIVE)
+
+### 0.1 Non-negotiables at a glance
+
+- **Brand:** light primary `#1A73E8`, small-text blue `#1557B0`, canvas `#F5F7FB`, card `#FFFFFF`, text `#111827`, muted `#5F6B7A`, border `#E1E7F0`, success `#188038`, pending `#B06000`, danger `#D93025`. Dark values and contrast ratios are in §0.3.
+- **Type:** Onest only. Instrument Serif is retired. No remote Google Fonts import; self-host through `next/font/google`.
+- **Surfaces:** every content surface is flat. Glass is allowed ONLY on (1) the fixed bottom navigation bar, (2) modal/sheet scrim + panel, (3) floating map controls, (4) the splash overlay.
+- **Banned by name:** `glass-lux`, `glass-strong`, `surface-elevated`, `surface-filled`, `surface-outlined`, `btn-glow`, `hover-glow`, cream `rgba(255,249,235,...)`, indigo `#1E29B6`/`#162086`/`#2e3bd1`, Instrument Serif. No gradients and no glow.
+- **Shape:** card radius 16px, control radius 12px, 1px card border and one soft shadow.
+- **Navigation:** customer 5, marketplace 5, mechanic 5, garage 5, seller 4; fleet keeps its existing nav; admin keeps its desktop sidebar. No back arrow on top-level screens; back only on pushed/detail screens.
+- **Status/payment:** the exact status map is §0.8. Payment is immediate capture; there is no hold/release UI.
+- **Accessibility:** 4.5:1 body text, 3:1 large text, visible focus rings, keyboard modal trap, reduced-motion support, and status conveyed by text not colour alone (§0.9).
+- **Demo/billing:** sample amounts only behind `NEXT_PUBLIC_DEMO_MODE=true` and visibly labelled `Demo`; production unsupported values render `—`. Rent/incentives are out of pilot scope; `NEXT_PUBLIC_BILLING_ENABLED` defaults to false (§0.10–§0.11).
+
+### 0.2 Surface system — flat by default
+
+Every content surface is flat: `background: var(--surface-card)`, `border: 1px solid var(--border)`, `border-radius: 16px`, `box-shadow: var(--shadow-card)`. This applies to cards, lists, forms, inputs, stat tiles, headers, tabs, popovers, toasts and empty states.
+
+Glass is allowed ONLY on these four surfaces:
+
+1. **Bottom navigation bar** — the fixed mobile tab bar.
+2. **Modal/sheet scrim + panel** — the scrim uses `--glass-overlay-scrim`; the panel may use `--glass-overlay-bg` plus blur.
+3. **Floating map controls** — zoom, recenter and layer buttons over the map.
+4. **Splash overlay** — the full-screen launch/hero overlay.
+
+Approved glass recipe, using tokens only:
+
+```css
+background: var(--glass-overlay-bg);
+border: 1px solid var(--glass-overlay-border);
+backdrop-filter: blur(var(--glass-overlay-blur));
+-webkit-backdrop-filter: blur(var(--glass-overlay-blur));
+```
+
+No `saturate(...)`, no cream tint, no indigo tint, no glow shadow, and no `backdrop-blur` anywhere else.
+
+**Banned legacy classes and values (zero hits in `src/`):**
+
+| Banned | Why / replacement |
+|---|---|
+| `glass-lux`, `glass`, `glass-strong`, `glass-lux-strong`, `glass-hover` | Old indigo glass; use flat `--surface-card`, or an approved overlay only |
+| `surface-elevated`, `surface-filled`, `surface-outlined` | Old card variants; all collapse to the flat card |
+| `btn-glow`, `hover-glow` | Neon glow; use a flat fill and `--shadow-card` |
+| `rgba(255,249,235,...)` (cream) | Old light glass tint; banned |
+| `#1E29B6`, `#162086`, `#2e3bd1` (indigo) | Old brand; banned |
+| `Instrument Serif` | Old display face; Onest only |
+| `backdrop-blur` outside the four allowed surfaces | Glass leakage; remove |
+| Gradient text/buttons/backgrounds, `saturate(1.2)` / `saturate(1.3)` | No gradients or glow in this system |
+| `dark:` utility variants for colour | Theme through `data-theme` tokens only |
+
+A legacy class in new or migrated code is a bug. Temporary aliases may exist only while a task is in flight; the pilot's final state is zero hits (task 10).
+
+### 0.3 Palette and exact tokens
+
+Light values live in `:root`; dark values live in `[data-theme="dark"]`. These are the canonical token names for task 5.
+
+| Role | Token | Light | Dark | Rule |
+|---|---|---|---|---|
+| Primary | `--primary` | `#1A73E8` | `#8AB4F8` | Fills, primary actions, active icons |
+| Primary small text | `--primary-dark` | `#1557B0` | `#A8C7FA` | All small blue text and links; never use `--primary` for body-size text |
+| Canvas | `--background` | `#F5F7FB` | `#0B1220` | App background |
+| Surface card | `--surface-card` | `#FFFFFF` | `#151C28` | Flat cards, modal/sheet panels |
+| Text | `--foreground` | `#111827` | `#E8EEF7` | Primary text |
+| Muted text | `--text-muted` | `#5F6B7A` | `#A7B2C3` | Secondary text, captions |
+| Border | `--border` | `#E1E7F0` | `#2A3444` | 1px card borders and dividers |
+| Control border | `--border-strong` | `#748192` | `#5C6C84` | Form-control boundaries (3:1 on card and canvas) |
+| Success | `--success` | `#188038` | `#81C995` | Completed/paid |
+| Pending | `--pending` | `#B06000` | `#FDD663` | Pending/awaiting fills and icons; text on card |
+| Danger | `--danger` | `#D93025` | `#F28B82` | Error, cancelled, destructive |
+| On primary | `--on-primary` | `#FFFFFF` | `#0B1220` | Text/icons on a primary fill |
+| Soft surface | `--surface-soft` | `#EDF2FA` | `#1B2432` | Active tab pill, tinted rows, skeletons |
+| Focus ring | `--ring` | `#1A73E8` | `#A8C7FA` | 2px focus outline |
+| Pending soft | `--pending-soft` | `#FDF3E7` | `#3A2C12` | Pending chip background |
+| Pending ink | `--pending-ink` | `#8A4A00` | `#FDD663` | Pending text directly on canvas |
+| Danger ink | `--danger-ink` | `#C5221F` | `#F28B82` | Danger text directly on canvas |
+| Glass background | `--glass-overlay-bg` | `rgba(255,255,255,0.78)` | `rgba(21,28,40,0.78)` | Approved glass only |
+| Glass border | `--glass-overlay-border` | `rgba(255,255,255,0.55)` | `rgba(232,238,247,0.14)` | Approved glass only |
+| Glass scrim | `--glass-overlay-scrim` | `rgba(17,24,39,0.48)` | `rgba(0,0,0,0.62)` | Modal/sheet scrim |
+| Glass blur | `--glass-overlay-blur` | `16px` | `16px` | Approved glass only |
+| Card shadow | `--shadow-card` | `0 1px 2px rgba(17,24,39,0.04), 0 8px 24px rgba(17,24,39,0.06)` | `0 1px 2px rgba(0,0,0,0.35), 0 8px 24px rgba(0,0,0,0.35)` | Flat card only |
+
+**Light contrast ratios (WCAG 2.x relative-luminance formula):**
+
+| Pair | Ratio | Use |
+|---|---|---|
+| `#111827` on `#F5F7FB` | 16.54:1 | Body text on canvas |
+| `#111827` on `#FFFFFF` | 17.74:1 | Body text on card |
+| `#5F6B7A` on `#F5F7FB` | 5.06:1 | Muted text on canvas |
+| `#5F6B7A` on `#FFFFFF` | 5.43:1 | Muted text on card |
+| `#1557B0` on `#F5F7FB` | 6.48:1 | Small blue text on canvas |
+| `#1557B0` on `#FFFFFF` | 6.95:1 | Small blue text on card |
+| `#FFFFFF` on `#1A73E8` | 4.51:1 | `--on-primary` on primary |
+| `#188038` on `#FFFFFF` | 5.02:1 | Success text on card |
+| `#B06000` on `#FFFFFF` | 4.65:1 | Pending text on card |
+| `#D93025` on `#FFFFFF` | 4.77:1 | Danger text on card |
+| `#8A4A00` on `#F5F7FB` | 6.40:1 | `--pending-ink` on canvas |
+| `#C5221F` on `#F5F7FB` | 5.40:1 | `--danger-ink` on canvas |
+
+**Light-theme cautions:** `#1A73E8` on `#F5F7FB` is 4.20:1 and must not be used for body-size text; use `--primary-dark`. `#B06000` on canvas is 4.33:1 and `#D93025` on canvas is 4.45:1, so status text placed directly on canvas uses `--pending-ink` / `--danger-ink`; otherwise put status text on a `--surface-card` or tinted pill. White on `#1A73E8` is 4.51:1 and is reserved for semibold 14px+ button labels.
+
+**Dark contrast ratios (all text pairs pass 4.5:1):**
+
+| Pair | Ratio | Use |
+|---|---|---|
+| `#E8EEF7` on `#0B1220` | 16.05:1 | Body text on canvas |
+| `#E8EEF7` on `#151C28` | 14.65:1 | Body text on card |
+| `#A7B2C3` on `#0B1220` | 8.74:1 | Muted text on canvas |
+| `#A7B2C3` on `#151C28` | 7.98:1 | Muted text on card |
+| `#A8C7FA` on `#0B1220` | 10.89:1 | Small blue text on canvas |
+| `#A8C7FA` on `#151C28` | 9.94:1 | Small blue text on card |
+| `#0B1220` on `#8AB4F8` | 8.88:1 | `--on-primary` on primary |
+| `#81C995` on `#0B1220` | 9.56:1 | Success text on canvas |
+| `#81C995` on `#151C28` | 8.73:1 | Success text on card |
+| `#FDD663` on `#0B1220` | 13.35:1 | Pending text on canvas |
+| `#FDD663` on `#151C28` | 12.19:1 | Pending text on card |
+| `#F28B82` on `#0B1220` | 7.84:1 | Danger text on canvas |
+| `#F28B82` on `#151C28` | 7.16:1 | Danger text on card |
+
+Dark `--on-primary` is deliberately `#0B1220`, not white: white on `#8AB4F8` is 2.11:1 and fails. Dark mode is a re-map of the same roles, not a separate theme.
+
+### 0.4 Typography — Onest only
+
+Self-host Onest through `next/font/google` with `display: "swap"` and `variable: "--font-onest"`; weights 400, 500, 600 and 700. Remove the remote `fonts.googleapis.com` `@import`. Instrument Serif is retired completely; headings use Onest.
+
+| Role | Size / line-height | Weight | Tracking | Use |
+|---|---|---|---|---|
+| Display | 32px / 36px | 700 | -0.02em | Landing hero, page hero |
+| Section header | 20px / 26px | 600 | -0.01em | Section titles |
+| Card title | 16px / 22px | 600 | 0 | Card headers, list-row titles |
+| Body | 15px / 23px | 400 | 0 | Paragraphs, form values |
+| Label | 13px / 18px | 600 | 0.01em | Field labels, chips |
+| Caption | 12px / 17px | 500 | 0.01em | Helper text, timestamps |
+| Stat value | 28px / 31px | 700 | -0.02em | Dashboard metrics; tabular numerals |
+| Button label | 14px / 20px | 600 | 0.01em | Primary/secondary controls |
+| Nav label | 11px / 14px | 600 | 0.01em | Bottom-nav labels |
+
+**Numeric treatment:** apply `font-variant-numeric: tabular-nums lining-nums` to stat values, prices, earnings, ETA, countdowns and table numbers. Use Indian digit grouping (`₹1,200`, no space after `₹`). Currency values are whole rupees in the UI; never invent decimals. Unknown or unsupported values render `—`. Offer timers use the real `expiresAt` (`mm:ss`, 15-minute offer window); do not add a fake 58-second timer.
+
+### 0.5 Shape, spacing and elevation
+
+- **Radii:** content card 16px; control (button, input, select, tab) 12px; modal/sheet 16px; pill/badge/avatar full; icon button 12px. The old 20px `glass-lux` radius and 0.75rem outliers are gone.
+- **Spacing scale:** 4, 8, 12, 16, 20, 24, 32, 40, 48px. Page gutter 16px mobile / 24px tablet / 32px desktop. Card padding 16px mobile / 20px desktop. Row minimum height 56px. Section gap 24–32px. Grid gap 12–16px.
+- **Controls:** minimum 44×44px target; primary controls 48px high; 12px radius; `--border-strong` boundary; visible label and error text.
+- **Flat card recipe:** `background: var(--surface-card); border: 1px solid var(--border); border-radius: 16px; box-shadow: var(--shadow-card)`. No gradient, no glow, no inset highlight, no glass.
+- **Motion:** 150–200ms ease-out for hover/press; 200–250ms for modal/sheet entrances. No parallax, no glow pulse, no gradient animation; reduced-motion collapses everything (§0.9).
+
+### 0.6 Navigation matrix (AUTHORITATIVE)
+
+| Surface | Items (count) | Back arrow |
+|---|---|---|
+| Customer dashboard | Service, Schedule, Vehicles, History, Store (5) | None on top-level |
+| Marketplace store | Home, Categories, Search, Cart, Profile (5) | None at root; one on category, product and checkout |
+| Mechanic | Home, Navigation, Earnings, History, Support (5) | None on top-level |
+| Garage | Home, Jobs, Analytics, Garage, Support (5) | None on top-level |
+| Seller | Dashboard, Listings, Sales, Upload (4) | None on top-level |
+| Fleet | Existing fleet nav; no new item | Existing behaviour |
+| Admin | Desktop sidebar/topbar | Not applicable |
+
+Rules:
+
+1. One `BottomNav` / `DashboardTabBar` implementation supports these exact items, order and routes. `?tab=` deep links keep working; the active item carries `aria-current="page"`.
+2. Top-level tabs never render a back arrow. Back arrows appear only on pushed/detail screens (for example category, product, checkout, job detail, settings, edit profile), and there is one back control in the header.
+3. The marketplace `Menu` popover is replaced by a header overflow button so theme, SOS and help stay reachable for logged-out users. It is not a sixth nav item.
+4. The bottom bar is fixed and persists on every top-level customer/partner tab, not only the dashboard screen. Keep the customer `Store` item pointing at the marketplace.
+5. Admin keeps its desktop sidebar/topbar; no mobile bottom nav is required. Seller and fleet keep their existing four-item bars. No new top-level destinations.
+
+### 0.7 Safe areas and layout bounds
+
+- The Next.js `viewport` export includes `viewportFit: "cover"`, `width: "device-width"`, `initialScale: 1`, and theme colours light `#F5F7FB` / dark `#0B1220`.
+- The bottom nav is fixed. Its height token is `--bottom-nav-height: 64px`, and it adds `padding-bottom: env(safe-area-inset-bottom)`.
+- Every scroll container gets bottom padding of at least `calc(var(--bottom-nav-height) + env(safe-area-inset-bottom) + 16px)`. No content may sit under the nav bar or the status bar.
+- Headers add `padding-top: env(safe-area-inset-top)`. Landscape layouts also respect `env(safe-area-inset-left)` and `env(safe-area-inset-right)`.
+- Modal/sheet panels and map controls respect the same insets; map controls sit above the nav height plus the bottom inset.
+- Minimum target size is 44×44px; nav items fill the bar height. Test at 360×800, 390×844, landscape, and a notched device.
+
+### 0.8 Status map and payment semantics
+
+| Status | Emitted by | Display copy | Rule |
+|---|---|---|---|
+| `searching` | Backend/DB | Finding a provider | Default status for a new request |
+| `providers_notified` | Frontend display-only | Providers notified | DB remains `searching`; never persist this value |
+| `assigned` | Backend | Mechanic assigned | Provider accepted |
+| `en_route` | Backend | On the way | Provider travelling |
+| `in_progress` | Backend | In service | Work started |
+| `payment_pending` | Backend | Awaiting payment | Bill ready |
+| `payment_escrow` | Frontend-only legacy label | Payment held (legacy) | Backend does not emit; do not create; no hold UI |
+| `payment_released` | Frontend-only legacy label | Payment released (legacy) | Backend does not emit; do not create; no release UI |
+| `payment_dispute` | Frontend-only legacy label | Payment dispute (legacy) | Backend does not emit; read-only if encountered |
+| `completed` | Backend | Service completed / Job completed | Payment captured |
+| `cancelled` | Backend | Cancelled | Request/job cancelled |
+
+Rules:
+
+1. This is the complete set. Do not invent `picked_up`, `delivered`, `ready` or any other status.
+2. `providers_notified` is display-only; the database status stays `searching`.
+3. `payment_escrow` / `payment_released` / `payment_dispute` are frontend-only legacy labels; the backend does not emit them. Do not add new UI, calls or copy around them.
+4. Payment is **immediate capture**. Razorpay verify and cash both set the job to `completed` on the backend. There is no hold/release step, no `/hold` or `/release` call, and no "Payment Held" / "Released" copy. Open review only after a backend-confirmed completion.
+5. Status pills use text plus icon, never colour alone. Recommended tone: info (blue) for searching/providers_notified/assigned; pending (amber) for en_route/in_progress/payment_pending; success for completed; danger for cancelled; neutral for legacy payment labels. Info text uses `--primary-dark` on `--surface-soft`; it does not get a new hue.
+
+### 0.9 Accessibility minimums
+
+- **Contrast:** WCAG AA in both themes — 4.5:1 for normal/body text, 3:1 for large text (≥24px regular or ≥18.66px bold) and for essential UI graphics. Card borders use `--border`; form-control boundaries use `--border-strong` (≥3:1 on card and canvas).
+- **Focus:** every interactive element shows a visible focus ring: 2px solid `var(--ring)`, 2px offset, at least 3:1 against adjacent colours. Never remove an outline without an equivalent visible replacement.
+- **Keyboard:** all controls are reachable in a logical order. Modals/sheets trap focus, close on Escape, and return focus to the trigger. Include the skip link and semantic headings.
+- **Reduced motion:** under `@media (prefers-reduced-motion: reduce)`, collapse animations/transitions to `0.001ms` or one frame. No parallax, autoplay or motion that hides content.
+- **Status:** convey status with text and an icon, not colour alone. Announce async status changes with a polite live region where appropriate.
+- **Targets and labels:** 44×44px minimum targets, programmatic labels on icon buttons, errors linked to their fields, alt text on meaningful images.
+- Dark mode is a full parity target; the same checks apply in both themes.
+
+### 0.10 Demo-mode labelling
+
+- `NEXT_PUBLIC_DEMO_MODE` is a build-time flag, default `false`. Demo fixtures, sample amounts and demo auth entries exist only when it is `true`.
+- Every sample amount or fixture value is visibly labelled `Demo` (for example a "Demo data" badge in the shell) and must never be presented as a real quote, payout or balance.
+- Production mode (`false`) renders unsupported values as `—`, ignores/clears persisted demo data, and never shows demo amounts. Remove fake fallbacks such as `1200` and `4.5 hrs`.
+- Demo data must not leak into production code paths, and production must not make demo network calls.
+
+### 0.11 Billing / pilot scope guard
+
+- Rent, incentives, rent payment history, onboarding and payout/settlement screens are **out of pilot scope**. They belong to Phase 2.
+- `NEXT_PUBLIC_BILLING_ENABLED` is a build-time flag, default `false`. When false, no rent/incentive/billing UI or copy is rendered, and no fake amounts are shown.
+- Do not add rent/incentive features to the pilot under the guise of visual polish.
+
+### 0.12 Implementation map for task 5 (`globals.css` + `layout.js`)
+
+Canonical declaration block (values are duplicated in §0.3 for readability; this block is the implementation source of truth):
+
+```css
+:root {
+  --primary: #1A73E8;
+  --primary-dark: #1557B0;
+  --background: #F5F7FB;
+  --surface-card: #FFFFFF;
+  --foreground: #111827;
+  --text-muted: #5F6B7A;
+  --border: #E1E7F0;
+  --border-strong: #748192;
+  --success: #188038;
+  --pending: #B06000;
+  --danger: #D93025;
+  --on-primary: #FFFFFF;
+  --surface-soft: #EDF2FA;
+  --ring: #1A73E8;
+  --pending-soft: #FDF3E7;
+  --pending-ink: #8A4A00;
+  --danger-ink: #C5221F;
+  --glass-overlay-bg: rgba(255,255,255,0.78);
+  --glass-overlay-border: rgba(255,255,255,0.55);
+  --glass-overlay-scrim: rgba(17,24,39,0.48);
+  --glass-overlay-blur: 16px;
+  --shadow-card: 0 1px 2px rgba(17,24,39,0.04), 0 8px 24px rgba(17,24,39,0.06);
+  --bottom-nav-height: 64px;
+}
+
+[data-theme="dark"] {
+  --primary: #8AB4F8;
+  --primary-dark: #A8C7FA;
+  --background: #0B1220;
+  --surface-card: #151C28;
+  --foreground: #E8EEF7;
+  --text-muted: #A7B2C3;
+  --border: #2A3444;
+  --border-strong: #5C6C84;
+  --success: #81C995;
+  --pending: #FDD663;
+  --danger: #F28B82;
+  --on-primary: #0B1220;
+  --surface-soft: #1B2432;
+  --ring: #A8C7FA;
+  --pending-soft: #3A2C12;
+  --pending-ink: #FDD663;
+  --danger-ink: #F28B82;
+  --glass-overlay-bg: rgba(21,28,40,0.78);
+  --glass-overlay-border: rgba(232,238,247,0.14);
+  --glass-overlay-scrim: rgba(0,0,0,0.62);
+  --glass-overlay-blur: 16px;
+  --shadow-card: 0 1px 2px rgba(0,0,0,0.35), 0 8px 24px rgba(0,0,0,0.35);
+}
+```
+
+Additional task-5 requirements:
+
+- `@theme inline` maps the canonical tokens (`--color-primary: var(--primary)`, `--color-background`, `--color-foreground`, `--color-surface-card`, `--color-text-muted`, `--color-border`, `--color-success`, `--color-pending`, `--color-danger`, `--color-on-primary`, `--color-surface-soft`, `--color-ring`).
+- Keep temporary compatibility aliases for one migration wave: `--surface: var(--surface-card)`, `--on-surface: var(--foreground)`, `--color-bg-card: var(--surface-card)`, `--color-text-muted: var(--text-muted)`, `--color-border-subtle: var(--border)`, `--color-surface-soft: var(--surface-soft)`, `--color-icon-highlight: var(--primary)`. Delete them at task 10.
+- `body` uses `font-family: var(--font-onest), sans-serif`, `background: var(--background)`, `color: var(--foreground)`. `h1`–`h4` use Onest; no Instrument Serif.
+- `layout.js` imports Onest from `next/font/google`, adds `viewportFit: "cover"`, and sets theme colours to `#F5F7FB` / `#0B1220`.
+- Remove `fonts.googleapis.com`; the standalone CSP stays unchanged. The static export has no server headers, so verify the offline APK.
+- Task 5 acceptance: `rg -n "Instrument Serif|fonts.googleapis.com|#1E29B6|#162086|#2e3bd1" src out` returns zero.
+
+### 0.13 Contract verification greps
+
+Run from the repo root. Zero hits, except documented third-party/fallback exceptions:
+
+```bash
+rg -n "Instrument Serif|#1E29B6|#162086|#2e3bd1" src
+rg -n "glass-lux|glass-strong|surface-elevated|surface-filled|surface-outlined|btn-glow|hover-glow" src --glob '!**/*.test.*'
+rg -n "dark:" src --glob '!**/*.test.*'
+rg -n "bg-white/(5|10)|border-white/" src --glob '!**/*.test.*'
+rg -n "text-warning|bg-warning|fill-warning" src --glob '!**/*.test.*'
+```
+
+Also audit every remaining `backdrop-blur` and confirm it belongs to one of the four allowed glass surfaces. Document exceptions (for example Google logo SVG brand colours, Leaflet tile colours, `global-error.js` fallback hexes) in `.omo/evidence/pilot/contract-exceptions.md` with file:line and reason.
+
+---
+
+## Historical contract (D1–D16) — retained for audit
+
+> **SUPERSEDED (2026-10-25):** Everything in D1–D16 below is the pre-pilot contract. It is kept to preserve the audit trail. Do not implement it where it conflicts with §0; each conflicting section carries an inline `SUPERSEDED` note with the replacement.
+
+**Historical status (at time of writing):** ENFORCEABLE. This file was the single design contract all later waves implemented against.
+**Historical scope:** ClutchD-App (Next.js + Capacitor + Tailwind v4), 43 screens, whole-product overhaul.
+**Historical direction:** Blue compulsory. Light-first default with dark toggle. No new screens, no new features, no new dependencies.
+**Historical rule of conflict:** If code disagreed with this file, code was wrong. Update code, not this file, unless the contract was amended here first.
 
 **Grounding (read-only sources this contract locks in):**
 `src/app/globals.css`, `src/store/themeStore.js`, `src/components/ui/ThemeProvider.js`,
@@ -17,6 +334,8 @@ floating ThemeToggle removed, `dark:` classes eliminated, 0.75rem radius outlier
 ---
 
 ## D1. Grounded-blue palette (LOCKED)
+
+> **SUPERSEDED (2026-10-25):** The indigo palette below is retired; use the flat-blue light/dark tokens in §0.3.
 
 Light theme values live in `:root`. Dark theme values live in `[data-theme="dark"]`. Nothing else defines brand color.
 
@@ -54,6 +373,8 @@ Enforcement: `grep -rn "btn-glow\|hover-glow\|#8b5cf6\|stone-\|zinc-\|lime\|teal
 
 ## D2. Light-first default + dark-toggle spec (LOCKED)
 
+> **PARTIALLY SUPERSEDED (2026-10-25):** D2.1–D2.4 and D2.6 remain compatible (light-first, `data-theme` tokens, no `dark:` branching). D2.5 is SUPERSEDED: the Menu popover is replaced by the marketplace header overflow (§0.6), with theme control there and in settings.
+
 1. Light is the startup default. `themeStore.js#getInitialTheme()` returns `'light'` unless `localStorage['clutchd_theme']` holds an explicit `'light'`/`'dark'`. Legacy `theme-storage` key migrates once, then is removed. No code path may default to dark.
 2. The single source of truth for theme is the `data-theme` attribute on `<html>` (`light` | `dark`), set from the store by `ThemeProvider.js`. `ThemeProvider` also toggles the `dark` class ONLY as a Tailwind `@custom-variant` compat shim. Components MUST NOT branch on it.
 3. All theme-varying values MUST be `var(--...)` CSS variables with both `:root` and `[data-theme="dark"]` definitions in `globals.css`. **Zero `dark:` classes in components.** The 19 existing `dark:` hits MUST be removed wave by wave until `grep -rn "dark:" src/components src/app --include="*.js" --include="*.jsx"` returns zero.
@@ -65,6 +386,8 @@ Enforcement: `grep -rn "btn-glow\|hover-glow\|#8b5cf6\|stone-\|zinc-\|lime\|teal
 
 ## D3. Type scale (LOCKED)
 
+> **SUPERSEDED (2026-10-25):** Instrument Serif is retired and `.type-display` is deleted; use the Onest-only scale in §0.4.
+
 1. Body and UI font is **Onest** (`--font-sans`, `body { font-family: 'Onest', sans-serif }`). Kept everywhere.
 2. Sanctioned type utilities: `headline-3` (1.5rem/1.35/500), `body-2` (0.875rem/1.45/400), `title-3` (0.875rem/1.45/600), `label-2` (0.6875rem/1.3/600/0.05em). BottomNav labels use `type-label-2`. These four are the workhorses; other existing scale steps may be used sparingly but never extended.
 3. **KILL `.type-display`** (3.5625rem). It MUST NOT be used on any screen. Remove usages; do not restyle it.
@@ -74,6 +397,8 @@ Enforcement: `grep -rn "btn-glow\|hover-glow\|#8b5cf6\|stone-\|zinc-\|lime\|teal
 ---
 
 ## D4. Radii (LOCKED)
+
+> **SUPERSEDED (2026-10-25):** Card 16px and control 12px are locked in §0.5; the glass-lux 20px radius and 0.75rem outlier rules no longer apply.
 
 | Role | Value | Applies to |
 |---|---|---|
@@ -86,6 +411,8 @@ Enforcement: `grep -rn "btn-glow\|hover-glow\|#8b5cf6\|stone-\|zinc-\|lime\|teal
 ---
 
 ## D5. Glass 2-variant spec (LOCKED)
+
+> **SUPERSEDED (2026-10-25):** Both glass-lux variants are banned; glass is restricted to bottom nav, modal/sheet, map controls and splash (§0.2), and the flat card is the default.
 
 Exactly two glass variants exist. Everything else is deprecated.
 
@@ -104,11 +431,15 @@ Consolidation target: the 185 glass hits across 53 files collapse onto these two
 
 ## D6. Elevation + shadow discipline
 
+> **SUPERSEDED (2026-10-25):** Glass shadows, hover-glow and elevation tiers are replaced by the single flat-card shadow token in §0.5; no glow or gradient.
+
 Use `--elevation-1` through `--elevation-5` and `--glass-lux-shadow` / `--glass-lux-shadow-hover` only. `hover-lift` (`translateY(-2px)`) is reserved for primary CTA and pressable glass. `hover-glow` is BANNED (see D1.1). Modal entrance stays `modal-in` / `backdrop-in`; page entrance stays `page-enter` (0.25s). No new shadow tokens, no per-component shadow literals.
 
 ---
 
 ## D7. Status color mapping: `--warning` to `--info` rename + new `--pending` (LOCKED)
+
+> **SUPERSEDED (2026-10-25):** The status colours and the complete status map are redefined in §0.8; do not use this warning/info/pending mapping in the pilot.
 
 `--warning` is a misnomer: both themes define it as blue (`#3b82f6` light / `#60a5fa` dark). It is RENAMED to `--info`. Amber takes over pending/warning semantics as `--pending`.
 
@@ -139,6 +470,8 @@ Migration rules:
 
 ## D9. Information architecture (LOCKED)
 
+> **SUPERSEDED (2026-10-25):** The six-item BottomNav and Menu popover are replaced by the authoritative navigation matrix in §0.6.
+
 1. **BottomNav: 6 items kept.** Home (`/marketplace`), Categories, Search, Cart (badge), Profile, Menu/Settings popover. Order, paths, and badge behavior are frozen. The Menu popover keeps: profile links (My Profile, Orders, Favorites), inline 2-tap Emergency SOS row (no overlay), and the Theme row. SOS behavior is frozen.
 2. **Per-role DashboardTabBars kept.** `DASHBOARD_TABS` (customer: Service, Schedule, Vehicles, History, Parts Store), `MECHANIC_TABS` (Jobs, Navigation, Earnings, Parts Store), `GARAGE_TABS` (Dashboard, Garage Profile, Analytics, Parts Store), `SELLER_TABS` (Dashboard, My Listings, Sales, Upload) with existing deep-link paths. Controlled mode (dashboard in-place) and link mode (profile pages deep-link) behavior is frozen.
 3. **Floating ThemeToggle deleted**, moved to settings route + Menu popover theme row (see D2.5). No wave may reintroduce it.
@@ -149,11 +482,15 @@ Migration rules:
 
 ## D10. Hierarchy rule (LOCKED)
 
+> **PARTIALLY SUPERSEDED (2026-10-25):** The parts-store hierarchy remains, but mechanic and garage no longer carry a Parts Store tab; use the exact navigation matrix in §0.6.
+
 Parts store is PRIMARY commerce surface; mechanic finding is SECONDARY discovery surface. Concretely: marketplace/parts-store entry points (BottomNav Home/Categories/Search/Cart, customer Parts Store tab, mechanic/garage Parts Store tabs) keep top-level placement and full visual weight. Mechanic/garage discovery cards, banners, or cross-sells MUST NOT outrank, overlay, or displace parts-store chrome. Any wave that touches home, search, or dashboard tabs MUST preserve this ordering or fail QA.
 
 ---
 
 ## D11. Dials, spacing, accessibility (LOCKED)
+
+> **PARTIALLY SUPERSEDED (2026-10-25):** The accessibility minimums in §0.9 are authoritative; `focus-lux` is replaced by `--ring`, and the safe-area/nav rules are in §0.7. The 4px/8px spacing rhythm remains valid.
 
 **Variance / motion / density caps (hard ceilings):**
 
@@ -175,6 +512,8 @@ Parts store is PRIMARY commerce surface; mechanic finding is SECONDARY discovery
 ---
 
 ## D12. Keep/kill checklist (grounded in the audit)
+
+> **SUPERSEDED (2026-10-25):** This list keeps the retired glass-lux system and six-item nav; the pilot bans both. Use §0.2, §0.6 and §0.13.
 
 ### KEEP
 
@@ -203,6 +542,8 @@ Parts store is PRIMARY commerce surface; mechanic finding is SECONDARY discovery
 ---
 
 ## D13. Per-wave QA gates (pass/fail, LOCKED)
+
+> **SUPERSEDED (2026-10-25):** These gates and greps target the retired indigo/glass system, and their G1/G2 names differ from the pilot gates. Use the contract greps in §0.13 and the plan verification strategy.
 
 Every implementation wave MUST pass ALL gates below. One fail blocks the wave.
 
@@ -264,6 +605,8 @@ Every wave's summary MUST map each change to a DESIGN.md section (D1-D16). Any v
 Pass: all four hold on every touched component. Fail: any role, state-layer, shape, or component-spec deviation.
 
 ## D15. Material 3 compliance mapping (LOCKED)
+
+> **SUPERSEDED (2026-10-25):** The M3 mapping is not adopted in the pilot; its indigo/glass role mappings are replaced by §0.3 and §0.5.
 
 **How M3 is implemented here:** M3 is a token/behavior spec inside our Tailwind + CSS-variable system, NOT `@material/web` components. No M3 library is installed and none may be added (G4 bans new dependencies). Every M3 role below resolves to an existing `var(--...)` token in `globals.css`; every M3 behavior resolves to an existing utility or a D-section rule. Where real M3 and a LOCKED section conflict, the LOCKED section wins; each conflict is resolved explicitly in D15.6.
 
@@ -362,5 +705,7 @@ Amendment record (per D16 protocol, formerly D14): D15 added 2026-09-26; G5 rang
 ---
 
 ## D16. Amendment protocol
+
+> **RETAINED:** Amendments to §0 use this protocol; cite the section, state old vs new, and re-baseline the affected gate.
 
 This file changes only by explicit amendment: cite the section, state old vs new, and re-baseline the affected QA gate. Implementation waves never silently reinterpret a LOCKED rule.
