@@ -1,19 +1,33 @@
 import { cn } from "@/lib/utils";
 
-// D5: exactly two sanctioned variants. Unknown strings pass through as-is
-// (one-release escape hatch for not-yet-migrated callers); unknown
-// variants resolve to glass-lux via the lookup fallback below.
+// Flat card surface. Legacy variant names are accepted so inherited call
+// sites keep rendering a visible surface; task 6 migrates them to the final
+// primitive API. Unknown variants resolve here instead of passing an
+// arbitrary string through as a class.
+const flatCard =
+  "bg-[var(--surface)] border border-[var(--color-border-subtle)] shadow-[var(--elevation-1)]";
+
 const variantClasses = {
-  "glass-lux": "glass-lux",
-  "glass-lux-interactive": "glass-lux-interactive",
+  "glass-lux": flatCard,
+  "glass-lux-interactive": flatCard,
+  strong: flatCard,
+  outlined: flatCard,
+  flat: flatCard,
+  glass: flatCard,
+  elevated: flatCard,
+  filled: flatCard,
 };
 
 export function GlassCard({ children, className, variant = "glass-lux", ...props }) {
+  const variantClass = Object.hasOwn(variantClasses, variant)
+    ? variantClasses[variant]
+    : flatCard;
+
   return (
     <div
       className={cn(
         "relative rounded-2xl transition-all duration-200",
-        variantClasses[variant] || variant || variantClasses["glass-lux"],
+        variantClass,
         className
       )}
       {...props}

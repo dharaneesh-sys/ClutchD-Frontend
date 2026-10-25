@@ -1,4 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
+import { render, screen } from "@testing-library/react";
 
 // ---------------------------------------------------------------------------
 // REGRESSION TESTS: Error #185 — Stable selectors vs getter functions
@@ -42,6 +43,7 @@ vi.mock("@/store/trackingStore", () => {
 });
 
 import { useTrackingStore } from "@/store/trackingStore";
+import { ProviderList } from "../ProviderList.jsx";
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -165,5 +167,28 @@ describe("ProviderList selectors — #185 regression", () => {
       prevMechs = mechs;
       prevGarages = garages;
     }
+  });
+});
+
+describe("ProviderList card surface", () => {
+  beforeEach(() => {
+    mockState._mechs = [mechA];
+    mockState._garages = [];
+    mockState._filter = "all";
+    mockState._error = null;
+    mockState.isLoading = false;
+  });
+
+  it("renders providers on an opaque flat card, not a glass/transparent surface", () => {
+    const { container } = render(<ProviderList />);
+
+    expect(screen.getByText("Alice")).toBeTruthy();
+    const card = container.querySelector("div.relative.rounded-2xl");
+    expect(card).toBeTruthy();
+    expect(card.className).toContain("bg-[var(--surface)]");
+    expect(card.className).toContain("border-[var(--color-border-subtle)]");
+    expect(card.className).not.toContain("glass-lux");
+    expect(card.className).not.toContain("backdrop-blur");
+    expect(card.className).not.toContain("bg-transparent");
   });
 });

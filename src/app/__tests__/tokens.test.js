@@ -67,14 +67,21 @@ describe("DESIGN.md token contract (Wave-1 Task 1: D1/D2/D4/D5/D7)", () => {
     expect(dark()).toContain(name);
   });
 
-  it("@theme inline maps --color-info (not --color-warning) and --color-pending (D7)", () => {
+  it("@theme inline maps --color-info, --color-pending and --color-warning (warning aliases pending)", () => {
     expect(css).toContain("--color-info: var(--info)");
     expect(css).toContain("--color-pending: var(--pending)");
-    expect(css).not.toMatch(/--color-warning\s*:/);
+    expect(css).toContain("--color-warning: var(--pending)");
   });
 
-  it("--warning survives only as a one-release alias of --info, never a literal (D7)", () => {
+  it("--warning maps to pending in both themes, never a literal", () => {
     expect(css).not.toMatch(/--warning\s*:\s*#/);
+    expect(root()).toContain("--warning: var(--pending)");
+    expect(dark()).toContain("--warning: var(--pending)");
+  });
+
+  it("light glass-lux override is a flat opaque surface, not cream glass", () => {
+    expect(css).not.toMatch(/rgba\(255,\s*249,\s*235/);
+    expect(css).not.toContain("saturate(1.2)");
   });
 
   it("dark theme lives only under [data-theme=dark]: no .dark block (D1/D2)", () => {
