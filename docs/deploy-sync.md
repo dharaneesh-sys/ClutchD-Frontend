@@ -119,11 +119,10 @@ Release builds MUST point at the server URL, not localhost:
 - The docker compose path above was **never exercised locally** (daemon
   sudo-gated on the dev workstation); Task 14's runtime smoke used a
   uvicorn+SQLite rig instead. First server run may surface compose-only issues.
-- ~20 frontend files still carry legacy demo/localStorage fallback machinery
-  (`fleetStorage.js` demo mode, `warrantyClaimsStore` localStorage fallback,
-  `payoutService`, `subscriptionService`, `certificationStore`, …) flagged for a
-  future purge pass — deferred by user decision; product code added since the
-  no-mock directive contains none of it.
+- Real-data-only pass completed: legacy fallback machinery was removed from
+  fleet, warranty, subscriptions, certifications, fitment and marketplace
+  error paths. Local storage is cache-only; missing backend endpoints fail
+  honestly.
 
 ## Cross-references
 

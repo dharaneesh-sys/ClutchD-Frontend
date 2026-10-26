@@ -195,7 +195,7 @@ ClutchD-Backend/
 │   │   ├── tasks/               # Celery worker + tasks
 │   │   └── ws/                  # WebSocket manager + handlers
 │   ├── scripts/
-│   │   ├── bootstrap_db.py      # Create tables + seed demo data
+│   │   ├── bootstrap_db.py      # Create tables + seed reference data
 │   │   ├── makemigration.sh     # Auto-generate Alembic migration
 │   │   └── migrate.sh           # Apply pending migrations
 │   ├── migrations/              # Alembic (env.py, versions/)
@@ -662,14 +662,7 @@ docker compose restart api       # Restart API only
 cd backend && uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 ```
 
-**Seed accounts** (auto-created by `bootstrap_db.py`):
-| Email | Password | Role |
-|-------|----------|------|
-| `admin@21907.com` | `clutchD123` | admin |
-| `admin@1907.com` | `clutchD123` | admin (backup) |
-| `customer@demo.com` | `demo123456` | customer |
-| `mechanic@demo.com` | `demo123456` | mechanic (verified, near Coimbatore) |
-| `garage@demo.com` | `demo123456` | garage (verified) |
+**Seed accounts:** QA accounts are provisioned separately as `TEST_*`; no seeded credentials are documented here.
 
 ### 10.4 Deploy Command Reference
 ```bash
@@ -691,12 +684,11 @@ docker compose restart api  # Restart API
 
 ---
 
-## 11. Demo Mode (removed)
+## 11. Real-data-only architecture
 
-Demo mode and every mock API path were removed from the frontend. The app now
-calls the real backend exclusively: there is no demo environment flag, response
-interceptor, demo login path, or seeded frontend data. Local storage is used
-only as an offline cache of real API responses.
+The app calls the real backend exclusively. There is no synthetic environment
+flag, response interceptor, synthetic login path, or seeded frontend data.
+Local storage is only an offline cache of real API responses.
 
 ---
 
@@ -717,7 +709,7 @@ RAZORPAY_KEY_SECRET=...
 ```
 Flow: `POST /payments/create` → returns Razorpay order → frontend opens Razorpay checkout → `POST /payments/verify` → order confirmed.
 
-**Security:** In production, if no payment keys are set, the payment endpoint returns HTTP 503. The mock Razorpay client is restricted to `debug=True` mode only.
+**Security:** In production, if no payment keys are set, the payment endpoint returns HTTP 503. The test Razorpay client is restricted to `debug=True` mode only.
 
 ---
 
@@ -888,7 +880,7 @@ const result = await signInWithCredential(auth, credential);
 | CORS blocking Capacitor WebView | Capacitor uses `https://localhost` origin, not in allowed origins | Added `capacitor://localhost` and `https://localhost` to `CORS_ORIGINS` |
 | Parts Store icon appears green in dark mode | `--color-icon-highlight` changed from gold `#d4a011` (light) to green `#10b981` (dark) — inconsistent with other icons | Changed Parts Store tab to use `text-primary`/`text-text-muted` like all other tabs |
 | React 19 max-update-depth crash (#185) | Zustand `onRehydrateStorage` → `setState` fires during React's render cycle | Custom `merge` function sets `_isRestoring=false` post-hydration; `onRehydrateStorage` intentionally omits `setState` |
-| Mock data leaking into real accounts | Components fell back to fabricated data when API calls failed | Removed all mock fallbacks and demo-prefixed paths; every data path is real-only |
+| Fabricated data leaking into real accounts | Components fell back to fabricated data when API calls failed | Removed all fabricated fallbacks and synthetic-prefixed paths; every data path is real-only |
 | Dev overlay blocking UI on connection errors | Next.js Turbopack intercepts `console.error` and shows full-screen error | Swapped `console.error` → `console.warn` for Axios/WebSocket connection errors |
 
 ### 19.2 Open Issues
@@ -936,10 +928,10 @@ sshpass -p '1907' ssh dinus@192.168.1.35 "command"
 # Health
 curl https://clutchd.tail14cfb9.ts.net:8000/health
 
-# Login
+# Login (set TEST_CUSTOMER_EMAIL / TEST_CUSTOMER_PASSWORD in your shell)
 curl -X POST https://clutchd.tail14cfb9.ts.net:8000/api/auth/login \
   -H "Content-Type: application/json" \
-  -d '{"email":"customer@demo.com","password":"demo123456"}'
+  -d "{\"email\":\"$TEST_CUSTOMER_EMAIL\",\"password\":\"$TEST_CUSTOMER_PASSWORD\"}"
 
 # Authenticated request
 curl -H "Authorization: Bearer $TOKEN" \

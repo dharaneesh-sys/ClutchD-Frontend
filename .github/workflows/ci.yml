@@ -35,5 +35,3 @@ jobs:
 
       - name: E2E Test
         run: npm run test:e2e
-        env:
-          NEXT_PUBLIC_DEMO_MODE: true

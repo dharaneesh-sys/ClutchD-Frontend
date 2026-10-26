@@ -5,9 +5,9 @@ paths verified against local `/home/dinusus/ClutchD-Backend/backend/app/api/v1/*
 NEW = no local backend route; needs backend work before wiring.
 
 Migration rule (all items): the frontend is real-data-only. Do not reintroduce
-local mock fallbacks, demo seeds, or fabricated success paths. Where a backend
-endpoint is missing, surface an honest error or empty state; local storage may
-only cache successful API responses.
+local fabricated fallbacks, seeded sample rows, or synthetic success paths.
+Where a backend endpoint is missing, surface an honest error or empty state;
+local storage may only cache successful API responses.
 
 ## 1. EXISTS — wire when backend is on (no backend changes needed)
 
@@ -34,7 +34,7 @@ only cache successful API responses.
 | settings data export | `GET /settings/export` (settings.py has GET/PUT/change-password/delete-account, no export) | server snapshot; local JSON export (src/lib/exportLocalUserData.js) stays as device-data path |
 | language switch | none (next-intl is client-side) | No backend needed — wire to src/lib/i18n when prioritized |
 
-## 3. Explicitly out of scope (not mocks)
+## 3. Explicitly out of scope (not synthetic data)
 
 - constants.js pricing/category/brand tables: legit static config, stays.
 - themeStore/toastStore localStorage/memory: correct as-is.

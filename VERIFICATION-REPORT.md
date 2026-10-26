@@ -1,5 +1,7 @@
 # CLUTCHD LIVE VERIFICATION REPORT — 2026-09-12 14:30–14:50 IST
 
+> Historical audit (pre-removal). Demo references below describe the old state; they are not current instructions.
+
 ## Version pins
 - Backend (server): `811705c` — `fix: reorder fitment endpoint params`, clean tree. Local backend HEAD is 6+ commits ahead (`f4fbea1`, `2174288`, `290edf5`, `512c471`, …) — NOT deployed.
 - Frontend: branch `clutchd-app-hardening` @ `4c5f857`. APK: `ClutchD-v1.6-funnel.apk` (built Sep 12 14:23, newer than HEAD, funnel URL verified in bundle, zero `localhost` refs).
@@ -13,7 +15,7 @@
 |---|---|
 | /health | 200 `{"status":"ok"}` |
 | /api/providers/nearby?lat=11.0168&lng=76.9558 | 200 — Vijay Kumar 4.7★ 0.0km + SpeedFix Auto Garage 1.95km |
-| login customer@demo.com/demo123456 | 200, 313-char JWT (sub + role customer) |
+| login QA customer account | 200, 313-char JWT (sub + role customer) |
 | wrong password | 401 `{"error":"Unauthorized","detail":"Invalid email or password"}` — no 500/hang |
 | WS /ws + token subprotocol | CONNECTED, auth accepted, OPEN 8s+, no 4401 |
 | Deviation (non-blocking) | No PONG handler server-side; app never listens for PONG — heartbeat is fire-and-forget by design both ends |
@@ -31,7 +33,7 @@ Marketplace: cart add 201 (qty 2) → cart get syncs → order POST **201** (`48
 - Persistence: verify job + order + history intact after restart. WS re-handshake post-restart: CONNECTED.
 - Retry safety (code + live): interceptors retry **only GET/HEAD/__isRetryable** (`api.js:143-144,195-196`); POST/PUT/PATCH/DELETE never auto-retried → no duplicate charges/orders possible from client retries. No double-POST evidence in server logs.
 - Token expiry honesty: expired 15-min access token → clean 401 `Not authenticated` (observed live), re-login restores. No hang.
-- ⚠️ ANOMALY: orders for customer@demo.com read **2 before** restart, **1 after** (only `48404572`). DB container untouched (3h uptime), no DELETEs in logs, no other writes in the window. Unexplained — needs a DB-level check before trusting order counts. Not claiming data loss.
+- ⚠️ ANOMALY: orders for the QA customer account read **2 before** restart, **1 after** (only `48404572`). DB container untouched (3h uptime), no DELETEs in logs, no other writes in the window. Unexplained — needs a DB-level check before trusting order counts. Not claiming data loss.
 - Not run (no device): airplane-mode toggle toasts, socket backoff timing under real radio loss. Code path returns honest "Server unreachable" (`extractApiError`, `api.js:221`).
 
 ## PHASE 4 — known gaps: ✅ MATCHES DOCUMENTED BEHAVIOR
@@ -63,7 +65,7 @@ Marketplace: cart add 201 (qty 2) → cart get syncs → order POST **201** (`48
   dispute → ticket `TKT-BCBAAE04` open; vehicle attach 200 (ownership-checked). OpenAPI 103 → 111 paths.
 - RED-3 closed: `notificationStore` now POSTs `/providers/device-tokens` {token, platform} and DELETEs by returned id;
   verified live 201 + 204. Old `/api/api/push/*` calls removed.
-- Orders anomaly resolved: host-DB ground truth = exactly 1 order for customer@demo.com (the verify order).
+- Orders anomaly resolved: host-DB ground truth = exactly 1 order for the QA customer account (the verify order).
   The earlier '2' was a misread on my side — no data loss, no phantom writes.
 - Cert demo tags: admin CertificationPanel now renders a Demo pill on all `cert-demo-*` seeds.
 - Full green: eslint 0, 278/278 tests, `npm run build` green.

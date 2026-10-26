@@ -220,10 +220,10 @@ Rules:
 
 ### 0.10 Real-data policy
 
-- The app has no demo mode, fixtures, synthetic records, fake users or mock API adapter. Every value comes from the live API or a cache of real API data.
+- The app has no synthetic mode, fixtures, seeded sample rows, fake users or fabricated API adapter. Every value comes from the live API or a cache of real API data.
 - Unsupported or missing values render `—`; never invent a fallback such as `1200` or `4.5 hrs`.
 - When the backend is unavailable, show an honest error or empty state. Do not fabricate success, balances, quotes, jobs or sessions.
-- Authentication is real only: no demo accounts, demo tokens or role-bypass identifiers.
+- Authentication is real only: no synthetic accounts, synthetic tokens or role-bypass identifiers.
 
 ### 0.11 Billing / pilot scope guard
 
