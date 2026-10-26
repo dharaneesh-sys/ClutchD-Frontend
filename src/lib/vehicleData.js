@@ -1,7 +1,7 @@
 /**
  * Vehicle data for VIN fitment — vehicle selector.
  *
- * Hardcoded demo data covering popular Indian car makes, models,
+ * Static reference catalog covering popular Indian car makes, models,
  * model years (2015–2025), and trim variants.
  *
  * Structure:

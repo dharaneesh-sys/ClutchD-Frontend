@@ -46,7 +46,7 @@ export default function FleetDashboardPage() {
           return;
         }
         // No local copy — a registration may exist server-side (e.g. signed
-        // up on another device). Backend decides; failure means demo/register.
+        // up on another device). The backend decides; failure shows the form.
         try {
           const api = (await import("@/lib/api")).default;
           const { data } = await api.get("/fleet/my-fleet");

@@ -166,6 +166,10 @@ function NewClaimForm({ isOpen, onClose, onSubmitted, completedServices }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!user?.id) {
+      toast.error("Please sign in to submit a warranty claim");
+      return;
+    }
     const errs = {};
     if (!selectedServiceId) errs.service = "Please select a service";
     if (!description.trim()) errs.description = "Please describe the issue";
@@ -176,7 +180,7 @@ function NewClaimForm({ isOpen, onClose, onSubmitted, completedServices }) {
     try {
       const selected = completedServices.find((s) => s.id === selectedServiceId);
 
-      // Convert uploaded photos to base64 data URLs for demo/localStorage persistence
+      // Convert uploaded photos to base64 data URLs for the offline cache
       let photoUrls = [];
       if (photos) {
         const files = Array.isArray(photos) ? photos : [photos];
@@ -192,8 +196,8 @@ function NewClaimForm({ isOpen, onClose, onSubmitted, completedServices }) {
         }
       }
 
-      WarrantyClaimsStore.submit({
-        userId: user?.id || "demo-cust-1",
+      await WarrantyClaimsStore.submit({
+        userId: user.id,
         userName: user?.name || "Customer",
         serviceId: selectedServiceId,
         serviceType: selected?.serviceType || selected?.issueTag || "general",
@@ -211,7 +215,7 @@ function NewClaimForm({ isOpen, onClose, onSubmitted, completedServices }) {
       setPhotos(null);
       setErrors({});
     } catch {
-      toast.error("Failed to submit claim");
+      toast.error("Couldn't submit your claim. Please try again.");
     } finally {
       setSubmitting(false);
     }
@@ -321,13 +325,16 @@ export default function WarrantyClaimsPage() {
   const fetchData = useCallback(async () => {
     setIsLoading(true);
     try {
-      const userId = user?.id || "demo-cust-1";
-      const userClaims = WarrantyClaimsStore.getUserClaims(userId);
+      if (!user?.id) {
+        setClaims([]);
+        setCompletedServices([]);
+        return;
+      }
+      const userClaims = WarrantyClaimsStore.getUserClaims(user.id);
       setClaims(userClaims);
 
-      // Load completed services from localStorage
-      // Do NOT fall back to demo mock data — that would leak fake
-      // completed services into real user accounts.
+      // Load completed services from the local service cache. Never synthesize
+      // entries: only real services already stored for this device are shown.
       let services = [];
       try {
         const raw = localStorage.getItem("clutchd_services");

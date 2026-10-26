@@ -6,7 +6,7 @@ import { refreshAccessToken, handleRefreshFailure } from "@/lib/authRefresh";
 
 // Public API path prefixes that should NOT trigger auth redirect on 401.
 // For these endpoints, the 401 is simply passed through so calling code
-// can fall back to demo data instead of redirecting to /auth.
+// can surface the error instead of redirecting to /auth.
 const PUBLIC_API_PATHS = ['/products', '/categories', '/health'];
 
 // Access-token TTL mirrors authStore — keeps 401-refresh tokens expiring client-side.
@@ -81,7 +81,7 @@ api.interceptors.response.use(
         // fall through to failure handling below
       }
 
-      // Refresh failed — drop tokens and redirect (unless demo session).
+      // Refresh failed — drop tokens and redirect.
       pendingRequests = [];
       handleRefreshFailure();
       // Reject with the ORIGINAL error so callers see the real failure.

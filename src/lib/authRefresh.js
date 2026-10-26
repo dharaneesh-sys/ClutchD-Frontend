@@ -106,7 +106,7 @@ export function refreshAccessToken() {
 
 /**
  * Force-logout UX shared by the 401 interceptor and authStore: drop tokens
- * and bounce to /auth. Skipped for demo/firebase-only sessions whose tokens
+ * and bounce to /auth. Skipped for firebase-only sessions whose tokens
  * can't validate against the real backend anyway.
  */
 export function handleRefreshFailure() {
@@ -114,7 +114,7 @@ export function handleRefreshFailure() {
   try {
     const stored = JSON.parse(localStorage.getItem("auth-storage") || "{}");
     const uid = stored?.state?.user?.id || "";
-    if (uid.startsWith("demo-") || uid.startsWith("firebase-")) return;
+    if (uid.startsWith("firebase-")) return;
   } catch {
     // ignore parse errors
   }

@@ -148,9 +148,7 @@ export default function FavoritesPage() {
         setFavorites((prev) => prev.filter((f) => f.product_id !== productId));
         toast.success("Removed from favorites");
       } catch {
-        // Optimistic removal with demo fallback
-        setFavorites((prev) => prev.filter((f) => f.product_id !== productId));
-        toast.success("Removed from favorites");
+        toast.error("Couldn't remove favorite. Please try again.");
       }
     },
     [toast]

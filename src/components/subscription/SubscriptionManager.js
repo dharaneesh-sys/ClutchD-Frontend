@@ -124,19 +124,11 @@ export function SubscriptionManager() {
           ? "Upgraded"
           : "Downgraded";
         toast.success(`${action} to ${targetPlan.name} plan successfully!`);
-
-        // If backend was offline, show a persistent info toast
-        if (!backendOnline) {
-          toast.info(
-            "Subscription setup will be available when the payment system is online. Your subscription is saved locally for demo purposes.",
-            { persistent: true, duration: 8000 }
-          );
-        }
       } else {
         toast.error(error || `Failed to subscribe to ${targetPlan.name} plan.`);
       }
     },
-    [currentPlanId, currentPlanIndex, subscribe, backendOnline, error, toast]
+    [currentPlanId, currentPlanIndex, subscribe, error, toast]
   );
 
   /**
@@ -208,7 +200,7 @@ export function SubscriptionManager() {
               </p>
               <p className="text-xs text-text-muted mt-1">
                 Subscription setup will be available when the payment system is
-                online. Changes are saved locally for demo purposes.
+                online. Changes require a live connection.
               </p>
             </div>
             <button

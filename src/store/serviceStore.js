@@ -263,9 +263,8 @@ export const useServiceStore = create((set, get) => ({
     try {
       const res = await api.get("/jobs/incoming");
       const jobs = res.data?.jobs || [];
-      const myJobs = jobs.filter(j => !j.id.startsWith("demo-req-seeded-"));
-      if (myJobs.length > 0) {
-        set({ activeRequest: myJobs[0] });
+      if (jobs.length > 0) {
+        set({ activeRequest: jobs[0] });
       }
     } catch {
       // Not critical — user can create a new request

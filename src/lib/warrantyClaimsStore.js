@@ -1,6 +1,6 @@
 "use client";
 
-import { BackendHealth } from "@/lib/backendHealth";
+import api from "@/lib/api";
 
 const STORAGE_KEY = "clutchd_warranty_claims";
 
@@ -63,10 +63,10 @@ export const WarrantyClaimsStore = {
   },
 
   /**
-   * Submit a new warranty claim.
-   * Falls back to localStorage when backend is unavailable.
+   * Submit a new warranty claim to the backend.
+   * The local cache is updated only after the API accepts the claim.
    */
-  submit: ({ userId, userName, serviceId, serviceType, issueTag, description, photos = [] }) => {
+  submit: async ({ userId, userName, serviceId, serviceType, issueTag, description, photos = [] }) => {
     const serviceLabel = (() => {
       const labels = {
         flat_tire: "Flat Tire", engine_failure: "Engine Failure",
@@ -95,29 +95,25 @@ export const WarrantyClaimsStore = {
       adminNotes: "",
     };
 
-    if (BackendHealth.isAvailable()) {
-      // Backend is alive — POST to API
-      // Using best-effort approach: try API, fall back to localStorage on failure
-      const tryApi = async () => {
-        try {
-          const api = (await import("@/lib/api")).default;
-          await api.post("/warranty/claims", claim);
-        } catch {
-          persist([...loadAll(), claim]);
-        }
-      };
-      tryApi();
-    }
-
-    // Always persist locally for demo mode / offline resilience
-    persist([...loadAll(), claim]);
-    return claim;
+    const res = await api.post("/warranty/claims", claim);
+    const saved = {
+      ...claim,
+      ...(res?.data && typeof res.data === "object" ? res.data : {}),
+    };
+    persist([...loadAll(), saved]);
+    return saved;
   },
 
   /**
-   * Update claim status (admin).
+   * Update claim status (admin). Backend-first: the local cache is updated
+   * only after the API accepts the change.
    */
-  updateStatus: (claimId, status, adminNotes = "") => {
+  updateStatus: async (claimId, status, adminNotes = "") => {
+    await api.patch(`/warranty/claims/${claimId}`, {
+      status,
+      admin_notes: adminNotes,
+    });
+
     const claims = loadAll();
     const idx = claims.findIndex((c) => c.id === claimId);
     if (idx === -1) return null;
@@ -134,4 +130,6 @@ export const WarrantyClaimsStore = {
 };
 
 
-// TODO(BACKEND_CONTRACTS §2 warranty): wire POST /warranty/claims + GET /warranty/claims?userId=; keep localStorage as offline fallback.
+// Backend contract: POST /warranty/claims and PATCH /warranty/claims/{id}.
+// localStorage holds only claims returned by those endpoints (offline cache);
+// no local-only claims are ever created.

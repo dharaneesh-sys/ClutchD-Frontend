@@ -5,11 +5,10 @@ import { persist } from "zustand/middleware";
 import { BULK_DISCOUNT_TIERS, FLEET_SERVICE_TYPES } from "@/lib/constants";
 import { formatIndianPlate } from "@/lib/plateFormatter";
 import {
+  getFleetRegistration,
   getFleetVehicles,
-  saveFleetVehicles,
   getFleetServiceHistory,
   saveFleetServiceHistory,
-  initDemoFleet,
   getFleetTier,
   saveFleetRegistration,
 } from "@/lib/fleet/fleetStorage";
@@ -63,26 +62,25 @@ export const useFleetStore = create(
       initialized: false,
 
       /**
-       * Initialize fleet data. Prefers the real backend registration
-       * (GET /fleet/my-fleet) when the user is signed in; falls back to
-       * localStorage (demo) otherwise. Call once on the dashboard mount.
+       * Initialize fleet data from the real backend (GET /fleet/my-fleet).
+       * The local cache is only used for instant paint; a failed request
+       * leaves the account empty instead of seeding fake data.
        */
       initialize: async () => {
         const vehicles = getFleetVehicles();
         const history = getFleetServiceHistory();
-        let fleet = null;
+        let fleet = getFleetRegistration();
         try {
           const api = (await import("@/lib/api")).default;
           const { data } = await api.get("/fleet/my-fleet");
           if (data?.fleets?.length) {
             fleet = { ...data.fleets[0] };
-            // Mirror to localStorage so registration checks elsewhere stay true
+            // Mirror the real response so registration checks stay warm.
             saveFleetRegistration(fleet);
           }
         } catch {
-          // Not signed in / backend unreachable — demo path below
+          // Backend unreachable — keep only the cached real registration.
         }
-        if (!fleet) fleet = initDemoFleet();
         set({
           fleetAccount: fleet,
           vehicles,
@@ -217,7 +215,7 @@ export const useFleetStore = create(
             const api = (await import("@/lib/api")).default;
             const { useAuthStore } = await import("@/store/authStore");
             const uid = useAuthStore.getState().user?.id || "";
-            if (!uid || uid.startsWith("demo-") || uid.startsWith("firebase-")) return;
+            if (!uid || uid.startsWith("firebase-")) return;
             await api.post("/fleet/bookings", {
               scheduledAt: `${selectedDate}T${selectedTime}:00Z`,
               vehicles: selectedVehicleIds.map((vid) => {
@@ -320,4 +318,4 @@ export const useFleetStore = create(
 );
 
 
-// TODO(BACKEND_CONTRACTS §2 fleet): wire POST /fleet/register, GET/POST /fleet/vehicles, GET/POST /fleet/bookings; keep demo seed as offline fallback.
+// Fleet registration, vehicles and bookings are backend-owned; local storage is an offline cache.

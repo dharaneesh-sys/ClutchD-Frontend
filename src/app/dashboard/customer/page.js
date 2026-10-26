@@ -160,7 +160,6 @@ export default function CustomerDashboard() {
   // backend rejects — bounce them to their own dashboard instead.
   useEffect(() => {
     if (!_hydrated || !isAuthenticated || !user?.id) return;
-    if (user.id.startsWith("demo-")) return;
     const allowed = ["customer", "admin"];
     if (!allowed.includes(user.role)) {
       router.replace(`/dashboard/${user.role || "customer"}`);
@@ -328,7 +327,7 @@ export default function CustomerDashboard() {
       subtitle="Customer Mode"
       user={user}
       mode="customer"
-      hideMobileMenu
+      hideMenu
       hasBottomNav
     >
 

@@ -272,72 +272,9 @@ describe("authStore", () => {
     });
   });
 
-  // ── setDemoUser ────────────────────────────────────
-  describe("setDemoUser", () => {
-    it("sets demo user and authenticates", () => {
-      const demoUser = {
-        id: "demo-1",
-        name: "Demo Customer",
-        role: "customer",
-      };
-
-      // setDemoUser calls require("../lib/tokenStore") via CJS which vitest
-      // may not mock with vi.mock("@/lib/tokenStore"). When the require fails
-      // or the zustand persist middleware defers rehydration, set() may not
-      // apply immediately.  Work around via setUser which uses the same path.
-      const fn = useAuthStore.getState().setDemoUser;
-      try {
-        fn(demoUser);
-      } catch {
-        // fallback — the dynamic require threw
-      }
-
-      // Check actual state — if setDemoUser applied its set(), this holds.
-      if (!useAuthStore.getState().user) {
-        // The persist middleware's delayed rehydration may have cleared it.
-        // Apply the intent directly via setUser + explicit setState.
-        useAuthStore.getState().setUser(demoUser);
-        useAuthStore.setState({ isLoading: false, error: null });
-      }
-
-      expect(useAuthStore.getState().user).toEqual(demoUser);
-      expect(useAuthStore.getState().isAuthenticated).toBe(true);
-      expect(useAuthStore.getState().isLoading).toBe(false);
-      expect(useAuthStore.getState().error).toBeNull();
-    });
-
-    it("sets isAuthenticated to false when passed null", () => {
-      try {
-        useAuthStore.getState().setDemoUser(null);
-      } catch {
-        useAuthStore.getState().setUser(null);
-      }
-
-      // If setDemoUser didn't fire, ensure null state
-      if (useAuthStore.getState().user !== null) {
-        useAuthStore.getState().setUser(null);
-      }
-
-      expect(useAuthStore.getState().user).toBeNull();
-      expect(useAuthStore.getState().isAuthenticated).toBe(false);
-    });
-  });
-
   // ── checkAuth ──────────────────────────────────────
   describe("checkAuth", () => {
     it("does nothing when not authenticated", async () => {
-      await useAuthStore.getState().checkAuth();
-
-      expect(mockPost).not.toHaveBeenCalled();
-    });
-
-    it("skips refresh for demo users", async () => {
-      useAuthStore.setState({
-        user: { id: "demo-1", role: "customer" },
-        isAuthenticated: true,
-        _hydrated: true,
-      });
-
       await useAuthStore.getState().checkAuth();
 
       expect(mockPost).not.toHaveBeenCalled();

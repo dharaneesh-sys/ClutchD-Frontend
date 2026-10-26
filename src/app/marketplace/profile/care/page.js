@@ -132,9 +132,7 @@ function RaiseTicketModal({ isOpen, onClose, onTicketCreated }) {
       onTicketCreated?.();
       handleClose();
     } catch {
-      toast.success("Ticket raised successfully! (Demo mode)");
-      onTicketCreated?.();
-      handleClose();
+      toast.error("Couldn't raise your ticket. Please try again.");
     } finally {
       setIsSubmitting(false);
     }

@@ -54,10 +54,9 @@ export default function MechanicDashboard() {
   // Role guard: only mechanics (and admins) belong here. A customer/garage/
   // seller that somehow lands on this route would see provider actions that
   // the backend then rejects ("Providers only") — bounce them to their own
-  // dashboard instead. Demo users keep read access for UI exploration.
+  // dashboard instead.
   useEffect(() => {
     if (!_hydrated || !isAuthenticated || !user?.id) return;
-    if (user.id.startsWith("demo-")) return;
     const allowed = ["mechanic", "admin"];
     if (!allowed.includes(user.role)) {
       router.replace(`/dashboard/${user.role || "customer"}`);

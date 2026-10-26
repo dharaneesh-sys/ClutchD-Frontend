@@ -15,6 +15,7 @@ import {
 import { cn, formatDate } from "@/lib/utils";
 import { resolveMediaUrl } from "@/lib/mediaUrl";
 import { WarrantyClaimsStore, CLAIM_STATUSES } from "@/lib/warrantyClaimsStore";
+import { useToastStore } from "@/store/toastStore";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
@@ -90,6 +91,7 @@ function ClaimRow({ claim, onReview }) {
 function ReviewClaimModal({ claim, isOpen, onClose, onUpdated }) {
   const [adminNotes, setAdminNotes] = useState(claim?.adminNotes || "");
   const [updating, setUpdating] = useState(false);
+  const toast = useToastStore();
 
   useEffect(() => {
     if (claim) {
@@ -102,11 +104,11 @@ function ReviewClaimModal({ claim, isOpen, onClose, onUpdated }) {
   const handleUpdateStatus = async (newStatus) => {
     setUpdating(true);
     try {
-      WarrantyClaimsStore.updateStatus(claim.id, newStatus, adminNotes);
+      await WarrantyClaimsStore.updateStatus(claim.id, newStatus, adminNotes);
       onUpdated();
       onClose();
     } catch {
-      // silent
+      toast.error("Couldn't update the claim. Please try again.");
     } finally {
       setUpdating(false);
     }

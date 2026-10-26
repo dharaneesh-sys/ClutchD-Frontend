@@ -20,7 +20,7 @@ test.describe.configure({ mode: 'serial' })
 // Parallel-safety: every customer-flow test provisions its OWN customer via a
 // real POST /api/auth/signup call (fixture creation through the public API —
 // no route mocks). The backend keeps ONE active request per customer, so tests
-// sharing customer@demo.com cancel each other's jobs mid-flight once workers
+// sharing one customer account cancel each other's jobs mid-flight once workers
 // run concurrently (restoreActiveRequest swaps the panel under them).
 
 const DELHI_MECHANIC = { email: 'delhi.mech@smoketest.com', password: 'smoke123456' }

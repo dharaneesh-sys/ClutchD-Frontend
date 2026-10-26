@@ -56,7 +56,7 @@ export function DashboardShell({
   sidebar,
   onReferral,
   className,
-  hideMobileMenu = false,
+  hideMenu = false,
   hasBottomNav = false,
   desktopSidebar = false,
 }) {
@@ -136,7 +136,7 @@ export function DashboardShell({
             <ModeIcon size={16} />
           </button>
           {/* Mobile menu button — only when sidebar nav is used */}
-          {!hideMobileMenu && (
+          {!hideMenu && (
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
               className="lg:hidden p-2 rounded-lg text-white/70 hover:text-white hover:bg-white/10"
@@ -150,7 +150,7 @@ export function DashboardShell({
       </header>
 
       {/* Mobile sidebar overlay — only when sidebar nav is used */}
-      {!hideMobileMenu && mobileMenuOpen && (
+      {!hideMenu && mobileMenuOpen && (
         <div
           className="lg:hidden fixed inset-0 z-40 bg-black/50"
           onClick={() => setMobileMenuOpen(false)}
@@ -159,7 +159,7 @@ export function DashboardShell({
       )}
 
       {/* Mobile sidebar — only when sidebar nav is used */}
-      {!hideMobileMenu && mobileMenuOpen && (
+      {!hideMenu && mobileMenuOpen && (
         <aside className={cn(
           "lg:hidden fixed top-0 right-0 h-full w-64 z-50 glass-strong flex flex-col",
           "bg-bg-card border-l border-border-subtle"

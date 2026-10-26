@@ -21,15 +21,6 @@ function loadAll() {
   if (typeof window === "undefined") return [];
 
   try {
-    // Purge any legacy demo rows from older app versions.
-    try {
-      const rawNow = localStorage.getItem(STORAGE_KEY);
-      if (rawNow && rawNow.includes("cert-demo-")) {
-        localStorage.removeItem(STORAGE_KEY);
-        localStorage.removeItem("clutchd_certifications_seeded");
-      }
-    } catch {}
-
     const raw = localStorage.getItem(STORAGE_KEY);
     _cache = raw ? JSON.parse(raw) : [];
   } catch {

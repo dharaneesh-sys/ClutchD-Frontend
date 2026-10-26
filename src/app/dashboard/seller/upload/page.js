@@ -32,7 +32,6 @@ export default function SellerUploadPage() {
   // Role guard: only sellers (and admins) belong here.
   useEffect(() => {
     if (!_hydrated || !isAuthenticated || !user?.id) return;
-    if (user.id.startsWith("demo-")) return;
     const allowed = ["seller", "admin"];
     if (!allowed.includes(user.role)) {
       router.replace(`/dashboard/${user.role || "customer"}`);

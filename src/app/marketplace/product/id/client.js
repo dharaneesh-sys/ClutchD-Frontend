@@ -341,31 +341,45 @@ export default function ProductDetailClient({ id: idProp }) {
                 variant="glass-lux"
                 className={cn(
                   "overflow-hidden transition-all duration-300",
-                  fitmentResult.compatible
+                  fitmentResult.compatible === true
                     ? "border-success/30 bg-success/[0.04]"
-                    : "border-[color-mix(in_srgb,var(--danger)_35%,transparent)] bg-[color-mix(in_srgb,var(--danger)_14%,transparent)]",
+                    : fitmentResult.compatible === false
+                      ? "border-[color-mix(in_srgb,var(--danger)_35%,transparent)] bg-[color-mix(in_srgb,var(--danger)_14%,transparent)]"
+                      : "border-border-subtle bg-bg-card",
                 )}
               >
                 <div className="flex items-start gap-4 p-5">
                   <div className={cn(
                     "flex h-10 w-10 shrink-0 items-center justify-center rounded-xl",
-                    fitmentResult.compatible
+                    fitmentResult.compatible === true
                       ? "bg-icon-highlight/15 text-icon-highlight"
-                      : "bg-[color-mix(in_srgb,var(--danger)_14%,transparent)] text-danger",
+                      : fitmentResult.compatible === false
+                        ? "bg-[color-mix(in_srgb,var(--danger)_14%,transparent)] text-danger"
+                        : "bg-surface-soft text-text-muted",
                   )}>
-                    {fitmentResult.compatible
+                    {fitmentResult.compatible === true
                       ? <CheckCircle2 size={22} />
-                      : <XCircle size={22} />
+                      : fitmentResult.compatible === false
+                        ? <XCircle size={22} />
+                        : <AlertTriangle size={22} />
                     }
                   </div>
                   <div className="min-w-0 flex-1">
                     <h4 className={cn(
                       "text-base font-semibold",
-                      fitmentResult.compatible ? "text-success" : "text-danger",
+                      fitmentResult.compatible === true
+                        ? "text-success"
+                        : fitmentResult.compatible === false
+                          ? "text-danger"
+                          : "text-text-primary",
                     )}>
-                      {fitmentResult.compatible ? "Compatible" : "Not Compatible"}
+                      {fitmentResult.compatible === true
+                        ? "Compatible"
+                        : fitmentResult.compatible === false
+                          ? "Not Compatible"
+                          : "Check unavailable"}
                     </h4>
-                    {fitmentResult.compatible ? (
+                    {fitmentResult.compatible === true ? (
                       <p className="mt-1 text-sm text-text-muted">
                         This part is verified to fit your{" "}
                         <span className="font-medium text-text-primary">
@@ -376,17 +390,13 @@ export default function ProductDetailClient({ id: idProp }) {
                       <div className="mt-2 space-y-1.5">
                         {fitmentResult.nonFittingParts.map((msg, i) => (
                           <p key={i} className="flex items-start gap-2 text-sm text-text-muted">
-                            <AlertTriangle size={14} className="mt-0.5 shrink-0 text-danger" />
+                            {fitmentResult.compatible === false && (
+                              <AlertTriangle size={14} className="mt-0.5 shrink-0 text-danger" />
+                            )}
                             {msg}
                           </p>
                         ))}
                       </div>
-                    )}
-                    {fitmentResult.source === "demo" && (
-                      <span className="mt-3 inline-flex items-center gap-1 rounded-full border border-[color-mix(in_srgb,var(--pending)_40%,transparent)] bg-[var(--pending-bg)] px-2.5 py-0.5 text-[0.6875rem] font-medium text-[var(--pending-text)]">
-                        <AlertTriangle size={11} />
-                        Demo check
-                      </span>
                     )}
                   </div>
                 </div>

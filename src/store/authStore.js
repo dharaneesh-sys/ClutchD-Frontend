@@ -23,7 +23,6 @@ function clearAllStorage() {
     localStorage.removeItem("clutchd_refresh_token");
     localStorage.removeItem("clutchd_token_expires_at");
     try { indexedDB.deleteDatabase("firebaseLocalStorageDb"); } catch {}
-    sessionStorage.removeItem("demo_token");
     sessionStorage.removeItem("auth-session");
     sessionStorage.removeItem("clutchd_access_token");
     // Clear cookies that may contain lingering session markers
@@ -190,11 +189,6 @@ export const useAuthStore = create(
           return;
         }
         const uid = typeof user.id === "string" ? user.id : "";
-        // Demo users have fake tokens — skip refresh against real backend
-        if (uid.startsWith("demo-")) {
-          set({ _isRestoring: false });
-          return;
-        }
         const isFirebase = uid.startsWith("firebase-");
         // firebase-* sessions are legacy ghosts from the old silent fallback —
         // they carry a fake token, so the refresh below fails 401 and drops

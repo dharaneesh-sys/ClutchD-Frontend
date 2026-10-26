@@ -37,7 +37,7 @@ export default function ProfilePage() {
   // Each fetch is independent and fails soft — tiles show "—" only when the
   // request errors, never a fake number.
   useEffect(() => {
-    if (!isAuthenticated || !user?.id || user?.id?.startsWith?.("demo-")) return;
+    if (!isAuthenticated || !user?.id) return;
     let cancelled = false;
     (async () => {
       try {

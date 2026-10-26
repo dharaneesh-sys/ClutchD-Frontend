@@ -21,7 +21,7 @@
 - **Navigation:** customer 5, marketplace 5, mechanic 5, garage 5, seller 4; fleet keeps its existing nav; admin keeps its desktop sidebar. No back arrow on top-level screens; back only on pushed/detail screens.
 - **Status/payment:** the exact status map is §0.8. Payment is immediate capture; there is no hold/release UI.
 - **Accessibility:** 4.5:1 body text, 3:1 large text, visible focus rings, keyboard modal trap, reduced-motion support, and status conveyed by text not colour alone (§0.9).
-- **Demo/billing:** sample amounts only behind `NEXT_PUBLIC_DEMO_MODE=true` and visibly labelled `Demo`; production unsupported values render `—`. Rent/incentives are out of pilot scope; `NEXT_PUBLIC_BILLING_ENABLED` defaults to false (§0.10–§0.11).
+- **Real data only:** every amount, quote, balance and fixture shown in the app comes from the live API or a cache of real API data. Unsupported values render `—`. Rent/incentives are out of pilot scope; `NEXT_PUBLIC_BILLING_ENABLED` defaults to false (§0.10–§0.11).
 
 ### 0.2 Surface system — flat by default
 
@@ -218,12 +218,12 @@ Rules:
 - **Targets and labels:** 44×44px minimum targets, programmatic labels on icon buttons, errors linked to their fields, alt text on meaningful images.
 - Dark mode is a full parity target; the same checks apply in both themes.
 
-### 0.10 Demo-mode labelling
+### 0.10 Real-data policy
 
-- `NEXT_PUBLIC_DEMO_MODE` is a build-time flag, default `false`. Demo fixtures, sample amounts and demo auth entries exist only when it is `true`.
-- Every sample amount or fixture value is visibly labelled `Demo` (for example a "Demo data" badge in the shell) and must never be presented as a real quote, payout or balance.
-- Production mode (`false`) renders unsupported values as `—`, ignores/clears persisted demo data, and never shows demo amounts. Remove fake fallbacks such as `1200` and `4.5 hrs`.
-- Demo data must not leak into production code paths, and production must not make demo network calls.
+- The app has no demo mode, fixtures, synthetic records, fake users or mock API adapter. Every value comes from the live API or a cache of real API data.
+- Unsupported or missing values render `—`; never invent a fallback such as `1200` or `4.5 hrs`.
+- When the backend is unavailable, show an honest error or empty state. Do not fabricate success, balances, quotes, jobs or sessions.
+- Authentication is real only: no demo accounts, demo tokens or role-bypass identifiers.
 
 ### 0.11 Billing / pilot scope guard
 

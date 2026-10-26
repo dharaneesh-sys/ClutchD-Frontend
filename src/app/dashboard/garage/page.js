@@ -40,7 +40,6 @@ export default function GarageDashboard() {
   // the backend rejects.
   useEffect(() => {
     if (!_hydrated || !isAuthenticated || !user?.id) return;
-    if (user.id.startsWith("demo-")) return;
     const allowed = ["garage", "admin"];
     if (!allowed.includes(user.role)) {
       router.replace(`/dashboard/${user.role || "customer"}`);

@@ -54,15 +54,15 @@ const INITIAL_FORM = {
 /**
  * Fleet/B2B registration form.
  *
- * Collects company details for a fleet account. In demo mode (when the
- * backend is unavailable), data is saved to localStorage. When the backend
- * is reachable, it submits via API.
+ * Collects company details and submits them to POST /fleet/register. A failed
+ * request surfaces an error; it never falls back to local-only registration.
  */
 export function FleetRegistrationForm({ onRegistered }) {
   const [form, setForm] = useState(INITIAL_FORM);
   const [errors, setErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isBackendAvailable, setIsBackendAvailable] = useState(null); // null = unchecked
+  const [submitError, setSubmitError] = useState("");
   const [submitted, setSubmitted] = useState(false);
 
   // Check backend availability on mount
@@ -112,6 +112,7 @@ export function FleetRegistrationForm({ onRegistered }) {
     if (!validate()) return;
 
     setIsSubmitting(true);
+    setSubmitError("");
 
     // Build the fleet account object
     const fleetAccount = {
@@ -134,25 +135,22 @@ export function FleetRegistrationForm({ onRegistered }) {
       serviceHistory: [],
     };
 
-    if (isBackendAvailable) {
-      try {
-        const api = (await import("@/lib/api")).default;
-        const res = await api.post("/fleet/register", fleetAccount);
-        if (res.data) {
-          saveFleetRegistration(res.data); // mirror to localStorage as fallback
-        }
-      } catch {
-        // Backend failed — fall back to localStorage
-        saveFleetRegistration(fleetAccount);
-      }
-    } else {
-      // Demo mode — persist to localStorage
-      saveFleetRegistration(fleetAccount);
+    try {
+      const api = (await import("@/lib/api")).default;
+      const res = await api.post("/fleet/register", fleetAccount);
+      const saved = res.data || fleetAccount;
+      // Mirror the real response so the dashboard can paint from cache.
+      saveFleetRegistration(saved);
+      setSubmitted(true);
+      onRegistered?.(saved);
+    } catch (err) {
+      setSubmitError(
+        err.response?.data?.detail ||
+          "Couldn't submit your registration. Check your connection and try again.",
+      );
+    } finally {
+      setIsSubmitting(false);
     }
-
-    setIsSubmitting(false);
-    setSubmitted(true);
-    onRegistered?.(fleetAccount);
   };
 
   if (submitted) {
@@ -184,9 +182,9 @@ export function FleetRegistrationForm({ onRegistered }) {
         <div>
           <h2 className="text-xl font-bold text-foreground">Fleet / B2B Registration</h2>
           <p className="text-sm text-text-muted">
-            {isBackendAvailable
-              ? "Register your fleet for priority dispatch"
-              : "Demo mode — data saved locally"}
+            {isBackendAvailable === false
+              ? "Registration requires a connection to the backend"
+              : "Register your fleet for priority dispatch"}
           </p>
         </div>
       </div>
@@ -195,7 +193,7 @@ export function FleetRegistrationForm({ onRegistered }) {
       {isBackendAvailable !== null && (
         <div className="mb-6">
           <Badge variant={isBackendAvailable ? "success" : "glass"}>
-            {isBackendAvailable ? "Backend Available" : "Demo Mode — Local Storage"}
+            {isBackendAvailable ? "Backend Available" : "Backend Unavailable"}
           </Badge>
         </div>
       )}
@@ -319,6 +317,12 @@ export function FleetRegistrationForm({ onRegistered }) {
             </div>
           </div>
         </div>
+
+        {submitError && (
+          <p role="alert" className="text-sm text-danger">
+            {submitError}
+          </p>
+        )}
 
         <Button type="submit" className="w-full" size="lg" isLoading={isSubmitting}>
           Register Fleet

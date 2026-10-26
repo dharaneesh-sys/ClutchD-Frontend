@@ -18,7 +18,7 @@ import { Shimmer } from "@/components/ui/Shimmer";
  * Determines whether a product's category matches the target category id.
  * Handles both exact matches and fuzzy prefix-based matches (e.g. "brakes"
  * matches "brake-parts" and vice versa) to accommodate differences between
- * product store demo data and PRODUCT_CATEGORIES slugs.
+ * product catalog categories and PRODUCT_CATEGORIES slugs.
  */
 function normalizeCat(s) {
   return s?.toLowerCase().replace(/[^a-z0-9]/g, "") || "";

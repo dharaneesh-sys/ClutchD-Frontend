@@ -177,7 +177,7 @@ export const payoutService = {
    *
    * Real data only: GET /admin/payouts computes the ledger from jobs and
    * captured payments. If the backend is unreachable the caller sees the
-   * error — no demo rows are ever fabricated.
+   * error — no fabricated rows are ever created.
    *
    * @returns {Promise<Array<Object>>}
    */
@@ -235,7 +235,7 @@ export const payoutService = {
    * Trigger a manual payout for a specific mechanic.
    *
    * Backend-only: POST /admin/payouts/manual records the real payout.
-   * Errors propagate to the caller — no mock transactions.
+   * Errors propagate to the caller — no local transactions.
    *
    * @param {string} mechanicId
    * @param {number} amount - Amount in rupees
@@ -284,4 +284,4 @@ export const payoutService = {
 };
 
 
-// TODO(BACKEND_CONTRACTS §2 payouts): wire GET /admin/payouts + POST /admin/payouts/manual + PUT /admin/payouts/schedule; keep mock only as 503 fallback.
+// TODO(BACKEND_CONTRACTS §2 payouts): wire GET /admin/payouts + POST /admin/payouts/manual + PUT /admin/payouts/schedule; backend-only, no local fallback.

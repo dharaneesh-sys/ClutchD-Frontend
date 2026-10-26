@@ -6,10 +6,10 @@ import { SUBSCRIPTION_PLANS } from "@/lib/constants";
 /**
  * Subscription store — manages the user's subscription plan state.
  *
- * On initialisation (hydration), it reads persisted subscription data
- * and also syncs from the subscription service's localStorage (the
- * service owns the source-of-truth for demo mode). This keeps the
- * store and the service in agreement.
+ * On initialisation (hydration), it reads the persisted snapshot and asks
+ * the subscription service for the current status. The service returns null
+ * until the backend exposes real subscription endpoints, so the store falls
+ * back to the Free plan.
  */
 export const useSubscriptionStore = create(
   persist(

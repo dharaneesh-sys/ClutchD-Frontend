@@ -118,12 +118,7 @@ function ReportProblemModal({ isOpen, onClose }) {
       setCategory("");
       onClose();
     } catch {
-      // Demo mode fallback
-      toast.success("Report submitted successfully! (Demo mode)");
-      setSubject("");
-      setMessage("");
-      setCategory("");
-      onClose();
+      toast.error("Couldn't submit your report. Please try again.");
     } finally {
       setIsSubmitting(false);
     }

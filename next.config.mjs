@@ -16,7 +16,6 @@ const nextConfig = {
     },
   }),
   env: {
-    NEXT_PUBLIC_DEMO_MODE: process.env.NEXT_PUBLIC_DEMO_MODE || "true",
     NEXT_PUBLIC_BUILD_MODE: process.env.NEXT_PUBLIC_BUILD_MODE || "",
   },
   // Headers only work with standalone/node.js runtime; skip for static export

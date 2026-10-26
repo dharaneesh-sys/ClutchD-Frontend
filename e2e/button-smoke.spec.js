@@ -16,11 +16,17 @@ test.describe.configure({ mode: 'serial' })
 // Parallel-safety: customer-role tests provision their OWN customer via a real
 // POST /api/auth/signup call (fixture creation through the public API — no
 // route mocks). The backend keeps ONE active request per customer, so sharing
-// customer@demo.com across concurrent workers lets one test's Cancel Request
+// one customer account across concurrent workers lets one test's Cancel Request
 // wipe another test's job mid-flight.
 
-const GARAGE = { email: 'garage@demo.com', password: 'demo123456' }
-const ADMIN = { email: 'admin@21907.com', password: 'clutchD123' }
+const GARAGE = {
+  email: process.env.TEST_GARAGE_EMAIL,
+  password: process.env.TEST_GARAGE_PASSWORD,
+}
+const ADMIN = {
+  email: process.env.TEST_ADMIN_EMAIL,
+  password: process.env.TEST_ADMIN_PASSWORD,
+}
 const DELHI = { latitude: 28.6139, longitude: 77.2090 }
 const API_URL = process.env.E2E_API_URL || 'http://localhost:8001/api'
 
@@ -193,6 +199,10 @@ test.describe('fleet dashboard buttons', () => {
 
 test.describe('garage dashboard buttons', () => {
   test('garage dashboard renders queue, real seeded profile, and action buttons', async ({ page }) => {
+    test.skip(
+      !GARAGE.email || !GARAGE.password,
+      'BLOCKED: real garage test account'
+    )
     await loginViaUi(page, GARAGE, /^Garage/)
     await page.waitForURL('**/dashboard/garage', { timeout: 20000 })
     // Desktop renders the h1; mobile collapses it behind "Open menu" and shows
@@ -223,6 +233,10 @@ test.describe('garage dashboard buttons', () => {
 
 test.describe('admin tables', () => {
   test('platform overview, users table with real rows, and jobs monitor render', async ({ page }) => {
+    test.skip(
+      !ADMIN.email || !ADMIN.password,
+      'BLOCKED: real admin test account'
+    )
     await loginViaUi(page, ADMIN) // backend ignores tile role for staff logins
     await page.waitForURL('**/admin', { timeout: 20000 })
     await expect(page.getByText('Platform Overview')).toBeVisible({ timeout: 20000 })

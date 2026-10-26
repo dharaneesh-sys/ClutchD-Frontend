@@ -1,31 +1,29 @@
 // Wave-4 Task 10 (customer + seller dashboards + upload) — flow test.
 // Seller dashboard surfaces store listings first; upload route + back-nav +
-// shared card/button/status language identical. No backend needed: a demo
-// seller session (demo- prefix skips refresh) renders both pages offline.
+// shared card/button/status language identical. Authenticated tests log in
+// through the real /auth UI with a real seller account from TEST_SELLER_*.
 import { test, expect } from "@playwright/test";
 
-const DEMO_SELLER_STORAGE = {
-  state: {
-    userId: "demo-seller-1",
-    userRole: "seller",
-    isAuthenticated: true,
-    _hydrated: true,
-    rememberMe: true,
-    user: {
-      id: "demo-seller-1",
-      role: "seller",
-      name: "Demo Seller",
-      email: null,
-      phone: null,
-    },
-  },
-  version: 0,
+const SELLER = {
+  email: process.env.TEST_SELLER_EMAIL,
+  password: process.env.TEST_SELLER_PASSWORD,
 };
 
-async function asDemoSeller(page) {
-  await page.addInitScript((storage) => {
-    window.localStorage.setItem("auth-storage", JSON.stringify(storage));
-  }, DEMO_SELLER_STORAGE);
+function requireSellerAccount() {
+  test.skip(
+    !SELLER.email || !SELLER.password,
+    "BLOCKED: real seller test account"
+  );
+}
+
+async function loginAsSeller(page) {
+  await page.goto("/auth");
+  await expect(page.getByRole("heading", { name: "Welcome Back" })).toBeVisible({ timeout: 20000 });
+  await page.getByRole("button", { name: /^Seller/ }).first().click();
+  await page.getByLabel("Email Address").fill(SELLER.email);
+  await page.getByLabel("Password").fill(SELLER.password);
+  await page.getByRole("button", { name: /Sign In/i }).click();
+  await page.waitForURL("**/dashboard/seller", { timeout: 20000 });
 }
 
 // The Next.js dev-tools overlay (<nextjs-portal>) is dev-build-only chrome
@@ -60,7 +58,8 @@ test.describe("signed-out access renders no seller chrome (routes frozen)", () =
 
 test.describe("seller dashboard surfaces listings first (store-first)", () => {
   test.beforeEach(async ({ page }) => {
-    await asDemoSeller(page);
+    requireSellerAccount();
+    await loginAsSeller(page);
   });
 
   test("welcome has no emoji, recent listings + view-all + upload entry render", async ({ page }) => {
@@ -101,7 +100,8 @@ test.describe("seller dashboard surfaces listings first (store-first)", () => {
 
 test.describe("seller upload page (upload route frozen)", () => {
   test.beforeEach(async ({ page }) => {
-    await asDemoSeller(page);
+    requireSellerAccount();
+    await loginAsSeller(page);
   });
 
   test("renders header, back nav, live count, and the full product form", async ({ page }) => {

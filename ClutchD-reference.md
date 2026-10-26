@@ -132,14 +132,13 @@ ClutchD-App/
 │   ├── lib/                    # Core application logic
 │   │   ├── api.js              # ⭐ Axios instance (interceptors, retry)
 │   │   ├── tokenStore.js       # localStorage JWT management
-│   │   ├── constants.js        # API_BASE_URL, DEMO_MODE, categories
+│   │   ├── constants.js        # API_BASE_URL, categories
 │   │   ├── utils.js            # cn(), formatCurrency(), formatDate()
 │   │   ├── validators.js       # Zod schemas
 │   │   ├── navigation.js       # Auth redirect helper
 │   │   ├── socket.js           # WebSocket connection
 │   │   ├── auth/               # Firebase Auth helpers
 │   │   ├── push/               # Push notification handlers
-│   │   ├── demo/               # Demo mode (mock data, interceptor)
 │   │   └── offline/            # Offline cache logic
 │   ├── store/                  # 14 Zustand state stores
 │   │   ├── authStore.js        # Auth, session, Google login
@@ -312,7 +311,7 @@ The primary layout wrapper for all dashboard views. Props:
 | `mode` | string | `"customer"` | One of: customer, mechanic, garage |
 | `sidebar` | array | — | Sidebar nav items `[{icon, label, onClick}]` |
 | `onReferral` | fn | — | Referral link handler |
-| `hideMobileMenu` | bool | `false` | Hide mobile hamburger menu |
+| `hideMenu` | bool | `false` | Hide mobile hamburger menu |
 | `hasBottomNav` | bool | `false` | Add bottom padding for BottomNav |
 | `desktopSidebar` | bool | `false` | Enable desktop sidebar mode |
 
@@ -692,36 +691,12 @@ docker compose restart api  # Restart API
 
 ---
 
-## 11. Demo Mode Architecture
+## 11. Demo Mode (removed)
 
-Demo mode is controlled by two separate flags (both must be `false` for production):
-
-| File | Logic | Notes |
-|------|-------|-------|
-| `lib/demo/demoFlag.js` | `DEMO_MODE = (NEXT_PUBLIC_DEMO_MODE === 'true')` | Standard env check |
-| `lib/constants.js` | `DEMO_MODE = (NEXT_PUBLIC_DEMO_MODE !== "false")` | Legacy: defaults to true |
-
-**When DEMO_MODE is active**, the Axios response interceptor routes through `apiInterceptor.js` which serves mock data for all endpoints.
-
-**Runtime triggers:**
-- `isRuntimeDemo`: set via `window.__DEMO_USER__` or `sessionStorage.demo_token` (toggled by DemoModeProvider)
-- `isDemoEmailLogin`: login email ends with `@demo.com`
-
-**Demo accounts are real backend accounts** — only the frontend intercepts their API calls to serve mock data.
-
-**Key files:**
-| File | Lines | Purpose |
-|------|-------|---------|
-| `lib/demo/apiInterceptor.js` | 771 lines | All mock endpoint handlers |
-| `lib/demo/mockData.js` | — | MOCK_USERS, MOCK_MECHANICS, MOCK_GARAGES, MOCK_VEHICLES, etc. |
-| `lib/demo/demoModeProvider.js` | — | React context + toggle + tour |
-| `lib/demo/demoFlag.js` | — | Boolean from env |
-| `lib/demo/demoMode.js` | — | Legacy demo mode |
-
-**User ID patterns:**
-- Firebase-signed-in users: `id` = Firebase UID (no prefix)
-- Demo users: `id` starts with `demo-` (`demo-cust-1`, `demo-mech-1`, etc.)
-- Firebase-fallback users: `id` starts with `firebase-`
+Demo mode and every mock API path were removed from the frontend. The app now
+calls the real backend exclusively: there is no demo environment flag, response
+interceptor, demo login path, or seeded frontend data. Local storage is used
+only as an offline cache of real API responses.
 
 ---
 
@@ -913,7 +888,7 @@ const result = await signInWithCredential(auth, credential);
 | CORS blocking Capacitor WebView | Capacitor uses `https://localhost` origin, not in allowed origins | Added `capacitor://localhost` and `https://localhost` to `CORS_ORIGINS` |
 | Parts Store icon appears green in dark mode | `--color-icon-highlight` changed from gold `#d4a011` (light) to green `#10b981` (dark) — inconsistent with other icons | Changed Parts Store tab to use `text-primary`/`text-text-muted` like all other tabs |
 | React 19 max-update-depth crash (#185) | Zustand `onRehydrateStorage` → `setState` fires during React's render cycle | Custom `merge` function sets `_isRestoring=false` post-hydration; `onRehydrateStorage` intentionally omits `setState` |
-| Demo data leaking into real accounts | Components fell back to MOCK_* data when API calls failed | Removed mock fallbacks; only inject for `demo-` prefixed users |
+| Mock data leaking into real accounts | Components fell back to fabricated data when API calls failed | Removed all mock fallbacks and demo-prefixed paths; every data path is real-only |
 | Dev overlay blocking UI on connection errors | Next.js Turbopack intercepts `console.error` and shows full-screen error | Swapped `console.error` → `console.warn` for Axios/WebSocket connection errors |
 
 ### 19.2 Open Issues
@@ -977,7 +952,6 @@ curl -H "Authorization: Bearer $TOKEN" \
 ```env
 NEXT_PUBLIC_API_URL=https://clutchd.tail14cfb9.ts.net:8000/api
 NEXT_PUBLIC_WS_URL=wss://clutchd.tail14cfb9.ts.net:8000/ws
-NEXT_PUBLIC_DEMO_MODE=false
 NEXT_PUBLIC_GOOGLE_CLIENT_ID=710446274779-8kn2hpj6bl7014gv19a63lipnehdedun.apps.googleusercontent.com
 NEXT_PUBLIC_FIREBASE_API_KEY=AIzaSyDV_ndlTW-n7-v1pLx5I9jV60YEWdFcF9o
 NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=clutchd-app.firebaseapp.com

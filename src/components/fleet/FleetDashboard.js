@@ -29,10 +29,9 @@ import { toCamelCase } from "@/lib/utils";
 import {
   getFleetRegistration,
   getFleetVehicles,
-  saveFleetVehicles,
   getFleetServiceHistory,
-  initDemoFleet,
   getFleetTier,
+  saveFleetRegistration,
 } from "@/lib/fleet/fleetStorage";
 
 const VEHICLE_TYPE_LABELS = {
@@ -210,32 +209,48 @@ function ServiceRow({ entry, onChat }) {
 /**
  * Fleet/B2B dashboard showing fleet vehicles, service history, and bulk discounts.
  *
- * Vehicles are DB-backed via GET/POST/DELETE /vehicles (per-user garage) when a
- * real session exists; localStorage demo fleet is the offline fallback.
+ * Vehicles are DB-backed via GET/POST/DELETE /vehicles; localStorage is only
+ * an offline cache of real API responses.
  */
 export function FleetDashboard({ onRegisterNew, onStartBooking, onChat }) {
   const user = useAuthStore((s) => s.user);
-  const isDemoUser = !user?.id || user?.id?.startsWith?.("demo-") || user?.id?.startsWith?.("firebase-");
   const [fleet, setFleet] = useState(null);
   const [vehicles, setVehicles] = useState([]);
   const [serviceHistory, setServiceHistory] = useState([]);
-  const [vehiclesFromBackend, setVehiclesFromBackend] = useState(false);
+  const [loadingFleet, setLoadingFleet] = useState(true);
   const [showAddVehicle, setShowAddVehicle] = useState(false);
   const [savingVehicle, setSavingVehicle] = useState(false);
   const [newVehicle, setNewVehicle] = useState({ make: "", model: "", year: "", plate: "", type: "light_truck" });
   const [formError, setFormError] = useState("");
 
-  // Load data: localStorage demo first (instant paint), then real API wins.
+  // Paint the cached real registration immediately, then refresh from the API.
   useEffect(() => {
-    const data = getFleetRegistration() || initDemoFleet();
-    setFleet(data);
+    let cancelled = false;
+    setFleet(getFleetRegistration());
     setVehicles(getFleetVehicles());
     setServiceHistory(getFleetServiceHistory());
+    (async () => {
+      try {
+        const { data } = await api.get("/fleet/my-fleet");
+        if (cancelled) return;
+        if (data?.fleets?.length) {
+          setFleet(data.fleets[0]);
+          saveFleetRegistration(data.fleets[0]);
+        }
+      } catch {
+        // Keep only the cached real registration — never seed fake data.
+      } finally {
+        if (!cancelled) setLoadingFleet(false);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
-  // Real vehicles from the backend — overrides demo seed for signed-in users.
+  // Real vehicles from the backend override the cached list.
   useEffect(() => {
-    if (isDemoUser) return;
+    if (!user?.id) return;
     let cancelled = false;
     (async () => {
       try {
@@ -253,15 +268,14 @@ export function FleetDashboard({ onRegisterNew, onStartBooking, onChat }) {
           status: "active",
         }));
         setVehicles(mapped);
-        setVehiclesFromBackend(true);
       } catch {
-        // keep demo/localStorage vehicles
+        // Keep the cached real list when the backend is unreachable.
       }
     })();
     return () => {
       cancelled = true;
     };
-  }, [isDemoUser]);
+  }, [user?.id]);
 
   const handleAddVehicle = async (e) => {
     e.preventDefault();
@@ -272,26 +286,17 @@ export function FleetDashboard({ onRegisterNew, onStartBooking, onChat }) {
     }
     setSavingVehicle(true);
     try {
-      if (vehiclesFromBackend && !isDemoUser) {
-        const { data } = await api.post("/vehicles", {
-          make: newVehicle.make.trim(),
-          model: newVehicle.model.trim(),
-          year: newVehicle.year ? parseInt(newVehicle.year, 10) : undefined,
-          license_plate: newVehicle.plate.trim() || undefined,
-        });
-        const v = toCamelCase(data);
-        setVehicles((prev) => [
-          ...prev,
-          { id: v.id, make: v.make, model: v.model, year: v.year, plate: v.licensePlate || "", type: "sedan", status: "active" },
-        ]);
-      } else {
-        const list = [
-          ...vehicles,
-          { id: "fv-" + Date.now(), make: newVehicle.make.trim(), model: newVehicle.model.trim(), year: newVehicle.year ? parseInt(newVehicle.year, 10) : "", plate: newVehicle.plate.trim(), type: newVehicle.type, status: "active" },
-        ];
-        setVehicles(list);
-        saveFleetVehicles(list);
-      }
+      const { data } = await api.post("/vehicles", {
+        make: newVehicle.make.trim(),
+        model: newVehicle.model.trim(),
+        year: newVehicle.year ? parseInt(newVehicle.year, 10) : undefined,
+        license_plate: newVehicle.plate.trim() || undefined,
+      });
+      const v = toCamelCase(data);
+      setVehicles((prev) => [
+        ...prev,
+        { id: v.id, make: v.make, model: v.model, year: v.year, plate: v.licensePlate || "", type: "sedan", status: "active" },
+      ]);
       setNewVehicle({ make: "", model: "", year: "", plate: "", type: "light_truck" });
       setShowAddVehicle(false);
     } catch (err) {
@@ -302,15 +307,12 @@ export function FleetDashboard({ onRegisterNew, onStartBooking, onChat }) {
   };
 
   const handleRemoveVehicle = async (id) => {
+    setFormError("");
     try {
-      if (vehiclesFromBackend && !isDemoUser) {
-        await api.delete(`/vehicles/${id}`);
-      }
-      const list = vehicles.filter((v) => v.id !== id);
-      setVehicles(list);
-      saveFleetVehicles(list);
+      await api.delete(`/vehicles/${id}`);
+      setVehicles((prev) => prev.filter((v) => v.id !== id));
     } catch (err) {
-      console.warn("[FleetDashboard] remove vehicle failed:", err?.message);
+      setFormError(err.response?.data?.detail || "Couldn't remove vehicle — check connection");
     }
   };
 
@@ -333,10 +335,23 @@ export function FleetDashboard({ onRegisterNew, onStartBooking, onChat }) {
     [serviceHistory]
   );
 
-  if (!fleet) {
+  if (loadingFleet) {
     return (
       <div className="flex items-center justify-center min-h-[50vh]">
         <div className="w-8 h-8 border-2 border-t-transparent rounded-full animate-spin border-primary" />
+      </div>
+    );
+  }
+
+  if (!fleet) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[50vh] gap-3 text-center">
+        <p className="text-text-muted">
+          We couldn&apos;t load your fleet account. Check your connection and try again.
+        </p>
+        <Button variant="outline" size="sm" onClick={onRegisterNew}>
+          Register fleet
+        </Button>
       </div>
     );
   }

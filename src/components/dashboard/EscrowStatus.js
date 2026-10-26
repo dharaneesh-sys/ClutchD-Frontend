@@ -14,7 +14,7 @@ import { Shield, CheckCheck, AlertTriangle, ArrowRight, ThumbsUp } from "lucide-
  *
  * When BackendHealth.isAvailable() === false the component still renders
  * correctly — all state transitions are managed optimistically in the
- * parent store so the UI works fully offline/demo.
+ * parent store.
  */
 export function escrowStatusVariant(status) {
   switch (status) {
