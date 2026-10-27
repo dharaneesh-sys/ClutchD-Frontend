@@ -18,9 +18,9 @@ describe("ScheduledAppointments card surface", () => {
   it("renders its flat variant as an opaque card, not a transparent glass surface", async () => {
     render(<ScheduledAppointments onBook={() => {}} />);
 
-    await screen.findByText("No upcoming appointments");
+    await screen.findByText("No upcoming bookings");
 
-    const card = screen.getByText("Scheduled Appointments").closest("div.relative.rounded-2xl");
+    const card = screen.getByText("Scheduled bookings").closest("div.relative.rounded-2xl");
     expect(card).toBeTruthy();
     expect(card.className).toContain("bg-[var(--surface)]");
     expect(card.className).toContain("border-[var(--color-border-subtle)]");

@@ -300,7 +300,7 @@ describe("ServiceHistory contract (D1/D5/D7/D15)", () => {
     expect(code).toContain('api.get("/jobs/history")');
     expect(code).toContain("PaymentModal");
     expect(code).toContain("downloadJobInvoice");
-    expect(code).toContain("WarrantyTerms");
+    expect(code).not.toContain("WarrantyTerms"); // unbacked warranty promise removed (task 18)
   });
 });
 

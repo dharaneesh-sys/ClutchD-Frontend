@@ -2,15 +2,16 @@
 
 import { useState, useEffect, useMemo, useCallback } from "react";
 import { GlassCard } from "@/components/ui/GlassCard";
-import { Badge } from "@/components/ui/Badge";
+import { Button } from "@/components/ui/Button";
 import { ConfirmModal } from "@/components/ui/ConfirmModal";
-import { Calendar, Download, MapPin, Loader2, Wrench, ChevronDown, ChevronUp, Receipt, RefreshCw, Mail, ShieldCheck, ListFilter } from "lucide-react";
+import { EmptyState } from "@/components/ui/EmptyState";
+import { StatusPill } from "@/components/ui/StatusPill";
+import { Skeleton } from "@/components/ui/Skeleton";
+import { Calendar, Download, Wrench, ChevronDown, ChevronUp, Receipt, Mail, ListFilter, AlertTriangle } from "lucide-react";
 import { cn, formatDate, formatTime } from "@/lib/utils";
-import { WarrantyTerms } from "@/components/dashboard/WarrantyTerms";
 import api, { extractApiError } from "@/lib/api";
 import { downloadJobInvoice, buildJobInvoiceText } from "@/lib/documentDownload";
-import { GST_RATE } from "@/lib/constants";
-import { useToast } from "@/hooks/useToast";
+import { GST_RATE, ISSUE_TAGS } from "@/lib/constants";
 import { useAuthStore } from "@/store/authStore";
 import { PaymentModal } from "@/components/dashboard/PaymentModal";
 
@@ -20,16 +21,23 @@ const FILTERS = [
   { key: "cancelled", label: "Cancelled" },
 ];
 
+const money = (v) => {
+  const n = Number(v);
+  return v === null || v === undefined || !Number.isFinite(n) ? "—" : `₹${n.toFixed(2)}`;
+};
+
+const issueLabel = (tag) => ISSUE_TAGS.find((t) => t.value === tag)?.label || tag || "Service";
+
 export function ServiceHistory() {
   const [history, setHistory] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState(null);
   const [paymentJob, setPaymentJob] = useState(null);
   const [expandedInvoice, setExpandedInvoice] = useState(null);
   const [deleteJob, setDeleteJob] = useState(null);
   const [deleteLoading, setDeleteLoading] = useState(false);
   const [errorToast, setErrorToast] = useState(null);
   const [filter, setFilter] = useState("all");
-  const { toast } = useToast();
 
   const filteredHistory = useMemo(() => {
     if (filter === "all") return history;
@@ -46,15 +54,16 @@ export function ServiceHistory() {
   }, [history, loading]);
 
   const fetchHistory = useCallback(async () => {
+    setLoadError(null);
     try {
       const res = await api.get("/jobs/history");
-      setHistory(res.data.jobs || []);
+      setHistory(res.data?.jobs || []);
     } catch (e) {
-      toast.error(extractApiError(e, "Failed to load history"));
+      setLoadError(extractApiError(e, "Couldn't load your history. Check your connection and try again."));
     } finally {
       setLoading(false);
     }
-  }, [toast]);
+  }, []);
 
   useEffect(() => {
     fetchHistory();
@@ -99,223 +108,144 @@ export function ServiceHistory() {
     setExpandedInvoice(expandedInvoice === jobId ? null : jobId);
   };
 
-  const showFilterTabs = !loading || history.length > 0;
+  const showFilterTabs = !loading && !loadError && history.length > 0;
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-3">
       {showFilterTabs && (
-        <div className="flex items-center gap-2 pb-1">
-          <ListFilter size={14} className="text-text-muted shrink-0" />
+        <div role="group" aria-label="Filter history" className="flex items-center gap-2 overflow-x-auto pb-1">
+          <ListFilter size={14} aria-hidden="true" className="text-[var(--text-muted)] shrink-0" />
           {FILTERS.map(({ key, label }) => (
             <button
               key={key}
+              type="button"
+              aria-pressed={filter === key}
               onClick={() => setFilter(key)}
               className={cn(
-                "px-3 py-1.5 rounded-lg text-xs font-semibold transition-all",
+                "min-h-[44px] shrink-0 rounded-full border px-4 text-sm font-medium transition-colors",
+                "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)]",
                 filter === key
-                  ? "bg-primary/10 text-primary border border-primary/20"
-                  : "text-text-muted hover:text-text-primary hover:bg-surface-soft"
+                  ? "border-[var(--primary)] bg-[var(--surface-soft)] text-[var(--primary-dark)]"
+                  : "border-[var(--border)] bg-[var(--surface-card)] text-[var(--text-muted)] hover:text-[var(--foreground)]"
               )}
             >
               {label}
-              {filterCounts && <span className="ml-1.5 text-[10px] opacity-60">({filterCounts[key]})</span>}
+              {filterCounts && <span className="ml-1 text-xs">({filterCounts[key]})</span>}
             </button>
           ))}
         </div>
       )}
 
       {loading ? (
-        <div className="flex flex-col items-center justify-center p-12">
-          <Loader2 size={40} className="animate-spin mb-4 text-icon-highlight" />
-          <p className="text-text-muted">Loading your history...</p>
+        <div className="space-y-3" aria-busy="true" aria-label="Loading your history">
+          {[1, 2, 3].map((i) => (
+            <div key={i} className="rounded-2xl border border-[var(--border)] bg-[var(--surface-card)] p-4 space-y-2">
+              <Skeleton className="w-1/2" />
+              <Skeleton className="w-1/3 h-3" />
+            </div>
+          ))}
+        </div>
+      ) : loadError ? (
+        <div role="alert" className="flex flex-col items-center gap-3 rounded-2xl border border-[var(--border)] bg-[var(--surface-card)] p-6 text-center">
+          <AlertTriangle size={24} aria-hidden="true" className="text-[var(--danger)]" />
+          <p className="text-sm text-[var(--danger-ink)]">{loadError}</p>
+          <Button variant="outline" size="sm" onClick={() => { setLoading(true); fetchHistory(); }}>
+            Retry
+          </Button>
         </div>
       ) : history.length === 0 ? (
-        <div className="flex flex-col items-center justify-center p-12 text-center rounded-2xl border bg-bg-card border-border-subtle">
-          <Wrench size={48} className="mb-4 opacity-50 text-text-dim" />
-          <h3 className="text-xl font-semibold mb-2 text-text-primary">No History Yet</h3>
-          <p className="text-text-muted">
-            Your completed and cancelled service requests will appear here.
-          </p>
-        </div>
+        <EmptyState
+          icon={Wrench}
+          title="No history yet"
+          description="Your completed and cancelled service requests will appear here."
+        />
       ) : filteredHistory.length === 0 ? (
-        <div className="text-center py-10 rounded-2xl border border-dashed bg-bg-card border-border-subtle">
-          <ListFilter size={28} className="mx-auto mb-2 text-text-dim opacity-50" />
-          <p className="text-sm font-medium text-text-muted">
-            No {filter === "all" ? "" : filter} service requests
-          </p>
-          <p className="text-xs text-text-dim mt-1">
-            {filter === "completed"
-              ? "Completed service requests will appear here."
-              : filter === "cancelled"
-                ? "Cancelled service requests will appear here."
-                : "Service requests will appear here once created."}
-          </p>
-        </div>
+        <EmptyState
+          icon={ListFilter}
+          title={`No ${filter} service requests`}
+          description={filter === "completed" ? "Completed service requests will appear here." : "Cancelled service requests will appear here."}
+        />
       ) : null}
-      {filteredHistory.length > 0 && filteredHistory.map(job => {
+
+      {!loading && !loadError && filteredHistory.map((job) => {
         const pricing = job.pricing;
-        const displayAmount = pricing?.totalAmount ?? job.priceEstimate?.min ?? 0;
+        const total = pricing?.totalAmount;
+        const hasTotal = total !== null && total !== undefined && Number.isFinite(Number(total));
+        const isCompleted = job.status === "completed";
         const isExpanded = expandedInvoice === job.id;
 
         return (
-          <GlassCard key={job.id} className="p-5 flex flex-col">
-            <div className="flex flex-col sm:flex-row gap-4 sm:items-center justify-between">
-              <div className="flex-1">
-                <div className="flex items-center gap-3 mb-2">
-                   <h4 className="text-lg font-bold text-text-primary">{job.issueTag}</h4>
-                   <Badge variant={job.status === "completed" ? "success" : "danger"}>
-                     {job.status.toUpperCase()}
-                   </Badge>
-                </div>
-                <p className="text-sm mb-3 line-clamp-2 text-text-primary">{job.description}</p>
-                
-                <div className="flex flex-wrap items-center gap-4 text-xs text-text-muted">
-                   <div className="flex items-center gap-1.5">
-                     <Calendar size={14} className="text-icon-highlight" />
-                     {job.createdAt ? `${formatDate(job.createdAt)} · ${formatTime(job.createdAt)}` : "Unknown Date"}
-                   </div>
-                   {job.mechanic && (
-                     <div className="flex items-center gap-1.5">
-                       <Wrench size={14} className="text-icon-highlight" />
-                       Serviced by: {job.mechanic.name}
-                     </div>
-                   )}
-                   {job.customerLocation && (
-                     <div className="flex items-center gap-1.5">
-                       <MapPin size={14} className="text-icon-highlight" />
-                       {Number(job.customerLocation.lat ?? 0).toFixed(4)}, {Number(job.customerLocation.lng ?? 0).toFixed(4)}
-                     </div>
-                   )}
-                </div>
+          <GlassCard key={job.id} data-testid="history-row" className="p-4">
+            <div className="flex items-start justify-between gap-3">
+              <div className="min-w-0">
+                <h4 className="truncate font-semibold text-[var(--foreground)]">{issueLabel(job.issueTag)}</h4>
+                <p className="mt-0.5 flex items-center gap-1.5 text-xs text-[var(--text-muted)]">
+                  <Calendar size={12} aria-hidden="true" />
+                  {job.createdAt ? `${formatDate(job.createdAt)} · ${formatTime(job.createdAt)}` : "—"}
+                </p>
               </div>
-              
-              {job.status === "completed" && (
-                <div className="flex sm:flex-col items-center sm:items-end justify-between pt-4 sm:pt-0 border-t sm:border-t-0 sm:border-l sm:pl-6 border-border-subtle">
-                  <div className="text-left sm:text-right mb-0 sm:mb-3">
-                    <p className="text-[10px] uppercase tracking-wider mb-1 text-text-dim">
-                      {job.isPaid ? "Amount Paid" : "Amount Due"}
-                    </p>
-                    <p className="text-xl font-bold text-icon-highlight">
-                      ₹{displayAmount.toFixed ? displayAmount.toFixed(2) : displayAmount}
-                    </p>
-                  </div>
-                  
-                  <div className="flex gap-2">
-                    {!job.isPaid ? (
-                      <button 
-                        onClick={() => setPaymentJob(job)}
-                        className="flex items-center gap-1.5 px-4 py-1.5 rounded-xl text-xs font-semibold text-[var(--background)] shadow transition-transform active:scale-95 bg-[var(--primary)] hover:bg-[var(--primary-dark)]"
-                      >
-                        Pay Now
-                      </button>
-                    ) : (
-                      <>
-                        {pricing && (
-                          <button 
-                            onClick={() => toggleInvoice(job.id)}
-                            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors bg-surface-soft text-icon-highlight hover:opacity-80 border border-border-subtle"
-                          >
-                            <Receipt size={14} />
-                            Invoice
-                            {isExpanded ? <ChevronUp size={12} /> : <ChevronDown size={12} />}
-                          </button>
-                        )}
-                        <button 
-                          onClick={() => downloadInvoice(job.id)}
-                          className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors bg-bg-card text-text-primary hover:bg-surface-soft hover:text-icon-highlight active:bg-surface-soft"
-                        >
-                          <Download size={14} />
-                          PDF
-                        </button>
-                        <button 
-                          onClick={() => emailInvoice(job)}
-                          className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors bg-bg-card text-text-primary hover:bg-surface-soft hover:text-icon-highlight active:bg-surface-soft"
-                        >
-                          <Mail size={14} />
-                          Email
-                        </button>
-                      </>
-                    )}
-                  </div>
-                  <button
-                    onClick={() => setDeleteJob(job)}
-                    className={`ml-2 flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold transition-colors text-[var(--danger)] hover:bg-[color-mix(in_srgb,var(--danger)_12%,transparent)] border border-[color-mix(in_srgb,var(--danger)_35%,transparent)]`}
-                  >
-                    Delete
-                  </button>
-                </div>
-              )}
+              <div className="flex shrink-0 flex-col items-end gap-1">
+                <StatusPill status={job.status} />
+                <span className="text-sm font-semibold text-[var(--foreground)]">{isCompleted ? money(total) : "—"}</span>
+              </div>
             </div>
 
-            {/* Inline Invoice Breakdown */}
-            {isExpanded && pricing && (
-              <div className="mt-4 p-4 rounded-xl border space-y-2 text-sm animate-in slide-in-from-top-1 bg-surface-soft border-border-subtle">
-                <div className="flex items-center gap-2 mb-3">
-                  <Receipt size={16} className="text-icon-highlight" />
-                  <h5 className="font-bold text-sm text-text-primary">
-                    Invoice #{job.id.substring(0, 8).toUpperCase()}
-                  </h5>
-                </div>
+            {job.description && <p className="mt-2 line-clamp-2 text-sm text-[var(--text-muted)]">{job.description}</p>}
+            {job.mechanic?.name && (
+              <p className="mt-1 flex items-center gap-1.5 text-xs text-[var(--text-muted)]">
+                <Wrench size={12} aria-hidden="true" /> {job.mechanic.name}
+              </p>
+            )}
 
-                <div className="flex justify-between text-text-primary">
-                  <span>Service Fee</span>
-                  <span className="font-medium">₹{Number(pricing.serviceAmount ?? 0).toFixed(2)}</span>
-                </div>
-                <div className="flex justify-between text-text-primary">
-                  <span>Convenience Fee</span>
-                  <span className="font-medium">₹{Number(pricing.convenienceFee ?? 0).toFixed(2)}</span>
-                </div>
-                <div className="flex justify-between text-text-primary">
-                  <span>Cancellation Fee</span>
-                  <span className="font-medium">₹{Number(pricing.cancellationFee ?? 0).toFixed(2)}</span>
-                </div>
-                <div className="flex justify-between text-text-primary">
-                  <span>Distance ({Number(pricing.distanceKm ?? 0).toFixed(1)} km)</span>
-                  <span className="font-medium">₹{Number(pricing.distanceFee ?? 0).toFixed(2)}</span>
-                </div>
-                <div className="flex justify-between text-text-primary">
-                  <span>GST ({GST_RATE * 100}%)</span>
-                  <span className="font-medium">₹{Number(pricing.gstAmount ?? 0).toFixed(2)}</span>
-                </div>
-                <div className="border-t pt-2 mt-2 flex justify-between font-bold border-border-subtle text-text-primary">
-                  <span>Grand Total</span>
-                  <span className="text-icon-highlight">₹{Number(pricing.totalAmount ?? 0).toFixed(2)}</span>
-                </div>
-
-                <div className="mt-3 pt-2 border-t space-y-1 border-border-subtle">
-                  <p className="text-[10px] text-text-dim">
-                    Service fee paid to your provider • Platform fees paid to ClutchD
-                  </p>
-                  {pricing.providerUpiId && (
-                    <p className="text-[10px] text-text-dim">
-                      Provider UPI: {pricing.providerUpiId}
-                    </p>
-                  )}
-                </div>
-
-                <div className="mt-4">
-                  <WarrantyTerms variant="inline" />
-                </div>
+            {isCompleted && (
+              <div className="mt-3 flex flex-wrap items-center gap-2 border-t border-[var(--border)] pt-3">
+                {!job.isPaid ? (
+                  hasTotal && (
+                    <Button size="sm" onClick={() => setPaymentJob(job)}>
+                      Pay {money(total)}
+                    </Button>
+                  )
+                ) : (
+                  <>
+                    <span className="mr-auto text-xs font-medium text-[var(--success)]">Paid</span>
+                    {pricing && (
+                      <Button size="sm" variant="secondary" onClick={() => toggleInvoice(job.id)} aria-expanded={isExpanded}>
+                        <Receipt size={14} aria-hidden="true" /> Invoice
+                        {isExpanded ? <ChevronUp size={12} aria-hidden="true" /> : <ChevronDown size={12} aria-hidden="true" />}
+                      </Button>
+                    )}
+                    <Button size="sm" variant="ghost" onClick={() => downloadInvoice(job.id)}>
+                      <Download size={14} aria-hidden="true" /> PDF
+                    </Button>
+                    <Button size="sm" variant="ghost" onClick={() => emailInvoice(job)}>
+                      <Mail size={14} aria-hidden="true" /> Email
+                    </Button>
+                  </>
+                )}
+                <Button size="sm" variant="ghost" className="text-[var(--danger-ink)]" onClick={() => setDeleteJob(job)}>
+                  Delete
+                </Button>
               </div>
             )}
 
-            {/* Always-visible warranty reference */}
-            {job.status === "completed" && !isExpanded && (
-              <div className="mt-4 pt-3 border-t border-border-subtle">
-                <div className="flex items-center gap-2 text-[10px] text-text-muted">
-                  <ShieldCheck size={12} className="text-icon-highlight shrink-0" />
-                  <span>
-                    Covered by our{" "}
-                    <button
-                      type="button"
-                      onClick={() => toggleInvoice(job.id)}
-                      className="underline hover:text-icon-highlight transition-colors"
-                    >
-                      warranty terms
-                    </button>
-                  </span>
+            {isExpanded && pricing && (
+              <dl className="mt-3 space-y-2 rounded-xl border border-[var(--border)] bg-[var(--surface-soft)] p-4 text-sm text-[var(--foreground)]">
+                <div className="mb-2 flex items-center gap-2 font-semibold">
+                  <Receipt size={16} aria-hidden="true" className="text-[var(--primary-dark)]" />
+                  Invoice #{String(job.id).substring(0, 8).toUpperCase()}
                 </div>
-              </div>
+                <div className="flex justify-between"><dt>Service</dt><dd>{money(pricing.serviceAmount)}</dd></div>
+                <div className="flex justify-between"><dt>Convenience fee</dt><dd>{money(pricing.convenienceFee)}</dd></div>
+                {Number(pricing.cancellationFee) > 0 && (
+                  <div className="flex justify-between"><dt>Cancellation fee</dt><dd>{money(pricing.cancellationFee)}</dd></div>
+                )}
+                <div className="flex justify-between"><dt>Distance</dt><dd>{money(pricing.distanceFee)}</dd></div>
+                <div className="flex justify-between"><dt>GST ({GST_RATE * 100}%)</dt><dd>{money(pricing.gstAmount)}</dd></div>
+                <div className="flex justify-between border-t border-[var(--border)] pt-2 font-semibold"><dt>Total</dt><dd>{money(pricing.totalAmount)}</dd></div>
+                {pricing.providerUpiId && (
+                  <p className="pt-1 text-xs text-[var(--text-muted)]">Provider UPI: {pricing.providerUpiId}</p>
+                )}
+              </dl>
             )}
           </GlassCard>
         );
@@ -325,7 +255,7 @@ export function ServiceHistory() {
         <PaymentModal
           isOpen={!!paymentJob}
           onClose={() => setPaymentJob(null)}
-          amount={paymentJob.pricing?.totalAmount ?? paymentJob.priceEstimate?.min ?? 0}
+          amount={paymentJob.pricing?.totalAmount ?? null}
           pricing={paymentJob.pricing}
           jobId={paymentJob.id}
           onSuccess={handlePaymentSuccess}
@@ -333,7 +263,7 @@ export function ServiceHistory() {
       )}
 
       {errorToast && (
-        <div className="fixed top-4 right-4 z-[100] px-4 py-3 rounded-xl border shadow-2xl text-sm font-medium bg-[color-mix(in_srgb,var(--danger)_12%,transparent)] border-[color-mix(in_srgb,var(--danger)_35%,transparent)] text-[var(--danger)]">
+        <div role="alert" className="fixed top-4 right-4 z-[100] px-4 py-3 rounded-xl border shadow-[var(--shadow-card)] text-sm font-medium bg-[var(--surface-card)] border-[var(--border)] text-[var(--danger-ink)]">
           {errorToast}
         </div>
       )}

@@ -54,14 +54,14 @@ function VehicleServiceJobCard({ job }) {
           )}
           <div className="flex items-center gap-3 text-xs text-text-muted">
             <span className="flex items-center gap-1">
-              <Calendar size={11} className="text-icon-highlight" />
+              <Calendar size={11} className="text-[var(--primary-dark)]" />
               {job.createdAt
                 ? formatDate(job.createdAt)
                 : "Unknown"}
             </span>
             {job.mechanic && (
               <span className="flex items-center gap-1">
-                <Wrench size={11} className="text-icon-highlight" />
+                <Wrench size={11} className="text-[var(--primary-dark)]" />
                 {job.mechanic.name}
               </span>
             )}
@@ -69,7 +69,7 @@ function VehicleServiceJobCard({ job }) {
         </div>
         {pricing?.totalAmount ? (
           <div className="text-right shrink-0">
-            <p className="text-sm font-bold text-icon-highlight">
+            <p className="text-sm font-bold text-[var(--primary-dark)]">
               ₹{Number(pricing.totalAmount || 0).toFixed(2)}
             </p>
           </div>
@@ -107,7 +107,7 @@ function VehicleCard({
       )}
     >
       {/* Vehicle icon */}
-      <div className="w-12 h-12 rounded-xl flex items-center justify-center mb-4 bg-surface-soft text-icon-highlight">
+      <div className="w-12 h-12 rounded-xl flex items-center justify-center mb-4 bg-[var(--surface-soft)] text-[var(--primary-dark)]">
         <Car size={24} />
       </div>
 
@@ -127,7 +127,7 @@ function VehicleCard({
       <div className="space-y-2">
         {/* Last service */}
         <div className="flex items-center gap-2 text-xs text-text-muted">
-          <History size={13} className="text-icon-highlight shrink-0" />
+          <History size={13} className="text-[var(--primary-dark)] shrink-0" />
           <span>
             {lastServiceDate
               ? `Last serviced ${formatDate(lastServiceDate)}`
@@ -167,7 +167,7 @@ function AddVehicleCard({ onClick }) {
         className={cn(
           "w-12 h-12 rounded-xl flex items-center justify-center mb-4",
           "bg-surface-soft group-hover:bg-bg-card transition-colors",
-          "text-icon-highlight"
+          "text-[var(--primary-dark)]"
         )}
       >
         <Plus size={24} />
@@ -338,7 +338,7 @@ export function VehicleList() {
             <div className="flex justify-center p-8">
               <Loader2
                 size={24}
-                className="animate-spin text-icon-highlight"
+                className="animate-spin text-[var(--primary-dark)]"
               />
             </div>
           ) : vehicleJobs.length > 0 ? (
