@@ -82,7 +82,7 @@ test.beforeEach(async ({ page }) => {
 async function ensureRequestPanel(page) {
   // Let the dashboard settle into either state (restored tracker or form).
   await page
-    .getByRole('heading', { name: /Service Status|Request Service/ })
+    .getByRole('heading', { name: /Service Status|What do you need\?/ })
     .waitFor({ timeout: 20000 })
   for (let i = 0; i < 3; i++) {
     const cancel = page.getByRole('button', { name: 'Cancel Request' })
@@ -91,7 +91,7 @@ async function ensureRequestPanel(page) {
     await cancel.click()
     await expect(cancel).toBeHidden({ timeout: 10000 })
   }
-  await expect(page.getByRole('heading', { name: 'Request Service' })).toBeVisible({ timeout: 15000 })
+  await expect(page.getByRole('heading', { name: 'What do you need?' })).toBeVisible({ timeout: 15000 })
 }
 
 async function loginAsCustomerAtDelhi(page, creds) {
@@ -128,7 +128,7 @@ test.describe('customer discovery → request → schedule (real backend)', () =
     )
     await loginViaUi(page, await signupFreshCustomer('login'))
     await page.waitForURL('**/dashboard/customer', { timeout: 20000 })
-    await expect(page.getByText(/Service Status|Request Service/)).toBeVisible({ timeout: 20000 })
+    await expect(page.getByText(/Service Status|What do you need\?/)).toBeVisible({ timeout: 20000 })
 
     const req = await authedReq
     expect(req.headers()['authorization']).toMatch(/^Bearer eyJ/) // real JWT from /api/auth/login
@@ -223,10 +223,10 @@ test.describe('customer discovery → request → schedule (real backend)', () =
     await expect(dialog).toBeHidden({ timeout: 10000 })
   })
 
-  test('Find Help Now creates a real dispatched job via POST /api/service/request', async ({ page }) => {
+  test('Request Service creates a real dispatched job via POST /api/service/request', async ({ page }) => {
     await loginAsCustomerAtDelhi(page, await signupFreshCustomer('dispatch'))
 
-    await page.getByLabel('What seems to be the issue?').selectOption('flat_tire')
+    await page.getByRole('radio', { name: 'Flat Tire' }).check({ force: true })
     await page
       .getByPlaceholder(/knocking sound/)
       .fill('Flat tire near India Gate, need urgent roadside help')
@@ -234,7 +234,7 @@ test.describe('customer discovery → request → schedule (real backend)', () =
     const postPromise = page.waitForResponse(
       (r) => r.url().includes('/service/request') && r.request().method() === 'POST'
     )
-    await page.getByRole('button', { name: /Find Help Now/i }).click()
+    await page.getByRole('button', { name: /Request Service/i }).click()
     const resp = await postPromise
 
     expect(resp.status()).toBe(200)
@@ -266,10 +266,10 @@ test.describe('location guard (device GPS denied)', () => {
 
     await expect(page.getByText('Location access was denied.')).toBeVisible({ timeout: 15000 })
 
-    await page.getByLabel('What seems to be the issue?').selectOption('flat_tire')
+    await page.getByRole('radio', { name: 'Flat Tire' }).check({ force: true })
     await page.getByPlaceholder(/knocking sound/).fill('Guard check: no pickup location set yet')
 
-    await page.getByRole('button', { name: /Find Help Now/i }).click()
+    await page.getByRole('button', { name: /Request Service/i }).click()
 
     // Guard toast from ServiceRequestPanel; no request is sent.
     await expect(page.getByText(/Set your pickup location first/)).toBeVisible({ timeout: 5000 })
@@ -294,7 +294,7 @@ test.describe('dispatch → acceptance → chat (two real sessions)', () => {
     const cust = await signupFreshCustomer('chat')
 
     await loginAsCustomerAtDelhi(custPage, cust)
-    await custPage.getByLabel('What seems to be the issue?').selectOption('flat_tire')
+    await custPage.getByRole('radio', { name: 'Flat Tire' }).check({ force: true })
     await custPage
       .getByPlaceholder(/knocking sound/)
       .fill(`Chat flow test [${cust.email}]: flat tire at Connaught Place roundabout`)
@@ -302,7 +302,7 @@ test.describe('dispatch → acceptance → chat (two real sessions)', () => {
     const postPromise = custPage.waitForResponse(
       (r) => r.url().includes('/service/request') && r.request().method() === 'POST'
     )
-    await custPage.getByRole('button', { name: /Find Help Now/i }).click()
+    await custPage.getByRole('button', { name: /Request Service/i }).click()
     const job = await (await postPromise).json()
     expect(job.status).toBe('providers_notified')
 

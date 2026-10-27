@@ -83,7 +83,7 @@ test.beforeEach(async ({ page }) => {
  */
 async function ensureRequestPanel(page) {
   await page
-    .getByRole('heading', { name: /Service Status|Request Service/ })
+    .getByRole('heading', { name: /Service Status|What do you need\?/ })
     .waitFor({ timeout: 20000 })
   for (let i = 0; i < 3; i++) {
     const cancel = page.getByRole('button', { name: 'Cancel Request' })
@@ -123,7 +123,7 @@ test.describe('customer dashboard buttons', () => {
     await loginViaUi(page, await signupFreshCustomer('tabs'))
     await page.waitForURL('**/dashboard/customer', { timeout: 20000 })
     await ensureRequestPanel(page)
-    await expect(page.getByRole('heading', { name: 'Request Service' })).toBeVisible({ timeout: 20000 })
+    await expect(page.getByRole('heading', { name: 'What do you need?' })).toBeVisible({ timeout: 20000 })
 
     await page.getByRole('button', { name: 'Vehicles', exact: true }).click()
     await expect(page.getByText(/No vehicles added|Select Vehicle|Add Vehicle|Your Garage/i).first()).toBeVisible({ timeout: 10000 })
@@ -139,7 +139,7 @@ test.describe('customer dashboard buttons', () => {
     await expect(page.getByText(/Categories|Products|Featured|Shop/i).first()).toBeVisible({ timeout: 15000 })
 
     await page.getByRole('button', { name: 'Service', exact: true }).click()
-    await expect(page.getByRole('heading', { name: 'Request Service' })).toBeVisible({ timeout: 10000 })
+    await expect(page.getByRole('heading', { name: 'What do you need?' })).toBeVisible({ timeout: 10000 })
   })
 
   test('SOS two-step confirm reaches the real /service/sos endpoint via menu', async ({ page }) => {
