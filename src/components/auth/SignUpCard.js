@@ -228,7 +228,7 @@ export function SignUpCard() {
         })}
       </div>
 
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+      <form onSubmit={handleSubmit(onSubmit)} noValidate className="space-y-6">
         <div className="max-h-[300px] overflow-y-auto px-1 -mx-1 custom-scrollbar">
           {selectedRole === "customer" && <CustomerFields register={register} errors={errors} />}
           {selectedRole === "seller" && <SellerFields register={register} errors={errors} />}

@@ -73,6 +73,8 @@ test.describe('G1 public surfaces', () => {
     await expect(email).toHaveValue('')
     await expect(page.getByLabel('Password')).toHaveValue('')
     await expect(page.locator('input[type=tel], input[name*=otp i]')).toHaveCount(0)
+    // Native browser validation must not pre-empt the designed inline errors.
+    await expect(page.locator('form').first()).toHaveAttribute('novalidate', '')
 
     await email.fill('not-an-email')
     await page.getByLabel('Password').fill('secret123')

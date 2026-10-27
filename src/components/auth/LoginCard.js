@@ -402,7 +402,7 @@ export function LoginCard({ onNeedSignUp }) {
         })}
       </div>
 
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
+      <form onSubmit={handleSubmit(onSubmit)} noValidate className="space-y-5">
         <Input
           label="Email Address"
           type="email"

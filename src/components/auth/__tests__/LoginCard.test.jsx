@@ -31,9 +31,11 @@ describe("LoginCard (task 12)", () => {
 
   it("invalid email shows inline validation and never calls login", async () => {
     render(<LoginCard />);
+    const form = screen.getByRole("button", { name: /Sign In/ }).closest("form");
+    expect(form).toHaveAttribute("novalidate");
     fireEvent.change(screen.getByLabelText("Email Address"), { target: { value: "not-an-email" } });
     fireEvent.change(screen.getByLabelText("Password"), { target: { value: "secret123" } });
-    fireEvent.submit(screen.getByRole("button", { name: /Sign In/ }).closest("form"));
+    fireEvent.submit(form);
     await waitFor(() => expect(screen.getAllByRole("alert").length).toBeGreaterThan(0));
     expect(login).not.toHaveBeenCalled();
   });
