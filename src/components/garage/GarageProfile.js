@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { MultiSelect } from "@/components/ui/MultiSelect";
 import { EXPERTISE_OPTIONS } from "@/lib/constants";
-import { Building2, MapPin, Phone, Clock, Users, Loader2, QrCode } from "lucide-react";
+import { Building2, MapPin, Phone, Clock, Users, Loader2, QrCode, Star } from "lucide-react";
 import { KycBadge } from "@/components/ui/KycBadge";
 import { useAuthStore } from "@/store/authStore";
 import { useToast } from "@/components/ui/ToastProvider";
@@ -53,28 +53,29 @@ export function GarageProfile() {
   };
 
   return (
-    <GlassCard variant="strong" className="p-4 sm:p-6 h-full flex flex-col">
+    <GlassCard className="p-4 sm:p-6 h-full flex flex-col">
       <div className="flex justify-between items-center mb-6">
-        <h2 className="text-xl font-bold tracking-tight text-text-primary">Garage Profile</h2>
+        <h2 className="text-lg font-semibold tracking-tight text-[var(--foreground)]">Garage Profile</h2>
         <Button variant="ghost" size="sm" onClick={() => setIsEditing(!isEditing)} disabled={saving}>
           {isEditing ? "Cancel" : "Edit Details"}
         </Button>
       </div>
 
-      <div className="flex items-center gap-4 mb-8 pb-6 border-b border-border-subtle">
-        <div className="w-20 h-20 rounded-2xl overflow-hidden flex items-center justify-center border-2 bg-surface-soft border-border-subtle">
+      <div className="flex items-center gap-4 mb-8 pb-6 border-b border-[var(--border)]">
+        <div className="w-16 h-16 shrink-0 rounded-2xl overflow-hidden flex items-center justify-center border bg-[var(--surface-soft)] border-[var(--border)]">
           {user?.image ? (
              <img src={resolveMediaUrl(user.image)} alt="Garage" className="w-full h-full object-cover" />
           ) : (
-            <Building2 size={32} className="text-icon-highlight" />
+            <Building2 size={32} className="text-[var(--primary-dark)]" />
           )}
         </div>
         <div>
-          <h3 className="text-xl font-semibold text-text-primary">{user?.name || user?.garageName || "Your Garage"}</h3>
-           <p className="text-sm text-text-muted">Managed by {user?.ownerName || "Owner"}</p>
+          <h3 className="text-xl font-semibold text-[var(--foreground)]">{user?.name || user?.garageName || "Your Garage"}</h3>
+           {user?.ownerName && <p className="text-sm text-[var(--text-muted)]">Managed by {user.ownerName}</p>}
           <div className="flex items-center gap-3 mt-2">
-              <div className="flex items-center text-xs text-icon-highlight">
-                ⭐ {user?.rating ?? "—"} <span className="ml-1 text-text-dim">Rating</span>
+              <div className="flex items-center gap-1 text-xs text-[var(--text-muted)]">
+                <Star size={12} aria-hidden="true" className="fill-[var(--pending)] text-[var(--pending)]" />
+                {user?.rating ?? "—"} rating
               </div>
               <KycBadge user={user} />
           </div>
@@ -139,17 +140,17 @@ export function GarageProfile() {
           />
         ) : (
           <div>
-              <label className="mb-2 block text-sm font-medium text-text-muted">Services Offered</label>
+              <label className="mb-1.5 block text-sm font-medium text-[var(--foreground)]">Services Offered</label>
             <div className="flex flex-wrap gap-2">
                {user?.services?.length > 0 ? user.services.map(exp => {
                  const label = EXPERTISE_OPTIONS.find(o => o.value === exp)?.label || exp;
                  return (
-                    <span key={exp} className="px-2.5 py-1 rounded-md text-xs font-medium bg-surface-soft border border-border-subtle text-text-primary">
+                    <span key={exp} className="px-2.5 py-1 rounded-lg text-xs font-medium bg-surface-soft border border-[var(--border)] text-[var(--foreground)]">
                       {label}
                     </span>
                  )
                }) : (
-                 <span className="text-xs text-text-dim">No services set</span>
+                 <span className="text-xs text-[var(--text-muted)]">— No services set</span>
                )}
             </div>
           </div>
@@ -167,19 +168,19 @@ export function GarageProfile() {
           />
         ) : (
           <div>
-              <label className="mb-2 block text-sm font-medium text-text-muted">UPI ID</label>
-             <div className="flex items-center gap-2 px-3 py-2.5 rounded-xl border text-sm bg-surface-soft border-border-subtle text-text-primary">
-               <QrCode size={14} className="text-icon-highlight" />
-              {user?.upiId || <span className="text-text-dim">Not set — add your UPI ID to receive payouts</span>}
+              <label className="mb-1.5 block text-sm font-medium text-[var(--foreground)]">UPI ID</label>
+             <div className="flex items-center gap-2 px-3 py-2.5 rounded-xl border text-sm bg-[var(--surface-soft)] border-[var(--border)] text-[var(--foreground)]">
+               <QrCode size={14} className="text-[var(--primary-dark)]" />
+              {user?.upiId || <span className="text-[var(--text-muted)]">— Not set. Add your UPI ID to receive payouts.</span>}
             </div>
           </div>
         )}
       </div>
 
       {isEditing && (
-        <div className="mt-6 pt-6 border-t flex justify-end border-border-subtle">
+        <div className="mt-6 pt-6 border-t flex justify-end border-[var(--border)]">
           <Button onClick={handleSave} disabled={saving}>
-            {saving ? <><Loader2 size={16} className="animate-spin mr-2" /> Saving...</> : "Save Details"}
+            {saving ? <><Loader2 size={16} className="animate-spin" aria-hidden="true" /> Saving...</> : "Save Details"}
           </Button>
         </div>
       )}

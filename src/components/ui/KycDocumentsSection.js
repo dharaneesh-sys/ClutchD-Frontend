@@ -62,11 +62,11 @@ export function KycDocumentsSection({ role }) {
   return (
     <GlassCard className="p-4 sm:p-6">
       <div className="flex items-center justify-between mb-4">
-        <h2 className="text-lg font-bold tracking-tight text-text-primary">KYC Documents</h2>
+        <h2 className="text-lg font-semibold tracking-tight text-[var(--foreground)]">KYC Documents</h2>
         <KycBadge user={user} />
       </div>
 
-      <p className="text-sm text-text-muted mb-5">
+      <p className="text-sm text-[var(--text-muted)] mb-5">
         {status === "verified"
           ? "Your identity is verified. You can replace your documents below if they change."
           : status === "submitted"
@@ -87,8 +87,8 @@ export function KycDocumentsSection({ role }) {
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-5">
         <div>
-          <label className="mb-2 flex items-center gap-1.5 block text-sm font-medium text-text-muted">
-            <IdCard size={14} className="text-icon-highlight" />
+          <label className="mb-2 flex items-center gap-1.5 block text-sm font-medium text-[var(--text-muted)]">
+            <IdCard size={14} className="text-[var(--primary-dark)]" />
             Aadhaar Card
           </label>
           <FileUpload
@@ -104,8 +104,8 @@ export function KycDocumentsSection({ role }) {
           )}
         </div>
         <div>
-          <label className="mb-2 flex items-center gap-1.5 block text-sm font-medium text-text-muted">
-            <IdCard size={14} className="text-icon-highlight" />
+          <label className="mb-2 flex items-center gap-1.5 block text-sm font-medium text-[var(--text-muted)]">
+            <IdCard size={14} className="text-[var(--primary-dark)]" />
             {docLabel}
           </label>
           <FileUpload
@@ -129,11 +129,11 @@ export function KycDocumentsSection({ role }) {
       >
         {uploading ? (
           <>
-            <Loader2 size={14} className="animate-spin mr-2" /> Uploading...
+            <Loader2 size={14} className="animate-spin" aria-hidden="true" /> Uploading...
           </>
         ) : (
           <>
-            <UploadCloud size={14} className="mr-2" />
+            <UploadCloud size={14} aria-hidden="true" />
             {status === "pending" ? "Submit Documents" : "Update Documents"}
           </>
         )}
