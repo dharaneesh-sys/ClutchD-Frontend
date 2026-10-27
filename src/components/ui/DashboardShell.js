@@ -35,15 +35,15 @@ const MODE_CONFIG = {
     icon: Wrench,
     label: "Provider Mode",
     color: "primary",
-    textClass: "text-primary-light",
-    avatarClass: "bg-primary/15 dark:bg-[var(--color-primary-rgb)]/15 border border-primary/30 text-primary-light",
+    textClass: "text-[var(--primary-dark)]",
+    avatarClass: "bg-[var(--surface-soft)] border border-[var(--border)] text-[var(--primary-dark)]",
   },
   fleet: {
     icon: Truck,
     label: "Fleet Mode",
     color: "info",
-    textClass: "text-sky-600 dark:text-sky-300",
-    avatarClass: "bg-sky-500/15 dark:bg-sky-500/20 border border-sky-500/30 text-sky-600 dark:text-sky-300",
+    textClass: "text-[var(--primary-dark)]",
+    avatarClass: "bg-[var(--surface-soft)] border border-[var(--border)] text-[var(--primary-dark)]",
   },
 };
 
@@ -59,6 +59,7 @@ export function DashboardShell({
   hideMenu = false,
   hasBottomNav = false,
   desktopSidebar = false,
+  greeting,
 }) {
   const router = useRouter();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -68,13 +69,22 @@ export function DashboardShell({
   return (
     <div className={cn("min-h-[100dvh] w-full flex flex-col", className)}>
       {/* Header */}
+      {/* Flat header: gear mark, optional greeting, bell, avatar. */}
       <header className={cn(
-        "glass-lux flex justify-between items-center px-4 lg:px-6 py-3 lg:py-4 flex-shrink-0 relative z-50",
-        "border-b border-border-subtle"
+        "flex justify-between items-center gap-3 px-4 lg:px-6 py-3 lg:py-4 flex-shrink-0 relative z-50",
+        "pt-[max(0.75rem,env(safe-area-inset-top))] pl-[max(1rem,env(safe-area-inset-left))] pr-[max(1rem,env(safe-area-inset-right))]",
+        "bg-[var(--surface-card)] border-b border-[var(--border)]"
       )}>
-        {/* Left: Logo */}
-        <div className="flex items-center gap-2 lg:gap-3">
-          <Logo size="md" showText />
+        {/* Left: Logo (+ greeting on mobile) */}
+        <div className="flex min-w-0 items-center gap-2 lg:gap-3">
+          <Logo size="md" showText={!greeting} className={greeting ? "lg:hidden" : undefined} />
+          {greeting && <Logo size="md" showText className="hidden lg:flex" />}
+          {greeting && (
+            <div className="min-w-0 lg:hidden">
+              <p className="truncate text-xs text-[var(--text-muted)]">{greeting.eyebrow || "Welcome back"}</p>
+              <p className="truncate text-base font-semibold text-[var(--foreground)]">{greeting.name}</p>
+            </div>
+          )}
         </div>
 
         {/* Center: Title/Subtitle (desktop only) */}
@@ -82,7 +92,7 @@ export function DashboardShell({
           {title && (
             <h1 className={cn(
               "text-lg font-bold tracking-tight",
-              "text-text-primary"
+              "text-[var(--foreground)]"
             )}>
               {title}
             </h1>
@@ -104,7 +114,7 @@ export function DashboardShell({
             <div className="flex items-center gap-2">
               <span className={cn(
                 "text-sm font-semibold",
-                "text-text-primary"
+                "text-[var(--foreground)]"
               )}>
                 {user?.name || config.label}
               </span>
@@ -129,7 +139,7 @@ export function DashboardShell({
             onClick={() => router.push("/marketplace/profile")}
             aria-label="View profile"
             className={cn(
-              "w-9 h-9 lg:w-10 lg:h-10 rounded-full flex items-center justify-center transition-transform hover:scale-105",
+              "w-11 h-11 shrink-0 rounded-full flex items-center justify-center transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)]",
               config.avatarClass
             )}
           >
@@ -139,7 +149,7 @@ export function DashboardShell({
           {!hideMenu && (
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="lg:hidden p-2 rounded-lg text-white/70 hover:text-white hover:bg-white/10"
+              className="lg:hidden flex h-11 w-11 items-center justify-center rounded-lg text-[var(--text-muted)] hover:text-[var(--foreground)] hover:bg-[var(--surface-soft)]"
               aria-label={mobileMenuOpen ? "Close menu" : "Open menu"}
               aria-expanded={mobileMenuOpen}
             >
@@ -152,7 +162,7 @@ export function DashboardShell({
       {/* Mobile sidebar overlay — only when sidebar nav is used */}
       {!hideMenu && mobileMenuOpen && (
         <div
-          className="lg:hidden fixed inset-0 z-40 bg-black/50"
+          className="lg:hidden fixed inset-0 z-40 bg-[var(--glass-overlay-scrim)]"
           onClick={() => setMobileMenuOpen(false)}
           aria-hidden="true"
         />
@@ -161,14 +171,14 @@ export function DashboardShell({
       {/* Mobile sidebar — only when sidebar nav is used */}
       {!hideMenu && mobileMenuOpen && (
         <aside className={cn(
-          "lg:hidden fixed top-0 right-0 h-full w-64 z-50 glass-strong flex flex-col",
-          "bg-bg-card border-l border-border-subtle"
+          "lg:hidden fixed top-0 right-0 h-full w-64 z-50 flex flex-col pt-[env(safe-area-inset-top)]",
+          "bg-[var(--surface-card)] border-l border-[var(--border)]"
         )}>
-          <div className="p-4 border-b flex items-center justify-between">
+          <div className="p-4 border-b border-[var(--border)] flex items-center justify-between">
             <Logo size="md" showText />
             <button
               onClick={() => setMobileMenuOpen(false)}
-              className="p-2 rounded-lg hover:bg-white/10"
+              className="flex h-11 w-11 items-center justify-center rounded-lg text-[var(--text-muted)] hover:bg-[var(--surface-soft)]"
               aria-label="Close menu"
             >
               <X size={20} />
@@ -184,7 +194,7 @@ export function DashboardShell({
                 }}
                 className={cn(
                   "w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-colors mb-2",
-                  "text-text-muted hover:bg-surface-soft hover:text-text-primary"
+                  "text-[var(--text-muted)] hover:bg-[var(--surface-soft)] hover:text-[var(--foreground)]"
                 )}
               >
                 <item.icon size={18} />
@@ -200,7 +210,7 @@ export function DashboardShell({
               }}
               className={cn(
                 "w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-colors mb-2",
-                "text-text-muted hover:bg-surface-soft hover:text-text-primary"
+                "text-[var(--text-muted)] hover:bg-[var(--surface-soft)] hover:text-[var(--foreground)]"
               )}
             >
               <User size={18} />
@@ -216,7 +226,7 @@ export function DashboardShell({
                 }}
                 className={cn(
                   "w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-colors mb-2",
-                  "text-text-muted hover:bg-surface-soft hover:text-text-primary"
+                  "text-[var(--text-muted)] hover:bg-[var(--surface-soft)] hover:text-[var(--foreground)]"
                 )}
               >
                 <Gift size={18} />
@@ -231,7 +241,9 @@ export function DashboardShell({
       {/* Main content */}
       <main className={cn(
         "flex-1",
-        hasBottomNav ? "pb-20" : "pb-4 lg:pb-6",
+        // hasBottomNav: true = bar at every width; "mobile" = bar hidden at lg.
+        hasBottomNav ? "pb-[calc(64px+env(safe-area-inset-bottom)+1rem)]" : "pb-4 lg:pb-6",
+        hasBottomNav === "mobile" && "lg:pb-6",
         desktopSidebar && "lg:ml-16"
       )}>
         <div className="p-3 sm:p-4 lg:p-6">

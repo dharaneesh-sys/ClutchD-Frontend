@@ -19,32 +19,41 @@ import {
   MECHANIC_TABS,
   GARAGE_TABS,
   SELLER_TABS,
+  MARKETPLACE_TABS,
+  TAB_ALIASES,
+  resolveTab,
 } from "@/components/dashboard/DashboardTabBar";
 
 beforeEach(() => {
   navMocks.push.mockClear();
 });
 
-describe("DashboardTabBar controlled mode (D9.2)", () => {
-  it("renders all 5 customer tabs with the frozen IA", () => {
-    render(<DashboardTabBar active="request" onSelect={() => {}} />);
-    expect(
-      DASHBOARD_TABS.map((t) => t.label),
-    ).toEqual(["Service", "Schedule", "Vehicles", "History", "Parts Store"]);
-    for (const t of DASHBOARD_TABS) {
-      expect(
-        screen.getByRole("button", { name: t.label }),
-      ).toBeInTheDocument();
-    }
+describe("Nav matrix (plan: authoritative)", () => {
+  it.each([
+    ["customer", DASHBOARD_TABS, ["Service", "Schedule", "Vehicles", "History", "Store"]],
+    ["marketplace", MARKETPLACE_TABS, ["Home", "Categories", "Search", "Cart", "Profile"]],
+    ["mechanic", MECHANIC_TABS, ["Home", "Navigation", "Earnings", "History", "Support"]],
+    ["garage", GARAGE_TABS, ["Home", "Jobs", "Analytics", "Garage", "Support"]],
+    ["seller", SELLER_TABS, ["Dashboard", "Listings", "Sales", "Upload"]],
+  ])("%s tabs are exactly the approved items", (_role, tabs, labels) => {
+    expect(tabs.map((t) => t.label)).toEqual(labels);
+    render(<DashboardTabBar tabs={tabs} active={tabs[0].key} onSelect={() => {}} />);
+    expect(screen.getAllByRole("button")).toHaveLength(labels.length);
   });
 
-  it("marks the active tab with aria-current + 3dp indicator + pill (D15.4.2)", () => {
+  it("never renders a back arrow", () => {
+    render(<DashboardTabBar active="request" onSelect={() => {}} />);
+    expect(screen.queryByRole("button", { name: /back/i })).toBeNull();
+  });
+});
+
+describe("DashboardTabBar controlled mode", () => {
+  it("marks the active tab with aria-current and the soft pill", () => {
     render(<DashboardTabBar active="schedule" onSelect={() => {}} />);
     const tab = screen.getByRole("button", { name: "Schedule" });
     expect(tab).toHaveAttribute("aria-current", "page");
-    const indicator = tab.querySelector(".bg-primary.rounded-full");
-    expect(indicator).not.toBeNull();
-    expect(tab.className).toMatch(/bg-surface-soft/);
+    expect(tab.querySelector("span").className).toMatch(/var\(--surface-soft\)/);
+    expect(screen.getByRole("button", { name: "Service" })).not.toHaveAttribute("aria-current");
   });
 
   it("selects in place via onSelect without navigating", () => {
@@ -55,62 +64,47 @@ describe("DashboardTabBar controlled mode (D9.2)", () => {
     expect(navMocks.push).not.toHaveBeenCalled();
   });
 
-  it("tab buttons use rounded-xl + type scale + elevation token (D4/D6/D3)", () => {
-    const { container } = render(
-      <DashboardTabBar active="request" onSelect={() => {}} />,
-    );
+  it("is a fixed glass bar with safe-area padding and ≥44px items", () => {
+    const { container } = render(<DashboardTabBar active="request" onSelect={() => {}} />);
     const nav = container.querySelector('nav[aria-label="Dashboard"]');
-    expect(nav).not.toBeNull();
+    expect(nav.className).toMatch(/fixed/);
+    expect(nav.className).toMatch(/var\(--glass-overlay-bg\)/);
+    expect(nav.className).toMatch(/backdrop-blur/);
+    expect(nav.className).toMatch(/safe-area-inset-bottom/);
     expect(nav.className).not.toMatch(/dark:/);
-    expect(nav.className).not.toMatch(/0_-4px_20px/);
     expect(nav.style.boxShadow).toBe("var(--elevation-2)");
-    const label = screen
-      .getByRole("button", { name: "Service" })
-      .querySelector("span");
-    expect(label.className).toMatch(/type-label-2/);
+    for (const btn of screen.getAllByRole("button")) {
+      expect(btn.className).toMatch(/min-h-\[44px\]/);
+    }
+  });
+
+  it("renders a count badge when provided", () => {
+    render(<DashboardTabBar tabs={GARAGE_TABS} active="dashboard" onSelect={() => {}} badges={{ jobs: 3 }} />);
+    expect(screen.getByRole("button", { name: "Jobs" }).textContent).toContain("3");
   });
 });
 
-describe("DashboardTabBar link mode (D9.2 deep links frozen)", () => {
+describe("DashboardTabBar link mode (deep links)", () => {
   it("deep-links to the customer dashboard tab", () => {
     render(<DashboardTabBar active="request" />);
     fireEvent.click(screen.getByRole("button", { name: "History" }));
-    expect(navMocks.push).toHaveBeenCalledWith(
-      "/dashboard/customer?tab=history",
-    );
+    expect(navMocks.push).toHaveBeenCalledWith("/dashboard/customer?tab=history");
   });
 
-  it("mechanic tabs keep their explicit deep-link paths", () => {
-    expect(MECHANIC_TABS.map((t) => t.key)).toEqual([
-      "jobs",
-      "navigation",
-      "earnings",
-      "store",
-    ]);
-    render(<DashboardTabBar active="jobs" tabs={MECHANIC_TABS} />);
+  it("partner tabs push their explicit ?tab= paths", () => {
+    render(<DashboardTabBar tabs={MECHANIC_TABS} />);
     fireEvent.click(screen.getByRole("button", { name: "Earnings" }));
-    expect(navMocks.push).toHaveBeenCalledWith(
-      "/dashboard/mechanic?tab=earnings",
-    );
+    expect(navMocks.push).toHaveBeenCalledWith("/dashboard/mechanic?tab=earnings");
+    for (const tab of [...MECHANIC_TABS, ...GARAGE_TABS, ...SELLER_TABS]) {
+      expect(tab.path).toMatch(/^\/dashboard\//);
+    }
   });
 
-  it("garage and seller tab sets keep keys + paths", () => {
-    expect(GARAGE_TABS.map((t) => t.key)).toEqual([
-      "dashboard",
-      "profile",
-      "analytics",
-      "store",
-    ]);
-    expect(SELLER_TABS.map((t) => t.key)).toEqual([
-      "dashboard",
-      "listings",
-      "sales",
-      "upload",
-    ]);
-    for (const tab of [...GARAGE_TABS, ...SELLER_TABS]) {
-      // Parts Store tabs surface the primary commerce route (D10);
-      // the rest deep-link back to their role dashboard.
-      expect(tab.path).toMatch(tab.key === "store" ? /^\/marketplace$/ : /^\/dashboard\//);
-    }
+  it("resolveTab keeps legacy deep links working", () => {
+    expect(resolveTab(MECHANIC_TABS, "jobs", TAB_ALIASES.mechanic)).toBe("home");
+    expect(resolveTab(MECHANIC_TABS, "earnings", TAB_ALIASES.mechanic)).toBe("earnings");
+    expect(resolveTab(MECHANIC_TABS, "bogus", TAB_ALIASES.mechanic)).toBe("home");
+    expect(resolveTab(GARAGE_TABS, "analytics", TAB_ALIASES.garage)).toBe("analytics");
+    expect(resolveTab(GARAGE_TABS, null, TAB_ALIASES.garage)).toBe("dashboard");
   });
 });

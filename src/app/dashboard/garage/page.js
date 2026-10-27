@@ -4,16 +4,22 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 
 import { useAuthStore } from "@/store/authStore";
-import { LayoutDashboard, Users, BarChart3, ShoppingBag, MessageSquare } from "lucide-react";
-import { ConnectionIndicator } from "@/components/ui/ConnectionIndicator";
-import { NotificationBell } from "@/components/ui/NotificationBell";
+import { useTrackingStore } from "@/store/trackingStore";
+import { MessageSquare } from "lucide-react";
 import { DashboardShell } from "@/components/ui/DashboardShell";
+import {
+  DashboardTabBar,
+  GARAGE_TABS,
+  TAB_ALIASES,
+  resolveTab,
+} from "@/components/dashboard/DashboardTabBar";
+import { PartnerTabStrip } from "@/components/partner/PartnerTabStrip";
+import { PartnerSupport } from "@/components/partner/PartnerSupport";
 import { ChatPanel } from "@/components/ui/ChatPanel";
 import { GarageProfile } from "@/components/garage/GarageProfile";
 import { KycDocumentsSection } from "@/components/ui/KycDocumentsSection";
 import { GarageJobQueue } from "@/components/garage/GarageJobQueue";
 import { GarageAnalytics } from "@/components/garage/GarageAnalytics";
-import { Logo } from "@/components/ui/Logo";
 import SplashScreen from "@/components/ui/SplashScreen";
 import { NAVIGATION_EVENT } from "@/lib/navigation";
 
@@ -26,7 +32,7 @@ export default function GarageDashboard() {
     // Deep-link support: /dashboard/garage?tab=analytics opens that tab.
     if (typeof window === "undefined") return "dashboard";
     const t = new URLSearchParams(window.location.search).get("tab");
-    return ["dashboard", "profile", "analytics"].includes(t) ? t : "dashboard";
+    return resolveTab(GARAGE_TABS, t, TAB_ALIASES.garage);
   });
 
   useEffect(() => {
@@ -79,13 +85,6 @@ export default function GarageDashboard() {
     return <SplashScreen />;
   }
 
-  const sidebarItems = [
-    { icon: LayoutDashboard, label: "Dashboard", onClick: () => setActiveTab("dashboard") },
-    { icon: Users, label: "Garage Profile", onClick: () => setActiveTab("profile") },
-    { icon: BarChart3, label: "Analytics", onClick: () => setActiveTab("analytics") },
-    { icon: ShoppingBag, label: "Parts Store", onClick: () => router.push("/marketplace") },
-  ];
-
   const openChat = (jobId, customerName) => {
     setChatJobId(jobId);
     setChatOtherName(customerName || "Customer");
@@ -98,9 +97,13 @@ export default function GarageDashboard() {
       subtitle="Business Mode"
       user={user}
       mode="garage"
-      sidebar={sidebarItems}
+      hideMenu
+      hasBottomNav="mobile"
+      greeting={user?.name ? { name: user.name } : undefined}
     >
-      <div className="flex-1 pb-4 lg:pb-6">
+      <div className="flex-1 pb-4 lg:pb-6 space-y-6">
+        <PartnerTabStrip tabs={GARAGE_TABS} active={activeTab} onSelect={setActiveTab} />
+
         {activeTab === "dashboard" && (
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 lg:gap-6">
             <div className="lg:col-span-5 xl:col-span-4 flex flex-col gap-4 lg:gap-6">
@@ -136,6 +139,10 @@ export default function GarageDashboard() {
           </div>
         )}
 
+        {activeTab === "jobs" && <GarageJobQueue onChat={openChat} />}
+
+        {activeTab === "support" && <PartnerSupport />}
+
         {activeTab === "analytics" && (
           <div className="grid grid-cols-1 gap-4 lg:gap-6">
             <div>
@@ -148,7 +155,7 @@ export default function GarageDashboard() {
 
       {/* ── Chat button (appears when a job is active) ──────────────── */}
       {chatJobId && (
-        <div className="fixed bottom-6 right-6 z-[800] flex flex-col items-end gap-3">
+        <div className="fixed bottom-[calc(64px+env(safe-area-inset-bottom)+16px)] lg:bottom-6 right-4 lg:right-6 z-[800] flex flex-col items-end gap-3">
           {chatOpen && (
             <ChatPanel
               jobId={chatJobId}
@@ -161,7 +168,7 @@ export default function GarageDashboard() {
             onClick={() => setChatOpen((o) => !o)}
             className="w-14 h-14 rounded-full flex items-center justify-center transition-all active-press
                        shadow-lg
-                       bg-primary text-[var(--background)] hover-lift"
+                       bg-[var(--primary)] text-[var(--on-primary)]"
             aria-label={chatOpen ? "Close chat" : "Chat with customer"}
           >
             <MessageSquare size={22} />
@@ -169,6 +176,12 @@ export default function GarageDashboard() {
         </div>
       )}
 
+      <DashboardTabBar
+        tabs={GARAGE_TABS}
+        active={activeTab}
+        onSelect={setActiveTab}
+        className="lg:hidden"
+      />
     </DashboardShell>
   );
 }

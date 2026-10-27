@@ -14,12 +14,18 @@ import { IncomingJobs } from "@/components/mechanic/IncomingJobs";
 import { EarningsChart } from "@/components/mechanic/EarningsChart";
 import { useAuthStore } from "@/store/authStore";
 import { useTrackingStore } from "@/store/trackingStore";
-import { Briefcase, MapPin, DollarSign, ShoppingBag, X, MessageSquare } from "lucide-react";
-import { NotificationBell } from "@/components/ui/NotificationBell";
-import { ConnectionIndicator } from "@/components/ui/ConnectionIndicator";
+import { Briefcase, X, MessageSquare, History } from "lucide-react";
 import { DashboardShell } from "@/components/ui/DashboardShell";
+import { EmptyState } from "@/components/ui/EmptyState";
+import {
+  DashboardTabBar,
+  MECHANIC_TABS,
+  TAB_ALIASES,
+  resolveTab,
+} from "@/components/dashboard/DashboardTabBar";
+import { PartnerTabStrip } from "@/components/partner/PartnerTabStrip";
+import { PartnerSupport } from "@/components/partner/PartnerSupport";
 import { ChatPanel } from "@/components/ui/ChatPanel";
-import { Logo } from "@/components/ui/Logo";
 import SplashScreen from "@/components/ui/SplashScreen";
 import { NAVIGATION_EVENT } from "@/lib/navigation";
 import { Modal } from "@/components/ui/Modal";
@@ -39,9 +45,10 @@ export default function MechanicDashboard() {
   const router = useRouter();
   const [activeTab, setActiveTab] = useState(() => {
     // Deep-link support: /dashboard/mechanic?tab=earnings opens that tab.
-    if (typeof window === "undefined") return "jobs";
+    // Legacy ?tab=jobs resolves to Home.
+    if (typeof window === "undefined") return "home";
     const t = new URLSearchParams(window.location.search).get("tab");
-    return ["jobs", "navigation", "earnings"].includes(t) ? t : "jobs";
+    return resolveTab(MECHANIC_TABS, t, TAB_ALIASES.mechanic);
   });
   const [jobsPanelOpen, setJobsPanelOpen] = useState(true);
 
@@ -101,13 +108,6 @@ export default function MechanicDashboard() {
     return <SplashScreen />;
   }
 
-  const sidebarItems = [
-    { icon: Briefcase, label: "Jobs", onClick: () => setActiveTab("jobs") },
-    { icon: MapPin, label: "Navigation", onClick: () => setActiveTab("navigation") },
-    { icon: DollarSign, label: "Earnings", onClick: () => setActiveTab("earnings") },
-    { icon: ShoppingBag, label: "Parts Store", onClick: () => router.push("/marketplace") },
-  ];
-
   const openChat = (jobId, customerName) => {
     setChatJobId(jobId);
     setChatOtherName(customerName || "Customer");
@@ -120,35 +120,14 @@ export default function MechanicDashboard() {
       subtitle="Provider Mode"
       user={user}
       mode="mechanic"
-      sidebar={sidebarItems}
+      hideMenu
+      hasBottomNav="mobile"
+      greeting={user?.name ? { name: user.name.split(" ")[0] } : undefined}
     >
       <div className="flex-1 pb-4 lg:pb-6 space-y-6">
-        {/* Desktop tab navigation */}
-        <div className="hidden lg:flex items-center gap-2 p-1 rounded-2xl bg-surface-soft border border-border-subtle w-fit">
-          {sidebarItems.map((item, index) => {
-            const isStore = item.label === "Parts Store";
-            const tabKey = item.label.toLowerCase().replace(" ", "");
-            const isActive = !isStore && activeTab === tabKey;
-            return (
-              <button
-                key={index}
-                onClick={item.onClick}
-                className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium transition-all ${
-                  isStore
-                    ? "text-text-muted hover:text-text-primary hover:bg-bg-card/50 border border-transparent"
-                    : isActive
-                      ? "bg-bg-card shadow-sm border border-border-subtle text-text-primary"
-                      : "text-text-muted hover:text-text-primary hover:bg-bg-card/50 border border-transparent"
-                }`}
-              >
-                <item.icon size={16} />
-                <span>{item.label}</span>
-              </button>
-            );
-          })}
-        </div>
+        <PartnerTabStrip tabs={MECHANIC_TABS} active={activeTab} onSelect={setActiveTab} />
 
-        {activeTab === "jobs" && (
+        {activeTab === "home" && (
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 lg:gap-6">
             <div className="lg:col-span-4 flex flex-col gap-4 lg:gap-6">
               <AvailabilityToggle />
@@ -211,6 +190,16 @@ export default function MechanicDashboard() {
           </div>
         )}
 
+        {activeTab === "history" && (
+          <EmptyState
+            icon={History}
+            title="Job history"
+            description="Your completed and cancelled jobs will appear here."
+          />
+        )}
+
+        {activeTab === "support" && <PartnerSupport />}
+
         {activeTab === "earnings" && (
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 lg:gap-6">
             <div className="lg:col-span-4 flex flex-col gap-4 lg:gap-6">
@@ -228,7 +217,7 @@ export default function MechanicDashboard() {
 
       {/* ── Chat button (appears when a job is active) ──────────────── */}
       {chatJobId && (
-        <div className="fixed bottom-6 right-6 z-[800] flex flex-col items-end gap-3">
+        <div className="fixed bottom-[calc(64px+env(safe-area-inset-bottom)+16px)] lg:bottom-6 right-4 lg:right-6 z-[800] flex flex-col items-end gap-3">
           {chatOpen && (
             <ChatPanel
               jobId={chatJobId}
@@ -241,7 +230,7 @@ export default function MechanicDashboard() {
             onClick={() => setChatOpen((o) => !o)}
             className="w-14 h-14 rounded-full flex items-center justify-center transition-all active-press
                        shadow-lg
-                       bg-primary text-[var(--background)] hover-lift"
+                       bg-[var(--primary)] text-[var(--on-primary)]"
             aria-label={chatOpen ? "Close chat" : "Chat with customer"}
           >
             <MessageSquare size={22} />
@@ -249,6 +238,12 @@ export default function MechanicDashboard() {
         </div>
       )}
 
+      <DashboardTabBar
+        tabs={MECHANIC_TABS}
+        active={activeTab}
+        onSelect={setActiveTab}
+        className="lg:hidden"
+      />
     </DashboardShell>
   );
 }
