@@ -81,14 +81,6 @@ export default function CustomerDashboard() {
     (...args) => useServiceStore.getState().completeRequest(...args),
     []
   );
-  const holdPayment = useCallback(
-    (...args) => useServiceStore.getState().holdPayment(...args),
-    []
-  );
-  const releasePayment = useCallback(
-    () => useServiceStore.getState().releasePayment(),
-    []
-  );
   const disputePayment = useCallback(
     (reason) => useServiceStore.getState().disputePayment(reason),
     []
@@ -97,6 +89,8 @@ export default function CustomerDashboard() {
   const [isPaymentOpen, setIsPaymentOpen] = useState(false);
   const [isReviewOpen, setIsReviewOpen] = useState(false);
   const [reviewProviderName, setReviewProviderName] = useState("the professional");
+  // completeRequest clears activeRequest, so the reviewed job id is captured first.
+  const [reviewJobId, setReviewJobId] = useState(null);
   // Real total only: no fallback amount. Null = no pay CTA, total shown as —.
   const [paymentAmount, setPaymentAmount] = useState(null);
   const [activeTab, setActiveTab] = useState(() => {
@@ -125,11 +119,6 @@ export default function CustomerDashboard() {
         toast.error("Could not load your saved vehicles. Please try again later.");
       });
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
-
-  const handleReleasePayment = useCallback(() => {
-    releasePayment();
-    setIsReviewOpen(true);
-  }, [releasePayment]);
 
   const handleDisputePayment = useCallback((reason) => {
     disputePayment(reason);
@@ -302,16 +291,20 @@ export default function CustomerDashboard() {
     }
   };
 
-  const handlePaymentSuccess = (paymentDetails) => {
+  // Immediate capture: /payments/verify and /payments/cash already complete
+  // the job on the backend. completeRequest posts /complete (idempotent) and
+  // clears the active request; then the review sheet opens.
+  const handlePaymentSuccess = async (paymentDetails) => {
+    const jobId = useServiceStore.getState().activeRequest?.id ?? activeRequest?.id ?? null;
     setIsPaymentOpen(false);
-    // After payment is collected, money moves into escrow
-    holdPayment(paymentDetails);
-    // Review opens later, after customer releases the escrowed payment
+    setReviewJobId(jobId);
+    await completeRequest(paymentDetails);
+    setIsReviewOpen(true);
   };
 
   const handleReviewSubmit = () => {
-    setIsReviewOpen(false);
     setReviewProviderName("the professional");
+    setReviewJobId(null);
   };
 
   const handleCancelRequest = () => {
@@ -383,7 +376,6 @@ export default function CustomerDashboard() {
                   request={activeRequest}
                   onComplete={handlePaymentInitiate}
                   onCancel={handleCancelRequest}
-                  onReleasePayment={handleReleasePayment}
                   onDisputePayment={handleDisputePayment}
                   onVehicleChange={handleVehicleChange}
                 />
@@ -427,6 +419,7 @@ export default function CustomerDashboard() {
         isOpen={isReviewOpen}
         onClose={() => setIsReviewOpen(false)}
         providerName={reviewProviderName}
+        jobId={reviewJobId}
         onSubmit={handleReviewSubmit}
       />
     </DashboardShell>

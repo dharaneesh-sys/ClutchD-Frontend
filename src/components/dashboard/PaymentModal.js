@@ -38,15 +38,22 @@ export function PaymentModal(props) {
 }
 
 function PaymentModalContent({ isOpen, onClose, amount, pricing, jobId, onSuccess }) {
-  const [method, setMethod] = useState("upi");
+  // Cash is the default method; Razorpay remains available as configured.
+  const [method, setMethod] = useState("cash");
   const [payState, setPayState] = useState("idle"); // idle | processing | success | failed
   const [qrData, setQrData] = useState(null);
   const [showBreakdown, setShowBreakdown] = useState(false);
   const qrPollRef = useRef(null);
   const { error: showError, success: showSuccess } = useToast();
 
-  // Use the finalized total if available, else fall back to passed amount
-  const displayAmount = Number(pricing?.totalAmount ?? amount ?? 0);
+  // Only a real backend total is payable. No total → "—" and no pay CTA.
+  const rawTotal = pricing?.totalAmount ?? amount;
+  const hasTotal = rawTotal !== null && rawTotal !== undefined && Number.isFinite(Number(rawTotal));
+  const displayAmount = hasTotal ? Number(rawTotal) : 0;
+  const money = (v) => {
+    const n = Number(v);
+    return v === null || v === undefined || !Number.isFinite(n) ? "—" : `₹${n.toFixed(2)}`;
+  };
 
   // Cleanup QR poll on unmount
   useEffect(() => {
@@ -202,6 +209,7 @@ function PaymentModalContent({ isOpen, onClose, amount, pricing, jobId, onSucces
   };
 
   const handlePay = () => {
+    if (!hasTotal) return;
     if (method === "upi" || method === "card") {
       handleRazorpayCheckout(method);
     } else if (method === "qr") {
@@ -215,11 +223,11 @@ function PaymentModalContent({ isOpen, onClose, amount, pricing, jobId, onSucces
     return (
       <Modal isOpen={isOpen} onClose={onClose} title="Payment Successful">
         <div className="text-center py-8">
-          <div className="w-20 h-20 rounded-full mx-auto flex items-center justify-center mb-4 bg-surface-soft">
-            <CheckCircle2 size={40} className="text-icon-highlight" />
+          <div className="w-16 h-16 rounded-full mx-auto flex items-center justify-center mb-4 bg-[color-mix(in_srgb,var(--success)_14%,transparent)]">
+            <CheckCircle2 size={32} aria-hidden="true" className="text-[var(--success)]" />
           </div>
-          <h3 className="text-xl font-bold mb-2 text-text-primary">Payment Complete!</h3>
-          <p className="text-sm text-text-muted">₹{Number(displayAmount).toFixed(2)} paid successfully</p>
+          <h3 className="text-lg font-semibold mb-1 text-[var(--foreground)]">Payment complete</h3>
+          <p className="text-sm text-[var(--text-muted)]">₹{Number(displayAmount).toFixed(2)} paid successfully</p>
         </div>
       </Modal>
     );
@@ -228,8 +236,11 @@ function PaymentModalContent({ isOpen, onClose, amount, pricing, jobId, onSucces
   return (
     <Modal isOpen={isOpen} onClose={onClose} title="Complete Payment">
       <div className="text-center mb-4">
-        <p className="text-sm mb-1 text-text-muted">Total Amount Due</p>
-        <p className="text-4xl font-bold tracking-tight text-primary tabular-nums">₹{Number(displayAmount).toFixed(2)}</p>
+        <p className="text-sm mb-1 text-[var(--text-muted)]">Total amount due</p>
+        <p data-testid="payment-total" className="text-3xl font-semibold tracking-tight text-[var(--foreground)] tabular-nums">{money(hasTotal ? displayAmount : null)}</p>
+        {!hasTotal && (
+          <p className="mt-1 text-xs text-[var(--text-muted)]">Waiting for the final bill from your provider.</p>
+        )}
       </div>
 
       {/* Itemized breakdown toggle */}
@@ -238,38 +249,39 @@ function PaymentModalContent({ isOpen, onClose, amount, pricing, jobId, onSucces
           <button
             type="button"
             onClick={() => setShowBreakdown(!showBreakdown)}
-            className="w-full flex items-center justify-between p-3 rounded-xl border text-sm transition-all bg-bg-card border-border-subtle text-text-primary hover:bg-surface-soft"
+            aria-expanded={showBreakdown}
+            className="w-full min-h-[44px] flex items-center justify-between p-3 rounded-xl border text-sm transition-colors bg-[var(--surface-card)] border-[var(--border)] text-[var(--foreground)] hover:bg-[var(--surface-soft)]"
           >
             <span className="font-medium">View Breakdown</span>
             {showBreakdown ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
           </button>
           {showBreakdown && (
-            <div className="mt-2 p-4 rounded-xl border space-y-2 text-sm animate-in slide-in-from-top-1 bg-bg-card border-border-subtle">
+            <div className="mt-2 p-4 rounded-xl border space-y-2 text-sm bg-[var(--surface-soft)] border-[var(--border)]">
               <div className="flex justify-between text-text-primary">
                 <span>Service Fee</span>
-                <span className="font-medium">₹{Number(pricing.serviceAmount ?? 0).toFixed(2)}</span>
+                <span className="font-medium">{money(pricing.serviceAmount)}</span>
               </div>
               <div className="flex justify-between text-text-primary">
                 <span>Convenience Fee</span>
-                <span className="font-medium">₹{Number(pricing.convenienceFee ?? 0).toFixed(2)}</span>
+                <span className="font-medium">{money(pricing.convenienceFee)}</span>
               </div>
               <div className="flex justify-between text-text-primary">
                 <span>Cancellation Fee</span>
-                <span className="font-medium">₹{Number(pricing.cancellationFee ?? 0).toFixed(2)}</span>
+                <span className="font-medium">{money(pricing.cancellationFee)}</span>
               </div>
               <div className="flex justify-between text-text-primary">
-                <span>Distance ({Number(pricing.distanceKm ?? 0).toFixed(1)} km)</span>
-                <span className="font-medium">₹{Number(pricing.distanceFee ?? 0).toFixed(2)}</span>
+                <span>Distance{Number.isFinite(Number(pricing.distanceKm)) ? ` (${Number(pricing.distanceKm).toFixed(1)} km)` : ""}</span>
+                <span className="font-medium">{money(pricing.distanceFee)}</span>
               </div>
               <div className="flex justify-between text-text-primary">
                 <span>GST ({GST_RATE * 100}%)</span>
-                <span className="font-medium">₹{Number(pricing.gstAmount ?? 0).toFixed(2)}</span>
+                <span className="font-medium">{money(pricing.gstAmount)}</span>
               </div>
               <div className="border-t pt-2 mt-2 flex justify-between font-bold border-border-subtle text-text-primary">
                 <span>Grand Total</span>
-                <span className="text-icon-highlight">₹{Number(pricing.totalAmount ?? 0).toFixed(2)}</span>
+                <span className="text-[var(--primary-dark)]">{money(pricing.totalAmount)}</span>
               </div>
-              <p className="text-[10px] mt-2 text-text-dim">
+              <p className="text-[11px] mt-2 text-[var(--text-muted)]">
                 Platform fee goes to ClutchD • Service fee goes to your provider
               </p>
             </div>
@@ -280,57 +292,61 @@ function PaymentModalContent({ isOpen, onClose, amount, pricing, jobId, onSucces
       
 
       {/* Method selection */}
-      <div className="space-y-2 mb-6">
-        <label className="text-sm font-medium mb-2 block text-text-primary">Select Payment Method</label>
+      <div role="radiogroup" aria-labelledby="pay-method-label" className="space-y-2 mb-5">
+        <p id="pay-method-label" className="text-sm font-medium mb-2 block text-[var(--foreground)]">Payment method</p>
         {METHODS.map(({ id, label, desc, icon: Icon }) => (
-          <div
+          <button
             key={id}
+            type="button"
+            role="radio"
+            aria-checked={method === id}
             onClick={() => { setMethod(id); setQrData(null); setPayState("idle"); }}
-            className={`flex items-center gap-4 p-3.5 rounded-xl border cursor-pointer transition-all ${
+            className={`w-full min-h-[56px] flex items-center gap-3 p-3 rounded-xl border text-left transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)] ${
               method === id
-                ? "bg-surface-soft border-border-subtle"
-                : "bg-bg-card border-border-subtle hover:bg-surface-soft"
+                ? "bg-[var(--surface-soft)] border-[var(--primary)]"
+                : "bg-[var(--surface-card)] border-[var(--border)] hover:bg-[var(--surface-soft)]"
             }`}
           >
-            <div className="w-9 h-9 rounded-full flex items-center justify-center bg-surface-soft text-icon-highlight">
-              <Icon size={18} />
-            </div>
-            <div className="flex-1">
-              <h4 className="font-medium text-sm text-text-primary">{label}</h4>
-              <p className="text-xs text-text-muted">{desc}</p>
-            </div>
-            <div className={`w-4.5 h-4.5 rounded-full border-2 flex items-center justify-center ${method === id ? "border-icon-highlight" : "border-border-subtle"}`}>
-              {method === id && <div className="w-2 h-2 rounded-full bg-icon-highlight" />}
-            </div>
-          </div>
+            <span className="w-9 h-9 shrink-0 rounded-full flex items-center justify-center bg-[var(--surface-soft)] text-[var(--primary-dark)]">
+              <Icon size={18} aria-hidden="true" />
+            </span>
+            <span className="flex-1">
+              <span className="block font-medium text-sm text-[var(--foreground)]">{label}</span>
+              <span className="block text-xs text-[var(--text-muted)]">{desc}</span>
+            </span>
+            <span aria-hidden="true" className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${method === id ? "border-[var(--primary)]" : "border-[var(--border-strong)]"}`}>
+              {method === id && <span className="w-2.5 h-2.5 rounded-full bg-[var(--primary)]" />}
+            </span>
+          </button>
         ))}
       </div>
 
       {/* QR Code display */}
       {method === "qr" && qrData && (
-        <div className="p-4 rounded-xl border text-center mb-6 animate-in slide-in-from-top-2 bg-bg-card border-border-subtle">
-          <div className="w-44 h-44 bg-white p-2 rounded-lg mx-auto mb-3 border-2 border-border-subtle">
+        <div className="p-4 rounded-xl border text-center mb-6 bg-[var(--surface-card)] border-[var(--border)]">
+          {/* QR stays on white in both themes so scanners can read it. */}
+          <div className="w-44 h-44 bg-white p-2 rounded-lg mx-auto mb-3 border border-[var(--border)]">
             <Image src={qrData.image_url} alt={`QR code for ₹${Number(displayAmount).toFixed(2)}`} width={176} height={176} className="w-full h-full object-contain" unoptimized />
           </div>
-          <p className="text-sm font-medium mb-1 text-text-primary">Scan to Pay ₹{Number(displayAmount).toFixed(2)}</p>
-          <p className="text-xs text-text-muted">Waiting for payment...</p>
+          <p className="text-sm font-medium mb-1 text-[var(--foreground)]">Scan to Pay ₹{Number(displayAmount).toFixed(2)}</p>
+          <p className="text-xs text-[var(--text-muted)]">Waiting for payment...</p>
           <div className="flex items-center justify-center gap-2 mt-2">
-            <Loader2 size={14} className="animate-spin text-icon-highlight" />
-            <span className="text-xs text-icon-highlight">Checking...</span>
+            <Loader2 size={14} aria-hidden="true" className="animate-spin text-[var(--primary-dark)]" />
+            <span className="text-xs text-[var(--primary-dark)]">Checking...</span>
           </div>
         </div>
       )}
 
       {/* Pay button */}
-      {!(method === "qr" && qrData) && (
+      {hasTotal && !(method === "qr" && qrData) && (
         <Button className="w-full" size="lg" onClick={handlePay} isLoading={payState === "processing"}>
           {method === "cash" ? `Confirm Cash ₹${Number(displayAmount).toFixed(0)}` : `Pay ₹${Number(displayAmount).toFixed(0)} Securely`}
         </Button>
       )}
 
       {/* Trust footer */}
-      <div className="mt-4 pt-3 border-t text-center border-border-subtle">
-        <p className="text-[10px] uppercase tracking-wider text-text-dim">
+      <div className="mt-4 pt-3 border-t text-center border-[var(--border)]">
+        <p className="text-[11px] uppercase tracking-wider text-[var(--text-muted)]">
           {method === "cash" ? "Confirmed between you and the mechanic" : "Secured by Razorpay • 256-bit SSL"}
         </p>
       </div>
