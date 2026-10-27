@@ -27,10 +27,10 @@ export class ErrorBoundary extends React.Component {
         this.state.error?.message || "An unexpected error occurred.";
 
       return (
-        <div className="flex items-center justify-center min-h-screen px-4 bg-background">
+        <div className="flex items-center justify-center min-h-screen px-4 bg-[var(--background)]">
           <div className="surface-card p-8 sm:p-12 text-center max-w-md w-full">
-            <div className="w-16 h-16 mx-auto mb-6 rounded-full bg-red-500/10 flex items-center justify-center">
-              <AlertTriangle className="w-8 h-8 text-red-400" strokeWidth={2} />
+            <div className="w-16 h-16 mx-auto mb-6 rounded-full bg-[color-mix(in_srgb,var(--danger)_12%,transparent)] flex items-center justify-center">
+              <AlertTriangle className="w-8 h-8 text-[var(--danger)]" strokeWidth={2} aria-hidden="true" />
             </div>
             <h2 className="text-xl font-bold text-foreground mb-2">
               Something went wrong
@@ -51,7 +51,7 @@ export class ErrorBoundary extends React.Component {
 
             <button
               onClick={() => this.setState({ hasError: false, error: null })}
-              className="px-6 py-3 rounded-xl bg-primary hover:opacity-90 text-white font-semibold text-sm transition-all duration-200"
+              className="min-h-[44px] px-6 rounded-xl bg-[var(--primary)] hover:bg-[var(--primary-dark)] text-[var(--on-primary)] font-semibold text-sm transition-colors"
             >
               Try Again
             </button>

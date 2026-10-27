@@ -19,7 +19,8 @@ import { NotificationBell } from "@/components/ui/NotificationBell";
 import { DashboardShell } from "@/components/ui/DashboardShell";
 import { DashboardTabBar } from "@/components/dashboard/DashboardTabBar";
 import { ChatPanel } from "@/components/ui/ChatPanel";
-import { MessageSquare, X } from "lucide-react";
+import { MessageSquare, X, MapPinOff } from "lucide-react";
+import { ErrorBoundary } from "@/components/ui/ErrorBoundary";
 import { SERVICE_STATUS, MAP_DEFAULT_CENTER } from "@/lib/constants";
 import { ScheduleBookingModal } from "@/components/dashboard/ScheduleBookingModal";
 import { ScheduledAppointments } from "@/components/dashboard/ScheduledAppointments";
@@ -37,7 +38,7 @@ const MapView = dynamic(
   {
     ssr: false,
     loading: () => (
-      <div className="w-full h-full bg-surface-container-low rounded-2xl animate-pulse" />
+      <div className="w-full h-full bg-[var(--surface-soft)] rounded-2xl animate-pulse motion-reduce:animate-none" />
     ),
   }
 );
@@ -96,7 +97,8 @@ export default function CustomerDashboard() {
   const [isPaymentOpen, setIsPaymentOpen] = useState(false);
   const [isReviewOpen, setIsReviewOpen] = useState(false);
   const [reviewProviderName, setReviewProviderName] = useState("the professional");
-  const [paymentAmount, setPaymentAmount] = useState(1200);
+  // Real total only: no fallback amount. Null = no pay CTA, total shown as —.
+  const [paymentAmount, setPaymentAmount] = useState(null);
   const [activeTab, setActiveTab] = useState(() => {
     // Deep-link support: /dashboard/customer?tab=history opens that tab.
     if (typeof window === "undefined") return "request";
@@ -253,9 +255,9 @@ export default function CustomerDashboard() {
     const name =
       req?.mechanic?.name ?? activeRequest?.mechanic?.name ?? "the professional";
     setReviewProviderName(name);
-    // Use finalized totalAmount from pricing if available, else estimate
-    const finalAmount = req?.pricing?.totalAmount ?? req?.priceEstimate?.min ?? activeRequest?.priceEstimate?.min ?? 1200;
-    setPaymentAmount(finalAmount);
+    // Only the finalized backend total is payable; never estimate or default.
+    const finalAmount = req?.pricing?.totalAmount ?? null;
+    setPaymentAmount(Number.isFinite(Number(finalAmount)) && finalAmount !== null ? Number(finalAmount) : null);
     setIsPaymentOpen(true);
   };
 
@@ -329,6 +331,7 @@ export default function CustomerDashboard() {
       mode="customer"
       hideMenu
       hasBottomNav
+      greeting={user?.name ? { name: user.name.split(" ")[0] } : undefined}
     >
 
 
@@ -344,16 +347,31 @@ export default function CustomerDashboard() {
         </div>
       ) : activeTab === "request" ? (
         <div className="flex-1 grid grid-cols-1 lg:grid-cols-12 gap-4 lg:gap-6 pb-4 lg:pb-6">
-          <div className="lg:col-span-7 xl:col-span-8 rounded-2xl overflow-hidden relative shadow-2xl min-h-[250px] sm:min-h-[350px] lg:min-h-[400px]">
-            <MapView role="customer" />
+          {/* Mobile: map preview → request card → providers. With an active
+              request the status card moves above the map. Desktop keeps the
+              12-column map + panel layout. */}
+          <div className="lg:col-span-7 xl:col-span-8 rounded-2xl overflow-hidden relative border border-[var(--border)] h-[260px] lg:h-auto lg:min-h-[400px]">
+            <ErrorBoundary
+              fallback={
+                <div className="flex h-full w-full flex-col items-center justify-center gap-2 bg-[var(--surface-soft)] p-6 text-center">
+                  <MapPinOff size={28} aria-hidden="true" className="text-[var(--text-muted)]" />
+                  <p className="text-sm text-[var(--text-muted)]">Map unavailable right now.</p>
+                </div>
+              }
+            >
+              <MapView role="customer" />
+            </ErrorBoundary>
 
-            <div className="absolute top-4 left-4 z-[400] glass-overlay px-3 py-1.5 rounded-full text-xs font-semibold flex items-center gap-2 text-foreground">
-              <span className="w-2 h-2 rounded-full bg-[var(--primary)]" />
+            <div className="absolute top-3 left-3 z-[400] glass-overlay px-3 py-1.5 rounded-full text-xs font-semibold flex items-center gap-2 text-[var(--foreground)]">
+              <span aria-hidden="true" className="w-2 h-2 rounded-full bg-[var(--primary)]" />
               Live Area Map
             </div>
           </div>
 
-          <div className="lg:col-span-5 xl:col-span-4 flex flex-col gap-4 lg:gap-6">
+          <div className={cn(
+            "lg:col-span-5 xl:col-span-4 flex flex-col gap-4 lg:gap-6",
+            activeRequest && "order-first lg:order-none"
+          )}>
             {!activeRequest ? (
               <>
                 <ServiceRequestPanel onSubmit={handleRequestSubmit} isLoading={isLoading} error={error} onDismissError={handleDismissError} />
@@ -422,7 +440,7 @@ export default function CustomerDashboard() {
 
     {/* ── Chat button (appears when mechanic is assigned) ──────────── */}
     {hasMechanic && chatJobId && (
-      <div className="fixed bottom-24 right-6 z-[800] flex flex-col items-end gap-3">
+      <div className="fixed bottom-[calc(64px+env(safe-area-inset-bottom)+16px)] right-4 lg:right-6 z-[800] flex flex-col items-end gap-3">
         {chatOpen && (
           <ChatPanel
             jobId={chatJobId}
@@ -434,11 +452,11 @@ export default function CustomerDashboard() {
         <button
           onClick={() => setChatOpen((o) => !o)}
           className={cn(
-            "w-14 h-14 rounded-full flex items-center justify-center transition-all active-press",
-            "shadow-[0_8px_32px_rgba(var(--color-primary-rgb),0.3)]",
+            "w-14 h-14 rounded-full flex items-center justify-center transition-colors active-press shadow-[var(--elevation-3)]",
+            "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)] focus-visible:ring-offset-2",
             chatOpen
-              ? "bg-[color-mix(in_srgb,var(--danger)_14%,transparent)] border border-[color-mix(in_srgb,var(--danger)_35%,transparent)] text-[var(--danger)] rotate-45"
-              : "bg-[var(--primary)] text-[var(--background)] hover:shadow-[0_12px_40px_rgba(var(--color-primary-rgb),0.4)] hover-lift"
+              ? "bg-[var(--surface-card)] border border-[var(--border)] text-[var(--foreground)]"
+              : "bg-[var(--primary)] text-[var(--on-primary)] hover:bg-[var(--primary-dark)]"
           )}
           aria-label={chatOpen ? "Close chat" : "Chat with mechanic"}
         >
