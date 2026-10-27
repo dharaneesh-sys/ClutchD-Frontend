@@ -1,58 +1,65 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { AlertTriangle } from "lucide-react";
 import { GlassCard } from "@/components/ui/GlassCard";
+import { Button } from "@/components/ui/Button";
+import { Skeleton } from "@/components/ui/Skeleton";
 import { AreaChart, Area } from "@/components/charts/area-chart";
-import api from "@/lib/api";
-import { Loader2 } from "lucide-react";
+import { money } from "@/components/partner/format";
 
-export function EarningsChart() {
-  const [data, setData] = useState([]);
-  const [total, setTotal] = useState(0);
-  const [loading, setLoading] = useState(true);
-  
-  useEffect(() => {
-    async function fetchEarnings() {
-      try {
-        const res = await api.get("/providers/earnings?period=week");
-        setData(res.data.earnings || []);
-        setTotal(res.data.total || 0);
-      } catch (e) {
-        console.warn("Failed to fetch earnings", e);
-      } finally {
-        setLoading(false);
-      }
-    }
-    fetchEarnings();
-  }, []);
+/**
+ * Weekly earnings from GET /providers/earnings?period=week (passed in by the
+ * dashboard's overview fetch). Chart points are only the real daily entries;
+ * the breakdown lists the same rows. No rent/incentive/payout rows.
+ */
+export function EarningsChart({ earnings, error, onRetry }) {
+  if (error) {
+    return (
+      <GlassCard role="alert" className="flex flex-col items-center gap-3 p-6 text-center">
+        <AlertTriangle size={24} aria-hidden="true" className="text-[var(--danger)]" />
+        <p className="text-sm text-[var(--danger-ink)]">Couldn&apos;t load earnings.</p>
+        {onRetry && <Button variant="outline" size="sm" onClick={onRetry}>Retry</Button>}
+      </GlassCard>
+    );
+  }
+  const loading = earnings === null || earnings === undefined;
+  const rows = earnings?.data || [];
 
   return (
-    <GlassCard variant="strong" className="p-6 h-full flex flex-col relative">
-      <div className="mb-6 flex justify-between items-end">
+    <GlassCard className="flex flex-col p-4 sm:p-6">
+      <div className="mb-4 flex items-end justify-between">
         <div>
-          <h2 className="text-xl font-bold tracking-tight text-text-primary">Earnings Overview</h2>
-          <p className="text-sm text-text-muted">This week</p>
+          <h2 className="text-lg font-semibold text-[var(--foreground)]">Earnings</h2>
+          <p className="text-sm text-[var(--text-muted)]">This week</p>
         </div>
         <div className="text-right">
-          <p className="text-sm mb-0.5 text-text-muted">Total</p>
-          <p className="text-2xl font-bold text-icon-highlight">₹{total}</p>
+          <p className="text-xs text-[var(--text-muted)]">Total</p>
+          <p data-testid="earnings-total" className="text-2xl font-semibold text-[var(--foreground)]">{loading ? "—" : money(earnings.total, 0)}</p>
         </div>
       </div>
-      
-      <div className="flex-1 min-h-[200px] w-full mt-4">
+
+      <div className="h-[200px] w-full">
         {loading ? (
-          <div className="flex flex-col items-center justify-center h-full">
-            <Loader2 size={32} className="animate-spin mb-2 text-icon-highlight" />
-            <span className="text-text-dim">Loading data...</span>
-          </div>
-        ) : data.length === 0 ? (
-          <span className="text-text-dim flex items-center justify-center h-full">No earnings this week</span>
+          <Skeleton className="h-full w-full rounded-xl" />
+        ) : rows.length === 0 ? (
+          <p className="flex h-full items-center justify-center text-sm text-[var(--text-muted)]">No earnings this week</p>
         ) : (
-          <AreaChart data={data} xDataKey="name" className="w-full h-full">
-            <Area dataKey="earnings" stroke="var(--primary)" fill="var(--primary)" fillOpacity={0.2} />
+          <AreaChart data={rows} xDataKey="name" className="h-full w-full">
+            <Area dataKey="earnings" stroke="var(--primary)" fill="var(--primary)" fillOpacity={0.15} />
           </AreaChart>
         )}
       </div>
+
+      {rows.length > 0 && (
+        <ul className="mt-4 divide-y divide-[var(--border)] border-t border-[var(--border)]">
+          {rows.map((r) => (
+            <li key={r.date} className="flex justify-between py-2 text-sm">
+              <span className="text-[var(--text-muted)]">{r.name} · {r.date}</span>
+              <span className="font-medium text-[var(--foreground)]">{money(r.earnings, 0)}</span>
+            </li>
+          ))}
+        </ul>
+      )}
     </GlassCard>
   );
 }

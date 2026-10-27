@@ -1,76 +1,70 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
+import { Loader2 } from "lucide-react";
 import { GlassCard } from "@/components/ui/GlassCard";
-import { Power, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import api from "@/lib/api";
 import { useAuthStore } from "@/store/authStore";
 
-export function AvailabilityToggle() {
+/**
+ * Mechanic online/offline switch. Reads the API value (`user.isOnline` from
+ * the session payload); unknown is shown as "Status unknown", never assumed
+ * online. The label changes only after PATCH /providers/availability succeeds.
+ */
+export function AvailabilityToggle({ className }) {
   const user = useAuthStore((s) => s.user);
   const updateUserData = useAuthStore((s) => s.updateUserData);
-  const [isOnline, setIsOnline] = useState(user?.isOnline ?? true);
   const [loading, setLoading] = useState(false);
-  
+  const [error, setError] = useState("");
+  const known = typeof user?.isOnline === "boolean";
+  const isOnline = known && user.isOnline;
 
-
-  useEffect(() => {
-    if (user && user.isOnline !== undefined) {
-      setIsOnline(user.isOnline);
-    }
-  }, [user?.isOnline]);
-
-  const toggleStatus = async () => {
-    const nextStatus = !isOnline;
-    setIsOnline(nextStatus); // Optimistic UI
+  const toggle = async () => {
+    const next = !isOnline;
     setLoading(true);
+    setError("");
     try {
-      await api.patch("/providers/availability", { available: nextStatus });
-      updateUserData({ isOnline: nextStatus });
-    } catch (e) {
-      console.warn("Failed to update availability", e);
-      setIsOnline(!nextStatus); // Revert
+      const { data } = await api.patch("/providers/availability", { available: next });
+      updateUserData({ isOnline: typeof data?.available === "boolean" ? data.available : next });
+    } catch {
+      setError("Couldn't change your status. Try again.");
     } finally {
       setLoading(false);
     }
   };
 
+  const label = !known ? "Status unknown" : isOnline ? "You're online" : "You're offline";
+  const hint = !known ? "Go online to receive job offers." : isOnline ? "Receiving job offers nearby." : "You won't receive new offers.";
+
   return (
-    <GlassCard variant="strong" className="p-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h3 className="text-lg font-bold mb-1 text-text-primary">Status</h3>
-          <p className="text-sm text-text-muted">
-            {isOnline ? "You are receiving job requests" : "You are currently hidden"}
-          </p>
-        </div>
-        
-        <button
-          onClick={toggleStatus}
-          disabled={loading}
+    <GlassCard className={cn("flex items-center justify-between gap-4 p-4", className)}>
+      <div className="min-w-0">
+        <p id="availability-label" className="font-semibold text-[var(--foreground)]">{label}</p>
+        <p className="text-sm text-[var(--text-muted)]">{hint}</p>
+        {error && <p role="alert" className="mt-1 text-xs text-[var(--danger-ink)]">{error}</p>}
+      </div>
+      <button
+        type="button"
+        role="switch"
+        aria-checked={isOnline}
+        aria-labelledby="availability-label"
+        onClick={toggle}
+        disabled={loading}
+        className={cn(
+          "relative inline-flex h-11 w-[72px] shrink-0 items-center rounded-full p-1 transition-colors",
+          "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)] focus-visible:ring-offset-2",
+          isOnline ? "bg-[var(--success)]" : "bg-[var(--border-strong)]",
+          loading && "opacity-70"
+        )}
+      >
+        <span
           className={cn(
-            "w-16 h-16 rounded-full flex items-center justify-center transition-all shadow-lg border-2 relative",
-            loading && "opacity-80 cursor-wait",
-            isOnline 
-              ? "bg-primary border-primary-light text-[var(--background)]" 
-              : "bg-bg-card border-border-subtle text-text-muted"
+            "flex h-9 w-9 items-center justify-center rounded-full bg-[var(--surface-card)] shadow transition-transform motion-reduce:transition-none",
+            isOnline ? "translate-x-7" : "translate-x-0"
           )}
         >
-          {loading ? <Loader2 className="animate-spin" size={24} /> : <Power size={24} />}
-        </button>
-      </div>
-      
-      <div className="mt-6 pt-5 flex gap-4 border-t border-border-subtle">
-         <div className="flex-1 rounded-xl p-3 text-center border bg-surface-soft border-border-subtle">
-            <p className="text-xs mb-1 text-text-muted">Status</p>
-            <p className={cn("font-bold", isOnline ? "text-icon-highlight" : "text-text-dim")}>
-              {isOnline ? "ONLINE" : "OFFLINE"}
-            </p>
-         </div>
-         <div className="flex-1 rounded-xl p-3 text-center border bg-surface-soft border-border-subtle">
-            <p className="text-xs mb-1 text-text-muted">Hours Today</p>
-            <p className="font-bold text-text-primary">4.5 hrs</p>
-         </div>
-      </div>
+          {loading && <Loader2 size={16} aria-hidden="true" className="animate-spin text-[var(--text-muted)]" />}
+        </span>
+      </button>
     </GlassCard>
   );
 }

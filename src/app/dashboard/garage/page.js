@@ -5,7 +5,10 @@ import { useRouter } from "next/navigation";
 
 import { useAuthStore } from "@/store/authStore";
 import { useTrackingStore } from "@/store/trackingStore";
-import { MessageSquare } from "lucide-react";
+import { MessageSquare, Briefcase, BarChart3, Building2, LifeBuoy, Wallet, CheckCircle2 } from "lucide-react";
+import { PartnerHome } from "@/components/partner/PartnerHome";
+import { useProviderOverview } from "@/hooks/useProviderOverview";
+import { money } from "@/components/partner/format";
 import { DashboardShell } from "@/components/ui/DashboardShell";
 import {
   DashboardTabBar,
@@ -80,6 +83,7 @@ export default function GarageDashboard() {
   const [chatOpen, setChatOpen] = useState(false);
   const [chatJobId, setChatJobId] = useState(null);
   const [chatOtherName, setChatOtherName] = useState("Customer");
+  const overview = useProviderOverview();
 
   if (!_hydrated) {
     return <SplashScreen />;
@@ -105,37 +109,29 @@ export default function GarageDashboard() {
         <PartnerTabStrip tabs={GARAGE_TABS} active={activeTab} onSelect={setActiveTab} />
 
         {activeTab === "dashboard" && (
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 lg:gap-6">
-            <div className="lg:col-span-5 xl:col-span-4 flex flex-col gap-4 lg:gap-6">
-              <div>
-                <GarageProfile />
-              </div>
-              <div>
-                <KycDocumentsSection role="garage" />
-              </div>
-              <div>
-                <GarageAnalytics />
-              </div>
-            </div>
-            <div className="lg:col-span-7 xl:col-span-8 flex flex-col gap-4 lg:gap-6">
-              <div>
-                <GarageJobQueue onChat={openChat} />
-              </div>
-            </div>
-          </div>
+          <PartnerHome
+            hasError={Object.values(overview.errors).some(Boolean)}
+            onRetry={overview.reload}
+            stats={[
+              { label: "Today's revenue", value: overview.todayEarnings === null ? "—" : money(overview.todayEarnings, 0), icon: Wallet, tone: "success" },
+              { label: "Active", value: overview.activeCount ?? "—", icon: Briefcase, tone: "pending" },
+              { label: "Completed", value: overview.completedCount === null ? "—" : `${overview.completedCount}${overview.completedCapped ? "+" : ""}`, hint: "All time", icon: CheckCircle2 },
+            ]}
+            actions={[
+              { icon: Briefcase, label: "Jobs", onClick: () => setActiveTab("jobs") },
+              { icon: BarChart3, label: "Analytics", onClick: () => setActiveTab("analytics") },
+              { icon: Building2, label: "Garage", onClick: () => setActiveTab("profile") },
+              { icon: LifeBuoy, label: "Support", onClick: () => setActiveTab("support") },
+            ]}
+            upcoming={overview.activeJobs ?? undefined}
+            onOpenJobs={() => setActiveTab("jobs")}
+          />
         )}
 
         {activeTab === "profile" && (
-          <div className="grid grid-cols-1 gap-4 lg:gap-6">
-            <div>
-              <GarageProfile />
-            </div>
-            <div>
-              <KycDocumentsSection role="garage" />
-            </div>
-            <div>
-              <GarageAnalytics />
-            </div>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-6">
+            <GarageProfile />
+            <KycDocumentsSection role="garage" />
           </div>
         )}
 
@@ -143,14 +139,7 @@ export default function GarageDashboard() {
 
         {activeTab === "support" && <PartnerSupport />}
 
-        {activeTab === "analytics" && (
-          <div className="grid grid-cols-1 gap-4 lg:gap-6">
-            <div>
-              <GarageAnalytics />
-            </div>
-          </div>
-        )}
-
+        {activeTab === "analytics" && <GarageAnalytics />}
       </div>
 
       {/* ── Chat button (appears when a job is active) ──────────────── */}
@@ -166,9 +155,7 @@ export default function GarageDashboard() {
           )}
           <button
             onClick={() => setChatOpen((o) => !o)}
-            className="w-14 h-14 rounded-full flex items-center justify-center transition-all active-press
-                       shadow-lg
-                       bg-[var(--primary)] text-[var(--on-primary)]"
+            className="w-14 h-14 rounded-full flex items-center justify-center shadow-[var(--elevation-3)] bg-[var(--primary)] text-[var(--on-primary)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)] focus-visible:ring-offset-2"
             aria-label={chatOpen ? "Close chat" : "Chat with customer"}
           >
             <MessageSquare size={22} />

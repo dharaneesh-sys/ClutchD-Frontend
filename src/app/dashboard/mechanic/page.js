@@ -14,9 +14,12 @@ import { IncomingJobs } from "@/components/mechanic/IncomingJobs";
 import { EarningsChart } from "@/components/mechanic/EarningsChart";
 import { useAuthStore } from "@/store/authStore";
 import { useTrackingStore } from "@/store/trackingStore";
-import { Briefcase, X, MessageSquare, History } from "lucide-react";
+import { Briefcase, X, MessageSquare, Power, MapPin, Wallet, History, LifeBuoy, CheckCircle2 } from "lucide-react";
 import { DashboardShell } from "@/components/ui/DashboardShell";
-import { EmptyState } from "@/components/ui/EmptyState";
+import { PartnerHome } from "@/components/partner/PartnerHome";
+import { ProviderHistory } from "@/components/partner/ProviderHistory";
+import { useProviderOverview } from "@/hooks/useProviderOverview";
+import { money } from "@/components/partner/format";
 import {
   DashboardTabBar,
   MECHANIC_TABS,
@@ -103,6 +106,7 @@ export default function MechanicDashboard() {
   const [chatOpen, setChatOpen] = useState(false);
   const [chatJobId, setChatJobId] = useState(null);
   const [chatOtherName, setChatOtherName] = useState("Customer");
+  const overview = useProviderOverview();
 
   if (!_hydrated) {
     return <SplashScreen />;
@@ -129,89 +133,68 @@ export default function MechanicDashboard() {
 
         {activeTab === "home" && (
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 lg:gap-6">
-            <div className="lg:col-span-4 flex flex-col gap-4 lg:gap-6">
-              <AvailabilityToggle />
+            <div className="lg:col-span-7 flex flex-col gap-5">
+              <PartnerHome
+                availability={<AvailabilityToggle />}
+                hasError={Object.values(overview.errors).some(Boolean)}
+                onRetry={overview.reload}
+                stats={[
+                  { label: "Today", value: overview.todayEarnings === null ? "—" : money(overview.todayEarnings, 0), icon: Wallet, tone: "success" },
+                  { label: "Completed", value: overview.completedCount === null ? "—" : `${overview.completedCount}${overview.completedCapped ? "+" : ""}`, hint: "All time", icon: CheckCircle2 },
+                  { label: "Active", value: overview.activeCount ?? "—", icon: Briefcase, tone: "pending" },
+                ]}
+                actions={[
+                  { icon: Power, label: "Status", onClick: () => document.querySelector('[role="switch"]')?.focus() },
+                  { icon: MapPin, label: "Navigation", onClick: () => setActiveTab("navigation") },
+                  { icon: Wallet, label: "Earnings", onClick: () => setActiveTab("earnings") },
+                  { icon: History, label: "History", onClick: () => setActiveTab("history") },
+                  { icon: LifeBuoy, label: "Support", onClick: () => setActiveTab("support") },
+                ]}
+              />
+              <IncomingJobs onChat={openChat} />
+            </div>
+            <div className="lg:col-span-5 flex flex-col gap-4 lg:gap-6">
               <ProfileEditor />
               <KycDocumentsSection role="mechanic" />
-            </div>
-            
-            <div className="lg:col-span-8 flex flex-col gap-4 lg:gap-6">
-              <IncomingJobs />
-              
-              <div className="h-[250px] sm:h-[300px] rounded-2xl overflow-hidden relative shadow-2xl border">
-                <NavigationMap role="mechanic" />
-                <div className="absolute top-4 left-4 z-[400] glass-overlay px-3 py-1.5 rounded-full text-xs font-semibold flex items-center gap-2 text-foreground">
-                  <span className="w-2 h-2 rounded-full bg-info animate-pulse" />
-                  Navigation
-                </div>
-              </div>
             </div>
           </div>
         )}
 
         {activeTab === "navigation" && (
-          <div className="space-y-4">
-            {/* Top bar with availability & profile controls */}
-            <div className="flex flex-wrap items-center gap-3">
-              <AvailabilityToggle />
-              <ProfileEditor />
-            </div>
-            
-            {/* Full-width map with collapsible jobs overlay */}
-            <div className="relative h-[60vh] sm:h-[70vh] lg:h-[75vh] rounded-2xl overflow-hidden shadow-2xl border">
-              <NavigationMap role="mechanic" />
-              
-              {/* Collapsible jobs panel */}
-              <div className={`absolute top-4 right-4 z-[400] w-80 sm:w-96 transition-all duration-300 ${jobsPanelOpen ? "opacity-100" : "opacity-0 pointer-events-none"}`}>
-                <div className="glass-overlay rounded-2xl overflow-hidden max-h-[55vh]">
-                  <div className="flex items-center justify-between px-4 py-3 border-b border-border-subtle">
-                    <div className="flex items-center gap-2">
-                      <Briefcase size={15} className="text-icon-highlight" />
-                      <span className="text-sm font-semibold text-foreground">Job Queue</span>
-                    </div>
-                    <button onClick={() => setJobsPanelOpen(false)} className="p-1.5 rounded-lg hover:bg-surface-soft text-text-muted hover:text-foreground transition-colors">
-                      <X size={14} />
-                    </button>
-                  </div>
-                  <div className="overflow-y-auto max-h-[calc(55vh-52px)] custom-scrollbar">
-<IncomingJobs onChat={openChat} />
-                  </div>
+          <div className="relative h-[calc(100dvh-220px)] min-h-[360px] rounded-2xl overflow-hidden border border-[var(--border)]">
+            <NavigationMap role="mechanic" />
+            <div className={`absolute inset-x-3 bottom-3 sm:inset-x-auto sm:right-3 sm:top-3 sm:bottom-auto z-[400] sm:w-96 transition-opacity motion-reduce:transition-none ${jobsPanelOpen ? "opacity-100" : "opacity-0 pointer-events-none"}`}>
+              <div className="glass-overlay rounded-2xl overflow-hidden max-h-[50vh] flex flex-col">
+                <div className="flex items-center justify-between px-4 py-2 border-b border-[var(--glass-overlay-border)]">
+                  <span className="flex items-center gap-2 text-sm font-semibold text-[var(--foreground)]">
+                    <Briefcase size={15} aria-hidden="true" /> Jobs
+                  </span>
+                  <button type="button" onClick={() => setJobsPanelOpen(false)} aria-label="Hide jobs" className="flex h-11 w-11 items-center justify-center rounded-lg text-[var(--text-muted)] hover:bg-[var(--surface-soft)]">
+                    <X size={16} />
+                  </button>
+                </div>
+                <div className="overflow-y-auto p-3 custom-scrollbar">
+                  <IncomingJobs onChat={openChat} />
                 </div>
               </div>
-              
-              {/* Toggle button when panel is closed */}
-              {!jobsPanelOpen && (
-                <button onClick={() => setJobsPanelOpen(true)} className="absolute top-4 right-4 z-[400] glass-overlay rounded-xl min-h-[44px] px-4 py-3 text-foreground hover:bg-surface-soft transition-all flex items-center gap-2">
-                  <Briefcase size={16} className="text-icon-highlight" />
-                  <span className="text-sm font-medium">Jobs</span>
-                </button>
-              )}
             </div>
+            {!jobsPanelOpen && (
+              <button type="button" onClick={() => setJobsPanelOpen(true)} className="absolute bottom-3 right-3 z-[400] glass-overlay flex h-14 items-center gap-2 rounded-full px-5 text-sm font-semibold text-[var(--foreground)]">
+                <Briefcase size={18} aria-hidden="true" /> Jobs
+              </button>
+            )}
           </div>
+        )}
+
+        {activeTab === "earnings" && (
+          <EarningsChart earnings={overview.earnings} error={overview.errors.earnings} onRetry={overview.reload} />
         )}
 
         {activeTab === "history" && (
-          <EmptyState
-            icon={History}
-            title="Job history"
-            description="Your completed and cancelled jobs will appear here."
-          />
+          <ProviderHistory jobs={overview.history} error={overview.errors.history} onRetry={overview.reload} />
         )}
 
         {activeTab === "support" && <PartnerSupport />}
-
-        {activeTab === "earnings" && (
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 lg:gap-6">
-            <div className="lg:col-span-4 flex flex-col gap-4 lg:gap-6">
-              <AvailabilityToggle />
-              <ProfileEditor />
-            </div>
-            
-            <div className="lg:col-span-8">
-              <EarningsChart />
-            </div>
-          </div>
-        )}
 
       </div>
 
@@ -228,9 +211,7 @@ export default function MechanicDashboard() {
           )}
           <button
             onClick={() => setChatOpen((o) => !o)}
-            className="w-14 h-14 rounded-full flex items-center justify-center transition-all active-press
-                       shadow-lg
-                       bg-[var(--primary)] text-[var(--on-primary)]"
+            className="w-14 h-14 rounded-full flex items-center justify-center shadow-[var(--elevation-3)] bg-[var(--primary)] text-[var(--on-primary)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)] focus-visible:ring-offset-2"
             aria-label={chatOpen ? "Close chat" : "Chat with customer"}
           >
             <MessageSquare size={22} />
