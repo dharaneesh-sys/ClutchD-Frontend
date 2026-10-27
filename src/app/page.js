@@ -13,118 +13,99 @@ const featureKeys = [
   { icon: Clock, key: "available247" },
 ];
 
+const ctaBase =
+  "inline-flex min-h-[48px] items-center justify-center gap-2 rounded-xl px-6 text-base font-semibold transition-colors " +
+  "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--splash-bg)]";
+
 export default function Home() {
   const t = useTranslations();
   useAuthRedirect();
 
   return (
-    <div className="min-h-screen flex flex-col relative overflow-hidden page-enter">
-      <nav className="relative z-10 flex items-center justify-between px-6 sm:px-10 lg:px-16 py-6">
-        <div className="flex items-center gap-2.5">
-          <Logo size="lg" showText />
-        </div>
-        <Link
-          href="/auth"
-          className="surface-card-interactive px-5 py-2.5 rounded-xl text-sm font-semibold text-foreground hover:text-primary-light transition-colors"
-        >
-          {t('nav.signIn')}
-        </Link>
-      </nav>
+    <div className="min-h-[100dvh] flex flex-col overflow-x-hidden bg-[var(--background)]">
+      {/* Blue hero */}
+      <section className="bg-[linear-gradient(180deg,var(--splash-bg)_0%,var(--splash-bg-deep)_100%)] pt-[env(safe-area-inset-top)]">
+        <nav className="mx-auto flex w-full max-w-6xl items-center justify-between px-4 py-4 sm:px-8">
+          <span className="flex items-center gap-2">
+            <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-[var(--surface-card)]">
+              <Logo size="md" />
+            </span>
+            <span className="text-lg font-bold text-[var(--on-splash)]">ClutchD</span>
+          </span>
+          <Link
+            href="/auth"
+            className="inline-flex min-h-[44px] items-center rounded-xl border border-[var(--on-splash-track)] px-4 text-sm font-semibold text-[var(--on-splash)] hover:bg-[var(--on-splash-track)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--on-splash)]"
+          >
+            {t("nav.signIn")}
+          </Link>
+        </nav>
 
-      <div className="relative z-10 flex-1 flex items-center justify-center px-6 sm:px-10 lg:px-16 py-16 lg:py-20">
-        <div className="w-full max-w-6xl grid grid-cols-1 lg:grid-cols-2 gap-16 lg:gap-24 items-center">
+        <div className="mx-auto grid w-full max-w-6xl grid-cols-1 items-center gap-10 px-4 pb-14 pt-6 sm:px-8 lg:grid-cols-2 lg:gap-16 lg:pb-20 lg:pt-10">
           <div className="text-center lg:text-left">
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full mb-10 surface-card text-sm">
-              <span className="w-2 h-2 rounded-full bg-primary-light animate-pulse" />
-              <span className="text-primary-light/90 font-medium">
-                {t('hero.badge')}
-              </span>
-            </div>
-
-            <h1 className="text-5xl sm:text-6xl lg:text-7xl font-extrabold tracking-tight leading-[1.08] text-foreground mb-8">
-              {t('hero.headline')}
+            <span className="mb-6 inline-flex items-center gap-2 rounded-full bg-[var(--on-splash-track)] px-3 py-1.5 text-sm font-medium text-[var(--on-splash)]">
+              <span aria-hidden="true" className="h-2 w-2 rounded-full bg-[var(--on-splash)]" />
+              {t("hero.badge")}
+            </span>
+            <h1 className="mb-5 text-4xl font-bold leading-[1.1] tracking-tight text-[var(--on-splash)] sm:text-5xl lg:text-6xl">
+              {t("hero.headline")}
             </h1>
-
-            <p className="text-lg sm:text-xl text-primary-light/70 max-w-lg mx-auto lg:mx-0 mb-12 leading-relaxed">
-              {t('hero.subtitle')}
+            <p className="mx-auto mb-8 max-w-lg text-base leading-relaxed text-[var(--on-splash-muted)] sm:text-lg lg:mx-0">
+              {t("hero.subtitle")}
             </p>
-
-            <div className="flex flex-col sm:flex-row gap-5 justify-center lg:justify-start">
+            <div className="flex flex-col justify-center gap-3 sm:flex-row lg:justify-start">
               <Link
                 href="/auth"
-                className="inline-flex items-center justify-center gap-2 px-8 py-4 rounded-2xl bg-gradient-to-r from-primary to-primary-light text-[var(--background)] font-bold text-lg shadow-lg hover-lift active:scale-[0.98] transition-all duration-200"
+                className={`${ctaBase} bg-[var(--surface-card)] text-[var(--primary-dark)] hover:bg-[var(--surface-soft)]`}
               >
-                {t('hero.getStarted')}
-                <ArrowRight size={20} />
+                {t("hero.getStarted")}
+                <ArrowRight size={20} aria-hidden="true" />
               </Link>
               <Link
                 href="/auth"
-                className="surface-card-interactive inline-flex items-center justify-center gap-2 px-8 py-4 rounded-2xl text-foreground font-semibold text-lg hover:bg-[var(--color-surface-soft)] active:scale-[0.98] transition-all duration-200"
+                className={`${ctaBase} border border-[var(--on-splash)] text-[var(--on-splash)] hover:bg-[var(--on-splash-track)]`}
               >
-                {t('hero.signIn')}
+                {t("hero.signIn")}
               </Link>
             </div>
           </div>
 
-          <div className="flex justify-center">
-            <div className="surface-card w-full max-w-md p-8 sm:p-10 rounded-2xl">
-              <div className="mb-8">
-                <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-primary-light to-primary flex items-center justify-center mb-5 shadow-lg">
-                  <Zap size={28} className="text-[var(--background)]" />
-                </div>
-                <h3 className="text-2xl font-bold text-foreground mb-3">
-                  {t('howItWorks.title')}
-                </h3>
-                <p className="text-primary-light/60 text-sm leading-relaxed">
-                  {t('howItWorks.description')}
-                </p>
-              </div>
-
-              <div className="space-y-3">
-                {[
-                  { num: "01", key: "step1" },
-                  { num: "02", key: "step2" },
-                  { num: "03", key: "step3" },
-                ].map((step) => (
-                  <div
-                    key={step.num}
-                    className="flex items-start gap-4 surface-card-interactive p-4 rounded-xl hover:bg-[var(--color-surface-soft)] transition-colors"
-                  >
-                     <span className="text-primary-light font-mono font-bold text-lg leading-none mt-0.5">
-                       {step.num}
-                     </span>
-                     <span className="text-primary-light/80 text-sm leading-relaxed">
-                      {t(`howItWorks.${step.key}`)}
-                    </span>
-                  </div>
-                ))}
-              </div>
-            </div>
+          {/* How it works — flat white card */}
+          <div className="surface-card w-full max-w-md justify-self-center p-6 sm:p-8">
+            <span className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-[var(--surface-soft)] text-[var(--primary-dark)]">
+              <Zap size={24} aria-hidden="true" />
+            </span>
+            <h2 className="mb-2 text-xl font-semibold text-[var(--foreground)]">{t("howItWorks.title")}</h2>
+            <p className="mb-5 text-sm leading-relaxed text-[var(--text-muted)]">{t("howItWorks.description")}</p>
+            <ol className="space-y-2">
+              {["step1", "step2", "step3"].map((key, i) => (
+                <li key={key} className="flex items-start gap-3 rounded-xl bg-[var(--surface-soft)] p-3">
+                  <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[var(--primary)] text-sm font-semibold text-[var(--on-primary)]">
+                    {i + 1}
+                  </span>
+                  <span className="pt-0.5 text-sm leading-relaxed text-[var(--foreground)]">
+                    {t(`howItWorks.${key}`)}
+                  </span>
+                </li>
+              ))}
+            </ol>
           </div>
         </div>
-      </div>
+      </section>
 
-      <div className="relative z-10 px-6 sm:px-10 lg:px-16 pb-16 lg:pb-20">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 max-w-6xl mx-auto">
-          {featureKeys.map((feat) => {
-            const Icon = feat.icon;
-            return (
-              <div
-                key={feat.key}
-                className="surface-card-interactive p-6 rounded-2xl text-center group hover-lift"
-              >
-                 <div className="w-12 h-12 rounded-xl bg-primary/15 flex items-center justify-center mx-auto mb-4 group-hover:bg-primary/25 group-hover:scale-110 transition-all duration-200">
-                   <Icon size={22} className="text-primary-light" />
-                 </div>
-                 <h4 className="text-foreground font-semibold mb-2">{t(`features.${feat.key}.title`)}</h4>
-                  <p className="text-primary-light/50 text-sm leading-relaxed">
-                   {t(`features.${feat.key}.desc`)}
-                </p>
-              </div>
-            );
-          })}
+      {/* Features */}
+      <section className="mx-auto w-full max-w-6xl px-4 py-10 sm:px-8 lg:py-16">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          {featureKeys.map(({ icon: Icon, key }) => (
+            <div key={key} className="surface-card p-5">
+              <span className="mb-3 flex h-11 w-11 items-center justify-center rounded-xl bg-[var(--surface-soft)] text-[var(--primary-dark)]">
+                <Icon size={22} aria-hidden="true" />
+              </span>
+              <h4 className="mb-1 font-semibold text-[var(--foreground)]">{t(`features.${key}.title`)}</h4>
+              <p className="text-sm leading-relaxed text-[var(--text-muted)]">{t(`features.${key}.desc`)}</p>
+            </div>
+          ))}
         </div>
-      </div>
+      </section>
     </div>
   );
 }
