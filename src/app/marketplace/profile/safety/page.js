@@ -89,7 +89,7 @@ function ExpandableSection({ icon: Icon, title, content, defaultOpen = false }) 
       className={cn(
         "rounded-2xl border transition-all duration-200 overflow-hidden",
         isOpen
-          ? "glass-lux border-primary/20"
+          ? "surface-card border-primary/20"
           : "bg-surface-container-low border-border-subtle hover:bg-surface-soft"
       )}
     >
@@ -288,7 +288,7 @@ export default function SafetyPage() {
               <a
                 key={contact.label}
                 href={`tel:${contact.number.replace(/\s/g, "")}`}
-                className="glass-lux-interactive rounded-2xl p-4 flex items-center gap-3 transition-colors"
+                className="surface-card-interactive rounded-2xl p-4 flex items-center gap-3 transition-colors"
               >
                 <div className="flex-shrink-0 w-10 h-10 rounded-xl bg-danger/15 flex items-center justify-center">
                   <Icon size={18} className="text-danger" />
@@ -311,7 +311,7 @@ export default function SafetyPage() {
       <section>
         <button
           onClick={handleReportSafetyIssue}
-          className="glass-lux-interactive rounded-2xl p-4 w-full flex items-center gap-3 transition-colors text-left"
+          className="surface-card-interactive rounded-2xl p-4 w-full flex items-center gap-3 transition-colors text-left"
         >
           <div className="flex-shrink-0 w-10 h-10 rounded-xl bg-primary/15 flex items-center justify-center">
             <AlertTriangle size={18} className="text-pending" />

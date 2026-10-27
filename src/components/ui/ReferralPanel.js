@@ -139,7 +139,7 @@ export function ReferralPanel({ className, onNavigateBack }) {
       </div>
 
       {/* Referral Code Card */}
-      <GlassCard variant="glass-lux" className="p-5 overflow-hidden relative">
+      <GlassCard className="p-5 overflow-hidden relative">
         {/* Decorative glow */}
         <div
           className="absolute -top-12 -right-12 w-32 h-32 rounded-full opacity-20 blur-3xl pointer-events-none"
@@ -225,7 +225,7 @@ export function ReferralPanel({ className, onNavigateBack }) {
 
       {/* Stats Grid */}
       <div className="grid grid-cols-2 gap-3">
-        <GlassCard variant="glass-lux" className="p-4">
+        <GlassCard className="p-4">
           <div className="flex items-center gap-2.5">
             <div className="w-9 h-9 rounded-xl bg-primary/15 flex items-center justify-center shrink-0">
               <Users size={16} className="text-primary-light" />
@@ -241,7 +241,7 @@ export function ReferralPanel({ className, onNavigateBack }) {
           </div>
         </GlassCard>
 
-        <GlassCard variant="glass-lux" className="p-4">
+        <GlassCard className="p-4">
           <div className="flex items-center gap-2.5">
             <div className="w-9 h-9 rounded-xl bg-primary/15 flex items-center justify-center shrink-0">
               <Coins size={16} className="text-icon-highlight" />
@@ -260,7 +260,7 @@ export function ReferralPanel({ className, onNavigateBack }) {
       </div>
 
       {/* How It Works / Progress Card */}
-      <GlassCard variant="glass-lux" className="p-4">
+      <GlassCard className="p-4">
         <div className="flex items-center gap-2 mb-3">
           <Sparkles size={14} className="text-icon-highlight" />
           <span className="text-sm font-semibold text-text-primary">

@@ -120,7 +120,7 @@ export function VendorComparisonTable({ productId, product }) {
 
   if (vendorEntries.length === 0) {
     return (
-      <GlassCard variant="glass-lux" className="p-6">
+      <GlassCard className="p-6">
         <h2 className="mb-3 text-lg font-semibold text-text-primary">
           Compare Vendor Pricing
         </h2>
@@ -135,7 +135,7 @@ export function VendorComparisonTable({ productId, product }) {
   }
 
   return (
-    <GlassCard variant="glass-lux" className="p-6">
+    <GlassCard className="p-6">
       {/* ── Header ─────────────────────────────────────────── */}
       <div className="flex items-center justify-between mb-5">
         <h2 className="text-lg font-semibold text-text-primary">
@@ -208,7 +208,7 @@ export function VendorComparisonTable({ productId, product }) {
           </button>
 
           {sortMenuOpen && (
-            <div className="absolute right-0 top-full mt-1.5 z-20 min-w-[190px] glass-lux rounded-xl overflow-hidden animate-scale-in">
+            <div className="absolute right-0 top-full mt-1.5 z-20 min-w-[190px] surface-card rounded-xl overflow-hidden animate-scale-in">
               {SORT_OPTIONS.map((option) => (
                 <button
                   key={option.value}

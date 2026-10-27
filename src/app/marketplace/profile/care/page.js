@@ -57,14 +57,14 @@ function LiveChatModal({ isOpen, onClose }) {
     <>
       <div
         onClick={onClose}
-        className="fixed inset-0 z-40 backdrop-blur-sm animate-[backdrop-in_0.2s_ease] bg-black/50"
+        className="fixed inset-0 z-40 animate-[backdrop-in_0.2s_ease] bg-[var(--glass-overlay-scrim)]"
         aria-hidden="true"
       />
       <div className="fixed inset-0 z-50 flex items-center justify-center p-4 py-12 px-4 sm:px-6 overflow-y-auto w-full h-full pointer-events-none">
         <div
           className={cn(
             "relative w-full max-w-sm rounded-2xl border pointer-events-auto animate-[modal-in_0.25s_ease]",
-            "p-6 backdrop-blur-3xl text-center",
+            "p-6 bg-[var(--surface-card)] text-center",
             "border-border-subtle bg-surface shadow-[0_30px_80px_rgba(var(--color-black-rgb),0.35)] ring-1 ring-primary/10"
           )}
         >
@@ -152,14 +152,14 @@ function RaiseTicketModal({ isOpen, onClose, onTicketCreated }) {
     <>
       <div
         onClick={handleClose}
-        className="fixed inset-0 z-40 backdrop-blur-sm animate-[backdrop-in_0.2s_ease] bg-black/50"
+        className="fixed inset-0 z-40 animate-[backdrop-in_0.2s_ease] bg-[var(--glass-overlay-scrim)]"
         aria-hidden="true"
       />
       <div className="fixed inset-0 z-50 flex items-center justify-center p-4 py-12 px-4 sm:px-6 overflow-y-auto w-full h-full pointer-events-none">
         <div
           className={cn(
             "relative w-full max-w-md rounded-2xl border pointer-events-auto animate-[modal-in_0.25s_ease]",
-            "p-6 backdrop-blur-3xl",
+            "p-6 bg-[var(--surface-card)]",
             "border-border-subtle bg-surface shadow-[0_30px_80px_rgba(var(--color-black-rgb),0.35)] ring-1 ring-primary/10"
           )}
         >
@@ -246,7 +246,7 @@ function ContactCard({ icon: Icon, label, description, href, color }) {
       href={href}
       target={href.startsWith("http") && !href.startsWith("tel") && !href.startsWith("mailto") ? "_blank" : undefined}
       rel={href.startsWith("http") && !href.startsWith("tel") && !href.startsWith("mailto") ? "noopener noreferrer" : undefined}
-      className="glass-lux-interactive rounded-2xl p-4 flex items-center gap-3 transition-colors"
+      className="surface-card-interactive rounded-2xl p-4 flex items-center gap-3 transition-colors"
     >
       <div
         className={cn(
@@ -270,7 +270,7 @@ function TicketCard({ ticket }) {
   const config = TICKET_STATUS_CONFIG[ticket.status] || { variant: "default", label: ticket.status };
 
   return (
-    <div className="glass-lux rounded-2xl p-4 space-y-3 animate-fade-in-up">
+    <div className="surface-card rounded-2xl p-4 space-y-3 animate-fade-in-up">
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0 flex-1">
           <div className="flex items-center gap-2">
@@ -392,7 +392,7 @@ export default function CarePage() {
       {/* Live Chat Button */}
       <button
         onClick={() => setShowLiveChat(true)}
-        className="glass-lux-interactive rounded-2xl p-4 w-full flex items-center gap-3 transition-colors text-left"
+        className="surface-card-interactive rounded-2xl p-4 w-full flex items-center gap-3 transition-colors text-left"
       >
         <div className="flex-shrink-0 w-12 h-12 rounded-xl bg-primary/15 flex items-center justify-center">
           <MessageCircle size={22} className="text-primary-light" />
@@ -425,7 +425,7 @@ export default function CarePage() {
       <section>
         <button
           onClick={() => setShowRaiseTicket(true)}
-          className="glass-lux-interactive rounded-2xl p-4 w-full flex items-center gap-3 transition-colors text-left"
+          className="surface-card-interactive rounded-2xl p-4 w-full flex items-center gap-3 transition-colors text-left"
         >
           <div className="flex-shrink-0 w-10 h-10 rounded-xl bg-primary/15 flex items-center justify-center">
             <Ticket size={18} className="text-primary-light" />
@@ -448,7 +448,7 @@ export default function CarePage() {
           <Search size={16} className="text-primary-light" />
           Track a Ticket
         </h2>
-        <div className="glass-lux rounded-2xl p-4 space-y-3">
+        <div className="surface-card rounded-2xl p-4 space-y-3">
           <div className="flex gap-2">
             <input
               type="text"
@@ -507,7 +507,7 @@ export default function CarePage() {
       )}
 
       {/* Business Hours */}
-      <div className="glass-lux rounded-2xl p-4 text-center">
+      <div className="surface-card rounded-2xl p-4 text-center">
         <p className="text-xs text-text-muted">
           Business hours:{" "}
           <span className="text-foreground font-medium">{CONTACT_INFO.hours}</span>

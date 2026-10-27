@@ -175,7 +175,7 @@ if (items.length === 0 && step === "form") {
     return (
       <div className="animate-fade-in-up p-4">
         <div className="mx-auto max-w-lg">
-          <div className="glass-lux rounded-2xl p-8 text-center">
+          <div className="surface-card rounded-2xl p-8 text-center">
             <div className="animate-scale-in mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-success/20">
               <CheckCircle size={44} className="text-success" />
             </div>
@@ -191,7 +191,7 @@ if (items.length === 0 && step === "form") {
               {placedOrder.id}
             </div>
 
-            <div className="glass-lux mb-8 rounded-xl p-5 text-left">
+            <div className="surface-card mb-8 rounded-xl p-5 text-left">
               <h3 className="mb-3 text-sm font-semibold text-text-muted uppercase tracking-wider">
                 Order Summary
               </h3>
@@ -288,7 +288,7 @@ if (items.length === 0 && step === "form") {
         <div className="flex flex-col gap-6 lg:flex-row">
           {/* ── Left: Form + Payment ───────────────────────────────── */}
           <div className="flex-1 space-y-6">
-            <div className="glass-lux rounded-2xl p-6">
+            <div className="surface-card rounded-2xl p-6">
               <h2 className="mb-4 text-lg font-semibold text-foreground">
                 Shipping Method
               </h2>
@@ -345,7 +345,7 @@ if (items.length === 0 && step === "form") {
               </div>
             </div>
 
-            <div className="glass-lux rounded-2xl p-6">
+            <div className="surface-card rounded-2xl p-6">
               <div className="mb-4 flex items-center gap-2">
                 {shippingMethod === "pickup" ? (
                   <Store size={18} className="text-icon-highlight" />
@@ -423,7 +423,7 @@ if (items.length === 0 && step === "form") {
             </div>
 
             {/* Payment Method */}
-            <div className="glass-lux rounded-2xl p-6">
+            <div className="surface-card rounded-2xl p-6">
               <h2 className="mb-4 text-lg font-semibold text-foreground">
                 Payment Method
               </h2>
@@ -463,7 +463,7 @@ if (items.length === 0 && step === "form") {
 
           {/* ── Right: Order Summary ────────────────────────────────── */}
           <div className="w-full lg:w-80 xl:w-96">
-            <div className="glass-lux lg:sticky lg:top-4 space-y-5 rounded-2xl p-6">
+            <div className="surface-card lg:sticky lg:top-4 space-y-5 rounded-2xl p-6">
               <h2 className="text-lg font-semibold text-foreground">
                 Order Summary
               </h2>

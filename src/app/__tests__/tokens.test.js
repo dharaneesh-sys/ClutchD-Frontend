@@ -84,16 +84,6 @@ const LEGACY_ALIASES = [
   ["--color-icon-highlight", "var(--primary)"],
   ["--color-badge-bg", "var(--surface-soft)"],
   ["--color-badge-text", "var(--primary-dark)"],
-  ["--glass-bg", "var(--glass-overlay-bg)"],
-  ["--glass-border", "var(--glass-overlay-border)"],
-  ["--glass-hover", "var(--glass-overlay-bg)"],
-  ["--glass-lux-bg", "var(--glass-overlay-bg)"],
-  ["--glass-lux-bg-strong", "var(--glass-overlay-bg)"],
-  ["--glass-lux-border", "var(--glass-overlay-border)"],
-  ["--glass-lux-border-accent", "var(--primary)"],
-  ["--glass-lux-shadow", "var(--shadow-card)"],
-  ["--glass-lux-shadow-hover", "var(--shadow-card)"],
-  ["--glass-lux-radius", "16px"],
 ];
 
 describe("DESIGN.md §0.3 flat-blue token contract", () => {
@@ -191,22 +181,26 @@ describe("DESIGN.md §0.3 flat-blue token contract", () => {
     expect(css).not.toMatch(new RegExp(["rgba\\(74,", "165,", "245"].join("\\s*")));
   });
 
-  it("light glass-lux override is a flat opaque surface, not cream glass", () => {
+  it("light theme has no cream glass override", () => {
     expect(css).not.toMatch(/rgba\(255,\s*249,\s*235/);
     expect(css).not.toContain("saturate(1.2)");
-    expect(css).toMatch(/:is\(\.light[^{]*\.glass-lux\s*\{[^}]*background:\s*var\(--surface\)/);
-    expect(css).toMatch(/:is\(\.light[^{]*\.glass-lux\s*\{[^}]*backdrop-filter:\s*none/);
   });
 
   it("dark theme lives only under [data-theme=dark]: no .dark block", () => {
     expect(css).not.toMatch(/^\.dark\s*\{/m);
   });
 
-  it("keeps the legacy glass variants until task 10 and drops the banned ones", () => {
-    expect(css).toMatch(/\.glass-lux\s*[,{]/);
-    expect(css).toMatch(/\.glass-lux-interactive\s*[,{]/);
-    expect(css).not.toMatch(/\.glass-lux-strong\s*[,{]/);
-    expect(css).not.toMatch(/\.glass-hover[\s:{]/);
+  it("task 10: legacy glass/glow classes and alias tokens are gone", () => {
+    for (const cls of ["glass-lux", "glass-lux-interactive", "glass-strong", "glass", "surface-elevated", "surface-filled", "surface-outlined", "btn-glow", "hover-glow", "input-glass"]) {
+      expect(css, cls).not.toMatch(new RegExp(`\\.${cls}\\s*[,{:]`));
+    }
+    expect(css).not.toMatch(/--glass-lux-|--glass-(bg|border|hover):/);
+  });
+
+  it("task 10: flat card + single glass overlay utilities exist", () => {
+    expect(css).toMatch(/\.surface-card\s*\{[^}]*background:\s*var\(--surface-card\)[^}]*border-radius:\s*16px/);
+    expect(css).toMatch(/\.surface-card-interactive\s*\{/);
+    expect(css).toMatch(/\.glass-overlay\s*\{[^}]*backdrop-filter:\s*blur\(var\(--glass-overlay-blur\)\)/);
   });
 
   it(".type-display is deleted", () => {

@@ -140,7 +140,7 @@ function OfferCard({ offer, locked }) {
   return (
     <div
       className={cn(
-        "glass-lux rounded-2xl p-4 transition-all duration-200",
+        "surface-card rounded-2xl p-4 transition-all duration-200",
         locked ? "opacity-50" : "hover:shadow-lg"
       )}
     >
@@ -245,7 +245,7 @@ export default function ClutchDCardPage() {
 
       {/* Error Banner */}
       {error && (
-        <div className="flex items-start gap-3 glass-lux rounded-2xl p-4 border border-[var(--danger)]/25 bg-[var(--danger)]/10">
+        <div className="flex items-start gap-3 surface-card rounded-2xl p-4 border border-[var(--danger)]/25 bg-[var(--danger)]/10">
           <p className="text-sm text-danger flex-1">{error}</p>
           <button
             onClick={fetchData}
@@ -318,7 +318,7 @@ export default function ClutchDCardPage() {
       </div>
 
       {/* ── Tier Progress ────────────────────────────────────────────── */}
-      <div className="glass-lux rounded-2xl p-5 space-y-3">
+      <div className="surface-card rounded-2xl p-5 space-y-3">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <TrendingUp size={16} className="text-primary-light" />
@@ -372,7 +372,7 @@ export default function ClutchDCardPage() {
         </div>
 
         {offers.length === 0 ? (
-          <div className="glass-lux rounded-2xl p-6 text-center">
+          <div className="surface-card rounded-2xl p-6 text-center">
             <Gift size={24} className="mx-auto text-text-muted mb-2" />
             <p className="text-sm text-text-muted">No offers available at the moment</p>
           </div>

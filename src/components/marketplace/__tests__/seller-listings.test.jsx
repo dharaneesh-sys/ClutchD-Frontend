@@ -1,6 +1,6 @@
 // Wave-4 Task 10 (customer + seller dashboards + upload) — RED-first tests.
 // DESIGN.md: D1 (grounded blue, token surfaces only), D4 (cards rounded-2xl,
-// controls rounded-xl), D5 (glass-lux pair only), D7 (info rename + pending
+// controls rounded-xl), D5 (surface-card pair only), D7 (info rename + pending
 // amber, no --warning), D8 (lucide only, no emoji), D9 (tab IA + upload route
 // frozen), D15 (M3 roles, token CTAs). Routes/data/upload logic identical.
 import "@testing-library/jest-dom/vitest";
@@ -184,9 +184,9 @@ describe("MyListings contract (D1/D4/D5/D7/D15)", () => {
     expect(code).not.toMatch(/red-400|red-500/);
   });
 
-  it("keeps glass-lux card + rounded-2xl + shared stock language", () => {
+  it("keeps surface-card card + rounded-2xl + shared stock language", () => {
     const code = src(mpDir, "MyListings.js");
-    expect(code).toContain("glass-lux rounded-2xl");
+    expect(code).toContain("surface-card rounded-2xl");
     expect(code).toContain("In Stock");
     expect(code).toContain("Out of Stock");
     expect(code).toContain("SellerProductForm");
@@ -197,7 +197,7 @@ describe("SellerProductForm contract (D1/D4/D5/D15)", () => {
   it("renders field errors in the danger token, never red-500 literals", () => {
     const code = src(mpDir, "SellerProductForm.js");
     expect(code).not.toMatch(/text-red-500/);
-    expect(code).toContain("glass-lux rounded-2xl");
+    expect(code).toContain("surface-card rounded-2xl");
     expect(code).toContain("accent-[var(--primary)]");
   });
 

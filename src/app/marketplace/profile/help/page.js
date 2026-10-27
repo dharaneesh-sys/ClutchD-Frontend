@@ -48,7 +48,7 @@ function FAQAccordion({ faqs, openId, onToggle }) {
             className={cn(
               "rounded-2xl border transition-all duration-200 overflow-hidden",
               isOpen
-                ? "glass-lux border-primary/20"
+                ? "surface-card border-primary/20"
                 : "bg-surface-container-low border-border-subtle hover:bg-surface-soft"
             )}
           >
@@ -130,14 +130,14 @@ function ReportProblemModal({ isOpen, onClose }) {
     <>
       <div
         onClick={onClose}
-        className="fixed inset-0 z-40 backdrop-blur-sm animate-[backdrop-in_0.2s_ease] bg-black/50"
+        className="fixed inset-0 z-40 animate-[backdrop-in_0.2s_ease] bg-[var(--glass-overlay-scrim)]"
         aria-hidden="true"
       />
       <div className="fixed inset-0 z-50 flex items-center justify-center p-4 py-12 px-4 sm:px-6 overflow-y-auto w-full h-full pointer-events-none">
         <div
           className={cn(
             "relative w-full max-w-md rounded-2xl border pointer-events-auto animate-[modal-in_0.25s_ease]",
-            "p-6 backdrop-blur-3xl",
+            "p-6 bg-[var(--surface-card)]",
             "border-border-subtle bg-surface shadow-[0_30px_80px_rgba(var(--color-black-rgb),0.35)] ring-1 ring-primary/10"
           )}
         >
@@ -253,7 +253,7 @@ function ContactSupport() {
             href={item.href}
             target={item.href.startsWith("http") ? "_blank" : undefined}
             rel={item.href.startsWith("http") ? "noopener noreferrer" : undefined}
-            className="glass-lux-interactive rounded-2xl p-4 flex items-center gap-3 transition-colors"
+            className="surface-card-interactive rounded-2xl p-4 flex items-center gap-3 transition-colors"
           >
             <div
               className={cn(
@@ -324,7 +324,7 @@ export default function HelpPage() {
       <section>
         <button
           onClick={() => setShowReportModal(true)}
-          className="glass-lux-interactive rounded-2xl p-4 w-full flex items-center gap-3 transition-colors text-left"
+          className="surface-card-interactive rounded-2xl p-4 w-full flex items-center gap-3 transition-colors text-left"
         >
           <div className="flex-shrink-0 w-10 h-10 rounded-xl bg-danger/15 flex items-center justify-center">
             <AlertCircle size={18} className="text-danger" />

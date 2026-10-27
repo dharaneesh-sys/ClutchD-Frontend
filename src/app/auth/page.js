@@ -21,7 +21,7 @@ export default function AuthPage() {
       <div className="w-full max-w-7xl grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-16 items-center px-4 relative z-10">
         <div className="order-2 lg:order-1 flex flex-col justify-center text-center lg:text-left lg:pr-12">
           <div>
-              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full mb-6 backdrop-blur-md hidden sm:inline-flex bg-primary-soft border border-subtle">
+              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full mb-6 hidden sm:inline-flex bg-primary-soft border border-subtle">
               <span className="w-2 h-2 rounded-full bg-primary" />
               <span className="text-xs font-medium text-muted">Now live in Coimbatore</span>
             </div>
@@ -45,7 +45,7 @@ export default function AuthPage() {
               ].map((feat, idx) => (
                 <div
                   key={idx}
-                  className={`glass-lux-interactive flex flex-col p-4 rounded-2xl backdrop-blur-sm`}
+                  className={`surface-card-interactive flex flex-col p-4 rounded-2xl`}
                 >
                   <span className="font-semibold mb-1 text-[var(--color-text-primary)]">{feat.title}</span>
                   <span className="text-sm text-muted">{feat.desc}</span>

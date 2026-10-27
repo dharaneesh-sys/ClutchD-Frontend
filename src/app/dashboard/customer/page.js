@@ -347,7 +347,7 @@ export default function CustomerDashboard() {
           <div className="lg:col-span-7 xl:col-span-8 rounded-2xl overflow-hidden relative shadow-2xl min-h-[250px] sm:min-h-[350px] lg:min-h-[400px]">
             <MapView role="customer" />
 
-            <div className="absolute top-4 left-4 z-[400] glass-lux px-3 py-1.5 rounded-full text-xs font-semibold flex items-center gap-2 text-foreground">
+            <div className="absolute top-4 left-4 z-[400] glass-overlay px-3 py-1.5 rounded-full text-xs font-semibold flex items-center gap-2 text-foreground">
               <span className="w-2 h-2 rounded-full bg-[var(--primary)]" />
               Live Area Map
             </div>

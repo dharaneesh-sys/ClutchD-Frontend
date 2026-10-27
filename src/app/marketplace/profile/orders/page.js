@@ -85,7 +85,7 @@ export function getStatusTab(status) {
 function OrderCard({ order, onViewDetails, onDownloadReceipt }) {
   return (
     <div
-      className="glass-lux rounded-2xl p-4 sm:p-5 space-y-3 animate-fade-in-up"
+      className="surface-card rounded-2xl p-4 sm:p-5 space-y-3 animate-fade-in-up"
     >
       {/* Header: ID + Status */}
       <div className="flex items-start justify-between gap-3">
@@ -174,14 +174,14 @@ function DetailModal({ order, onClose }) {
     <>
       <div
         onClick={onClose}
-        className="fixed inset-0 z-40 backdrop-blur-sm animate-[backdrop-in_0.2s_ease] bg-black/50"
+        className="fixed inset-0 z-40 animate-[backdrop-in_0.2s_ease] bg-[var(--glass-overlay-scrim)]"
         aria-hidden="true"
       />
       <div className="fixed inset-0 z-50 flex items-center justify-center p-4 py-12 px-4 sm:px-6 overflow-y-auto w-full h-full pointer-events-none">
         <div
           className={cn(
             "relative w-full max-w-md rounded-2xl border pointer-events-auto animate-[modal-in_0.25s_ease]",
-            "p-6 backdrop-blur-3xl",
+            "p-6 bg-[var(--surface-card)]",
             "border-border-subtle bg-surface shadow-[0_30px_80px_rgba(var(--color-black-rgb),0.35)] ring-1 ring-primary/10"
           )}
         >

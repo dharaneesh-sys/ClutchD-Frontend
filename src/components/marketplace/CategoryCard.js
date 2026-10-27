@@ -32,7 +32,7 @@ function resolveIconKey(name) {
 }
 
 /**
- * CategoryCard — a glass-lux tile with icon, name, and item count.
+ * CategoryCard — a surface-card tile with icon, name, and item count.
  *
  * @param {object}   category              - Category object from the store
  * @param {string}   category.id           - Unique identifier (slug or id)
@@ -56,7 +56,7 @@ export function CategoryCard({ category, icon, className }) {
     <Link
       href={`/marketplace/categories/id?id=${category.id}`}
       className={cn(
-        "glass-lux-interactive rounded-2xl p-3.5",
+        "surface-card-interactive rounded-2xl p-3.5",
         "flex flex-col items-center gap-2.5 text-center",
         "hover:border-primary/30",
         "hover-lift active-press",

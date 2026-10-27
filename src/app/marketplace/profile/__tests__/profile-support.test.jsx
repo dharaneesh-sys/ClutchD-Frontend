@@ -1,7 +1,7 @@
 // Wave-3 Task 9 — RED-first contract tests for profile support screens.
 // DESIGN.md: D1 (grounded blue, BAN one-off hues/white hardcodes/neon),
 // D3 (headline-3/body-2 shell language), D4 (cards rounded-2xl),
-// D5 (glass-lux 2-variant only), D7/D15 (danger/info/pending roles;
+// D5 (surface-card 2-variant only), D7/D15 (danger/info/pending roles;
 // SOS queued/confirming use pending, never blue/red), D9 (SOS inline,
 // 2-tap, no overlay), D10 (parts store outranks discovery/SOS).
 import "@testing-library/jest-dom/vitest";
@@ -31,9 +31,9 @@ const shared = () => ({
 const allTouched = () => ({ ...screens(), ...shared() });
 
 describe("support screens share the profile shell language (D3/D4/D5)", () => {
-  it("all 6 screens use glass-lux cards with rounded-2xl, no legacy variants or glow", () => {
+  it("all 6 screens use surface-card cards with rounded-2xl, no legacy variants or glow", () => {
     for (const [name, code] of Object.entries(screens())) {
-      expect(code, `${name} needs glass-lux`).toContain("glass-lux");
+      expect(code, `${name} needs a flat card`).toMatch(/surface-card|<GlassCard/);
       expect(code, `${name} needs rounded-2xl`).toContain("rounded-2xl");
       expect(code, `${name} bans legacy glass`).not.toMatch(
         /glass-strong|glass-lux-strong|surface-elevated|surface-filled|surface-outlined/
@@ -94,9 +94,9 @@ describe("support screens stay in grounded blue (D1/D7/D15)", () => {
 });
 
 describe("referral display (D1/D5)", () => {
-  it("ReferralPanel uses glass-lux only, no purple hex fallbacks", () => {
+  it("ReferralPanel uses surface-card only, no purple hex fallbacks", () => {
     const code = shared().ReferralPanel;
-    expect(code).toContain("glass-lux");
+    expect(code).toMatch(/surface-card|<GlassCard/);
     expect(code).not.toMatch(/variant="glass"/);
     expect(code).not.toMatch(/#[0-9a-fA-F]{3,6}/);
   });
@@ -159,9 +159,9 @@ describe("empty/error states use shared components (D5)", () => {
     }
   });
 
-  it("ErrorCard uses glass-lux, not legacy glass", () => {
+  it("ErrorCard uses surface-card, not legacy glass", () => {
     const code = shared().ErrorCard;
-    expect(code).toContain("glass-lux");
+    expect(code).toMatch(/surface-card|<GlassCard/);
     expect(code).not.toMatch(/"glass |glass p-/);
   });
 });

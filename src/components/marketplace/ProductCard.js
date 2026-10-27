@@ -94,7 +94,7 @@ export function ProductCard({ product, className }) {
       onClick={() => router.push(`/marketplace/product/id?id=${id}`)}
       onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); router.push(`/marketplace/product/id?id=${id}`); }}}
       className={cn(
-        "glass-lux-interactive group rounded-2xl overflow-hidden cursor-pointer",
+        "surface-card-interactive group rounded-2xl overflow-hidden cursor-pointer",
         "flex h-full flex-col",
         "hover-lift active-press",
         className
@@ -137,7 +137,7 @@ export function ProductCard({ product, className }) {
             disabled={favBusy}
             aria-label={fav ? "Remove from favorites" : "Add to favorites"}
             className={cn(
-              "absolute top-3 right-3 inline-flex items-center justify-center w-8 h-8 rounded-full backdrop-blur-xl transition-all active:scale-95",
+              "absolute top-3 right-3 inline-flex items-center justify-center w-8 h-8 rounded-full transition-all active:scale-95",
               "focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/50",
               fav ? "bg-[var(--color-surface-mid)] text-icon-highlight" : "bg-[var(--surface-container)]/80 text-on-surface-variant hover:text-on-surface"
             )}

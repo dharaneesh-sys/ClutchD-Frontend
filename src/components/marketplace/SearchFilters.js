@@ -41,7 +41,7 @@ function FilterCheckbox({ label, checked, onChange }) {
           "flex-shrink-0 w-4 h-4 rounded border-2 flex items-center justify-center transition-all",
           checked
             ? "bg-primary border-primary"
-            : "border-white/20 group-hover:border-white/40"
+            : "border-[var(--border)] group-hover:border-[var(--border-strong)]"
         )}
       >
         {checked && (
@@ -241,7 +241,7 @@ export function SearchFilters({
   return (
     <>
       {/* Desktop sidebar */}
-      <aside className="hidden lg:flex flex-col w-64 shrink-0 glass-lux rounded-2xl overflow-hidden h-fit max-h-[calc(100dvh-12rem)] sticky top-24">
+      <aside className="hidden lg:flex flex-col w-64 shrink-0 surface-card rounded-2xl overflow-hidden h-fit max-h-[calc(100dvh-12rem)] sticky top-24">
         {content}
       </aside>
 
@@ -249,10 +249,10 @@ export function SearchFilters({
       {isMobileOpen && (
         <div className="fixed inset-0 z-50 lg:hidden">
           <div
-            className="absolute inset-0 bg-[rgba(0,0,0,0.32)] backdrop-blur-sm"
+            className="absolute inset-0 bg-[var(--glass-overlay-scrim)]"
             onClick={onMobileClose}
           />
-          <div className="absolute bottom-0 left-0 right-0 max-h-[85dvh] flex flex-col glass-lux rounded-t-2xl overflow-hidden animate-fade-in-up">
+          <div className="absolute bottom-0 left-0 right-0 max-h-[85dvh] flex flex-col surface-card rounded-t-2xl overflow-hidden animate-fade-in-up">
             {content}
           </div>
         </div>

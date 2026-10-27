@@ -68,7 +68,7 @@ function SettingsSkeleton() {
         <Skeleton className="w-56" />
       </div>
       {Array.from({ length: 3 }).map((_, i) => (
-        <div key={i} className="glass-lux rounded-2xl p-6 space-y-4">
+        <div key={i} className="surface-card rounded-2xl p-6 space-y-4">
           <Skeleton variant="title" className="w-32" />
           <Skeleton className="h-12 w-full" />
           <Skeleton className="h-12 w-full" />
@@ -336,7 +336,7 @@ export default function SettingsPage() {
 
       {/* ── Error Banner ─────────────────────────────────────────────── */}
       {error && (
-        <div className="flex items-start gap-3 glass-lux rounded-2xl p-4 border border-[var(--danger)]/25 bg-[var(--danger)]/10">
+        <div className="flex items-start gap-3 surface-card rounded-2xl p-4 border border-[var(--danger)]/25 bg-[var(--danger)]/10">
           <AlertTriangle
             size={18}
             className="mt-0.5 shrink-0 text-danger"
@@ -362,7 +362,7 @@ export default function SettingsPage() {
       {/* ══════════════════════════════════════════════════════════════════
           ACCOUNT SECTION
           ══════════════════════════════════════════════════════════════════ */}
-      <section className="glass-lux rounded-2xl p-6 space-y-4">
+      <section className="surface-card rounded-2xl p-6 space-y-4">
         <SectionHeader icon={Lock} title="Account" danger />
 
         {/* Change Password */}
@@ -444,7 +444,7 @@ export default function SettingsPage() {
       {/* ══════════════════════════════════════════════════════════════════
           NOTIFICATIONS SECTION
           ══════════════════════════════════════════════════════════════════ */}
-      <section className="glass-lux rounded-2xl p-6 space-y-4">
+      <section className="surface-card rounded-2xl p-6 space-y-4">
         <SectionHeader icon={Bell} title="Notifications" />
 
         <div className="space-y-1">
@@ -537,7 +537,7 @@ export default function SettingsPage() {
       {/* ══════════════════════════════════════════════════════════════════
           APPEARANCE SECTION
           ══════════════════════════════════════════════════════════════════ */}
-      <section className="glass-lux rounded-2xl p-6 space-y-4">
+      <section className="surface-card rounded-2xl p-6 space-y-4">
         <SectionHeader icon={Sun} title="Appearance" />
 
         <div className="grid grid-cols-3 gap-3">
@@ -583,7 +583,7 @@ export default function SettingsPage() {
       {/* ══════════════════════════════════════════════════════════════════
           LANGUAGE SECTION — UI only, no i18n integration yet
           ══════════════════════════════════════════════════════════════════ */}
-      <section className="glass-lux rounded-2xl p-6 space-y-4 opacity-60 pointer-events-none select-none">
+      <section className="surface-card rounded-2xl p-6 space-y-4 opacity-60 pointer-events-none select-none">
         <div className="flex items-center justify-between mb-5">
           <SectionHeader icon={Globe} title="Language" />
           <span className="rounded-full bg-surface-soft border border-subtle px-2.5 py-0.5 text-[0.625rem] font-medium text-text-muted uppercase tracking-wider">
@@ -627,7 +627,7 @@ export default function SettingsPage() {
       {/* ══════════════════════════════════════════════════════════════════
           PRIVACY SECTION
           ══════════════════════════════════════════════════════════════════ */}
-      <section className="glass-lux rounded-2xl p-6 space-y-4">
+      <section className="surface-card rounded-2xl p-6 space-y-4">
         <SectionHeader icon={Shield} title="Privacy" />
 
         {/* Manage Permissions */}

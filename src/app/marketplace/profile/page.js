@@ -91,7 +91,7 @@ export default function ProfilePage() {
   return (
     <div className="p-4 sm:p-5 space-y-5 animate-fade-in-up">
       {/* Profile Header Card */}
-      <div className="glass-lux rounded-2xl p-5 relative overflow-hidden">
+      <div className="surface-card rounded-2xl p-5 relative overflow-hidden">
         {/* Decorative gradient */}
         <div className="absolute -top-20 -right-20 w-40 h-40 rounded-full bg-surface-soft blur-3xl pointer-events-none" />
 
@@ -174,7 +174,7 @@ export default function ProfilePage() {
 
       {/* Quick Stats — values sourced from real API data */}
       <div className="grid grid-cols-3 gap-3">
-        <div className="glass-lux rounded-2xl p-4 text-center">
+        <div className="surface-card rounded-2xl p-4 text-center">
           <div className="w-8 h-8 rounded-lg bg-primary-soft flex items-center justify-center mx-auto mb-2">
             <ShoppingBag size={16} className="text-primary-light" />
           </div>
@@ -185,7 +185,7 @@ export default function ProfilePage() {
             Orders
           </p>
         </div>
-        <div className="glass-lux rounded-2xl p-4 text-center">
+        <div className="surface-card rounded-2xl p-4 text-center">
           <div className="w-8 h-8 rounded-lg bg-primary-mid flex items-center justify-center mx-auto mb-2">
             <Wrench size={16} className="text-primary-light" />
           </div>
@@ -196,7 +196,7 @@ export default function ProfilePage() {
             Active
           </p>
         </div>
-        <div className="glass-lux rounded-2xl p-4 text-center">
+        <div className="surface-card rounded-2xl p-4 text-center">
           <div className="w-8 h-8 rounded-lg bg-primary-soft flex items-center justify-center mx-auto mb-2">
             <Gift size={16} className="text-icon-highlight" />
           </div>
@@ -212,7 +212,7 @@ export default function ProfilePage() {
       {/* Quick Action: View Account Details */}
       <button
         onClick={() => router.push("/marketplace/profile/account")}
-        className="glass-lux-interactive rounded-2xl p-4 w-full flex items-center gap-3 text-left"
+        className="surface-card-interactive rounded-2xl p-4 w-full flex items-center gap-3 text-left"
       >
         <div className="w-10 h-10 rounded-xl bg-primary-soft flex items-center justify-center flex-shrink-0">
           <User size={18} className="text-primary-light" />

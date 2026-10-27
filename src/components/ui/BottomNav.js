@@ -131,7 +131,7 @@ export function BottomNav() {
                     className={cn(
                       "absolute bottom-full right-0 mb-3",
                       "min-w-[220px]",
-                      "glass-lux",
+                      "surface-card",
                       "rounded-2xl",
                       "p-3 z-[9999]",
                       "animate-scale-in"

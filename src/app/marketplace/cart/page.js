@@ -105,7 +105,7 @@ if (items.length === 0) {
             {items.map((item, index) => (
               <div
                 key={item.productId}
-                className="glass-lux rounded-2xl p-4 animate-fade-in-up"
+                className="surface-card rounded-2xl p-4 animate-fade-in-up"
                 style={{ animationDelay: `${index * 60}ms` }}
               >
                 <div className="flex items-start gap-4">
@@ -191,7 +191,7 @@ if (items.length === 0) {
 
           {/* ── Summary Sidebar ────────────────────────────────────────── */}
           <div className="w-full lg:w-80 xl:w-96">
-            <div className="glass-lux lg:sticky lg:top-4 space-y-5 rounded-2xl p-6">
+            <div className="surface-card lg:sticky lg:top-4 space-y-5 rounded-2xl p-6">
               <h2 className="text-lg font-semibold text-foreground">
                 Order Summary
               </h2>

@@ -256,7 +256,7 @@ function SearchPageContent() {
   return (
     <div className="min-h-dvh">
       {/* ─── Search Header ─────────────────────────────────── */}
-      <div className="sticky top-0 z-30 glass-lux rounded-none border-b border-border-subtle">
+      <div className="sticky top-0 z-30 surface-card rounded-none border-b border-border-subtle">
         <div className="max-w-7xl mx-auto px-4 py-3">
           <div className="relative">
             <Search
@@ -434,7 +434,7 @@ function SearchPageContent() {
                     </button>
 
                     {showSortDropdown && (
-                      <div className="absolute right-0 top-full mt-1.5 z-20 min-w-[180px] glass-lux rounded-xl overflow-hidden animate-scale-in">
+                      <div className="absolute right-0 top-full mt-1.5 z-20 min-w-[180px] surface-card rounded-xl overflow-hidden animate-scale-in">
                         {SORT_OPTIONS.map((option) => (
                           <button
                             key={option.value}

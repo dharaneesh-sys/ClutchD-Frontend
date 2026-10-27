@@ -14,7 +14,7 @@ export function Loader({ size = 24, className }) {
 
 export function FullPageLoader() {
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center backdrop-blur-sm bg-[var(--background)]/80">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-[var(--background)]">
       <div className="flex flex-col items-center space-y-4">
         <Loader size={48} />
         <p className="text-sm font-medium text-icon-highlight">Loading ClutchD...</p>

@@ -56,7 +56,7 @@ export function CategoryIcon({ category, size = "md", className }) {
     <div
       className={cn(
         "inline-flex items-center justify-center rounded-full",
-        "bg-surface-soft backdrop-blur-xl",
+        "bg-surface-soft",
         "ring-1 ring-border-subtle",
         className
       )}

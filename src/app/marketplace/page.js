@@ -21,7 +21,7 @@ function CategoryGridSkeleton() {
       {Array.from({ length: 6 }).map((_, i) => (
         <div
           key={i}
-          className="glass-lux rounded-2xl p-3.5 flex flex-col items-center gap-2.5"
+          className="surface-card rounded-2xl p-3.5 flex flex-col items-center gap-2.5"
         >
           <Shimmer variant="avatar" className="!h-12 !w-12" />
           <Shimmer variant="text" className="!h-3.5 !w-16" />
@@ -37,7 +37,7 @@ function ProductRowSkeleton() {
     <div className="flex gap-3 overflow-x-auto pb-2 -mx-4 px-4 snap-x snap-mandatory">
       {Array.from({ length: 4 }).map((_, i) => (
         <div key={i} className="snap-start shrink-0 w-44">
-          <div className="glass-lux rounded-2xl overflow-hidden">
+          <div className="surface-card rounded-2xl overflow-hidden">
             <Shimmer variant="image" className="!h-32 !w-full !rounded-none" />
             <div className="p-3.5 space-y-2.5">
               <Shimmer variant="text" className="!h-2.5 !w-14" />
@@ -184,7 +184,7 @@ export default function MarketplaceHome() {
             <Link
               href="/marketplace/profile/favorites"
               aria-label="My favorites"
-              className="inline-flex items-center justify-center w-10 h-10 rounded-xl glass-lux-interactive text-muted hover:text-primary transition-colors"
+              className="inline-flex items-center justify-center w-10 h-10 rounded-xl surface-card-interactive text-muted hover:text-primary transition-colors"
             >
               <Heart size={17} />
             </Link>
@@ -258,7 +258,7 @@ export default function MarketplaceHome() {
             })}
           </div>
         ) : status !== "ERROR" && (
-          <div className="glass-lux rounded-2xl py-6 px-4 text-center">
+          <div className="surface-card rounded-2xl py-6 px-4 text-center">
             <p className="text-sm text-muted">No categories available.</p>
           </div>
         )}
@@ -292,7 +292,7 @@ export default function MarketplaceHome() {
             ))}
           </div>
         ) : (
-          <div className="glass-lux rounded-2xl py-8 px-4 text-center">
+          <div className="surface-card rounded-2xl py-8 px-4 text-center">
             <div className="w-10 h-10 rounded-xl flex items-center justify-center mx-auto mb-3 bg-surface-soft text-icon-highlight">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
             </div>

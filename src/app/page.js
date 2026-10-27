@@ -25,7 +25,7 @@ export default function Home() {
         </div>
         <Link
           href="/auth"
-          className="glass-lux-interactive px-5 py-2.5 rounded-xl text-sm font-semibold text-foreground hover:text-primary-light transition-colors"
+          className="surface-card-interactive px-5 py-2.5 rounded-xl text-sm font-semibold text-foreground hover:text-primary-light transition-colors"
         >
           {t('nav.signIn')}
         </Link>
@@ -34,7 +34,7 @@ export default function Home() {
       <div className="relative z-10 flex-1 flex items-center justify-center px-6 sm:px-10 lg:px-16 py-16 lg:py-20">
         <div className="w-full max-w-6xl grid grid-cols-1 lg:grid-cols-2 gap-16 lg:gap-24 items-center">
           <div className="text-center lg:text-left">
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full mb-10 glass-lux text-sm">
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full mb-10 surface-card text-sm">
               <span className="w-2 h-2 rounded-full bg-primary-light animate-pulse" />
               <span className="text-primary-light/90 font-medium">
                 {t('hero.badge')}
@@ -59,7 +59,7 @@ export default function Home() {
               </Link>
               <Link
                 href="/auth"
-                className="glass-lux-interactive inline-flex items-center justify-center gap-2 px-8 py-4 rounded-2xl text-foreground font-semibold text-lg hover:bg-[var(--color-surface-soft)] active:scale-[0.98] transition-all duration-200"
+                className="surface-card-interactive inline-flex items-center justify-center gap-2 px-8 py-4 rounded-2xl text-foreground font-semibold text-lg hover:bg-[var(--color-surface-soft)] active:scale-[0.98] transition-all duration-200"
               >
                 {t('hero.signIn')}
               </Link>
@@ -67,7 +67,7 @@ export default function Home() {
           </div>
 
           <div className="flex justify-center">
-            <div className="glass-lux w-full max-w-md p-8 sm:p-10 rounded-2xl">
+            <div className="surface-card w-full max-w-md p-8 sm:p-10 rounded-2xl">
               <div className="mb-8">
                 <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-primary-light to-primary flex items-center justify-center mb-5 shadow-lg">
                   <Zap size={28} className="text-[var(--background)]" />
@@ -88,7 +88,7 @@ export default function Home() {
                 ].map((step) => (
                   <div
                     key={step.num}
-                    className="flex items-start gap-4 glass-lux-interactive p-4 rounded-xl hover:bg-[var(--color-surface-soft)] transition-colors"
+                    className="flex items-start gap-4 surface-card-interactive p-4 rounded-xl hover:bg-[var(--color-surface-soft)] transition-colors"
                   >
                      <span className="text-primary-light font-mono font-bold text-lg leading-none mt-0.5">
                        {step.num}
@@ -111,7 +111,7 @@ export default function Home() {
             return (
               <div
                 key={feat.key}
-                className="glass-lux-interactive p-6 rounded-2xl text-center group hover-lift"
+                className="surface-card-interactive p-6 rounded-2xl text-center group hover-lift"
               >
                  <div className="w-12 h-12 rounded-xl bg-primary/15 flex items-center justify-center mx-auto mb-4 group-hover:bg-primary/25 group-hover:scale-110 transition-all duration-200">
                    <Icon size={22} className="text-primary-light" />

@@ -1,6 +1,6 @@
 // Wave-1 Task 4 (cards) — RED-first contract tests for ProfileMenu.
 // DESIGN.md: D1 (grounded blue + danger token, no red-*/white-* hardcodes),
-// D3 (label-2 section heads), D4 (rows cards rounded-2xl), D5 (glass-lux rows),
+// D3 (label-2 section heads), D4 (rows cards rounded-2xl), D5 (surface-card rows),
 // D7/D15 (danger role for SOS), D8 (lucide only), D9 (menu entries/nav targets frozen).
 import "@testing-library/jest-dom/vitest";
 import { describe, it, expect, vi, beforeEach } from "vitest";
@@ -64,10 +64,10 @@ describe("ProfileMenu render + nav (targets frozen per D9)", () => {
 });
 
 describe("ProfileMenu contract (D1/D3/D4/D5/D7/D8)", () => {
-  it("glass-lux row cards + rounded-2xl with semantic dividers (no divide-white)", () => {
+  it("surface-card row cards + rounded-2xl with semantic dividers (no divide-white)", () => {
     const code = src();
-    expect(code).toContain("glass-lux");
-    expect(code).not.toContain("glass-lux-interactive");
+    expect(code).toContain("surface-card");
+    expect(code).not.toContain("surface-card-interactive");
     expect(code).toContain("rounded-2xl");
     expect(code).toMatch(/divide-border-subtle/);
     expect(code).not.toMatch(/divide-white/);

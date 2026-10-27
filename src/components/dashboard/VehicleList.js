@@ -28,7 +28,7 @@ import api from "@/lib/api";
 function VehicleServiceJobCard({ job }) {
   const pricing = job.pricing;
   return (
-    <GlassCard variant="glass-lux" className="p-4">
+    <GlassCard className="p-4">
       <div className="flex items-center justify-between gap-4">
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 mb-1">

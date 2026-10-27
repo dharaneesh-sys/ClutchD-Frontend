@@ -106,20 +106,20 @@ export function ChatPanel({ jobId, otherUserName, otherUserRole, onClose }) {
     <>
       <div
         className={cn(
-          "glass-lux w-[380px] max-w-[calc(100vw-32px)]",
+          "surface-card w-[380px] max-w-[calc(100vw-32px)]",
           "flex flex-col overflow-hidden",
           "animate-scale-in origin-bottom-right",
-          "shadow-[var(--glass-lux-shadow)]",
+          "shadow-[var(--shadow-card)]",
           "max-h-[600px] sm:max-h-[540px]"
         )}
         role="dialog"
         aria-label={`Chat with ${otherUserName}`}
       >
-        <div className="flex items-center justify-between px-4 py-3 border-b border-[var(--glass-lux-border)]">
+        <div className="flex items-center justify-between px-4 py-3 border-b border-[var(--border)]">
           <div className="flex items-center gap-2.5 min-w-0">
             <button
               onClick={onClose}
-              className="glass-lux-interactive w-7 h-7 flex items-center justify-center rounded-lg active-press shrink-0"
+              className="surface-card-interactive w-7 h-7 flex items-center justify-center rounded-lg active-press shrink-0"
               aria-label="Back"
             >
               <ChevronLeft size={16} className="text-on-surface-variant" />
@@ -145,7 +145,7 @@ export function ChatPanel({ jobId, otherUserName, otherUserRole, onClose }) {
           </div>
           <button
             onClick={onClose}
-            className="glass-lux-interactive w-7 h-7 flex items-center justify-center rounded-lg active-press shrink-0"
+            className="surface-card-interactive w-7 h-7 flex items-center justify-center rounded-lg active-press shrink-0"
             aria-label="Close chat"
           >
             <X size={14} className="text-on-surface-variant" />
@@ -171,15 +171,15 @@ export function ChatPanel({ jobId, otherUserName, otherUserRole, onClose }) {
           )}
         </div>
 
-        <div className="flex items-end gap-2 px-4 py-3 border-t border-[var(--glass-lux-border)]">
+        <div className="flex items-end gap-2 px-4 py-3 border-t border-[var(--border)]">
           <button
             onClick={() => fileInputRef.current?.click()}
             disabled={uploading}
             className={cn(
               "w-11 h-11 flex items-center justify-center rounded-xl transition-all flex-shrink-0 active-press",
               uploading
-                ? "bg-white/5 text-dim cursor-not-allowed"
-                : "bg-white/5 text-on-surface-variant hover:bg-white/10"
+                ? "bg-[var(--surface-soft)] text-dim cursor-not-allowed"
+                : "bg-[var(--surface-soft)] text-on-surface-variant hover:bg-[var(--surface-soft)]"
             )}
             aria-label="Attach image"
           >
@@ -214,7 +214,7 @@ export function ChatPanel({ jobId, otherUserName, otherUserRole, onClose }) {
               "w-11 h-11 flex items-center justify-center rounded-xl transition-all flex-shrink-0 active-press",
               inputValue.trim()
                 ? "bg-primary text-white shadow-[0_0_16px_rgba(var(--color-primary-rgb),0.25)] hover:shadow-[0_0_20px_rgba(var(--color-primary-rgb),0.35)]"
-                : "bg-white/5 text-dim cursor-not-allowed"
+                : "bg-[var(--surface-soft)] text-dim cursor-not-allowed"
             )}
             aria-label="Send message"
           >
@@ -240,7 +240,7 @@ export function ChatPanel({ jobId, otherUserName, otherUserRole, onClose }) {
             <button
               onClick={() => setPreviewImage(null)}
               className="mt-4 flex items-center gap-2 px-4 py-2 rounded-xl text-sm
-                         bg-white/10 hover:bg-white/20 text-on-surface transition-colors"
+                         bg-[var(--surface-soft)] hover:bg-[var(--surface-soft)] text-on-surface transition-colors"
             >
               <XCircle size={16} />
               Close

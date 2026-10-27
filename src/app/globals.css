@@ -62,17 +62,7 @@
   --elevation-4: 0 6px 10px 4px rgba(0,0,0,0.08), 0 2px 3px 0 rgba(0,0,0,0.06);
   --elevation-5: 0 8px 12px 6px rgba(0,0,0,0.08), 0 4px 4px 0 rgba(0,0,0,0.06);
 
-  --glass-bg: var(--glass-overlay-bg);
-  --glass-border: var(--glass-overlay-border);
-  --glass-hover: var(--glass-overlay-bg);
 
-  --glass-lux-bg: var(--glass-overlay-bg);
-  --glass-lux-bg-strong: var(--glass-overlay-bg);
-  --glass-lux-border: var(--glass-overlay-border);
-  --glass-lux-border-accent: var(--primary);
-  --glass-lux-shadow: var(--shadow-card);
-  --glass-lux-shadow-hover: var(--shadow-card);
-  --glass-lux-radius: 16px;
 
   --color-emerald-filter: "none";
   --color-surface-soft: var(--surface-soft);
@@ -173,17 +163,7 @@
   --elevation-4: 0 6px 10px 4px rgba(0,0,0,0.15), 0 2px 3px 0 rgba(0,0,0,0.3);
   --elevation-5: 0 8px 12px 6px rgba(0,0,0,0.15), 0 4px 4px 0 rgba(0,0,0,0.3);
 
-  --glass-bg: var(--glass-overlay-bg);
-  --glass-border: var(--glass-overlay-border);
-  --glass-hover: var(--glass-overlay-bg);
 
-  --glass-lux-bg: var(--glass-overlay-bg);
-  --glass-lux-bg-strong: var(--glass-overlay-bg);
-  --glass-lux-border: var(--glass-overlay-border);
-  --glass-lux-border-accent: var(--primary);
-  --glass-lux-shadow: var(--shadow-card);
-  --glass-lux-shadow-hover: var(--shadow-card);
-  --glass-lux-radius: 16px;
 
   --color-emerald-filter: "none";
   --color-surface-soft: var(--surface-soft);
@@ -342,52 +322,34 @@ h1, h2, h3, h4 {
   letter-spacing: -0.02em;
 }
 
-/* Deprecated one-release aliases (D5, Wave-1): collapse onto glass-lux. Banned for new code. */
-.glass,
-.glass-strong,
-.surface-elevated,
-.surface-filled,
-.surface-outlined {
-  background: var(--glass-lux-bg);
-  backdrop-filter: blur(20px) saturate(1.3);
-  -webkit-backdrop-filter: blur(20px) saturate(1.3);
-  border: 1px solid var(--glass-lux-border);
-  border-radius: var(--glass-lux-radius);
-  box-shadow: var(--glass-lux-shadow);
+/* Flat content card (DESIGN.md §0) — every content surface. */
+.surface-card {
+  background: var(--surface-card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  box-shadow: var(--shadow-card);
 }
 
-/* Glass-Lux System — clean, no pseudo-element gradients */
-.glass-lux {
-  background: var(--glass-lux-bg);
-  backdrop-filter: blur(20px) saturate(1.3);
-  -webkit-backdrop-filter: blur(20px) saturate(1.3);
-  border: 1px solid var(--glass-lux-border);
-  border-radius: var(--glass-lux-radius);
-  box-shadow: var(--glass-lux-shadow);
-}
-
-
-.glass-lux-interactive {
-  background: var(--glass-lux-bg);
-  backdrop-filter: blur(20px) saturate(1.3);
-  -webkit-backdrop-filter: blur(20px) saturate(1.3);
-  border: 1px solid var(--glass-lux-border);
-  border-radius: var(--glass-lux-radius);
-  box-shadow: var(--glass-lux-shadow);
+.surface-card-interactive {
+  background: var(--surface-card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  box-shadow: var(--shadow-card);
   cursor: pointer;
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  transition: border-color 0.15s ease, background-color 0.15s ease;
 }
+.surface-card-interactive:hover { border-color: var(--border-strong); }
+.surface-card-interactive:active { background-color: var(--surface-soft); }
 
-.glass-lux-interactive:hover {
-  border-color: var(--glass-lux-border-accent);
-  box-shadow: var(--glass-lux-shadow-hover);
+/* The only translucent surface. Allowed on: bottom nav, modal/sheet,
+   floating map controls, splash hero overlay. */
+.glass-overlay {
+  background: var(--glass-overlay-bg);
+  backdrop-filter: blur(var(--glass-overlay-blur));
+  -webkit-backdrop-filter: blur(var(--glass-overlay-blur));
+  border: 1px solid var(--glass-overlay-border);
+  box-shadow: var(--shadow-card);
 }
-
-.glass-lux-interactive:active {
-  transform: scale(0.99);
-}
-
-/* M3 surface roles resolve to tokens and the glass-lux alias group above (D4, D5, D15.1). */
 
 /* M3 Elevation Classes */
 .elevation-1 { box-shadow: var(--elevation-1); }
@@ -435,16 +397,6 @@ h1, h2, h3, h4 {
   background-clip: text;
 }
 
-.btn-glow {
-  background: linear-gradient(135deg, var(--primary-light) 0%, var(--primary-dark) 100%);
-  box-shadow: 0 4px 15px rgba(var(--color-primary-rgb), 0.25);
-  transition: all 0.2s ease;
-}
-
-.btn-glow:hover {
-  box-shadow: 0 6px 25px rgba(var(--color-primary-rgb), 0.4);
-}
-
 ::-webkit-scrollbar { width: 8px; }
 ::-webkit-scrollbar-track { background: rgba(var(--color-white-rgb), 0.02); }
 ::-webkit-scrollbar-thumb {
@@ -452,31 +404,6 @@ h1, h2, h3, h4 {
   border-radius: 3px;
 }
 ::-webkit-scrollbar-thumb:hover { background: rgba(var(--color-primary-rgb), 0.5); }
-
-.input-glass {
-  background: rgba(var(--color-white-rgb), 0.03);
-  border: 1px solid rgba(var(--color-white-rgb), 0.08);
-  border-radius: 0.75rem;
-  padding: 0.75rem 1rem;
-  color: var(--foreground);
-  font-size: 0.875rem;
-  transition: all 0.2s ease;
-  outline: none;
-  width: 100%;
-}
-
-.input-glass::placeholder { color: rgba(var(--color-white-rgb), 0.3); }
-
-.input-glass:focus {
-  border-color: var(--primary);
-  box-shadow: 0 0 0 3px rgba(var(--color-primary-rgb), 0.15);
-  background: rgba(var(--color-white-rgb), 0.05);
-}
-
-.input-glass.error {
-  border-color: var(--danger);
-  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.15);
-}
 
 @keyframes fade-in-up {
   from { opacity: 0; transform: translateY(12px); }
@@ -495,14 +422,6 @@ h1, h2, h3, h4 {
 .hover-lift:hover {
   transform: translateY(-2px);
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
-}
-
-.hover-glow {
-  transition: box-shadow 0.2s ease, border-color 0.2s ease;
-}
-.hover-glow:hover {
-  box-shadow: 0 0 0 2px rgba(var(--color-primary-rgb), 0.15),
-              0 0 16px rgba(var(--color-primary-rgb), 0.1);
 }
 
 .active-press {
@@ -600,30 +519,22 @@ h1, h2, h3, h4 {
 .status-inprogress { color: var(--primary); }
 .status-completed { color: var(--success); }
 
-/* Leaflet map overrides */
+/* Leaflet map overrides — popup is a floating map overlay (approved glass). */
 .leaflet-container {
-  background: #2a2a3a !important;
+  background: var(--surface-soft) !important;
   border-radius: 1rem;
 }
-.leaflet-tile-pane { filter: brightness(0.8) contrast(1.1) saturate(0.7); }
+[data-theme="dark"] .leaflet-tile-pane { filter: brightness(0.8) contrast(1.1) saturate(0.7); }
 .leaflet-popup-content-wrapper {
-  background: rgba(24, 24, 27, 0.95) !important;
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(var(--color-white-rgb), 0.15);
+  background: var(--glass-overlay-bg) !important;
+  backdrop-filter: blur(var(--glass-overlay-blur));
+  -webkit-backdrop-filter: blur(var(--glass-overlay-blur));
+  border: 1px solid var(--glass-overlay-border) !important;
   border-radius: 1rem !important;
-  color: var(--foreground) !important;
-}
-.leaflet-popup-tip { background: rgba(24, 24, 27, 0.95) !important; }
-
-:is(.light, [data-theme="light"]) .leaflet-container { background: #f1f5f9 !important; }
-:is(.light, [data-theme="light"]) .leaflet-tile-pane { filter: none; }
-:is(.light, [data-theme="light"]) .leaflet-popup-content-wrapper {
-  background: var(--surface-card) !important;
-  color: var(--foreground) !important;
-  border: 1px solid var(--border) !important;
   box-shadow: var(--shadow-card) !important;
+  color: var(--foreground) !important;
 }
-:is(.light, [data-theme="light"]) .leaflet-popup-tip { background: rgba(255, 255, 255, 0.95) !important; }
+.leaflet-popup-tip { background: var(--surface-card) !important; }
 
 /* ─── Custom SVG Marker Styles ────────────────────────────────────────── */
 .marker-custom,
@@ -650,14 +561,14 @@ h1, h2, h3, h4 {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 36px;
-  height: 36px;
+  width: 44px;
+  height: 44px;
   padding: 0;
   margin: 0;
-  background: var(--glass-lux-bg);
-  backdrop-filter: blur(16px) saturate(1.3);
-  -webkit-backdrop-filter: blur(16px) saturate(1.3);
-  border: 1px solid var(--glass-lux-border);
+  background: var(--glass-overlay-bg);
+  backdrop-filter: blur(var(--glass-overlay-blur));
+  -webkit-backdrop-filter: blur(var(--glass-overlay-blur));
+  border: 1px solid var(--glass-overlay-border);
   border-radius: 8px;
   color: var(--foreground);
   cursor: pointer;
@@ -666,8 +577,8 @@ h1, h2, h3, h4 {
   position: relative;
 }
 .my-location-btn:hover {
-  background: var(--glass-hover);
-  border-color: var(--glass-lux-border-accent);
+  background: var(--surface-soft);
+  border-color: var(--primary);
   box-shadow: var(--elevation-3);
 }
 .my-location-btn:active {
@@ -708,10 +619,10 @@ h1, h2, h3, h4 {
   display: flex;
   flex-direction: column;
   align-items: center;
-  background: var(--glass-lux-bg-strong);
-  backdrop-filter: blur(16px) saturate(1.3);
-  -webkit-backdrop-filter: blur(16px) saturate(1.3);
-  border: 1px solid var(--glass-lux-border);
+  background: var(--glass-overlay-bg);
+  backdrop-filter: blur(var(--glass-overlay-blur));
+  -webkit-backdrop-filter: blur(var(--glass-overlay-blur));
+  border: 1px solid var(--glass-overlay-border);
   border-radius: 8px;
   overflow: hidden;
   box-shadow: var(--elevation-2);
@@ -720,8 +631,8 @@ h1, h2, h3, h4 {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 36px;
-  height: 36px;
+  width: 44px;
+  height: 44px;
   padding: 0;
   margin: 0;
   background: transparent;
@@ -731,7 +642,7 @@ h1, h2, h3, h4 {
   transition: background 0.2s ease;
 }
 .zoom-control-btn:hover {
-  background: var(--glass-hover);
+  background: var(--surface-soft);
 }
 .zoom-control-btn:active {
   transform: scale(0.95);
@@ -742,7 +653,7 @@ h1, h2, h3, h4 {
 .zoom-control-divider {
   width: 24px;
   height: 1px;
-  background: var(--glass-lux-border);
+  background: var(--glass-overlay-border);
   flex-shrink: 0;
 }
 :is(.light, [data-theme="light"]) .zoom-controls {
@@ -763,10 +674,10 @@ h1, h2, h3, h4 {
   display: flex;
   align-items: center;
   gap: 4px;
-  background: var(--glass-lux-bg-strong);
-  backdrop-filter: blur(16px) saturate(1.3);
-  -webkit-backdrop-filter: blur(16px) saturate(1.3);
-  border: 1px solid var(--glass-lux-border-accent);
+  background: var(--glass-overlay-bg);
+  backdrop-filter: blur(var(--glass-overlay-blur));
+  -webkit-backdrop-filter: blur(var(--glass-overlay-blur));
+  border: 1px solid var(--primary);
   border-radius: 9999px;
   padding: 3px 10px;
   font-size: 0.75rem;
@@ -786,10 +697,10 @@ h1, h2, h3, h4 {
 
 /* ─── Map Legend ───────────────────────────────────────────────────────── */
 .map-legend {
-  background: var(--glass-lux-bg-strong);
-  backdrop-filter: blur(20px) saturate(1.3);
-  -webkit-backdrop-filter: blur(20px) saturate(1.3);
-  border: 1px solid var(--glass-lux-border);
+  background: var(--glass-overlay-bg);
+  backdrop-filter: blur(var(--glass-overlay-blur));
+  -webkit-backdrop-filter: blur(var(--glass-overlay-blur));
+  border: 1px solid var(--glass-overlay-border);
   border-radius: 10px;
   padding: 8px 12px;
   box-shadow: var(--elevation-2);
@@ -841,7 +752,7 @@ h1, h2, h3, h4 {
   color: var(--foreground);
 }
 
-/* ─── Glass-Lux Map Popups ──────────────────────────────────────────────── */
+/* ─── Map Popups ──────────────────────────────────────────────── */
 .leaflet-popup-content {
   margin: 0 !important;
   min-width: 160px;
@@ -935,73 +846,6 @@ h1, h2, h3, h4 {
   color: var(--foreground);
 }
 
-:is(.light, [data-theme="light"]) .glass {
-  background: var(--glass-overlay-bg);
-  border: 1px solid var(--glass-overlay-border);
-  box-shadow: var(--shadow-card);
-}
-
-:is(.light, [data-theme="light"]) .glass-strong {
-  background: var(--glass-overlay-bg);
-  border: 1px solid var(--glass-overlay-border);
-  box-shadow: var(--shadow-card);
-}
-
-
-/* Flat opaque card surface. The cream glass override is retired here;
-   the remaining legacy glass selectors are removed in task 10. */
-:is(.light, [data-theme="light"]) .glass-lux {
-  background: var(--surface);
-  backdrop-filter: none;
-  -webkit-backdrop-filter: none;
-  border: 1px solid var(--color-border-subtle);
-  box-shadow: var(--elevation-1);
-}
-
-
-:is(.light, [data-theme="light"]) .glass-lux-interactive {
-  background: var(--surface);
-  backdrop-filter: none;
-  -webkit-backdrop-filter: none;
-  border: 1px solid var(--color-border-subtle);
-  box-shadow: var(--elevation-1);
-}
-
-:is(.light, [data-theme="light"]) .glass-lux-interactive:hover {
-  border-color: var(--outline-variant);
-  box-shadow: var(--elevation-2);
-}
-
-:is(.light, [data-theme="light"]) .hover-lift:hover {
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06), 0 2px 8px rgba(0, 0, 0, 0.04);
-}
-
-:is(.light, [data-theme="light"]) .hover-glow:hover {
-  box-shadow: 0 0 0 2px rgba(var(--color-primary-rgb), 0.12),
-              0 0 16px rgba(var(--color-primary-rgb), 0.08),
-              0 6px 20px rgba(0, 0, 0, 0.05);
-}
-
-:is(.light, [data-theme="light"]) .btn-glow {
-  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
-  box-shadow: 0 4px 14px rgba(var(--color-primary-rgb), 0.25);
-  color: var(--on-primary);
-}
-
-:is(.light, [data-theme="light"]) .btn-glow:hover { box-shadow: 0 6px 24px rgba(var(--color-primary-rgb), 0.35); }
-
-:is(.light, [data-theme="light"]) .input-glass {
-  background: var(--surface-card);
-  border: 1px solid var(--border);
-  color: var(--foreground);
-}
-:is(.light, [data-theme="light"]) .input-glass::placeholder { color: var(--text-muted); }
-:is(.light, [data-theme="light"]) .input-glass:focus {
-  border-color: var(--primary);
-  box-shadow: 0 0 0 3px rgba(var(--color-primary-rgb), 0.12);
-  background: var(--surface-card);
-}
-
 :is(.light, [data-theme="light"]) ::-webkit-scrollbar-track { background: rgba(var(--color-black-rgb), 0.02); }
 :is(.light, [data-theme="light"]) ::-webkit-scrollbar-thumb { background: rgba(var(--color-black-rgb), 0.12); }
 :is(.light, [data-theme="light"]) ::-webkit-scrollbar-thumb:hover { background: rgba(var(--color-black-rgb), 0.22); }
@@ -1015,7 +859,6 @@ h1, h2, h3, h4 {
 /* Mobile-first — touch targets, density */
 @media (max-width: 640px) {
   button, a, [role="button"] { min-height: 44px; }
-  .glass-lux, .glass-lux-interactive, .glass, .glass-strong { border-radius: 16px; }
 }
 
 /* Print styles */
@@ -1030,7 +873,7 @@ h1, h2, h3, h4 {
     -webkit-print-color-adjust: exact;
     print-color-adjust: exact;
   }
-  .glass-lux, .glass-lux-interactive, .glass, .glass-strong {
+  .surface-card, .surface-card-interactive, .glass-overlay {
     background: white !important;
     border: 1px solid #ddd !important;
     box-shadow: none !important;

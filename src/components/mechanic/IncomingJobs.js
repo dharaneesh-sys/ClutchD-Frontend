@@ -186,7 +186,7 @@ export function IncomingJobs({ onChat }) {
            </div>
         ) : error ? (
            <div className="h-full flex flex-col items-center justify-center text-text-dim">
-              <AlertTriangle size={40} className="mb-4 text-warning/50" />
+              <AlertTriangle size={40} className="mb-4 text-[var(--pending)]" />
               <p>{error}</p>
              <Button variant="ghost" size="sm" className="mt-2" onClick={fetchJobs}>Retry</Button>
            </div>

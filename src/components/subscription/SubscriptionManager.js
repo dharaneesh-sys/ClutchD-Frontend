@@ -191,7 +191,7 @@ export function SubscriptionManager() {
 
       {/* Backend Offline Notice */}
       {showOfflineNotice && !backendOnline && (
-        <GlassCard variant="glass-lux" className="p-4 border border-primary/30 bg-primary-soft">
+        <GlassCard className="p-4 border border-primary/30 bg-primary-soft">
           <div className="flex items-start gap-3">
             <AlertTriangle size={18} className="text-primary-light flex-shrink-0 mt-0.5" />
             <div className="flex-1 min-w-0">
@@ -215,7 +215,7 @@ export function SubscriptionManager() {
       )}
 
       {/* Current Plan Status */}
-      <GlassCard variant="glass-lux" className="p-5 rounded-2xl">
+      <GlassCard className="p-5 rounded-2xl">
         <div className="flex items-start gap-4">
           <div className="flex-shrink-0 w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center">
             <Crown size={24} className="text-primary-light" />
@@ -302,7 +302,7 @@ export function SubscriptionManager() {
       </div>
 
       {/* Upgrade vs Downgrade hint */}
-      <GlassCard variant="glass-lux" className="p-4">
+      <GlassCard className="p-4">
         <div className="flex items-start gap-3">
           <ArrowUp size={16} className="text-icon-highlight flex-shrink-0 mt-0.5" />
           <ArrowDown size={16} className="text-pending flex-shrink-0 mt-0.5" />

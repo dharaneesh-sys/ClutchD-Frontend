@@ -2,7 +2,7 @@
 // DESIGN.md: D2 (light-first, zero dark-prefixed classes, toggle only in settings + Menu popover),
 // D9.1 (6-item IA frozen, Menu popover w/ profile links + inline SOS + theme row),
 // D15.4.1 (M3 nav-bar: active-indicator pill, badge role), D4 (popovers rounded-2xl),
-// D5 (glass-lux only).
+// D5 (surface-card only).
 import "@testing-library/jest-dom/vitest";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen, fireEvent, cleanup } from "@testing-library/react";
@@ -134,12 +134,12 @@ describe("BottomNav Menu popover (D9.1 frozen behavior)", () => {
     expect(screen.getByText("Theme")).toBeInTheDocument();
   });
 
-  it("uses glass-lux + rounded-2xl (D4/D5), no dark-prefixed classes", () => {
+  it("uses surface-card + rounded-2xl (D4/D5), no dark-prefixed classes", () => {
     openMenu();
     const menu = screen.getByRole("button", { name: "Menu" });
     expect(menu.getAttribute("aria-expanded")).toBe("true");
     expect(menu.getAttribute("aria-haspopup")).toBe("true");
-    const panel = document.querySelector(".glass-lux.rounded-2xl");
+    const panel = document.querySelector(".surface-card.rounded-2xl");
     expect(panel).not.toBeNull();
     expect(panel.className).not.toMatch(/dark:/);
   });

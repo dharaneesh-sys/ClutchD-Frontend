@@ -37,7 +37,7 @@ export function BookingConfirmation({ booking, onDismiss, onNewBooking }) {
   return (
     <div className="space-y-6">
       {/* Success header */}
-      <GlassCard variant="glass-lux" className="p-6 sm:p-8 text-center">
+      <GlassCard className="p-6 sm:p-8 text-center">
         <div className="w-16 h-16 rounded-full bg-green-500/20 flex items-center justify-center mx-auto mb-5">
           <CheckCircle2 size={40} className="text-green-400" />
         </div>
@@ -128,7 +128,7 @@ export function BookingConfirmation({ booking, onDismiss, onNewBooking }) {
       </GlassCard>
 
       {/* Pricing summary */}
-      <GlassCard variant="glass-lux" className="p-5">
+      <GlassCard className="p-5">
         <h4 className="text-sm font-bold text-text-primary mb-4 flex items-center gap-2">
           <IndianRupee size={16} className="text-icon-highlight" />
           Pricing

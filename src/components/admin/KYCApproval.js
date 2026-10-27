@@ -48,7 +48,7 @@ function DocThumb({ doc, onOpen }) {
     <button
       type="button"
       onClick={() => onOpen(doc)}
-      className="group relative block w-full aspect-[4/3] rounded-xl overflow-hidden border border-white/10 bg-white/5 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/60"
+      className="group relative block w-full aspect-[4/3] rounded-xl overflow-hidden border border-[var(--border)] bg-[var(--surface-soft)] focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/60"
       aria-label={`View ${doc.label}`}
     >
       {doc.url ? (
@@ -97,7 +97,7 @@ function DocLightbox({ doc, onClose }) {
           <button
             type="button"
             onClick={onClose}
-            className="p-2 rounded-lg text-white/80 hover:bg-white/10 focus:outline-none focus-visible:ring-2 focus-visible:ring-white/50"
+            className="p-2 rounded-lg text-white/80 hover:bg-[var(--surface-soft)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)]"
             aria-label="Close"
           >
             <XCircle size={22} />
@@ -197,7 +197,7 @@ export function KYCApproval() {
             className={`px-3.5 py-1.5 rounded-full text-sm font-medium border transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/60 ${
               statusFilter === f.key
                 ? "bg-primary text-white border-primary"
-                : "bg-white/5 text-text-muted border-white/10 hover:bg-white/10"
+                : "bg-[var(--surface-soft)] text-text-muted border-[var(--border)] hover:bg-[var(--surface-soft)]"
             }`}
           >
             {f.label}
@@ -334,7 +334,7 @@ export function KYCApproval() {
                   ? "Optional — e.g. documents checked over a call"
                   : "Required — e.g. 'Aadhaar photo is blurred, please retake'"
               }
-              className="w-full rounded-xl bg-white/5 border border-white/10 px-3.5 py-2.5 text-sm text-text-primary placeholder:text-text-dim focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary/50 resize-none"
+              className="w-full rounded-xl bg-[var(--surface-soft)] border border-[var(--border)] px-3.5 py-2.5 text-sm text-text-primary placeholder:text-text-dim focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary/50 resize-none"
             />
 
             <div className="flex gap-3 justify-end mt-6">

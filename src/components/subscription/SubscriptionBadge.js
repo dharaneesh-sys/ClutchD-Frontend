@@ -116,7 +116,7 @@ export function SubscriptionFeatureBadge({
         "inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[0.625rem] font-semibold uppercase tracking-wider transition-colors",
         hasAccess
           ? "bg-success/15 text-success"
-          : "bg-white/5 text-text-dim",
+          : "bg-[var(--surface-soft)] text-text-dim",
         className
       )}
       title={hasAccess ? `Available on ${planId === "pro" ? "Pro" : "Plus"} plan` : `Requires ${requiredPlan === "pro" ? "Pro" : "Plus"} plan`}

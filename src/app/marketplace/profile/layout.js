@@ -21,7 +21,7 @@ export default function ProfileLayout({ children }) {
   return (
     <div className="flex-1 flex">
       {/* Sidebar — hidden on mobile, visible on lg+ */}
-      <aside className="hidden lg:flex flex-col w-64 flex-shrink-0 border-r border-white/[0.06] p-4 overflow-y-auto">
+      <aside className="hidden lg:flex flex-col w-64 flex-shrink-0 border-r border-[var(--border)] p-4 overflow-y-auto">
         <ProfileMenu />
       </aside>
 

@@ -193,7 +193,7 @@ export function ServiceStatusTracker({ request, onComplete, onCancel, onReleaseP
   };
 
   return (
-    <GlassCard variant="glass-lux" className="w-full p-6 flex flex-col flex-shrink-0">
+    <GlassCard className="w-full p-6 flex flex-col flex-shrink-0">
       <div className="mb-8">
         <h2 className="text-2xl font-bold mb-1 text-text-primary">Service Status</h2>
         <p className="text-sm text-text-muted">Track your request in real-time</p>

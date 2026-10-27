@@ -62,7 +62,7 @@ function CategoryProductsSkeleton() {
       {/* Grid skeleton */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
         {Array.from({ length: 4 }).map((_, i) => (
-          <div key={i} className="glass-lux rounded-2xl overflow-hidden">
+          <div key={i} className="surface-card rounded-2xl overflow-hidden">
             <Shimmer variant="image" className="!h-32 !w-full !rounded-none" />
             <div className="p-3.5 space-y-2.5">
               <Shimmer variant="text" className="!h-2.5 !w-14" />

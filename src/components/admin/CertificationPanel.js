@@ -45,7 +45,7 @@ function StatsCard({ icon: Icon, label, value, color }) {
             color === "success" && "bg-green-500/10 text-green-400",
             color === "pending" && "bg-[var(--pending-bg)] text-[var(--pending-text)]",
             color === "danger" && "bg-red-500/10 text-red-400",
-            color === "default" && "bg-white/10 text-text-dim"
+            color === "default" && "bg-[var(--surface-soft)] text-text-dim"
           )}
         >
           <Icon size={18} />
@@ -283,7 +283,7 @@ export function CertificationPanel() {
       {isLoading ? (
         <div className="space-y-3">
           {[1, 2, 3].map((i) => (
-            <div key={i} className="h-12 bg-white/5 rounded-xl animate-pulse" />
+            <div key={i} className="h-12 bg-[var(--surface-soft)] rounded-xl animate-pulse" />
           ))}
         </div>
       ) : filtered.length > 0 ? (

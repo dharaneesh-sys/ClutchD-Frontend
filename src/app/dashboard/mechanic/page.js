@@ -140,7 +140,7 @@ export default function MechanicDashboard() {
               
               <div className="h-[250px] sm:h-[300px] rounded-2xl overflow-hidden relative shadow-2xl border">
                 <NavigationMap role="mechanic" />
-                <div className="absolute top-4 left-4 z-[400] glass-lux px-3 py-1.5 rounded-full border border-border-subtle text-xs font-semibold flex items-center gap-2 text-foreground">
+                <div className="absolute top-4 left-4 z-[400] glass-overlay px-3 py-1.5 rounded-full text-xs font-semibold flex items-center gap-2 text-foreground">
                   <span className="w-2 h-2 rounded-full bg-info animate-pulse" />
                   Navigation
                 </div>
@@ -163,7 +163,7 @@ export default function MechanicDashboard() {
               
               {/* Collapsible jobs panel */}
               <div className={`absolute top-4 right-4 z-[400] w-80 sm:w-96 transition-all duration-300 ${jobsPanelOpen ? "opacity-100" : "opacity-0 pointer-events-none"}`}>
-                <div className="glass-lux rounded-2xl border border-border-subtle shadow-2xl overflow-hidden max-h-[55vh]">
+                <div className="glass-overlay rounded-2xl overflow-hidden max-h-[55vh]">
                   <div className="flex items-center justify-between px-4 py-3 border-b border-border-subtle">
                     <div className="flex items-center gap-2">
                       <Briefcase size={15} className="text-icon-highlight" />
@@ -181,7 +181,7 @@ export default function MechanicDashboard() {
               
               {/* Toggle button when panel is closed */}
               {!jobsPanelOpen && (
-                <button onClick={() => setJobsPanelOpen(true)} className="absolute top-4 right-4 z-[400] glass-lux rounded-xl border border-border-subtle shadow-2xl px-4 py-3 text-foreground hover:bg-surface-soft transition-all flex items-center gap-2">
+                <button onClick={() => setJobsPanelOpen(true)} className="absolute top-4 right-4 z-[400] glass-overlay rounded-xl min-h-[44px] px-4 py-3 text-foreground hover:bg-surface-soft transition-all flex items-center gap-2">
                   <Briefcase size={16} className="text-icon-highlight" />
                   <span className="text-sm font-medium">Jobs</span>
                 </button>

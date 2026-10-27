@@ -118,7 +118,7 @@ export function ProfileMenu({ className }) {
       {/* Role dashboard entry */}
       <button
         onClick={() => router.push(dashboardEntry.path)}
-        className="glass-lux rounded-2xl w-full flex items-center gap-3 px-4 py-3.5 text-left transition-all duration-200 hover:bg-surface-soft"
+        className="surface-card rounded-2xl w-full flex items-center gap-3 px-4 py-3.5 text-left transition-all duration-200 hover:bg-surface-soft"
       >
         <div className="flex-shrink-0 w-9 h-9 rounded-xl flex items-center justify-center bg-primary-soft text-primary-light">
           <dashboardEntry.icon size={17} />
@@ -135,7 +135,7 @@ export function ProfileMenu({ className }) {
           <h3 className="type-label-2 uppercase text-muted px-1 mb-2">
             {section.label}
           </h3>
-          <div className="glass-lux rounded-2xl overflow-hidden divide-y divide-border-subtle">
+          <div className="surface-card rounded-2xl overflow-hidden divide-y divide-border-subtle">
             {section.items
               .filter((item) => !item.roles || item.roles.includes(role))
               .map((item) => {

@@ -150,7 +150,7 @@ function ReviewCard({ review }) {
 
         {/* Verified badge */}
         {review.verified && (
-          <span className="flex-shrink-0 inline-flex items-center gap-1 rounded-full border border-[color-mix(in_srgb,var(--success)_35%,transparent)] bg-[color-mix(in_srgb,var(--success)_14%,transparent)] px-2 py-0.5 text-[11px] font-medium text-[color-mix(in_srgb,var(--success)_70%,var(--foreground))] backdrop-blur-sm">
+          <span className="flex-shrink-0 inline-flex items-center gap-1 rounded-full border border-[color-mix(in_srgb,var(--success)_35%,transparent)] bg-[color-mix(in_srgb,var(--success)_14%,transparent)] px-2 py-0.5 text-[11px] font-medium text-[color-mix(in_srgb,var(--success)_70%,var(--foreground))]">
             <CheckCircle size={12} />
             Verified
           </span>

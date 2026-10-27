@@ -101,7 +101,7 @@ export function ProductImage({ src, alt = "", productName = "", className }) {
       )}
     >
       {showPlaceholder ? (
-        <div className="flex h-full w-full flex-col items-center justify-center glass-lux">
+        <div className="flex h-full w-full flex-col items-center justify-center surface-card">
           {firstLetter ? (
             <span className="select-none text-4xl font-bold leading-none tracking-tight text-text-dim">
               {firstLetter}

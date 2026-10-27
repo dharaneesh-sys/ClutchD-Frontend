@@ -160,7 +160,7 @@ export function VehicleSelector({ onVehicleChange, className, initialVehicle }) 
   const isComplete = !!(make && model && year && variant);
 
   return (
-    <GlassCard variant="glass-lux" className={cn("p-5 sm:p-6", className)}>
+    <GlassCard className={cn("p-5 sm:p-6", className)}>
       {/* ── Header ──────────────────────────────────────────── */}
       <div className="flex items-center justify-between gap-3 mb-5">
         <div className="flex items-center gap-2.5">

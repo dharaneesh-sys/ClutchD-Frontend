@@ -63,7 +63,7 @@ export function MyListings({ onAddNew }) {
       {listings.map((product) => (
         <div
           key={product.id}
-          className="glass-lux rounded-2xl p-3 flex items-center gap-3"
+          className="surface-card rounded-2xl p-3 flex items-center gap-3"
         >
           <div className="w-16 shrink-0">
             <ProductImage

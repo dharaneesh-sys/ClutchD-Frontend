@@ -276,7 +276,7 @@ export function LoginCard({ onNeedSignUp }) {
 
   if (view === "forgot_email") {
     return (
-      <GlassCard variant="glass-lux" className="w-full max-w-md p-8 pt-10">
+      <GlassCard className="w-full max-w-md p-8 pt-10">
         <div className="mb-8 text-center">
           <h2 className="text-2xl font-bold mb-2 tracking-tight text-text-primary">Reset Password</h2>
           <p className="text-text-muted">Enter your email to receive a recovery code.</p>
@@ -312,7 +312,7 @@ export function LoginCard({ onNeedSignUp }) {
 
    if (view === "forgot_code") {
     return (
-      <GlassCard variant="glass-lux" className="w-full max-w-md p-8 pt-10">
+      <GlassCard className="w-full max-w-md p-8 pt-10">
         <div className="mb-8 text-center">
           <h2 className="text-2xl font-bold mb-2 tracking-tight text-text-primary">Enter Code</h2>
           <p className="text-text-muted">Enter the reset code you received.</p>
@@ -360,7 +360,7 @@ export function LoginCard({ onNeedSignUp }) {
    }
 
    return (
-    <GlassCard variant="glass-lux" className="w-full max-w-md p-8 pt-10">
+    <GlassCard className="w-full max-w-md p-8 pt-10">
       <div className="mb-8 text-center">
         <h2 className="text-3xl font-bold mb-2 tracking-tight text-text-primary">Welcome Back</h2>
         <p className="text-text-muted">Sign in to your ClutchD account</p>

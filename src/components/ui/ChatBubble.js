@@ -39,7 +39,7 @@ export function ChatBubble({ message, isOwn }) {
           "px-3.5 py-2 rounded-2xl text-sm leading-relaxed break-words space-y-1.5",
           isOwn
             ? "bg-primary/20 text-primary-light border border-primary/20 rounded-br-md"
-            : "bg-white/5 text-on-surface border border-[var(--glass-lux-border)] rounded-bl-md"
+            : "bg-[var(--surface-soft)] text-on-surface border border-[var(--border)] rounded-bl-md"
         )}
       >
         {/* Text content */}

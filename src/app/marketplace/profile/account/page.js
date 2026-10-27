@@ -81,7 +81,7 @@ export default function AccountDetailsPage() {
       </div>
 
       {/* Profile Photo & Name */}
-      <div className="glass-lux rounded-2xl p-5 flex items-center gap-4">
+      <div className="surface-card rounded-2xl p-5 flex items-center gap-4">
         <div className="flex-shrink-0 w-16 h-16 rounded-full bg-gradient-to-br from-primary/30 to-primary/10 ring-2 ring-border-subtle flex items-center justify-center">
           {displayName !== "User" ? (
             <span className="text-lg font-bold text-primary-light">{getInitials(displayName)}</span>
@@ -121,7 +121,7 @@ export default function AccountDetailsPage() {
 
 function DetailRow({ icon: Icon, label, value }) {
   return (
-    <div className="glass-lux rounded-2xl p-4 flex items-center gap-3">
+    <div className="surface-card rounded-2xl p-4 flex items-center gap-3">
       <div className="flex-shrink-0 w-9 h-9 rounded-xl bg-surface-soft flex items-center justify-center">
         <Icon size={16} className="text-text-muted" />
       </div>

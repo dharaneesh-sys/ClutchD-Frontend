@@ -1,6 +1,6 @@
 // Wave-3 Task 8 — RED-first contract tests for profile commerce (6 screens).
 // DESIGN.md: D1 (grounded blue, no one-off hues, no white hardcodes),
-// D4 (cards rounded-2xl, controls rounded-xl), D5 (glass-lux 2-variant only),
+// D4 (cards rounded-2xl, controls rounded-xl), D5 (surface-card 2-variant only),
 // D7/D15 (status chips info/pending/success/danger only, no warning refs,
 // no red-*/sky/lime/teal/zinc hardcodes), D3 (headline-3/body-2 language).
 import "@testing-library/jest-dom/vitest";
@@ -25,10 +25,10 @@ const files = () => ({
 });
 
 describe("profile commerce cards (D4/D5)", () => {
-  it("screens and GlassCard consumers use glass-lux with rounded-2xl, no legacy variants", () => {
+  it("screens and GlassCard consumers use surface-card with rounded-2xl, no legacy variants", () => {
     const { warrantyTerms: _terms, ...rest } = files();
     for (const [name, code] of Object.entries(rest)) {
-      expect(code, `${name} needs glass-lux`).toContain("glass-lux");
+      expect(code, `${name} needs a flat card`).toMatch(/surface-card|<GlassCard/);
       expect(code, `${name} bans legacy glass`).not.toMatch(
         /glass-strong|glass-lux-strong|surface-elevated|surface-filled|surface-outlined/
       );

@@ -21,7 +21,7 @@ export function PlanCard({ plan, isCurrent, onSubscribe, isSubscribing }) {
 
   return (
     <GlassCard
-      variant="glass-lux"
+     
       className={cn(
         "relative flex flex-col p-6 sm:p-7",
         isCurrent

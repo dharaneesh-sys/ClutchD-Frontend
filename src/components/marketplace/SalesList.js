@@ -79,7 +79,7 @@ export function SalesList() {
 
       {/* Revenue summary */}
       <div className="grid grid-cols-2 gap-3">
-        <div className="glass-lux rounded-2xl p-4">
+        <div className="surface-card rounded-2xl p-4">
           <div className="flex items-center gap-2 text-text-muted">
             <ReceiptText size={16} />
             <span className="text-[11px] font-semibold uppercase tracking-wider">
@@ -88,7 +88,7 @@ export function SalesList() {
           </div>
           <p className="mt-2 text-xl font-bold text-text-primary">{sales.length}</p>
         </div>
-        <div className="glass-lux rounded-2xl p-4">
+        <div className="surface-card rounded-2xl p-4">
           <div className="flex items-center gap-2 text-text-muted">
             <IndianRupee size={16} />
             <span className="text-[11px] font-semibold uppercase tracking-wider">
@@ -102,12 +102,12 @@ export function SalesList() {
       </div>
 
       {!loaded ? (
-        <div className="glass-lux rounded-2xl p-8 text-center">
+        <div className="surface-card rounded-2xl p-8 text-center">
           <div className="mx-auto mb-3 h-8 w-8 animate-spin rounded-full border-2 border-t-transparent border-primary" />
           <p className="text-sm text-text-muted">Loading your sales…</p>
         </div>
       ) : sales.length === 0 ? (
-        <div className="glass-lux rounded-2xl p-8 text-center">
+        <div className="surface-card rounded-2xl p-8 text-center">
           <ReceiptText size={32} className="mx-auto mb-3 text-text-muted" />
           <p className="text-sm font-semibold text-text-primary">No sales yet</p>
           <p className="mt-1 text-sm text-text-muted">
@@ -122,7 +122,7 @@ export function SalesList() {
               0
             );
             return (
-              <div key={order.id} className="glass-lux rounded-2xl p-4">
+              <div key={order.id} className="surface-card rounded-2xl p-4">
                 <div className="flex items-center justify-between gap-2">
                   <span className="font-mono text-xs text-text-muted">
                     #{String(order.id).slice(0, 8)}

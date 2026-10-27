@@ -338,7 +338,7 @@ export default function ProductDetailClient({ id: idProp }) {
 
             {fitmentResult && (
               <GlassCard
-                variant="glass-lux"
+               
                 className={cn(
                   "overflow-hidden transition-all duration-300",
                   fitmentResult.compatible === true
@@ -407,7 +407,7 @@ export default function ProductDetailClient({ id: idProp }) {
       </section>
 
       {/* ── Product Details ────────────────────────────────── */}
-      <GlassCard variant="glass-lux" className="p-6">
+      <GlassCard className="p-6">
         <h2 className="mb-5 text-lg font-semibold text-text-primary">
           Product Details
         </h2>

@@ -158,7 +158,7 @@ export function ServiceHistory() {
         const isExpanded = expandedInvoice === job.id;
 
         return (
-          <GlassCard key={job.id} variant="glass-lux" className="p-5 flex flex-col">
+          <GlassCard key={job.id} className="p-5 flex flex-col">
             <div className="flex flex-col sm:flex-row gap-4 sm:items-center justify-between">
               <div className="flex-1">
                 <div className="flex items-center gap-3 mb-2">

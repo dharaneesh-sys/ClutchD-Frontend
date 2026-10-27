@@ -42,7 +42,7 @@ function ClaimCard({ claim, onViewDetails }) {
   return (
     <button
       onClick={() => onViewDetails(claim)}
-      className="w-full glass-lux-interactive rounded-2xl p-4 space-y-3 text-left animate-fade-in-up"
+      className="w-full surface-card-interactive rounded-2xl p-4 space-y-3 text-left animate-fade-in-up"
     >
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0 flex-1">
@@ -439,7 +439,7 @@ export default function WarrantyClaimsPage() {
           {[1, 2, 3].map((i) => (
             <div
               key={i}
-              className="glass-lux rounded-2xl p-4 animate-pulse space-y-3"
+              className="surface-card rounded-2xl p-4 animate-pulse space-y-3"
             >
               <div className="h-4 bg-surface-soft rounded w-1/3" />
               <div className="h-3 bg-surface-soft rounded w-2/3" />

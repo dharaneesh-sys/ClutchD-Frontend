@@ -187,7 +187,7 @@ export function SellerProductForm({ initialProduct = null, onSuccess }) {
   return (
     <form
       onSubmit={handleSubmit(onSubmit)}
-      className="glass-lux rounded-2xl p-5 space-y-4"
+      className="surface-card rounded-2xl p-5 space-y-4"
     >
       <Input
         label="Part name *"

@@ -36,7 +36,7 @@ export function SOSButton({ className }) {
   return (
     <div className={cn("flex flex-col items-start gap-2", className)}>
       {errorMsg && (
-        <div className="flex items-center gap-2 px-4 py-3 rounded-xl border shadow-2xl text-sm font-medium backdrop-blur-xl bg-danger/10 border-danger/30 text-danger">
+        <div className="flex items-center gap-2 px-4 py-3 rounded-xl border shadow-2xl text-sm font-medium bg-[var(--surface-card)] border-danger/30 text-danger">
           <span>{errorMsg}</span>
           <button
             type="button"
@@ -50,7 +50,7 @@ export function SOSButton({ className }) {
       )}
 
       {queuedMsg && (
-        <div className="flex items-center gap-2 px-4 py-3 rounded-xl border shadow-2xl text-sm font-medium backdrop-blur-xl bg-pending/10 border-pending/30 text-pending">
+        <div className="flex items-center gap-2 px-4 py-3 rounded-xl border shadow-2xl text-sm font-medium bg-[var(--surface-card)] border-pending/30 text-pending">
           <WifiOff size={14} />
           <span>{queuedMsg}</span>
         </div>

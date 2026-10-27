@@ -186,7 +186,7 @@ export function SignUpCard() {
   };
 
   return (
-    <GlassCard variant="glass-lux" className="w-full max-w-xl p-6 sm:p-8 pt-10">
+    <GlassCard className="w-full max-w-xl p-6 sm:p-8 pt-10">
       <div className="mb-8 text-center">
         <h2 className="text-3xl font-bold mb-2 tracking-tight text-text-primary">Create Account</h2>
         <p className="text-text-muted">Join the ultimate on-demand platform</p>

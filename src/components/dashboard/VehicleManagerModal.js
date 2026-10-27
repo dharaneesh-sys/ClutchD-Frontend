@@ -125,7 +125,7 @@ export function VehicleManagerModal({ isOpen, onClose, onVehiclesChanged }) {
           </div>
           <Input label="License Plate" name="license_plate" value={formData.license_plate} onChange={handlePlateChange} onBlur={handlePlateBlur} placeholder="e.g. TN-38-AB-1234" />
           
-          <div className="flex gap-3 justify-end pt-4 mt-2 border-t border-white/10">
+          <div className="flex gap-3 justify-end pt-4 mt-2 border-t border-[var(--border)]">
             <Button type="button" variant="ghost" onClick={() => setAdding(false)} disabled={saving}>Cancel</Button>
             <Button type="submit" disabled={saving}>
               {saving ? <Loader2 size={16} className="animate-spin" /> : "Save Vehicle"}

@@ -155,7 +155,7 @@ export function FleetRegistrationForm({ onRegistered }) {
 
   if (submitted) {
     return (
-      <GlassCard variant="glass-lux" className="w-full max-w-lg mx-auto p-8 text-center">
+      <GlassCard className="w-full max-w-lg mx-auto p-8 text-center">
         <div className="w-16 h-16 rounded-full bg-success/20 flex items-center justify-center mx-auto mb-5">
           <CheckCircle size={36} className="text-success" />
         </div>
@@ -173,7 +173,7 @@ export function FleetRegistrationForm({ onRegistered }) {
   }
 
   return (
-      <GlassCard variant="glass-lux" className="w-full max-w-lg mx-auto p-6 sm:p-8">
+      <GlassCard className="w-full max-w-lg mx-auto p-6 sm:p-8">
       {/* Header */}
       <div className="flex items-center gap-3 mb-6">
         <div className="w-12 h-12 rounded-2xl bg-primary/20 flex items-center justify-center">

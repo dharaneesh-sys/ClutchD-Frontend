@@ -53,7 +53,7 @@ const TIER_COLORS = {
 
 function StatCard({ icon: Icon, label, value, sub, className }) {
   return (
-    <GlassCard variant="glass-lux" className={cn("p-4 sm:p-5", className)}>
+    <GlassCard className={cn("p-4 sm:p-5", className)}>
       <div className="flex items-start justify-between">
         <div className="space-y-1 min-w-0">
           <p className="text-xs font-medium text-text-muted uppercase tracking-wider">
@@ -85,7 +85,7 @@ function VehicleCard({ vehicle, onRemove }) {
   const detailsId = `vehicle-details-${vehicle.id}`;
 
   return (
-    <GlassCard variant="glass-lux-interactive" className="p-4">
+    <GlassCard variant="interactive" className="p-4">
       <div className="flex items-start justify-between">
         <div className="flex items-start gap-3 min-w-0">
           <div className="w-10 h-10 rounded-xl bg-surface-soft flex items-center justify-center shrink-0">
@@ -413,7 +413,7 @@ export function FleetDashboard({ onRegisterNew, onStartBooking, onChat }) {
 
       {/* Tier Progress */}
       {tierInfo.name !== "platinum" && (
-        <GlassCard variant="glass-lux" className="p-4 sm:p-5">
+        <GlassCard className="p-4 sm:p-5">
           <div className="flex items-center justify-between mb-3">
             <div className="flex items-center gap-2">
               <Shield size={16} className="text-primary-light" />
@@ -473,7 +473,7 @@ export function FleetDashboard({ onRegisterNew, onStartBooking, onChat }) {
           </div>
 
           {showAddVehicle && (
-            <GlassCard variant="glass-lux" className="p-4">
+            <GlassCard className="p-4">
               <form onSubmit={handleAddVehicle} className="grid grid-cols-2 sm:grid-cols-5 gap-2">
                 <input
                   className="col-span-2 sm:col-span-1 rounded-lg bg-surface-soft border border-border-subtle px-3 py-2 text-sm text-foreground placeholder:text-text-dim focus:outline-none focus:ring-2 focus:ring-primary/40"
@@ -533,7 +533,7 @@ export function FleetDashboard({ onRegisterNew, onStartBooking, onChat }) {
         {/* Sidebar: Service History + Discount Info */}
         <div className="lg:col-span-5 xl:col-span-4 space-y-4">
           {/* Bulk Discount Card */}
-          <GlassCard variant="glass-lux" className="p-4 sm:p-5">
+          <GlassCard className="p-4 sm:p-5">
             <div className="flex items-center gap-2 mb-3">
               <Percent size={16} className="text-primary-light" />
               <h3 className="text-sm font-bold text-foreground">Volume Discounts</h3>
@@ -570,7 +570,7 @@ export function FleetDashboard({ onRegisterNew, onStartBooking, onChat }) {
             </div>
 
             {recentServices.length > 0 ? (
-              <GlassCard variant="glass-lux" className="divide-y divide-border-subtle/50">
+              <GlassCard className="divide-y divide-border-subtle/50">
                 {recentServices.map((entry) => (
                   <ServiceRow key={entry.id} entry={entry} onChat={onChat} />
                 ))}

@@ -144,7 +144,7 @@ export default function EditProfilePage() {
 
       <form onSubmit={handleSubmit} className="space-y-5">
         {/* Profile Photo */}
-        <div className="glass-lux rounded-2xl p-5 flex flex-col items-center gap-3">
+        <div className="surface-card rounded-2xl p-5 flex flex-col items-center gap-3">
           <div className="relative">
             <div className="w-20 h-20 rounded-full bg-gradient-to-br from-primary/30 to-primary/10 ring-2 ring-border-subtle flex items-center justify-center overflow-hidden">
               {photoPreview ? (
@@ -178,7 +178,7 @@ export default function EditProfilePage() {
         </div>
 
         {/* Form Fields */}
-        <div className="glass-lux rounded-2xl p-5 space-y-4">
+        <div className="surface-card rounded-2xl p-5 space-y-4">
           <Input
             label="Full Name"
             value={form.name}

@@ -77,7 +77,7 @@ export default function QuickActionsPage() {
             <button
               key={shortcut.label}
               onClick={() => router.push(shortcut.path)}
-              className="glass-lux-interactive rounded-2xl p-4 flex flex-col items-center gap-2 transition-colors text-center"
+              className="surface-card-interactive rounded-2xl p-4 flex flex-col items-center gap-2 transition-colors text-center"
             >
               <div className="w-10 h-10 rounded-xl bg-surface-soft flex items-center justify-center">
                 <shortcut.icon size={20} className={shortcut.color} />
@@ -126,7 +126,7 @@ export default function QuickActionsPage() {
             recentServices.map((svc) => (
               <div
                 key={svc.id}
-                className="glass-lux rounded-2xl p-4 flex items-center gap-3"
+                className="surface-card rounded-2xl p-4 flex items-center gap-3"
               >
                 <div className="flex-shrink-0 w-9 h-9 rounded-lg bg-primary-soft flex items-center justify-center">
                   <Clock size={16} className="text-primary-light" />

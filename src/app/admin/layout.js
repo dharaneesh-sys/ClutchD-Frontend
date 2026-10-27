@@ -71,7 +71,7 @@ export default function AdminLayout({ children }) {
       {/* Mobile overlay */}
       {sidebarOpen && (
         <div
-          className="lg:hidden fixed inset-0 z-40 bg-black/40 backdrop-blur-sm"
+          className="lg:hidden fixed inset-0 z-40 bg-[var(--glass-overlay-scrim)]"
           onClick={() => setSidebarOpen(false)}
         />
       )}

@@ -1,6 +1,6 @@
 // Wave-1 Task 4 (cards) — RED-first contract tests for ProductCard + GlassCard.
 // DESIGN.md: D1 (grounded blue, no one-off hues), D3 (type scale),
-// D4 (cards rounded-2xl), D5 (glass-lux pair only), D8 (lucide only),
+// D4 (cards rounded-2xl), D5 (surface-card pair only), D8 (lucide only),
 // D11 (44px targets, focus-visible), D15.4.3 (cards map to glass pair).
 import "@testing-library/jest-dom/vitest";
 import { describe, it, expect, vi, beforeEach } from "vitest";
@@ -69,10 +69,10 @@ describe("ProductCard render + behavior (API/nav frozen)", () => {
 });
 
 describe("ProductCard contract (D1/D3/D4/D5/D8/D11/D15)", () => {
-  it("uses glass-lux-interactive pressable + rounded-2xl, keeps hover-lift/active-press", () => {
+  it("uses surface-card-interactive pressable + rounded-2xl, keeps hover-lift/active-press", () => {
     const { container } = render(<ProductCard product={product} />);
     const cls = container.firstChild.className;
-    expect(cls).toContain("glass-lux-interactive");
+    expect(cls).toContain("surface-card-interactive");
     expect(cls).toContain("rounded-2xl");
     expect(cls).toContain("hover-lift");
     expect(cls).toContain("active-press");
@@ -97,7 +97,7 @@ describe("GlassCard flat default (DESIGN.md §0)", () => {
   it("defaults to the flat card; legacy names are aliases, glass is the overlay", () => {
     const code = src(uiDir, "GlassCard.js");
     expect(code).toMatch(/variant\s*=\s*"card"/);
-    expect(code).toContain('"glass-lux": flatCard');
+    expect(code).toContain('"surface-card": flatCard');
     expect(code).toContain("glass: glassOverlay");
     expect(code).not.toMatch(/glass-strong|glass-lux-strong|surface-elevated|surface-filled|surface-outlined/);
   });

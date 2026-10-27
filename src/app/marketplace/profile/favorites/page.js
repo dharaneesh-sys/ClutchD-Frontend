@@ -49,7 +49,7 @@ function FavoriteCard({ item, onRemove, onMoveToCart }) {
   };
 
   return (
-    <div className="glass-lux rounded-2xl overflow-hidden transition-all duration-200 hover:shadow-lg group">
+    <div className="surface-card rounded-2xl overflow-hidden transition-all duration-200 hover:shadow-lg group">
       {/* Product Image Placeholder */}
       <div className="aspect-[4/3] bg-surface-soft flex items-center justify-center relative overflow-hidden">
         {item.product?.image_url ? (
@@ -70,7 +70,7 @@ function FavoriteCard({ item, onRemove, onMoveToCart }) {
           disabled={removing}
           className={cn(
             "absolute top-2 right-2 w-8 h-8 rounded-full flex items-center justify-center",
-            "bg-black/60 backdrop-blur-sm text-danger opacity-0 group-hover:opacity-100 transition-opacity",
+            "bg-[var(--surface-card)] border border-[var(--border)] text-danger opacity-0 group-hover:opacity-100 transition-opacity",
             "hover:bg-danger/10"
           )}
           aria-label="Remove from favorites"
@@ -189,7 +189,7 @@ export default function FavoritesPage() {
 
       {/* Error Banner */}
       {error && (
-        <div className="flex items-start gap-3 glass-lux rounded-2xl p-4 border border-[var(--danger)]/25 bg-[var(--danger)]/10">
+        <div className="flex items-start gap-3 surface-card rounded-2xl p-4 border border-[var(--danger)]/25 bg-[var(--danger)]/10">
           <p className="text-sm text-danger flex-1">{error}</p>
           <button
             onClick={fetchFavorites}

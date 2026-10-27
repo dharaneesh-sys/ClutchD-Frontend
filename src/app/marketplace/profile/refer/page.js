@@ -30,7 +30,7 @@ const REWARD_STATUS_CONFIG = {
 
 function ReferralHero({ referral, onCopy, onShare, copied }) {
   return (
-    <div className="glass-lux rounded-2xl p-5 overflow-hidden relative">
+    <div className="surface-card rounded-2xl p-5 overflow-hidden relative">
       {/* Decorative glow */}
       <div
         className="absolute -top-16 -right-16 w-40 h-40 rounded-full opacity-20 blur-3xl pointer-events-none"
@@ -110,7 +110,7 @@ function ReferralHero({ referral, onCopy, onShare, copied }) {
 function StatsCards({ balance, totalReferrals }) {
   return (
     <div className="grid grid-cols-2 gap-3">
-      <div className="glass-lux rounded-2xl p-4">
+      <div className="surface-card rounded-2xl p-4">
         <div className="flex items-center gap-2.5">
           <div className="w-9 h-9 rounded-xl bg-primary/15 flex items-center justify-center shrink-0">
             <Coins size={16} className="text-primary-light" />
@@ -125,7 +125,7 @@ function StatsCards({ balance, totalReferrals }) {
           </div>
         </div>
       </div>
-      <div className="glass-lux rounded-2xl p-4">
+      <div className="surface-card rounded-2xl p-4">
         <div className="flex items-center gap-2.5">
           <div className="w-9 h-9 rounded-xl bg-info/15 flex items-center justify-center shrink-0">
             <Users size={16} className="text-info" />
@@ -169,7 +169,7 @@ function HowItWorks() {
   ];
 
   return (
-    <div className="glass-lux rounded-2xl p-5">
+    <div className="surface-card rounded-2xl p-5">
       <div className="flex items-center gap-2 mb-4">
         <Sparkles size={16} className="text-icon-highlight" />
         <span className="text-sm font-semibold text-foreground">
@@ -233,7 +233,7 @@ function ReferralHistory({ rewards }) {
       {rewards.map((reward, index) => (
         <div
           key={reward.id}
-          className="glass-lux rounded-2xl p-4 flex items-center justify-between gap-3 animate-fade-in-up"
+          className="surface-card rounded-2xl p-4 flex items-center justify-between gap-3 animate-fade-in-up"
           style={{ animationDelay: `${index * 60}ms` }}
         >
           <div className="min-w-0 flex-1">

@@ -1,7 +1,7 @@
 // Wave-3 Task 7 — RED-first contract tests for the profile shell.
 // DESIGN.md: D1 (grounded blue, no white-wash chips, no warning refs),
 // D3 (headline-3/body-2 shell language), D4 (cards rounded-2xl),
-// D5 (glass-lux 2-variant only), D7/D15 (danger/info/pending roles, no red-*).
+// D5 (surface-card 2-variant only), D7/D15 (danger/info/pending roles, no red-*).
 import "@testing-library/jest-dom/vitest";
 import { describe, it, expect } from "vitest";
 import fs from "node:fs";
@@ -19,9 +19,9 @@ const screens = () => ({
 });
 
 describe("profile shell language (D3/D4/D5)", () => {
-  it("all 4 screens use glass-lux cards with rounded-2xl, no legacy variants", () => {
+  it("all 4 screens use surface-card cards with rounded-2xl, no legacy variants", () => {
     for (const [name, code] of Object.entries(screens())) {
-      expect(code, `${name} needs glass-lux`).toContain("glass-lux");
+      expect(code, `${name} needs surface-card`).toContain("surface-card");
       expect(code, `${name} needs rounded-2xl`).toContain("rounded-2xl");
       expect(code, `${name} bans legacy glass`).not.toMatch(
         /glass-strong|glass-lux-strong|surface-elevated|surface-filled|surface-outlined/
@@ -83,7 +83,7 @@ describe("KycBadge / KycDocumentsSection display (D5/D7)", () => {
     expect(code).not.toMatch(/variant:\s*"warning"/);
   });
 
-  it("KycDocumentsSection uses the default glass-lux variant (no strong)", () => {
+  it("KycDocumentsSection uses the default surface-card variant (no strong)", () => {
     const code = read(path.join(uiDir, "KycDocumentsSection.js"));
     expect(code).not.toMatch(/variant="strong"|glass-lux-strong/);
     expect(code).not.toMatch(/red-400|red-500/);

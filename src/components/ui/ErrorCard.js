@@ -7,7 +7,7 @@ export default function ErrorCard({ error, onRetry, className = "" }) {
 
   return (
     <div className={`flex items-center justify-center min-h-screen px-4 bg-background ${className}`}>
-      <div className="glass-lux rounded-2xl p-8 sm:p-12 text-center max-w-md w-full">
+      <div className="surface-card rounded-2xl p-8 sm:p-12 text-center max-w-md w-full">
         <div className="w-16 h-16 mx-auto mb-6 rounded-full bg-danger/10 flex items-center justify-center">
           <AlertTriangle className="w-8 h-8 text-danger" strokeWidth={2} />
         </div>

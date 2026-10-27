@@ -73,7 +73,7 @@ export function CertificationBadge({ certification, issuedDate, expiryDate, show
       <span
         className={cn(
           "inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[11px] font-semibold leading-none",
-          "backdrop-blur-xl shadow-lg",
+          "shadow-lg",
           "transition-all duration-200 hover:scale-105",
           style.gradient,
           style.text,
@@ -104,7 +104,7 @@ export function CertificationBadge({ certification, issuedDate, expiryDate, show
             "z-50 w-56"
           )}
         >
-          <div className="rounded-xl border glass-lux backdrop-blur-xl p-3 shadow-2xl border-border-subtle">
+          <div className="rounded-xl border surface-card p-3 shadow-2xl border-border-subtle">
             <div className="flex items-center gap-2 mb-1.5">
               <Icon size={14} className={style.text} />
               <span className="text-xs font-bold text-foreground">{certDef.label}</span>

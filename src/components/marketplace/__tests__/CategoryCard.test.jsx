@@ -1,6 +1,6 @@
 // Wave-1 Task 4 (cards) — RED-first contract tests for CategoryCard + CategoryIcon.
 // DESIGN.md: D1 (grounded blue, token surfaces), D3 (title-3/label-2 type),
-// D4 (cards rounded-2xl), D5 (glass-lux-interactive pressable),
+// D4 (cards rounded-2xl), D5 (surface-card-interactive pressable),
 // D8 (lucide-react ONLY — no inline SVG icon sets).
 import "@testing-library/jest-dom/vitest";
 import { describe, it, expect, vi } from "vitest";
@@ -56,10 +56,10 @@ describe("CategoryCard icon (D8 lucide only)", () => {
 });
 
 describe("CategoryCard contract (D1/D3/D4/D5)", () => {
-  it("uses glass-lux-interactive + rounded-2xl with press feedback", () => {
+  it("uses surface-card-interactive + rounded-2xl with press feedback", () => {
     render(<CategoryCard category={{ id: "c1", name: "Spare Parts", productCount: 3 }} />);
     const cls = screen.getByRole("link").className;
-    expect(cls).toContain("glass-lux-interactive");
+    expect(cls).toContain("surface-card-interactive");
     expect(cls).toContain("rounded-2xl");
     expect(cls).toContain("active-press");
   });

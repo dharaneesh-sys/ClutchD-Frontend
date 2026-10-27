@@ -307,7 +307,7 @@ export function FleetBookingPanel() {
       </GlassCard>
 
       {/* Step 3: Pricing */}
-      <GlassCard variant="glass-lux" className="p-5">
+      <GlassCard className="p-5">
         <h3 className="text-lg font-bold text-text-primary mb-4 flex items-center gap-2">
           <IndianRupee size={20} className="text-icon-highlight" />
           Pricing Summary

@@ -12,7 +12,7 @@ describe("Wave-6 Task 14: landing/auth/shell design contract (D1/D4/D5/D15)", ()
   it("landing page uses only sanctioned glass variants (D5)", () => {
     const src = read("src/app/page.js");
     expect(src).not.toContain("glass-lux-strong");
-    expect(src).toMatch(/glass-lux/);
+    expect(src).toMatch(/surface-card|<GlassCard/);
   });
 
   it("landing page has no white hardcodes or glow shadows (D1.1)", () => {
@@ -29,32 +29,32 @@ describe("Wave-6 Task 14: landing/auth/shell design contract (D1/D4/D5/D15)", ()
   it("auth shell page has no white hardcodes (D1.1)", () => {
     const src = read("src/app/auth/page.js");
     expect(src).not.toMatch(/text-white|bg-white|border-white/);
-    expect(src).toMatch(/glass-lux/);
+    expect(src).toMatch(/surface-card|<GlassCard/);
   });
 
-  it("LoginCard uses glass-lux + danger tokens, no red-*/glow/undefined utilities (D5/D7/D15)", () => {
+  it("LoginCard uses surface-card + danger tokens, no red-*/glow/undefined utilities (D5/D7/D15)", () => {
     const src = read("src/components/auth/LoginCard.js");
     expect(src).not.toContain("glass-lux-strong");
     expect(src).not.toMatch(/red-500|red-400/);
     expect(src).not.toMatch(/shadow-\[0_0_/);
     expect(src).not.toContain("primary-text");
-    expect(src).toMatch(/glass-lux/);
+    expect(src).toMatch(/surface-card|<GlassCard/);
   });
 
-  it("SignUpCard uses glass-lux + danger tokens, no red-*/glow (D5/D7/D15)", () => {
+  it("SignUpCard uses surface-card + danger tokens, no red-*/glow (D5/D7/D15)", () => {
     const src = read("src/components/auth/SignUpCard.js");
     expect(src).not.toContain("glass-lux-strong");
     expect(src).not.toMatch(/red-500|red-400/);
     expect(src).not.toMatch(/shadow-\[0_0_/);
-    expect(src).toMatch(/glass-lux/);
+    expect(src).toMatch(/surface-card|<GlassCard/);
   });
 
-  it("not-found uses glass-lux + defined tokens only (D5/D15)", () => {
+  it("not-found uses surface-card + defined tokens only (D5/D15)", () => {
     const src = read("src/app/not-found.js");
     expect(src).not.toMatch(/"glass[ "]/);
     expect(src).not.toContain("--secondary");
     expect(src).not.toMatch(/text-white/);
-    expect(src).toContain("glass-lux");
+    expect(src).toMatch(/surface-card|<GlassCard/);
   });
 });
 

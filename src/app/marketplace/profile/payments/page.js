@@ -50,7 +50,7 @@ function PaymentCard({ payment, onDownload }) {
   const methodLabel = METHOD_LABELS[payment.method] || payment.method;
 
   return (
-    <div className="glass-lux rounded-2xl p-4 sm:p-5 space-y-3 animate-fade-in-up">
+    <div className="surface-card rounded-2xl p-4 sm:p-5 space-y-3 animate-fade-in-up">
       {/* Header: Method + Status */}
       <div className="flex items-start justify-between gap-3">
         <div className="flex items-center gap-3 min-w-0">
@@ -160,7 +160,7 @@ export default function PaymentsPage() {
 
       {/* Summary Cards */}
       <div className="grid grid-cols-2 gap-3 mb-6">
-        <div className="glass-lux rounded-2xl p-4">
+        <div className="surface-card rounded-2xl p-4">
           <div className="flex items-center gap-2.5">
             <div className="w-9 h-9 rounded-xl bg-primary/15 flex items-center justify-center shrink-0">
               <DollarSign size={16} className="text-primary-light" />
@@ -173,7 +173,7 @@ export default function PaymentsPage() {
             </div>
           </div>
         </div>
-        <div className="glass-lux rounded-2xl p-4">
+        <div className="surface-card rounded-2xl p-4">
           <div className="flex items-center gap-2.5">
             <div className="w-9 h-9 rounded-xl bg-pending/15 flex items-center justify-center shrink-0">
               <Receipt size={16} className="text-pending" />

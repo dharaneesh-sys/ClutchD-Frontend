@@ -151,22 +151,22 @@ export function ChatWidget() {
       {isOpen && (
         <div
           className={cn(
-            "glass-lux w-[360px] max-w-[calc(100vw-48px)]",
+            "surface-card w-[360px] max-w-[calc(100vw-48px)]",
             "flex flex-col overflow-hidden",
             "animate-scale-in origin-bottom-right",
-            "shadow-[var(--glass-lux-shadow)]",
+            "shadow-[var(--shadow-card)]",
             "max-h-[600px] sm:max-h-[540px]"
           )}
           role="dialog"
           aria-label="Live chat"
         >
           {/* ── Header ─────────────────────────────────────────── */}
-          <div className="flex items-center justify-between px-4 py-3 border-b border-[var(--glass-lux-border)]">
+          <div className="flex items-center justify-between px-4 py-3 border-b border-[var(--border)]">
             <div className="flex items-center gap-2.5">
               <span
                 className={cn(
                   "w-2 h-2 rounded-full",
-wsConnected ? "bg-primary-light" : "bg-warning",
+wsConnected ? "bg-primary-light" : "bg-[var(--pending)]",
                    wsConnected ? "" : "animate-pulse"
                  )}
                />
@@ -177,7 +177,7 @@ wsConnected ? "bg-primary-light" : "bg-warning",
 
             <button
               onClick={() => setIsOpen(false)}
-              className="glass-lux-interactive w-7 h-7 flex items-center justify-center rounded-lg active-press"
+              className="surface-card-interactive w-7 h-7 flex items-center justify-center rounded-lg active-press"
               aria-label="Close chat"
             >
               <svg
@@ -222,7 +222,7 @@ wsConnected ? "bg-primary-light" : "bg-warning",
                   )}
                 >
                   {isSystem ? (
-                    <span className="inline-block px-3 py-1.5 rounded-full text-xs text-dim bg-white/5 border border-[var(--glass-lux-border)] leading-tight text-center max-w-[85%]">
+                    <span className="inline-block px-3 py-1.5 rounded-full text-xs text-dim bg-[var(--surface-soft)] border border-[var(--border)] leading-tight text-center max-w-[85%]">
                       {msg.text}
                     </span>
                   ) : (
@@ -232,7 +232,7 @@ wsConnected ? "bg-primary-light" : "bg-warning",
                         isMe &&
                           "bg-primary/20 text-primary-light border border-primary/20",
                         isThem &&
-                          "bg-white/5 text-on-surface border border-[var(--glass-lux-border)]"
+                          "bg-[var(--surface-soft)] text-on-surface border border-[var(--border)]"
                       )}
                     >
                       {msg.text}
@@ -244,7 +244,7 @@ wsConnected ? "bg-primary-light" : "bg-warning",
           </div>
 
           {/* ── Input ───────────────────────────────────────────── */}
-          <div className="flex items-end gap-2 px-4 py-3 border-t border-[var(--glass-lux-border)]">
+          <div className="flex items-end gap-2 px-4 py-3 border-t border-[var(--border)]">
             <input
               ref={inputRef}
               type="text"
@@ -264,7 +264,7 @@ wsConnected ? "bg-primary-light" : "bg-warning",
                 "active-press",
                 inputValue.trim()
                   ? "bg-primary text-white shadow-[0_0_16px_rgba(var(--color-primary-rgb),0.25)] hover:shadow-[0_0_20px_rgba(var(--color-primary-rgb),0.35)]"
-                  : "bg-white/5 text-dim cursor-not-allowed"
+                  : "bg-[var(--surface-soft)] text-dim cursor-not-allowed"
               )}
               aria-label="Send message"
             >
@@ -331,7 +331,7 @@ wsConnected ? "bg-primary-light" : "bg-warning",
         <span
           className={cn(
             "absolute bottom-0 right-0 w-3.5 h-3.5 rounded-full border-2 border-[var(--background)]",
-            wsConnected ? "bg-primary-light" : "bg-warning",
+            wsConnected ? "bg-primary-light" : "bg-[var(--pending)]",
             wsConnected ? "" : "animate-pulse"
           )}
           style={{ bottom: "-2px", right: "-2px" }}

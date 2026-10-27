@@ -88,7 +88,7 @@ export default function MarketplaceLayout({ children }) {
     <div className="min-h-[100dvh] flex flex-col">
       <button
         onClick={handleBack}
-        className="fixed top-4 left-4 flex items-center justify-center w-10 h-10 rounded-full bg-bg-card backdrop-blur-2xl border border-border-subtle shadow-2xl transition-all duration-200 hover:scale-105 active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
+        className="fixed top-4 left-4 flex items-center justify-center w-10 h-10 rounded-full bg-bg-card border border-border-subtle shadow-2xl transition-all duration-200 hover:scale-105 active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
         aria-label="Go back"
       >
         <ArrowLeft size={20} className="text-text-muted" />

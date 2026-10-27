@@ -46,7 +46,7 @@ export function PushPermissionBanner() {
 
   return (
     <div className="fixed bottom-20 left-4 right-4 z-50 animate-fade-in-up max-w-sm mx-auto">
-      <div className="glass-lux rounded-2xl p-4 border border-white/10 shadow-xl">
+      <div className="surface-card rounded-2xl p-4 border border-[var(--border)] shadow-xl">
         <div className="flex items-start gap-3">
           <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center shrink-0 ring-1 ring-primary/20">
             <Bell size={20} className="text-primary-light" />
@@ -69,7 +69,7 @@ export function PushPermissionBanner() {
               <button
                 type="button"
                 onClick={handleLater}
-                className="inline-flex items-center justify-center rounded-lg px-4 py-1.5 text-xs font-medium text-text-muted hover:text-foreground hover:bg-white/5 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/20"
+                className="inline-flex items-center justify-center rounded-lg px-4 py-1.5 text-xs font-medium text-text-muted hover:text-foreground hover:bg-[var(--surface-soft)] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)]"
               >
                 Later
               </button>
@@ -78,7 +78,7 @@ export function PushPermissionBanner() {
           <button
             type="button"
             onClick={handleLater}
-            className="shrink-0 w-6 h-6 rounded-full flex items-center justify-center hover:bg-white/5 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/20"
+            className="shrink-0 w-6 h-6 rounded-full flex items-center justify-center hover:bg-[var(--surface-soft)] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)]"
             aria-label="Dismiss"
           >
             <X size={14} className="text-text-dim" />

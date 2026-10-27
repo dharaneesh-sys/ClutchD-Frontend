@@ -110,7 +110,7 @@ export default function SellerDashboardPage() {
         {activeTab === "dashboard" && (
           <div className="space-y-4 lg:space-y-6">
             {/* Welcome + quick actions */}
-            <div className="glass-lux rounded-2xl p-5">
+            <div className="surface-card rounded-2xl p-5">
               <h2 className="text-lg font-bold text-text-primary">
                 Welcome{user?.name ? `, ${user.name}` : ""}
               </h2>
@@ -175,7 +175,7 @@ export default function SellerDashboardPage() {
                 </button>
               </div>
               {sellerProducts.length === 0 ? (
-                <div className="glass-lux rounded-2xl p-8 text-center">
+                <div className="surface-card rounded-2xl p-8 text-center">
                   <Package size={32} className="mx-auto mb-3 text-text-muted" />
                   <p className="text-sm font-semibold text-text-primary">
                     No parts listed yet
@@ -219,7 +219,7 @@ export default function SellerDashboardPage() {
 
 function StatCard({ icon: Icon, label, value }) {
   return (
-    <div className="glass-lux rounded-2xl p-4">
+    <div className="surface-card rounded-2xl p-4">
       <div className="flex items-center gap-2 text-text-muted">
         <Icon size={16} />
         <span className="type-label-2 uppercase">
