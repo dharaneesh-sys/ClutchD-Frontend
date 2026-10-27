@@ -42,9 +42,9 @@ function StatsCard({ icon: Icon, label, value, color }) {
           className={cn(
             "w-10 h-10 rounded-lg flex items-center justify-center",
             color === "primary" && "bg-primary/10 text-primary-light",
-            color === "success" && "bg-green-500/10 text-green-400",
+            color === "success" && "bg-[color-mix(in_srgb,var(--success)_14%,transparent)] text-[var(--success)]",
             color === "pending" && "bg-[var(--pending-bg)] text-[var(--pending-text)]",
-            color === "danger" && "bg-red-500/10 text-red-400",
+            color === "danger" && "bg-[color-mix(in_srgb,var(--danger)_10%,transparent)] text-[var(--danger-ink)]",
             color === "default" && "bg-[var(--surface-soft)] text-text-dim"
           )}
         >
@@ -351,7 +351,7 @@ export function CertificationPanel() {
                         <button
                           onClick={() => openConfirm(cert, "reject")}
                           disabled={actionLoading === cert.id}
-                          className="p-1.5 rounded-lg transition-colors hover:bg-red-500/10 text-red-400 hover:text-red-300"
+                          className="p-1.5 rounded-lg transition-colors hover:bg-[color-mix(in_srgb,var(--danger)_10%,transparent)] text-[var(--danger-ink)] hover:text-[var(--danger-ink)]"
                           title="Reject"
                         >
                           {actionLoading === cert.id ? (
@@ -363,7 +363,7 @@ export function CertificationPanel() {
                         <button
                           onClick={() => openConfirm(cert, "approve")}
                           disabled={actionLoading === cert.id}
-                          className="p-1.5 rounded-lg transition-colors hover:bg-green-500/10 text-green-400 hover:text-green-300"
+                          className="p-1.5 rounded-lg transition-colors hover:bg-[color-mix(in_srgb,var(--success)_14%,transparent)] text-[var(--success)]"
                           title="Verify"
                         >
                           <CheckCircle2 size={16} />

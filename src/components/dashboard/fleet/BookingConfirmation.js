@@ -38,8 +38,8 @@ export function BookingConfirmation({ booking, onDismiss, onNewBooking }) {
     <div className="space-y-6">
       {/* Success header */}
       <GlassCard className="p-6 sm:p-8 text-center">
-        <div className="w-16 h-16 rounded-full bg-green-500/20 flex items-center justify-center mx-auto mb-5">
-          <CheckCircle2 size={40} className="text-green-400" />
+        <div className="w-16 h-16 rounded-full bg-[color-mix(in_srgb,var(--success)_14%,transparent)] flex items-center justify-center mx-auto mb-5">
+          <CheckCircle2 size={40} className="text-[var(--success)]" />
         </div>
         <h2 className="text-2xl font-bold text-text-primary mb-2">
           Bulk Booking Confirmed!
@@ -142,11 +142,11 @@ export function BookingConfirmation({ booking, onDismiss, onNewBooking }) {
           </div>
           {booking.pricing.discountPercent > 0 && (
             <div className="flex items-center justify-between text-sm">
-              <span className="flex items-center gap-1 text-green-400">
+              <span className="flex items-center gap-1 text-[var(--success)]">
                 <Percent size={14} />
                 Bulk Discount ({booking.pricing.discountLabel})
               </span>
-              <span className="text-green-400 font-medium tabular-nums">
+              <span className="text-[var(--success)] font-medium tabular-nums">
                 -₹{booking.pricing.discountAmount.toLocaleString("en-IN")}
               </span>
             </div>

@@ -100,7 +100,7 @@ export function PaymentsManager() {
                 onClick={() => setStatusFilter(s)}
                 className={`whitespace-nowrap px-3 py-1.5 rounded-full text-xs font-medium transition-all ${
                   statusFilter === s
-                    ? "bg-primary text-white shadow-sm"
+                    ? "bg-[var(--primary)] text-[var(--on-primary)] shadow-sm"
                     : "bg-surface-soft text-text-primary hover:bg-bg-card"
                 }`}
               >

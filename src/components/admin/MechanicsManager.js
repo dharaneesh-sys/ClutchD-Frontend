@@ -74,7 +74,7 @@ export function MechanicsManager() {
             <div className="w-8 h-8 border-2 border-t-transparent rounded-full animate-spin border-primary" />
           </div>
         ) : error ? (
-          <div className="py-12 text-center text-red-500">
+          <div className="py-12 text-center text-[var(--danger-ink)]">
             <p>{error}</p>
             <button onClick={loadData} className="mt-3 text-sm underline">Retry</button>
           </div>
@@ -117,8 +117,8 @@ export function MechanicsManager() {
                       <Badge variant={m.verified ? "success" : "pending"}>{m.verified ? "Verified" : "Pending"}</Badge>
                     </td>
                     <td className="px-3 py-3">
-                      <span className={`flex items-center gap-1 ${m.available ? "text-icon-highlight" : "text-red-500"}`}>
-                        <span className={`w-1.5 h-1.5 rounded-full ${m.available ? "bg-green-500" : "bg-red-500"}`} />
+                      <span className={`flex items-center gap-1 ${m.available ? "text-icon-highlight" : "text-[var(--danger-ink)]"}`}>
+                        <span className={`w-1.5 h-1.5 rounded-full ${m.available ? "bg-[var(--success)]" : "bg-[var(--danger)]"}`} />
                         {m.available ? "Available" : "Busy"}
                       </span>
                     </td>
@@ -136,7 +136,7 @@ export function MechanicsManager() {
                           disabled={actionLoading === m.id}
                           className={`p-1.5 rounded transition-colors ${
                             m.verified
-                              ? "hover:bg-surface-soft text-red-500 hover:text-red-600"
+                              ? "hover:bg-surface-soft text-[var(--danger-ink)]"
                               : "hover:bg-surface-soft text-icon-highlight hover:text-icon-highlight"
                           }`}
                           title={m.verified ? "Unverify" : "Verify"}
@@ -204,7 +204,7 @@ export function MechanicsManager() {
               </div>
               <div className={`p-4 rounded-xl border ${"bg-bg-card border-border-subtle"}`}>
                 <p className={`text-xs uppercase mb-1 ${"text-text-dim"}`}>Penalty</p>
-                <p className={`font-medium ${profileModal.penalized ? "text-red-500" : "text-text-primary"}`}>
+                <p className={`font-medium ${profileModal.penalized ? "text-[var(--danger-ink)]" : "text-text-primary"}`}>
                   {profileModal.penalized ? `₹${(profileModal.penaltyAmount / 100).toLocaleString("en-IN")}` : "None"}
                 </p>
               </div>

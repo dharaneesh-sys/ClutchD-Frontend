@@ -59,7 +59,7 @@ export function AdminOverview() {
 
   if (error) {
     return (
-      <div className="flex flex-col items-center justify-center py-20 text-red-500">
+      <div className="flex flex-col items-center justify-center py-20 text-[var(--danger-ink)]">
         <p>{error}</p>
         <button onClick={fetchData} className="mt-3 text-sm underline">Retry</button>
       </div>

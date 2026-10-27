@@ -135,7 +135,7 @@ export function JobMonitor() {
               onClick={() => setFilter(f)}
               className={`whitespace-nowrap px-4 py-1.5 rounded-full text-sm font-medium transition-all ${
                 filter === f
-                    ? 'bg-primary text-white shadow-sm'
+                    ? 'bg-[var(--primary)] text-[var(--on-primary)] shadow-sm'
                   : ('bg-surface-soft text-text-primary hover:bg-bg-card')
               }`}
             >

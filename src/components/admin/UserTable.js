@@ -143,7 +143,7 @@ export function UserTable() {
             <div className="w-8 h-8 border-2 border-t-transparent rounded-full animate-spin border-primary" />
           </div>
         ) : error ? (
-          <div className="py-12 text-center text-red-500">
+          <div className="py-12 text-center text-[var(--danger-ink)]">
             <p>{error}</p>
             <button onClick={loadUsers} className="mt-3 text-sm underline">Retry</button>
           </div>
@@ -203,7 +203,7 @@ export function UserTable() {
                             className={`w-full flex items-center gap-2 px-4 py-2.5 text-sm transition-colors ${
                               user.status === "Suspended"
                                 ? "text-icon-highlight hover:bg-surface-soft"
-                                : "text-red-500 hover:bg-surface-soft"
+                                : "text-[var(--danger-ink)] hover:bg-surface-soft"
                             }`}
                           >
                             {user.status === "Suspended" ? (
@@ -216,7 +216,7 @@ export function UserTable() {
                           <button
                             onClick={() => { setDeleteConfirm(user); setOpenDropdown(null); }}
                             className={`w-full flex items-center gap-2 px-4 py-2.5 text-sm transition-colors ${
-                              "text-red-500 hover:bg-surface-soft"
+                              "text-[var(--danger-ink)] hover:bg-surface-soft"
                             }`}
                           >
                             <Trash2 size={14} /> Delete User
@@ -275,7 +275,7 @@ export function UserTable() {
       <Modal isOpen={!!deleteConfirm} onClose={() => setDeleteConfirm(null)} title="Delete User">
         <div className="space-y-4">
           <p>Are you sure you want to permanently delete <strong>{deleteConfirm?.name}</strong>?</p>
-          <p className="text-sm text-red-500 mt-2">This action cannot be undone. All user data (profile, vehicles, jobs, notifications, favorites) will be permanently removed.</p>
+          <p className="text-sm text-[var(--danger-ink)] mt-2">This action cannot be undone. All user data (profile, vehicles, jobs, notifications, favorites) will be permanently removed.</p>
           <div className="flex justify-end gap-3 pt-2">
             <Button variant="ghost" onClick={() => setDeleteConfirm(null)}>Cancel</Button>
             <Button

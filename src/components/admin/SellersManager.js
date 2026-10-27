@@ -76,7 +76,7 @@ export function SellersManager() {
             <div className="w-8 h-8 border-2 border-t-transparent rounded-full animate-spin border-primary" />
           </div>
         ) : error ? (
-          <div className="py-12 text-center text-red-500">
+          <div className="py-12 text-center text-[var(--danger-ink)]">
             <p>{error}</p>
             <button onClick={loadData} className="mt-3 text-sm underline">Retry</button>
           </div>
@@ -132,7 +132,7 @@ export function SellersManager() {
                           onClick={() => handleVerify(s)}
                           disabled={actionLoading === s.id}
                           aria-label={s.verified ? "Unverify seller" : "Verify seller"}
-                          className={`p-1.5 rounded transition-colors ${s.verified ? "text-red-500 hover:bg-surface-soft" : "text-icon-highlight hover:bg-surface-soft"}`}
+                          className={`p-1.5 rounded transition-colors ${s.verified ? "text-[var(--danger-ink)] hover:bg-surface-soft" : "text-icon-highlight hover:bg-surface-soft"}`}
                         >
                           {s.verified ? <ShieldOff size={15} /> : <ShieldCheck size={15} />}
                         </button>

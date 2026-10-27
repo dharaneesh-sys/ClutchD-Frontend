@@ -65,7 +65,7 @@ export function PayoutLedger() {
           Payout Ledger
         </h3>
         <div className="flex items-center gap-2">
-          <span className="inline-block w-2 h-2 rounded-full bg-green-500" title="Live data" />
+          <span className="inline-block w-2 h-2 rounded-full bg-[var(--success)]" title="Live data" />
           <span className="text-xs text-text-muted">Live</span>
           <button
             onClick={loadData}
@@ -95,7 +95,7 @@ export function PayoutLedger() {
               onClick={() => setStatusFilter(s)}
               className={`whitespace-nowrap px-3 py-1.5 rounded-full text-xs font-medium transition-all ${
                 statusFilter === s
-                  ? "bg-primary text-white shadow-sm"
+                  ? "bg-[var(--primary)] text-[var(--on-primary)] shadow-sm"
                   : "bg-surface-soft text-text-primary hover:bg-bg-card"
               }`}
             >
@@ -111,7 +111,7 @@ export function PayoutLedger() {
           <div className="w-8 h-8 border-2 border-t-transparent rounded-full animate-spin border-primary" />
         </div>
       ) : error ? (
-        <div className="py-12 text-center text-red-500">
+        <div className="py-12 text-center text-[var(--danger-ink)]">
           <p>{error}</p>
           <button onClick={loadData} className="mt-3 text-sm underline">
             Retry

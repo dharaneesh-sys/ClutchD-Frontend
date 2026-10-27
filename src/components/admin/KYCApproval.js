@@ -196,7 +196,7 @@ export function KYCApproval() {
             onClick={() => setStatusFilter(f.key)}
             className={`px-3.5 py-1.5 rounded-full text-sm font-medium border transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/60 ${
               statusFilter === f.key
-                ? "bg-primary text-white border-primary"
+                ? "bg-[var(--primary)] text-[var(--on-primary)] border-primary"
                 : "bg-[var(--surface-soft)] text-text-muted border-[var(--border)] hover:bg-[var(--surface-soft)]"
             }`}
           >
@@ -210,7 +210,7 @@ export function KYCApproval() {
           <div className="w-8 h-8 border-2 border-t-transparent rounded-full animate-spin mx-auto border-primary" />
         </div>
       ) : error ? (
-        <div className="col-span-full py-12 text-center text-red-500">
+        <div className="col-span-full py-12 text-center text-[var(--danger-ink)]">
           <p>{error}</p>
           <button onClick={() => loadApplications()} className="mt-3 text-sm underline">Retry</button>
         </div>
@@ -285,7 +285,7 @@ export function KYCApproval() {
                   <div className="mt-auto grid grid-cols-2 gap-3 pt-4 border-t border-border-subtle">
                     <Button
                       variant="outline"
-                      className="!text-red-400 !border-red-500/40 hover:!bg-red-500/10 hover:!text-red-300"
+                      className="!text-[var(--danger-ink)] !border-[color-mix(in_srgb,var(--danger)_35%,transparent)] hover:!bg-[color-mix(in_srgb,var(--danger)_10%,transparent)] hover:!text-[var(--danger-ink)]"
                       onClick={() => openReview(app, "reject")}
                     >
                       <XCircle size={16} className="mr-2" /> Reject
@@ -322,7 +322,7 @@ export function KYCApproval() {
             )}
 
             <label className="block text-sm font-medium text-text-primary mb-1.5">
-              Note {reviewModal.action === "reject" && <span className="text-red-400">*</span>}
+              Note {reviewModal.action === "reject" && <span className="text-[var(--danger-ink)]">*</span>}
             </label>
             <textarea
               value={note}

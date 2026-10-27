@@ -165,7 +165,7 @@ export function FleetBookingPanel() {
                         : "border-border-subtle bg-transparent"
                     )}
                   >
-                    {isSelected && <CheckSquare size={14} className="text-white" />}
+                    {isSelected && <CheckSquare size={14} className="text-[var(--on-primary)]" />}
                   </div>
                   <div className="min-w-0 flex-1">
                     <p className="text-sm font-semibold text-text-primary truncate">
@@ -350,7 +350,7 @@ export function FleetBookingPanel() {
             {/* Discount */}
             <div className="flex items-center justify-between text-sm">
               <span className="flex items-center gap-1.5 text-text-muted">
-                <Percent size={14} className="text-green-400" />
+                <Percent size={14} className="text-[var(--success)]" />
                 Bulk Discount
                 {pricing.effectiveDiscountPercent > 0 && (
                   <Badge variant="success" className="text-[10px]">
@@ -359,7 +359,7 @@ export function FleetBookingPanel() {
                 )}
               </span>
               {pricing.effectiveDiscountPercent > 0 ? (
-                <span className="text-green-400 font-medium tabular-nums">
+                <span className="text-[var(--success)] font-medium tabular-nums">
                   -₹{pricing.discountAmount.toLocaleString("en-IN")}
                 </span>
               ) : (
@@ -400,7 +400,7 @@ export function FleetBookingPanel() {
 
       {/* Error */}
       {error && (
-        <div className="p-4 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-sm">
+        <div className="p-4 rounded-xl bg-[color-mix(in_srgb,var(--danger)_10%,transparent)] border border-[color-mix(in_srgb,var(--danger)_35%,transparent)] text-[var(--danger-ink)] text-sm">
           {error}
         </div>
       )}

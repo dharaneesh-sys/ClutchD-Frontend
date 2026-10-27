@@ -103,7 +103,7 @@ export function Sidebar({ currentPath = "/admin", onClose }) {
       <div className={`p-4 border-t mx-4 mb-4 ${"border-border-subtle"}`}>
         <button
           onClick={logout}
-          className="flex items-center gap-3 w-full px-4 py-3 text-red-400/80 hover:bg-red-400/10 hover:text-red-400 rounded-xl transition-all text-sm font-medium"
+          className="flex items-center gap-3 w-full px-4 py-3 text-[var(--danger-ink)] hover:bg-[var(--surface-soft)] hover:text-[var(--danger-ink)] rounded-xl transition-all text-sm font-medium"
         >
           <UserCircle size={18} />
           Logout Admin

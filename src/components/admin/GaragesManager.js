@@ -74,7 +74,7 @@ export function GaragesManager() {
             <div className="w-8 h-8 border-2 border-t-transparent rounded-full animate-spin border-primary" />
           </div>
         ) : error ? (
-          <div className="py-12 text-center text-red-500">
+          <div className="py-12 text-center text-[var(--danger-ink)]">
             <p>{error}</p>
             <button onClick={loadData} className="mt-3 text-sm underline">Retry</button>
           </div>
@@ -124,7 +124,7 @@ export function GaragesManager() {
                           disabled={actionLoading === g.id}
                           className={`p-1.5 rounded transition-colors ${
                             g.verified
-                              ? "hover:bg-surface-soft text-red-500 hover:text-red-600"
+                              ? "hover:bg-surface-soft text-[var(--danger-ink)]"
                               : "hover:bg-surface-soft text-icon-highlight hover:text-icon-highlight"
                           }`}
                           title={g.verified ? "Unverify" : "Verify"}
@@ -198,7 +198,7 @@ export function GaragesManager() {
               </div>
               <div className={`p-4 rounded-xl border ${"bg-bg-card border-border-subtle"}`}>
                 <p className={`text-xs uppercase mb-1 ${"text-text-dim"}`}>Penalty</p>
-                <p className={`font-medium ${profileModal.penalized ? "text-red-500" : "text-text-primary"}`}>
+                <p className={`font-medium ${profileModal.penalized ? "text-[var(--danger-ink)]" : "text-text-primary"}`}>
                   {profileModal.penalized ? `₹${(profileModal.penaltyAmount / 100).toLocaleString("en-IN")}` : "None"}
                 </p>
               </div>
