@@ -5,6 +5,9 @@ import { usePathname } from "next/navigation";
 import { useRouter } from "next/navigation";
 import { ArrowLeft } from "lucide-react";
 import { BottomNav } from "@/components/ui/BottomNav";
+import { MarketplaceMenu } from "@/components/ui/MarketplaceMenu";
+import { Logo } from "@/components/ui/Logo";
+import { marketplaceShowsBack } from "@/lib/marketplaceNav";
 import { DashboardTabBar, MECHANIC_TABS, GARAGE_TABS, SELLER_TABS } from "@/components/dashboard/DashboardTabBar";
 import { useAuthStore } from "@/store/authStore";
 import { NAVIGATION_EVENT } from "@/lib/navigation";
@@ -84,16 +87,29 @@ export default function MarketplaceLayout({ children }) {
     bottomNav = <DashboardTabBar />;
   }
 
+  const showBack = marketplaceShowsBack(pathname);
+
   return (
-    <div className="min-h-[100dvh] flex flex-col">
-      <button
-        onClick={handleBack}
-        className="fixed top-4 left-4 flex items-center justify-center w-10 h-10 rounded-full bg-bg-card border border-border-subtle shadow-2xl transition-all duration-200 hover:scale-105 active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
-        aria-label="Go back"
-      >
-        <ArrowLeft size={20} className="text-text-muted" />
-      </button>
-      <main className="flex-1 pt-14 pb-20">{children}</main>
+    <div className="min-h-[100dvh] flex flex-col bg-[var(--background)]">
+      <header className="sticky top-0 z-50 flex items-center gap-2 border-b border-[var(--border)] bg-[var(--surface-card)] px-2 pb-2 pt-[max(0.5rem,env(safe-area-inset-top))] sm:px-4">
+        {showBack ? (
+          <button
+            type="button"
+            onClick={handleBack}
+            className="flex h-11 w-11 items-center justify-center rounded-full text-[var(--foreground)] hover:bg-[var(--surface-soft)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)]"
+            aria-label="Go back"
+          >
+            <ArrowLeft size={20} aria-hidden="true" />
+          </button>
+        ) : (
+          <span className="pl-2">
+            <Logo size="md" showText />
+          </span>
+        )}
+        <span className="flex-1" />
+        <MarketplaceMenu />
+      </header>
+      <main className="flex-1 pb-[calc(64px+env(safe-area-inset-bottom)+1rem)] lg:pb-6">{children}</main>
       {bottomNav}
     </div>
   );

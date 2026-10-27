@@ -1,8 +1,4 @@
-// Wave-1 Task 3 (nav shell) — RED-first contract tests for BottomNav.
-// DESIGN.md: D2 (light-first, zero dark-prefixed classes, toggle only in settings + Menu popover),
-// D9.1 (6-item IA frozen, Menu popover w/ profile links + inline SOS + theme row),
-// D15.4.1 (M3 nav-bar: active-indicator pill, badge role), D4 (popovers rounded-2xl),
-// D5 (surface-card only).
+// Task 19: marketplace shell — 5-item store nav + header overflow menu.
 import "@testing-library/jest-dom/vitest";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen, fireEvent, cleanup } from "@testing-library/react";
@@ -32,11 +28,13 @@ vi.mock("@/components/ui/useSOS", () => ({
   useSOS: () => sosMocks.sos,
 }));
 
-import { BottomNav } from "@/components/ui/BottomNav";
+import { BottomNav, marketplaceTabFor } from "@/components/ui/BottomNav";
+import { MarketplaceMenu } from "@/components/ui/MarketplaceMenu";
+import { marketplaceShowsBack } from "@/lib/marketplaceNav";
 import { useCartStore } from "@/store/cartStore";
 import { themeStore } from "@/store/themeStore";
 
-const ITEMS = ["Home", "Categories", "Search", "Cart", "Profile", "Menu"];
+const ITEMS = ["Home", "Categories", "Search", "Cart", "Profile"];
 
 beforeEach(() => {
   navMocks.push.mockClear();
@@ -50,125 +48,113 @@ beforeEach(() => {
   document.documentElement.setAttribute("data-theme", "light");
 });
 
-describe("BottomNav IA (D9.1 frozen)", () => {
-  it("renders all 6 nav items in order, no more, no fewer", () => {
+describe("Marketplace BottomNav (plan nav matrix)", () => {
+  it("renders exactly Home, Categories, Search, Cart, Profile", () => {
     render(<BottomNav />);
-    const buttons = screen.getAllByRole("button");
-    const labels = buttons.map((b) => b.getAttribute("aria-label"));
-    expect(labels).toEqual(ITEMS);
+    expect(screen.getAllByRole("button").map((b) => b.getAttribute("aria-label"))).toEqual(ITEMS);
+    expect(screen.queryByRole("button", { name: "Menu" })).toBeNull();
   });
 
-  it("marks Home active via aria-current on /marketplace", () => {
+  it.each([
+    ["/marketplace", "Home"],
+    ["/marketplace/categories", "Categories"],
+    ["/marketplace/categories/id", "Categories"],
+    ["/marketplace/search", "Search"],
+    ["/marketplace/cart", "Cart"],
+    ["/marketplace/profile/orders", "Profile"],
+  ])("%s marks %s active", (path, label) => {
+    navMocks.path = path;
     render(<BottomNav />);
-    expect(screen.getByRole("button", { name: "Home" })).toHaveAttribute(
-      "aria-current",
-      "page",
-    );
-    expect(
-      screen.getByRole("button", { name: "Search" }),
-    ).not.toHaveAttribute("aria-current");
+    expect(screen.getByRole("button", { name: label })).toHaveAttribute("aria-current", "page");
   });
 
-  it("marks Search active on its route", () => {
-    navMocks.path = "/marketplace/search";
-    render(<BottomNav />);
-    expect(screen.getByRole("button", { name: "Search" })).toHaveAttribute(
-      "aria-current",
-      "page",
-    );
+  it("product/checkout pages mark no tab active", () => {
+    expect(marketplaceTabFor("/marketplace/product/id")).toBeUndefined();
+    expect(marketplaceTabFor("/marketplace/checkout")).toBeUndefined();
   });
 
-  it("navigates to the item path on tap (IA routes unchanged)", () => {
+  it("navigates to the item path on tap", () => {
     render(<BottomNav />);
     fireEvent.click(screen.getByRole("button", { name: "Cart" }));
     expect(navMocks.push).toHaveBeenCalledWith("/marketplace/cart");
   });
 
-  it("active destination carries the M3 active-indicator pill (D15.4.1)", () => {
+  it("shows the real cart count badge, capped at 99+, hidden when empty", () => {
+    useCartStore.setState({ items: [{ id: "a", quantity: 2 }] });
+    const { unmount } = render(<BottomNav />);
+    expect(screen.getByRole("button", { name: "Cart" })).toHaveTextContent("2");
+    unmount();
+    useCartStore.setState({ items: [{ id: "a", quantity: 150 }] });
+    const second = render(<BottomNav />);
+    expect(screen.getByRole("button", { name: "Cart" })).toHaveTextContent("99+");
+    second.unmount();
+    useCartStore.setState({ items: [] });
     render(<BottomNav />);
-    const home = screen.getByRole("button", { name: "Home" });
-    const pill = home.querySelector(".bg-surface-soft.rounded-full");
-    expect(pill).not.toBeNull();
+    expect(screen.getByRole("button", { name: "Cart" }).textContent).toBe("Cart");
+  });
+
+  it("back arrow only on pushed/detail screens", () => {
+    for (const p of ["/marketplace", "/marketplace/categories", "/marketplace/search", "/marketplace/cart", "/marketplace/profile"]) {
+      expect(marketplaceShowsBack(p), p).toBe(false);
+    }
+    for (const p of ["/marketplace/categories/id", "/marketplace/product/id", "/marketplace/checkout"]) {
+      expect(marketplaceShowsBack(p), p).toBe(true);
+    }
   });
 });
 
-describe("BottomNav cart badge (M3 badge role, D15.4.1)", () => {
-  it("shows the item count badge", () => {
-    useCartStore.setState({
-      items: [{ productId: "p1", quantity: 2, product: {}, vendor: {} }],
-    });
-    render(<BottomNav />);
-    expect(screen.getByText("2")).toBeInTheDocument();
-  });
-
-  it("caps the badge at 99+", () => {
-    useCartStore.setState({
-      items: [{ productId: "p1", quantity: 150, product: {}, vendor: {} }],
-    });
-    render(<BottomNav />);
-    expect(screen.getByText("99+")).toBeInTheDocument();
-  });
-
-  it("hides the badge when the cart is empty", () => {
-    render(<BottomNav />);
-    const cart = screen.getByRole("button", { name: "Cart" });
-    expect(cart.querySelector(".bg-danger")).toBeNull();
-  });
-});
-
-describe("BottomNav Menu popover (D9.1 frozen behavior)", () => {
+describe("Marketplace header overflow menu", () => {
   function openMenu() {
     cleanup();
-    render(<BottomNav />);
-    fireEvent.click(screen.getByRole("button", { name: "Menu" }));
+    render(<MarketplaceMenu />);
+    fireEvent.click(screen.getByRole("button", { name: "More options" }));
   }
 
-  it("opens with profile links, inline SOS row, and theme row", () => {
+  it("opens with profile links, help, inline SOS row and theme row", () => {
     openMenu();
     expect(screen.getByText("My Profile")).toBeInTheDocument();
     expect(screen.getByText("Orders")).toBeInTheDocument();
     expect(screen.getByText("Favorites")).toBeInTheDocument();
-    expect(
-      screen.getByRole("button", { name: "Emergency SOS" }),
-    ).toBeInTheDocument();
+    expect(screen.getByText("Help & Support")).toBeInTheDocument();
+    expect(screen.getByRole("menuitem", { name: "Emergency SOS" })).toBeInTheDocument();
     expect(screen.getByText("Theme")).toBeInTheDocument();
   });
 
-  it("uses surface-card + rounded-2xl (D4/D5), no dark-prefixed classes", () => {
+  it("is a flat card, aria-expanded/haspopup, no dark-prefixed classes", () => {
     openMenu();
-    const menu = screen.getByRole("button", { name: "Menu" });
-    expect(menu.getAttribute("aria-expanded")).toBe("true");
-    expect(menu.getAttribute("aria-haspopup")).toBe("true");
-    const panel = document.querySelector(".surface-card.rounded-2xl");
-    expect(panel).not.toBeNull();
-    expect(panel.className).not.toMatch(/dark:/);
+    const button = screen.getByRole("button", { name: "More options" });
+    expect(button).toHaveAttribute("aria-expanded", "true");
+    expect(button).toHaveAttribute("aria-haspopup", "true");
+    const panel = screen.getByRole("menu");
+    expect(panel.className).toContain("bg-[var(--surface-card)]");
+    expect(panel.className).not.toMatch(/dark:|backdrop-blur/);
   });
 
-  it("profile link navigates and closes the popover", () => {
+  it("links navigate and close the menu", () => {
     openMenu();
     fireEvent.click(screen.getByText("Orders"));
-    expect(navMocks.push).toHaveBeenCalledWith(
-      "/marketplace/profile/orders",
-    );
+    expect(navMocks.push).toHaveBeenCalledWith("/marketplace/profile/orders");
     expect(screen.queryByText("My Profile")).toBeNull();
+    openMenu();
+    fireEvent.click(screen.getByText("Help & Support"));
+    expect(navMocks.push).toHaveBeenCalledWith("/marketplace/profile/help");
   });
 
-  it("SOS row calls the inline 2-tap handler without an overlay", () => {
+  it("SOS row calls the inline 2-tap handler and keeps the menu open", () => {
     openMenu();
-    fireEvent.click(screen.getByRole("button", { name: "Emergency SOS" }));
+    fireEvent.click(screen.getByRole("menuitem", { name: "Emergency SOS" }));
     expect(sosMocks.sos.handleSOS).toHaveBeenCalledTimes(1);
-    // Popover stays open — no overlay steals the second tap.
     expect(screen.getByText("Theme")).toBeInTheDocument();
   });
 
-  it("theme row toggles light/dark from the store (D2.5)", () => {
+  it("theme row toggles light/dark from the store", () => {
     openMenu();
     expect(screen.getByText("Light")).toBeInTheDocument();
     fireEvent.click(screen.getByText("Theme").closest("button"));
     expect(themeStore.getState().theme).toBe("dark");
   });
 
-  it("closes on Escape and on outside click (D9.4)", () => {
+  it("closes on Escape and on outside click", () => {
     openMenu();
     fireEvent.keyDown(document, { key: "Escape" });
     expect(screen.queryByText("My Profile")).toBeNull();
