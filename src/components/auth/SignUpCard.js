@@ -3,7 +3,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { customerSignupSchema, mechanicSignupSchema, garageSignupSchema, sellerSignupSchema } from "@/lib/validators";
 import { useAuthStore } from "@/store/authStore";
-import { UserCircle, Wrench, Building2, UserPlus, Store } from "lucide-react";
+import { Check, UserCircle, Wrench, Building2, UserPlus, Store } from "lucide-react";
 import { GlassCard } from "@/components/ui/GlassCard";
 import { Button } from "@/components/ui/Button";
 import { CustomerFields } from "@/components/auth/CustomerFields";
@@ -186,13 +186,18 @@ export function SignUpCard() {
   };
 
   return (
-    <GlassCard className="w-full max-w-xl p-6 sm:p-8 pt-10">
-      <div className="mb-8 text-center">
-        <h2 className="text-3xl font-bold mb-2 tracking-tight text-text-primary">Create Account</h2>
-        <p className="text-text-muted">Join the ultimate on-demand platform</p>
+    <GlassCard className="w-full max-w-xl p-5 sm:p-8">
+      <div className="mb-6 text-center">
+        <h2 className="text-2xl font-semibold mb-1 tracking-tight text-[var(--foreground)]">Create account</h2>
+        <p className="text-[var(--text-muted)]">Join the ultimate on-demand platform</p>
       </div>
 
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-8">
+      <p id="signup-role-label" className="mb-2 text-sm font-medium text-[var(--foreground)]">I am a</p>
+      <div
+        role="group"
+        aria-labelledby="signup-role-label"
+        className="-mx-1 mb-6 flex snap-x gap-2 overflow-x-auto px-1 pb-1 sm:mx-0 sm:grid sm:grid-cols-4 sm:overflow-visible sm:px-0"
+      >
         {ROLES.map((role) => {
           const Icon = role.icon;
           const isSelected = selectedRole === role.id;
@@ -201,18 +206,23 @@ export function SignUpCard() {
               key={role.id}
               type="button"
               onClick={() => setSelectedRole(role.id)}
+              aria-pressed={isSelected}
               className={`
-                flex flex-col items-center p-3 sm:p-4 rounded-xl border transition-all text-center group
+                relative flex min-h-[72px] min-w-[84px] shrink-0 snap-start flex-col items-center justify-center rounded-xl border p-2.5 text-center transition-colors
+                focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)]
                 ${
                   isSelected
-                    ? "bg-surface-soft border-border-subtle text-text-primary elevation-1"
-                    : "bg-bg-card border-border-subtle text-text-muted hover:bg-surface-soft hover:text-text-primary"
+                    ? "border-[var(--primary)] bg-[var(--surface-soft)] text-[var(--primary-dark)]"
+                    : "border-[var(--border)] bg-[var(--surface-card)] text-[var(--text-muted)] hover:bg-[var(--surface-soft)] hover:text-[var(--foreground)]"
                 }
               `}
             >
-              <Icon size={24} className={`mb-2 ${isSelected ? "text-icon-highlight" : "text-text-dim group-hover:text-text-primary"}`} />
+              {isSelected && (
+                <Check size={14} aria-hidden="true" className="absolute right-1.5 top-1.5 text-[var(--primary-dark)]" />
+              )}
+              <Icon size={22} aria-hidden="true" className="mb-1.5" />
               <span className="text-sm font-medium mb-1">{role.label}</span>
-              <span className="text-[10px] opacity-70 leading-tight hidden sm:block">{role.desc}</span>
+              <span className="text-[10px] leading-tight hidden sm:block text-[var(--text-muted)]">{role.desc}</span>
             </button>
           );
         })}
@@ -227,37 +237,37 @@ export function SignUpCard() {
         </div>
 
         {authError && (
-          <div className="p-3 rounded-lg bg-danger/10 border border-danger/20 text-danger text-sm">
+          <div role="alert" className="p-3 rounded-xl border border-[color-mix(in_srgb,var(--danger)_30%,transparent)] bg-[color-mix(in_srgb,var(--danger)_8%,transparent)] text-[var(--danger-ink)] text-sm">
             {authError}
           </div>
         )}
 
         <Button type="submit" className="w-full mt-4" size="lg" isLoading={isLoading}>
-          <UserPlus size={18} className="mr-2" />
+          <UserPlus size={18} aria-hidden="true" />
           Create Account
         </Button>
 
         <div className="relative my-6">
           <div className="absolute inset-0 flex items-center">
-             <div className="w-full border-t border-border-subtle"></div>
+             <div className="w-full border-t border-[var(--border)]"></div>
           </div>
            <div className="relative flex justify-center text-sm">
-              <span className="px-2 bg-primary-soft text-muted">Or sign up with</span>
+              <span className="px-2 bg-[var(--surface-card)] text-[var(--text-muted)]">Or sign up with</span>
            </div>
         </div>
 
         <div className="w-full space-y-3">
           {googleClientId ? (
             <>
-              <div className="w-full rounded-xl border p-3 border-border-subtle bg-bg-card">
+              <div className="w-full rounded-xl border p-2 border-[var(--border)] bg-[var(--surface-card)]">
                 {typeof window !== "undefined" && window.Capacitor?.isNativePlatform() ? (
                   <button
                     type="button"
                     onClick={handleCapacitorGoogleSignIn}
-                    className="w-full flex items-center justify-center gap-3 px-4 py-3 rounded-lg border border-border-subtle bg-bg-card hover:bg-surface-soft transition-colors"
+                    className="w-full min-h-[48px] flex items-center justify-center gap-3 px-4 py-3 rounded-xl border border-[var(--border)] bg-[var(--surface-card)] hover:bg-[var(--surface-soft)] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)]"
                   >
-                    <svg width="20" height="20" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
-                    <span className="text-sm font-medium text-text-primary">Sign up with Google</span>
+                    <svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+                    <span className="text-sm font-medium text-[var(--foreground)]">Sign up with Google</span>
                   </button>
                 ) : (
                   <div
@@ -266,12 +276,12 @@ export function SignUpCard() {
                   />
                 )}
               </div>
-              <p className="text-xs text-center text-text-dim">
-                 Google signup will use <span className="font-medium text-text-primary">{selectedRole}</span>.
+              <p className="text-xs text-center text-[var(--text-muted)]">
+                 Google signup will use <span className="font-medium text-[var(--foreground)]">{selectedRole}</span>.
               </p>
             </>
           ) : (
-             <div className="w-full p-3 rounded-xl border text-sm text-center border-border-subtle bg-bg-card text-text-muted">
+             <div className="w-full p-3 rounded-xl border text-sm text-center border-[var(--border)] bg-[var(--surface-soft)] text-[var(--text-muted)]">
                Set `NEXT_PUBLIC_GOOGLE_CLIENT_ID` to enable Google.
              </div>
           )}

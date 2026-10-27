@@ -17,46 +17,41 @@ export default function AuthPage() {
   useAuthRedirect();
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 sm:p-8 relative overflow-hidden page-enter">
-      <div className="w-full max-w-7xl grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-16 items-center px-4 relative z-10">
-        <div className="order-2 lg:order-1 flex flex-col justify-center text-center lg:text-left lg:pr-12">
-          <div>
-              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full mb-6 hidden sm:inline-flex bg-primary-soft border border-subtle">
-              <span className="w-2 h-2 rounded-full bg-primary" />
-              <span className="text-xs font-medium text-muted">Now live in Coimbatore</span>
-            </div>
+    <div className="min-h-[100dvh] bg-[var(--background)] px-4 pb-8 pt-[max(1.5rem,env(safe-area-inset-top))] sm:px-8 page-enter">
+      <div className="mx-auto grid w-full max-w-6xl grid-cols-1 items-center gap-8 lg:min-h-[calc(100dvh-4rem)] lg:grid-cols-2 lg:gap-16">
+        <div className="order-2 text-center lg:order-1 lg:pr-12 lg:text-left">
+          <span className="mb-5 hidden items-center gap-2 rounded-full border border-[var(--border)] bg-[var(--surface-card)] px-3 py-1.5 sm:inline-flex">
+            <span aria-hidden="true" className="h-2 w-2 rounded-full bg-[var(--primary)]" />
+            <span className="text-xs font-medium text-[var(--text-muted)]">Now live in Coimbatore</span>
+          </span>
 
-            <h1 className="text-5xl lg:text-7xl font-extrabold tracking-tight mb-6 leading-[1.1] text-foreground">
-              Vehicle Service,<br />
-              <span className="gradient-text">On Demand.</span>
-            </h1>
+          <h1 className="mb-4 text-3xl font-bold leading-[1.15] tracking-tight text-[var(--foreground)] sm:text-4xl lg:text-5xl">
+            Vehicle Service,<br />
+            <span className="text-[var(--primary-dark)]">On Demand.</span>
+          </h1>
 
-            <p className="text-lg mb-10 max-w-xl mx-auto lg:mx-0 leading-relaxed text-on-surface-variant">
-              Connect instantly with top-rated mechanics and premium garages nearby.
-              Real-time tracking, transparent pricing, and trusted professionals.
-            </p>
+          <p className="mx-auto mb-8 max-w-xl text-base leading-relaxed text-[var(--text-muted)] lg:mx-0">
+            Connect instantly with top-rated mechanics and premium garages nearby.
+            Real-time tracking, transparent pricing, and trusted professionals.
+          </p>
 
-            <div className="grid grid-cols-2 gap-4 max-w-lg mx-auto lg:mx-0 text-left">
-              {[
-                { title: "24/7 Support", desc: "Always available" },
-                { title: "Live Tracking", desc: "See mechanic on map" },
-                { title: "Verified Pros", desc: "Background checked" },
-                { title: "Upfront Pricing", desc: "No hidden fees" },
-              ].map((feat, idx) => (
-                <div
-                  key={idx}
-                  className={`surface-card-interactive flex flex-col p-4 rounded-2xl`}
-                >
-                  <span className="font-semibold mb-1 text-[var(--color-text-primary)]">{feat.title}</span>
-                  <span className="text-sm text-muted">{feat.desc}</span>
-                </div>
-              ))}
-            </div>
+          <div className="mx-auto grid max-w-lg grid-cols-2 gap-3 text-left lg:mx-0">
+            {[
+              { title: "24/7 Support", desc: "Always available" },
+              { title: "Live Tracking", desc: "See mechanic on map" },
+              { title: "Verified Pros", desc: "Background checked" },
+              { title: "Upfront Pricing", desc: "No hidden fees" },
+            ].map((feat) => (
+              <div key={feat.title} className="surface-card flex flex-col p-4">
+                <span className="mb-1 font-semibold text-[var(--foreground)]">{feat.title}</span>
+                <span className="text-sm text-[var(--text-muted)]">{feat.desc}</span>
+              </div>
+            ))}
           </div>
         </div>
 
-        <div className="order-1 lg:order-2 flex flex-col items-center lg:items-end w-full">
-          <div className="w-full flex justify-center lg:justify-end">
+        <div className="order-1 flex w-full flex-col items-center lg:order-2 lg:items-end">
+          <div className="flex w-full justify-center lg:justify-end">
             {isLoginView ? (
               <LoginCard onNeedSignUp={setIsLoginView} />
             ) : (
@@ -64,17 +59,16 @@ export default function AuthPage() {
             )}
           </div>
 
-          <div className="mt-6 text-center lg:text-right w-full lg:max-w-md lg:mr-2">
-            <p className="text-muted">
-              {isLoginView ? "Don\u0027t have an account?" : "Already have an account?"}
-              <button
-                onClick={() => setIsLoginView(!isLoginView)}
-                className="ml-2 font-semibold transition-colors focus:outline-none text-[var(--primary-light)] hover:text-[var(--primary)]"
-              >
-                {isLoginView ? "Sign Up" : "Log In"}
-              </button>
-            </p>
-          </div>
+          <p className="mt-4 w-full text-center text-[var(--text-muted)] lg:max-w-md lg:text-right">
+            {isLoginView ? "Don\u0027t have an account?" : "Already have an account?"}
+            <button
+              type="button"
+              onClick={() => setIsLoginView(!isLoginView)}
+              className="ml-1 min-h-[44px] px-1 font-semibold text-[var(--primary-dark)] hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)] rounded"
+            >
+              {isLoginView ? "Sign Up" : "Log In"}
+            </button>
+          </p>
         </div>
       </div>
     </div>

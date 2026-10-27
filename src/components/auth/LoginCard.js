@@ -4,7 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { loginSchema } from "@/lib/validators";
 import { useAuthStore } from "@/store/authStore";
 import { setFleetPersona } from "@/lib/persona";
-import { Mail, Lock, LogIn, UserCircle, Wrench, Building2, Truck, Store } from "lucide-react";
+import { Check, Mail, Lock, LogIn, UserCircle, Wrench, Building2, Truck, Store } from "lucide-react";
 import { GlassCard } from "@/components/ui/GlassCard";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
@@ -276,10 +276,10 @@ export function LoginCard({ onNeedSignUp }) {
 
   if (view === "forgot_email") {
     return (
-      <GlassCard className="w-full max-w-md p-8 pt-10">
+      <GlassCard className="w-full max-w-md p-5 sm:p-8">
         <div className="mb-8 text-center">
-          <h2 className="text-2xl font-bold mb-2 tracking-tight text-text-primary">Reset Password</h2>
-          <p className="text-text-muted">Enter your email to receive a recovery code.</p>
+          <h2 className="text-2xl font-semibold mb-1 tracking-tight text-[var(--foreground)]">Reset Password</h2>
+          <p className="text-[var(--text-muted)]">Enter your email to receive a recovery code.</p>
         </div>
         <form onSubmit={handleForgotRequest} className="space-y-4">
           <Input 
@@ -291,7 +291,7 @@ export function LoginCard({ onNeedSignUp }) {
             placeholder="name@example.com" 
           />
           {resetError && (
-             <div className="p-3 rounded-lg bg-danger/10 border border-danger/20 text-danger text-sm">
+             <div role="alert" className="p-3 rounded-xl border border-[color-mix(in_srgb,var(--danger)_30%,transparent)] bg-[color-mix(in_srgb,var(--danger)_8%,transparent)] text-[var(--danger-ink)] text-sm">
                {resetError}
              </div>
           )}
@@ -301,7 +301,7 @@ export function LoginCard({ onNeedSignUp }) {
           <button 
              type="button" 
              onClick={() => setView("login")} 
-              className={`w-full text-sm mt-4 text-center hover:underline text-text-muted`}
+              className="w-full min-h-[44px] text-sm mt-2 text-center font-medium hover:underline text-[var(--primary-dark)]"
           >
              Back to Login
            </button>
@@ -312,14 +312,14 @@ export function LoginCard({ onNeedSignUp }) {
 
    if (view === "forgot_code") {
     return (
-      <GlassCard className="w-full max-w-md p-8 pt-10">
+      <GlassCard className="w-full max-w-md p-5 sm:p-8">
         <div className="mb-8 text-center">
-          <h2 className="text-2xl font-bold mb-2 tracking-tight text-text-primary">Enter Code</h2>
-          <p className="text-text-muted">Enter the reset code you received.</p>
+          <h2 className="text-2xl font-semibold mb-1 tracking-tight text-[var(--foreground)]">Enter Code</h2>
+          <p className="text-[var(--text-muted)]">Enter the reset code you received.</p>
         </div>
         <form onSubmit={handleForgotReset} className="space-y-4">
           {resetNotice && (
-            <div className="p-3 rounded-lg bg-primary/10 border border-primary/20 text-primary-light text-sm">
+            <div role="status" className="p-3 rounded-xl border border-[var(--border)] bg-[var(--surface-soft)] text-[var(--primary-dark)] text-sm">
               {resetNotice}
             </div>
           )}
@@ -340,7 +340,7 @@ export function LoginCard({ onNeedSignUp }) {
             placeholder="••••••••" 
           />
           {resetError && (
-             <div className="p-3 rounded-lg bg-danger/10 border border-danger/20 text-danger text-sm">
+             <div role="alert" className="p-3 rounded-xl border border-[color-mix(in_srgb,var(--danger)_30%,transparent)] bg-[color-mix(in_srgb,var(--danger)_8%,transparent)] text-[var(--danger-ink)] text-sm">
                {resetError}
              </div>
           )}
@@ -350,7 +350,7 @@ export function LoginCard({ onNeedSignUp }) {
           <button 
              type="button" 
              onClick={() => setView("login")} 
-              className={`w-full text-sm mt-4 text-center hover:underline text-text-muted`}
+              className="w-full min-h-[44px] text-sm mt-2 text-center font-medium hover:underline text-[var(--primary-dark)]"
           >
              Back to Login
            </button>
@@ -360,13 +360,18 @@ export function LoginCard({ onNeedSignUp }) {
    }
 
    return (
-    <GlassCard className="w-full max-w-md p-8 pt-10">
-      <div className="mb-8 text-center">
-        <h2 className="text-3xl font-bold mb-2 tracking-tight text-text-primary">Welcome Back</h2>
-        <p className="text-text-muted">Sign in to your ClutchD account</p>
+    <GlassCard className="w-full max-w-md p-5 sm:p-8">
+      <div className="mb-6 text-center">
+        <h2 className="text-2xl font-semibold mb-1 tracking-tight text-[var(--foreground)]">Welcome back</h2>
+        <p className="text-[var(--text-muted)]">Sign in to your ClutchD account</p>
       </div>
 
-      <div className="grid grid-cols-3 sm:grid-cols-5 gap-3 mb-6">
+      <p id="login-role-label" className="mb-2 text-sm font-medium text-[var(--foreground)]">I am a</p>
+      <div
+        role="group"
+        aria-labelledby="login-role-label"
+        className="-mx-1 mb-6 flex snap-x gap-2 overflow-x-auto px-1 pb-1 sm:mx-0 sm:grid sm:grid-cols-5 sm:overflow-visible sm:px-0"
+      >
         {ROLES.map((role) => {
           const Icon = role.icon;
           const isSelected = selectedRole === role.id;
@@ -375,21 +380,23 @@ export function LoginCard({ onNeedSignUp }) {
               key={role.id}
               type="button"
               onClick={() => setSelectedRole(role.id)}
+              aria-pressed={isSelected}
               className={`
-                flex flex-col items-center p-3 rounded-xl border transition-all text-center group
+                relative flex min-h-[72px] min-w-[84px] shrink-0 snap-start flex-col items-center justify-center rounded-xl border p-2.5 text-center transition-colors
+                focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)]
                 ${
                   isSelected
-                    ? "bg-surface-soft border-border-subtle text-text-primary elevation-1"
-                    : "bg-bg-card border-border-subtle text-text-muted hover:bg-surface-soft hover:text-text-primary"
+                    ? "border-[var(--primary)] bg-[var(--surface-soft)] text-[var(--primary-dark)]"
+                    : "border-[var(--border)] bg-[var(--surface-card)] text-[var(--text-muted)] hover:bg-[var(--surface-soft)] hover:text-[var(--foreground)]"
                 }
               `}
             >
-              <Icon
-                size={24}
-                className={`mb-2 ${isSelected ? "text-icon-highlight" : "text-text-dim group-hover:text-text-primary"}`}
-              />
+              {isSelected && (
+                <Check size={14} aria-hidden="true" className="absolute right-1.5 top-1.5 text-[var(--primary-dark)]" />
+              )}
+              <Icon size={22} aria-hidden="true" className="mb-1.5" />
               <span className="text-sm font-medium mb-1">{role.label}</span>
-              <span className="text-[10px] opacity-70 leading-tight hidden sm:block">{role.desc}</span>
+              <span className="text-[10px] leading-tight hidden sm:block text-[var(--text-muted)]">{role.desc}</span>
             </button>
           );
         })}
@@ -415,37 +422,37 @@ export function LoginCard({ onNeedSignUp }) {
             error={errors.password?.message}
           />
           <div className="flex items-center justify-between">
-            <label className="flex items-center gap-2 text-sm text-text-muted cursor-pointer select-none">
+            <label className="flex min-h-[44px] items-center gap-2 text-sm text-[var(--text-muted)] cursor-pointer select-none">
               <input
                 type="checkbox"
                 checked={rememberMe}
                 onChange={(e) => setRememberMeChecked(e.target.checked)}
-                className="h-4 w-4 rounded accent-[var(--primary)]"
+                className="h-5 w-5 rounded accent-[var(--primary)]"
               />
               Remember me
             </label>
             <button
               type="button"
               onClick={() => setView("forgot_email")}
-              className="text-sm font-medium transition-colors text-icon-highlight"
+              className="min-h-[44px] px-1 text-sm font-medium transition-colors text-[var(--primary-dark)] hover:underline"
             >
               Forgot password?
             </button>
           </div>
         </div>
         {sessionExpired && (
-          <div className="p-3 rounded-lg bg-info/10 border border-info/20 text-[var(--primary)] text-sm">
+          <div role="status" className="p-3 rounded-xl border border-[var(--border)] bg-[var(--surface-soft)] text-[var(--primary-dark)] text-sm">
             Your session expired. Please sign in again.
           </div>
         )}
         {authError && (
-          <div className="p-3 rounded-lg bg-danger/10 border border-danger/20 text-danger text-sm">
+          <div role="alert" className="p-3 rounded-xl border border-[color-mix(in_srgb,var(--danger)_30%,transparent)] bg-[color-mix(in_srgb,var(--danger)_8%,transparent)] text-[var(--danger-ink)] text-sm">
             {authError}
             {signupNeeded && (
               <button
                 type="button"
                 onClick={() => goToSignup(lastLoginEmail.current)}
-                className="mt-2 w-full py-2 rounded-lg bg-primary text-[var(--background)] text-sm font-semibold hover:opacity-90 transition-opacity"
+                className="mt-2 w-full min-h-[44px] rounded-xl bg-[var(--primary)] text-[var(--on-primary)] text-sm font-semibold hover:bg-[var(--primary-dark)] transition-colors"
               >
                 Create an account
               </button>
@@ -453,31 +460,31 @@ export function LoginCard({ onNeedSignUp }) {
           </div>
         )}
         <Button type="submit" className="w-full mt-2" size="lg" isLoading={isSubmitting}>
-          <LogIn size={18} className="mr-2" />
+          <LogIn size={18} aria-hidden="true" />
           Sign In
         </Button>
 
         <div className="relative my-6">
           <div className="absolute inset-0 flex items-center">
-            <div className="w-full border-t border-border-subtle"></div>
+            <div className="w-full border-t border-[var(--border)]"></div>
           </div>
            <div className="relative flex justify-center text-sm">
-             <span className="px-2 bg-primary-soft text-muted">Or continue with</span>
+             <span className="px-2 bg-[var(--surface-card)] text-[var(--text-muted)]">Or continue with</span>
            </div>
         </div>
 
         <div className="w-full space-y-3">
           {googleClientId ? (
             <>
-              <div className="w-full rounded-xl border p-3 border-border-subtle bg-bg-card">
+              <div className="w-full rounded-xl border p-2 border-[var(--border)] bg-[var(--surface-card)]">
                 {typeof window !== "undefined" && window.Capacitor?.isNativePlatform() ? (
                   <button
                     type="button"
                     onClick={handleCapacitorGoogleSignIn}
-                    className="w-full flex items-center justify-center gap-3 px-4 py-3 rounded-lg border border-border-subtle bg-bg-card hover:bg-surface-soft transition-colors"
+                    className="w-full min-h-[48px] flex items-center justify-center gap-3 px-4 py-3 rounded-xl border border-[var(--border)] bg-[var(--surface-card)] hover:bg-[var(--surface-soft)] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)]"
                   >
-                    <svg width="20" height="20" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
-                    <span className="text-sm font-medium text-text-primary">Sign in with Google</span>
+                    <svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+                    <span className="text-sm font-medium text-[var(--foreground)]">Sign in with Google</span>
                   </button>
                 ) : (
                   <div
@@ -486,22 +493,22 @@ export function LoginCard({ onNeedSignUp }) {
                   />
                 )}
               </div>
-              <p className="text-xs text-center text-text-dim">
+              <p className="text-xs text-center text-[var(--text-muted)]">
                 {selectedRole === "fleet" ? (
                   <>
-                    Google login will open <span className="font-medium text-text-primary">Fleet</span>.{" "}
+                    Google login will open <span className="font-medium text-[var(--foreground)]">Fleet</span>.{" "}
                   </>
                 ) : (
                   <>
                     New Google accounts sign up as{" "}
-                    <span className="font-medium text-text-primary">{selectedRole}</span>.{" "}
+                    <span className="font-medium text-[var(--foreground)]">{selectedRole}</span>.{" "}
                   </>
                 )}
                 Existing accounts always open in their original role.
               </p>
             </>
           ) : (
-            <div className="w-full p-3 rounded-xl border text-sm text-center border-border-subtle bg-bg-card text-text-muted">
+            <div className="w-full p-3 rounded-xl border text-sm text-center border-[var(--border)] bg-[var(--surface-soft)] text-[var(--text-muted)]">
               Set `NEXT_PUBLIC_GOOGLE_CLIENT_ID` to enable Google login.
             </div>
           )}
