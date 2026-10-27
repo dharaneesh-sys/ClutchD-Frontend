@@ -51,7 +51,7 @@ export function BookingConfirmation({ booking, onDismiss, onNewBooking }) {
       </GlassCard>
 
       {/* Booking reference */}
-      <GlassCard variant="glass" className="p-5">
+      <GlassCard className="p-5">
         <div className="flex items-center gap-3 mb-1">
           <FileText size={16} className="text-icon-highlight" />
           <span className="text-xs text-text-dim uppercase tracking-wider">Booking Reference</span>
@@ -63,7 +63,7 @@ export function BookingConfirmation({ booking, onDismiss, onNewBooking }) {
 
       {/* Booking details */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <GlassCard variant="glass" className="p-5">
+        <GlassCard className="p-5">
           <div className="flex items-center gap-2 mb-3">
             <Calendar size={16} className="text-icon-highlight" />
             <h4 className="text-sm font-semibold text-text-primary">Scheduled Date</h4>
@@ -82,7 +82,7 @@ export function BookingConfirmation({ booking, onDismiss, onNewBooking }) {
           </div>
         </GlassCard>
 
-        <GlassCard variant="glass" className="p-5">
+        <GlassCard className="p-5">
           <div className="flex items-center gap-2 mb-3">
             <Truck size={16} className="text-icon-highlight" />
             <h4 className="text-sm font-semibold text-text-primary">Vehicles</h4>
@@ -97,7 +97,7 @@ export function BookingConfirmation({ booking, onDismiss, onNewBooking }) {
       </div>
 
       {/* Vehicle list */}
-      <GlassCard variant="glass" className="p-5">
+      <GlassCard className="p-5">
         <h4 className="text-sm font-bold text-text-primary mb-4 flex items-center gap-2">
           <Car size={16} className="text-icon-highlight" />
           Vehicle Details

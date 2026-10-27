@@ -126,7 +126,8 @@ export function Modal({
           through the dimmed overlay. No floating chrome exists (D9.3). */}
       <div
         onClick={onClose}
-        className="fixed inset-0 z-[10040] backdrop-blur-sm animate-[backdrop-in_0.2s_ease] bg-[rgba(0,0,0,0.32)]"
+        data-testid="modal-scrim"
+        className="fixed inset-0 z-[10040] animate-[backdrop-in_0.2s_ease] bg-[var(--glass-overlay-scrim)]"
         aria-hidden="true"
       />
 
@@ -135,7 +136,8 @@ export function Modal({
           centers the dialog when it fits, and when the Android keyboard
           shrinks the viewport the container scrolls — nothing is ever
           pushed below the screen or clipped unreachable. */}
-      <div className="fixed inset-0 z-[10041] flex items-start justify-center p-4 sm:px-6 overflow-y-auto w-full h-full pointer-events-none">
+      {/* Mobile: bottom sheet pinned to the safe area. sm+: centered modal. */}
+      <div className="fixed inset-0 z-[10041] flex items-end sm:items-start justify-center p-0 sm:p-4 sm:px-6 overflow-y-auto w-full h-full pointer-events-none">
         <div
           ref={modalRef}
           role={role}
@@ -143,25 +145,29 @@ export function Modal({
           aria-labelledby={titleId}
           tabIndex={-1}
           className={cn(
-            "relative w-full rounded-2xl border pointer-events-auto animate-[modal-in_0.25s_ease]",
-            "p-6 backdrop-blur-3xl my-auto",
-            "glass-lux",
+            "relative w-full pointer-events-auto animate-[modal-in_0.25s_ease] motion-reduce:animate-none",
+            "rounded-t-2xl sm:rounded-2xl border border-[var(--border)] bg-[var(--surface-card)] shadow-[var(--shadow-card)]",
+            "p-5 sm:p-6 pb-[max(1.25rem,env(safe-area-inset-bottom))] sm:my-auto",
             maxWidth,
             className
           )}
         >
           {/* Header */}
-          <div className="flex items-center justify-between mb-6">
+          <div
+            aria-hidden="true"
+            className="mx-auto -mt-2 mb-3 h-1.5 w-10 rounded-full bg-[var(--border)] sm:hidden"
+          />
+          <div className="flex items-center justify-between gap-3 mb-5">
             <h2
               id={titleId}
-              className="text-xl font-semibold tracking-tight text-text-primary"
+              className="text-lg font-semibold tracking-tight text-[var(--foreground)]"
             >
               {title}
             </h2>
             <button
               onClick={onClose}
               aria-label="Close modal"
-              className="rounded-full p-1.5 transition-colors focus:outline-none text-text-dim hover:bg-surface-soft hover:text-text-primary"
+              className="-mr-2 flex h-11 w-11 items-center justify-center rounded-full transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)] text-[var(--text-muted)] hover:bg-[var(--surface-soft)] hover:text-[var(--foreground)]"
             >
               <X size={20} />
             </button>
@@ -169,7 +175,7 @@ export function Modal({
 
            {/* Content — flex-basis cap instead of a dvh calc so the inner
                area shrinks with the container instead of overflowing it */}
-           <div className="max-h-[60dvh] overflow-y-auto pr-2 custom-scrollbar">
+           <div className="max-h-[70dvh] sm:max-h-[60dvh] overflow-y-auto pr-1 custom-scrollbar">
             {children}
            </div>
         </div>

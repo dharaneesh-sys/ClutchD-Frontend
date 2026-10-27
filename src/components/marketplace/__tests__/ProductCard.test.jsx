@@ -93,12 +93,12 @@ describe("ProductCard contract (D1/D3/D4/D5/D8/D11/D15)", () => {
   });
 });
 
-describe("GlassCard 2-variant consolidation (D5)", () => {
-  it("exposes exactly glass-lux (default) + glass-lux-interactive with pass-through hatch", () => {
+describe("GlassCard flat default (DESIGN.md §0)", () => {
+  it("defaults to the flat card; legacy names are aliases, glass is the overlay", () => {
     const code = src(uiDir, "GlassCard.js");
-    expect(code).toContain('"glass-lux"');
-    expect(code).toContain('"glass-lux-interactive"');
+    expect(code).toMatch(/variant\s*=\s*"card"/);
+    expect(code).toContain('"glass-lux": flatCard');
+    expect(code).toContain("glass: glassOverlay");
     expect(code).not.toMatch(/glass-strong|glass-lux-strong|surface-elevated|surface-filled|surface-outlined/);
-    expect(code).toMatch(/variant\s*=\s*"glass-lux"/);
   });
 });

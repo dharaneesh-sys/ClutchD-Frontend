@@ -95,7 +95,6 @@ describe("Wave-1 Task 2: primitives restyle contract (D1/D4/D8/D11/D15)", () => 
     "strong",
     "outlined",
     "flat",
-    "glass",
     "glass-lux",
     "glass-lux-interactive",
     "elevated",
@@ -163,3 +162,60 @@ describe("Wave-1 Task 2: primitives restyle contract (D1/D4/D8/D11/D15)", () => 
     expect(src("Skeleton.js")).toContain("shimmer-pulse");
   });
 });
+
+describe("Task 6: flat-blue primitives", () => {
+  it.each(["primary", "secondary", "tonal", "outline", "ghost", "danger"])(
+    "Button %s renders a solid token surface with no gradient/glow and a 44px target",
+    (variant) => {
+      const { container } = render(<Button variant={variant}>Go</Button>);
+      const cls = container.querySelector("button").className;
+      expect(cls).not.toMatch(/gradient|btn-glow|hover-glow|hover-lift|shadow-\[0_10px|ring-1/);
+      expect(cls).toContain("min-h-[44px]");
+    }
+  );
+
+  it("Button primary is solid --primary with --on-primary text", () => {
+    const { container } = render(<Button>Pay</Button>);
+    const cls = container.querySelector("button").className;
+    expect(cls).toContain("bg-[var(--primary)]");
+    expect(cls).toContain("text-[var(--on-primary)]");
+  });
+
+  it("Button unknown variant/size fall back to primary/md", () => {
+    const { container } = render(<Button variant="nope" size="huge">X</Button>);
+    const cls = container.querySelector("button").className;
+    expect(cls).toContain("bg-[var(--primary)]");
+    expect(cls).toContain("h-12");
+  });
+
+  it("GlassCard glass/overlay variants are the only translucent surface", () => {
+    for (const variant of ["glass", "overlay"]) {
+      const { container, unmount } = render(<GlassCard variant={variant}>Nav</GlassCard>);
+      expect(container.firstChild.className).toContain("var(--glass-overlay-bg)");
+      expect(container.firstChild.className).toContain("backdrop-blur");
+      unmount();
+    }
+  });
+
+  it("primitives contain no legacy hex, glow or glass-lux classes", () => {
+    for (const f of [
+      "Button.js", "GlassCard.js", "Badge.js", "Input.js", "Select.js", "Modal.js",
+      "Toast.js", "Shimmer.js", "Skeleton.js", "EmptyState.js", "ConfirmModal.js",
+    ]) {
+      const code = src(f);
+      expect(code, f).not.toMatch(/#1E29B6|btn-glow|hover-glow|glass-strong/);
+      // GlassCard keeps legacy names only as keys of its alias map.
+      if (f !== "GlassCard.js") expect(code, f).not.toContain("glass-lux");
+    }
+    for (const f of ["Button.js", "Input.js", "Select.js", "Toast.js", "Shimmer.js", "Skeleton.js", "EmptyState.js", "Badge.js"]) {
+      expect(src(f), f).not.toContain("backdrop-blur");
+    }
+  });
+
+  it("Input/Select errors are announced and controls are 44px", () => {
+    const { container } = render(<Input label="Email" error="Bad email" />);
+    expect(container.querySelector("input").className).toContain("min-h-[44px]");
+    expect(screen.getByRole("alert").textContent).toBe("Bad email");
+  });
+});
+

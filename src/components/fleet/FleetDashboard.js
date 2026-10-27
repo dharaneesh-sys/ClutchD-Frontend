@@ -587,7 +587,7 @@ export function FleetDashboard({ onRegisterNew, onStartBooking, onChat }) {
       </div>
 
       {/* Priority Dispatch Banner */}
-      <GlassCard variant="glass" className="p-4 sm:p-5 bg-primary/5 border-primary/20">
+      <GlassCard className="p-4 sm:p-5 bg-primary/5 border-primary/20">
         <div className="flex items-start gap-3">
           <div className="w-10 h-10 rounded-xl bg-primary/15 flex items-center justify-center shrink-0">
             <AlertCircle size={20} className="text-primary-light" />

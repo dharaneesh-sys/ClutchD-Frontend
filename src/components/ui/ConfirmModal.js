@@ -16,32 +16,29 @@ export function ConfirmModal({
   return (
     <Modal isOpen={isOpen} onClose={onClose} title={title} role="alertdialog">
       <div className="text-center">
-        <div className="w-14 h-14 mx-auto mb-4 rounded-full flex items-center justify-center bg-surface-soft">
+        <div className="w-14 h-14 mx-auto mb-4 rounded-full flex items-center justify-center bg-[var(--surface-soft)]">
           <AlertTriangle
             size={28}
             className={
-              variant === "danger" ? "text-danger" : "text-info"
+              variant === "danger" ? "text-[var(--danger)]" : "text-[var(--primary-dark)]"
             }
           />
         </div>
         <p
-          className="text-sm mb-6 text-text-muted"
+          className="text-sm mb-6 text-[var(--text-muted)]"
         >
           {message}
         </p>
         <div className="flex gap-3">
-          <Button variant="ghost" className="flex-1" onClick={onClose}>
+          <Button variant="secondary" className="flex-1" onClick={onClose}>
             Cancel
           </Button>
           <Button
             onClick={onConfirm}
             isLoading={isLoading}
-            className={
-              variant === "danger"
-                ? "flex-1 !bg-danger hover:opacity-90 !text-white"
-                : "flex-1"
-            }
-            >
+            variant={variant === "danger" ? "danger" : "primary"}
+            className="flex-1"
+          >
             {confirmLabel}
           </Button>
         </div>

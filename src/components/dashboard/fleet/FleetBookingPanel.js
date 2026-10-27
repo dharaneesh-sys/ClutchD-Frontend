@@ -249,7 +249,7 @@ export function FleetBookingPanel() {
       </div>
 
       {/* Step 2: Date & Time */}
-      <GlassCard variant="glass" className="p-5">
+      <GlassCard className="p-5">
         <h3 className="text-lg font-bold text-text-primary mb-4 flex items-center gap-2">
           <Calendar size={20} className="text-icon-highlight" />
           Schedule Date & Time

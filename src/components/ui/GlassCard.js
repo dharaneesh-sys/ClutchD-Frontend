@@ -1,38 +1,42 @@
 import { cn } from "@/lib/utils";
 
-// Flat card surface. Legacy variant names are accepted so inherited call
-// sites keep rendering a visible surface; task 6 migrates them to the final
-// primitive API. Unknown variants resolve here instead of passing an
-// arbitrary string through as a class.
+// Content surfaces are flat white cards (DESIGN.md §0). `variant="glass"`
+// (alias `overlay`) is the one translucent surface and is reserved for bottom
+// nav, sheets, map controls and the splash. Legacy variant names resolve to
+// the flat card so inherited call sites keep a visible surface.
 const flatCard =
-  "bg-[var(--surface)] border border-[var(--color-border-subtle)] shadow-[var(--elevation-1)]";
+  "bg-[var(--surface)] border border-[var(--color-border-subtle)] shadow-[var(--shadow-card)]";
+
+const glassOverlay =
+  "bg-[var(--glass-overlay-bg)] border border-[var(--glass-overlay-border)] shadow-[var(--shadow-card)] backdrop-blur-[var(--glass-overlay-blur)]";
 
 const variantClasses = {
+  card: flatCard,
+  flat: flatCard,
+  glass: glassOverlay,
+  overlay: glassOverlay,
+  // legacy names → flat
   "glass-lux": flatCard,
   "glass-lux-interactive": flatCard,
   strong: flatCard,
   outlined: flatCard,
-  flat: flatCard,
-  glass: flatCard,
   elevated: flatCard,
   filled: flatCard,
 };
 
-export function GlassCard({ children, className, variant = "glass-lux", ...props }) {
+export function GlassCard({ children, className, variant = "card", ...props }) {
   const variantClass = Object.hasOwn(variantClasses, variant)
     ? variantClasses[variant]
     : flatCard;
 
   return (
     <div
-      className={cn(
-        "relative rounded-2xl transition-all duration-200",
-        variantClass,
-        className
-      )}
+      className={cn("relative rounded-2xl transition-colors duration-150", variantClass, className)}
       {...props}
     >
       {children}
     </div>
   );
 }
+
+export { GlassCard as Card };

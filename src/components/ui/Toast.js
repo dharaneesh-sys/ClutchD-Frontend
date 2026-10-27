@@ -17,18 +17,19 @@ const ICONS = {
   info: Info,
 };
 
+// Semantic, opaque toasts (DESIGN.md §0): a tinted left rule on a flat card.
 const TYPE_CLASSES = {
-  success: "border-primary/30 bg-primary/10",
-  error: "border-red-500/30 bg-red-500/10",
-  warning: "border-[var(--color-primary-rgb)]/30 bg-[var(--color-primary-rgb)]/15",
-  info: "border-blue-500/30 bg-blue-500/10",
+  success: "border-l-[var(--success)]",
+  error: "border-l-[var(--danger)]",
+  warning: "border-l-[var(--pending)]",
+  info: "border-l-[var(--primary)]",
 };
 
 const ICON_CLASSES = {
-  success: "text-primary-light",
-  error: "text-red-400",
-  warning: "text-warning",
-  info: "text-blue-400",
+  success: "text-[var(--success)]",
+  error: "text-[var(--danger)]",
+  warning: "text-[var(--pending)]",
+  info: "text-[var(--primary-dark)]",
 };
 
 const TOAST_ROLES = {
@@ -38,11 +39,11 @@ const TOAST_ROLES = {
   info: "status",
 };
 
-const PROGRESS_CLASSES = {
-  success: "bg-primary",
-  error: "bg-red-500",
-  warning: "bg-[var(--color-primary-rgb)]/15",
-  info: "bg-blue-500",
+const PROGRESS_COLORS = {
+  success: "var(--success)",
+  error: "var(--danger)",
+  warning: "var(--pending)",
+  info: "var(--primary)",
 };
 
 export function Toast({ toast, onDismiss }) {
@@ -76,9 +77,9 @@ export function Toast({ toast, onDismiss }) {
   return (
     <div
       className={cn(
-        "flex items-start gap-3 p-4 rounded-2xl border glass-strong animate-fade-in-up",
-        "min-w-[300px] max-w-md shadow-xl relative overflow-hidden",
-        TYPE_CLASSES[toast.type]
+        "flex items-start gap-3 p-4 rounded-2xl border border-[var(--border)] border-l-4 bg-[var(--surface-card)] animate-fade-in-up",
+        "min-w-[min(300px,calc(100vw-32px))] max-w-md shadow-[var(--shadow-card)] relative overflow-hidden",
+        TYPE_CLASSES[toast.type] || TYPE_CLASSES.info
       )}
       role={TOAST_ROLES[toast.type] || "status"}
     >
@@ -88,7 +89,7 @@ export function Toast({ toast, onDismiss }) {
           className="absolute bottom-0 left-0 h-1 transition-all duration-75 ease-linear"
           style={{
             width: `${progress}%`,
-            backgroundColor: `var(--color-${PROGRESS_CLASSES[toast.type].replace("bg-", "")})`,
+            backgroundColor: PROGRESS_COLORS[toast.type] || PROGRESS_COLORS.info,
           }}
         />
       )}
@@ -97,7 +98,7 @@ export function Toast({ toast, onDismiss }) {
         <Icon size={20} />
       </div>
       <div className="flex-1 min-w-0">
-        <p className="text-sm font-medium text-text-primary">
+        <p className="text-sm font-medium text-[var(--foreground)]">
           {toast.message}
         </p>
         {toast.action && (
@@ -108,7 +109,7 @@ export function Toast({ toast, onDismiss }) {
             }}
             className={cn(
               "mt-2 text-sm font-medium underline underline-offset-2 transition-colors",
-              "text-icon-highlight"
+              "text-[var(--primary-dark)]"
             )}
           >
             {toast.action.label}
@@ -118,8 +119,8 @@ export function Toast({ toast, onDismiss }) {
       <button
         onClick={() => onDismiss(toast.id)}
         className={cn(
-          "flex-shrink-0 p-1 rounded-lg transition-colors",
-          "text-text-dim hover:text-text-primary hover:bg-surface-soft"
+          "flex-shrink-0 -m-2 p-3 rounded-lg transition-colors",
+          "text-[var(--text-muted)] hover:text-[var(--foreground)] hover:bg-[var(--surface-soft)]"
         )}
         aria-label="Dismiss"
       >

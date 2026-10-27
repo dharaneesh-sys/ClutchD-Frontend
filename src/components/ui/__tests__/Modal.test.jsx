@@ -39,18 +39,19 @@ describe.each(["light", "dark"])("Modal a11y in %s theme (D9.4)", (theme) => {
     expect(document.body.contains(panel)).toBe(true);
   });
 
-  it("uses glass-lux + rounded-2xl with the M3 32% scrim (D4/D5/D15.4.6)", () => {
+  it("uses an opaque flat panel, bottom sheet on mobile, and the token scrim (DESIGN.md §0)", () => {
     render(
       <Modal isOpen onClose={() => {}} title="Hello">
         body
       </Modal>,
     );
     const panel = dialogPanel();
-    expect(panel.className).toMatch(/glass-lux/);
-    expect(panel.className).toMatch(/rounded-2xl/);
-    expect(panel.className).not.toMatch(/dark:/);
-    const scrim = document.querySelector('[aria-hidden="true"]');
-    expect(scrim.className).toMatch(/0,0,0,0\.32/);
+    expect(panel.className).toMatch(/bg-\[var\(--surface-card\)\]/);
+    expect(panel.className).toMatch(/rounded-t-2xl/);
+    expect(panel.className).toMatch(/sm:rounded-2xl/);
+    expect(panel.className).not.toMatch(/glass-lux|backdrop-blur|dark:/);
+    const scrim = screen.getByTestId("modal-scrim");
+    expect(scrim.className).toMatch(/var\(--glass-overlay-scrim\)/);
   });
 
   it("closes on Escape and on backdrop click", () => {
@@ -133,7 +134,8 @@ describe("ConfirmModal glass + status roles (D5/D7)", () => {
       />,
     );
     const dialog = screen.getByRole("alertdialog");
-    expect(dialog.className).toMatch(/glass-lux/);
+    expect(dialog.className).toMatch(/bg-\[var\(--surface-card\)\]/);
+    expect(dialog.className).not.toMatch(/glass-lux/);
     expect(dialog.innerHTML).not.toMatch(/text-warning/);
   });
 
@@ -150,7 +152,7 @@ describe("ConfirmModal glass + status roles (D5/D7)", () => {
     );
     expect(screen.getByText("Delete it?")).toBeInTheDocument();
     const confirm = screen.getByRole("button", { name: "Delete" });
-    expect(confirm.className).toMatch(/bg-danger/);
+    expect(confirm.className).toMatch(/bg-\[var\(--danger\)\]/);
     expect(confirm.className).not.toMatch(/bg-red-500/);
     fireEvent.click(confirm);
     expect(onConfirm).toHaveBeenCalledTimes(1);

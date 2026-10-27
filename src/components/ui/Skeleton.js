@@ -6,7 +6,7 @@ export function Skeleton({ className, variant = "text" }) {
       aria-hidden="true"
       tabIndex={-1}
       className={cn(
-        "rounded-md bg-gradient-to-r from-[var(--surface-container-high)] via-[var(--surface-container-highest)] to-[var(--surface-container-high)] bg-[length:200%_100%] animate-[shimmer-pulse_2s_ease-in-out_infinite]",
+        "rounded-md bg-[var(--surface-soft)] animate-[shimmer-pulse_2s_ease-in-out_infinite] motion-reduce:animate-none",
         variant === "text" && "h-4 w-full",
         variant === "title" && "h-6 w-3/4",
         variant === "avatar" && "h-10 w-10 rounded-full",
@@ -20,7 +20,7 @@ export function Skeleton({ className, variant = "text" }) {
 
 export function CardSkeleton() {
   return (
-    <div className="rounded-2xl border border-[var(--color-border-subtle)] bg-[var(--surface-container-low)] p-5 space-y-4">
+    <div className="rounded-2xl border border-[var(--border)] bg-[var(--surface-card)] p-5 space-y-4">
       <div className="flex justify-between items-start">
         <div className="space-y-2 flex-1">
           <Skeleton variant="title" />
