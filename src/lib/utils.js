@@ -111,7 +111,11 @@ export function isPlatform(platform) {
   if (typeof window === "undefined") return false;
 
   if (platform === "capacitor") {
-    return !!(window.Capacitor || window.__CAPACITOR__);
+    // @capacitor/core defines window.Capacitor in browsers too; only a real
+    // native shell counts, otherwise native-only plugins throw on web.
+    const cap = window.Capacitor;
+    if (cap && typeof cap.isNativePlatform === "function") return cap.isNativePlatform();
+    return !!window.__CAPACITOR__;
   }
 
   // web is the default / fallback

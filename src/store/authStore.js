@@ -8,6 +8,14 @@ import { cacheUserProfile } from "@/lib/offline/offlineCache";
 import { setFleetPersona } from "@/lib/persona";
 import { useToastStore } from "@/store/toastStore";
 
+/** API `detail` as display text: FastAPI 422s send an array of objects. */
+function detailText(error) {
+  const d = error?.response?.data?.detail;
+  if (typeof d === "string") return d;
+  if (Array.isArray(d) && d.length) return d.map((x) => x?.msg || x?.message || "Invalid input").join("; ");
+  return "";
+}
+
 /**
  * Clear ALL client-side storage — localStorage, sessionStorage, and cookies
  * related to auth. Called on full logout or session teardown.
@@ -298,12 +306,12 @@ export const useAuthStore = create(
           // 404 = unknown email: surface a structured flag so the login UI can
           // offer sign-up (with the email prefilled) instead of a dead end.
           if (error.response?.status === 404) {
-            const msg = error.response?.data?.detail || "No account found with this email. Please sign up first.";
+            const msg = detailText(error) || "No account found with this email. Please sign up first.";
             set({ isLoading: false, error: msg, _signupNeeded: true });
             return null;
           }
           const msg =
-            error.response?.data?.detail ||
+            detailText(error) ||
             (error.response ? "Login failed. Please try again." : "Server unreachable. Please check your connection.");
           set({ isLoading: false, error: msg, _signupNeeded: false });
           return null;
@@ -362,7 +370,7 @@ export const useAuthStore = create(
             ? isTimeout
               ? "Google sign-in timed out — the server is busy. Tap Google again to retry."
               : "Server unreachable — couldn't complete Google sign-in. Check your connection and try again."
-            : error.response?.data?.detail || "Google sign-in failed. Please try again.";
+            : detailText(error) || "Google sign-in failed. Please try again.";
           set({ isLoading: false, error: msg });
           try {
             useToastStore.getState().error(msg);
@@ -455,7 +463,7 @@ export const useAuthStore = create(
           const isNetworkError = !error.response;
           const msg = isNetworkError
             ? "Server unreachable — couldn't complete Google sign-in. Check your connection and try again."
-            : error.response?.data?.detail || "Google sign-in failed. Please try again.";
+            : detailText(error) || "Google sign-in failed. Please try again.";
           set({ isLoading: false, error: msg });
           try {
             useToastStore.getState().error(msg);
@@ -485,7 +493,7 @@ export const useAuthStore = create(
           
         } catch (error) {
           const msg =
-            error.response?.data?.detail ||
+            detailText(error) ||
             (error.response ? "Signup failed. Please try again." : "Server unreachable. Please check your connection.");
           set({ isLoading: false, error: msg });
           return null;
