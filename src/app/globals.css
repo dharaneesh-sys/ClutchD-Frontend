@@ -17,6 +17,12 @@
   --pending: #B06000;
   --danger: #D93025;
   --on-primary: #FFFFFF;
+  /* Splash hero: brand blue in light, deep brand blue in dark (white text ≥ 4.5:1). */
+  --splash-bg: #1A73E8;
+  --splash-bg-deep: #1557B0;
+  --on-splash: #FFFFFF;
+  --on-splash-muted: rgba(255,255,255,0.86);
+  --on-splash-track: rgba(255,255,255,0.25);
   --surface-soft: #EDF2FA;
   --ring: #1A73E8;
   --pending-soft: #FDF3E7;
@@ -123,6 +129,11 @@
   --pending: #FDD663;
   --danger: #F28B82;
   --on-primary: #0B1220;
+  --splash-bg: #123B7A;
+  --splash-bg-deep: #0B1220;
+  --on-splash: #FFFFFF;
+  --on-splash-muted: rgba(255,255,255,0.86);
+  --on-splash-track: rgba(255,255,255,0.25);
   --surface-soft: #1B2432;
   --ring: #A8C7FA;
   --pending-soft: #3A2C12;
@@ -569,6 +580,11 @@ h1, h2, h3, h4 {
 }
 
 /* Respect reduced motion */
+@keyframes splash-progress {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(300%); }
+}
+
 @media (prefers-reduced-motion: reduce) {
   * {
     animation-duration: 0.001ms !important;

@@ -9,14 +9,24 @@
         <item name="colorAccent">@color/colorAccent</item>
     </style>
 
+    <!-- Post-splash theme. The window background stays brand blue so there is
+         no white frame between the native splash and the first web paint. -->
     <style name="AppTheme.NoActionBar" parent="Theme.AppCompat.DayNight.NoActionBar">
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
         <item name="android:background">@null</item>
+        <item name="android:windowBackground">@color/clutchd_splash_bg</item>
+        <item name="android:statusBarColor">@color/clutchd_status_bar</item>
     </style>
 
-
-    <style name="AppTheme.NoActionBarLaunch" parent="Theme.SplashScreen">
-        <item name="android:background">@drawable/splash</item>
+    <!-- Launch theme (androidx core-splashscreen; Android 12+ attributes are
+         back-ported to older versions by the compat library). -->
+    <style name="AppTheme.NoActionBarLaunch" parent="Theme.SplashScreen.IconBackground">
+        <item name="windowSplashScreenBackground">@color/clutchd_splash_bg</item>
+        <item name="windowSplashScreenAnimatedIcon">@mipmap/ic_launcher_foreground</item>
+        <item name="windowSplashScreenIconBackgroundColor">@color/clutchd_splash_icon_bg</item>
+        <item name="windowSplashScreenAnimationDuration">200</item>
+        <item name="postSplashScreenTheme">@style/AppTheme.NoActionBar</item>
+        <item name="android:statusBarColor">@color/clutchd_splash_bg</item>
     </style>
 </resources>
