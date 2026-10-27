@@ -1,5 +1,6 @@
 import "./globals.css";
 
+import { Onest } from "next/font/google";
 import { ThemeProvider } from "@/components/ui/ThemeProvider";
 import { AuthInit } from "@/components/ui/AuthInit";
 import { ErrorBoundary } from "@/components/ui/ErrorBoundary";
@@ -8,6 +9,13 @@ import { BackButtonHandler } from "@/components/ui/BackButtonHandler";
 import { PushInit } from "@/components/ui/PushInit";
 import { PushPermissionBanner } from "@/components/ui/PushPermissionBanner";
 import DynamicI18nProvider from "@/lib/i18n/DynamicI18nProvider";
+
+const onest = Onest({
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
+  variable: "--font-onest",
+  display: "swap",
+});
 
 export const metadata = {
   title: "ClutchD — On-Demand Mechanic Platform",
@@ -37,14 +45,14 @@ export const viewport = {
   width: "device-width",
   initialScale: 1,
   themeColor: [
-    { media: "(prefers-color-scheme: dark)", color: "#09090b" },
-    { media: "(prefers-color-scheme: light)", color: "#f4f6fc" },
+    { media: "(prefers-color-scheme: dark)", color: "#0B1220" },
+    { media: "(prefers-color-scheme: light)", color: "#F5F7FB" },
   ],
 };
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en" className="h-full antialiased" data-theme="light" suppressHydrationWarning>
+    <html lang="en" className={`${onest.variable} h-full antialiased`} data-theme="light" suppressHydrationWarning>
       <head>
         <link rel="manifest" href="/manifest.json" />
         <script

@@ -9,14 +9,14 @@ export function GarageAnalytics() {
     if (typeof document === 'undefined') return fallback;
     return getComputedStyle(document.documentElement).getPropertyValue(name).trim() || fallback;
   };
-  const primaryColor = getCSSVar('--primary', '#1E29B6');
-  const barColor = getCSSVar('--primary', '#1E29B6');
-  const tickColor = getCSSVar('--on-surface-variant', 'rgba(255,255,255,0.4)');
-  const gridColor = getCSSVar('--outline-variant', 'rgba(255,255,255,0.05)');
-  const tooltipBg = getCSSVar('--surface-container', '#18181b');
-  const tooltipBorder = getCSSVar('--outline-variant', 'rgba(255,255,255,0.1)');
-  const tooltipColor = getCSSVar('--on-surface', '#fff');
-  const boxShadow = getCSSVar('--elevation-2', '0 2px 6px 2px rgba(0,0,0,0.15)');
+  const primaryColor = getCSSVar('--primary', 'currentColor');
+  const barColor = getCSSVar('--primary', 'currentColor');
+  const tickColor = getCSSVar('--on-surface-variant', 'currentColor');
+  const gridColor = getCSSVar('--outline-variant', 'currentColor');
+  const tooltipBg = getCSSVar('--surface-container', 'var(--surface-container)');
+  const tooltipBorder = getCSSVar('--outline-variant', 'var(--border)');
+  const tooltipColor = getCSSVar('--on-surface', 'var(--foreground)');
+  const boxShadow = getCSSVar('--elevation-2', 'none');
 
   return (
     <GlassCard variant="strong" className="p-4 sm:p-6 h-full flex flex-col">

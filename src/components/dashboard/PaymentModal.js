@@ -97,7 +97,7 @@ function PaymentModalContent({ isOpen, onClose, amount, pricing, jobId, onSucces
         description: "Vehicle Service Payment",
         order_id: orderData.order_id,
         prefill: {},
-        theme: { color: getComputedStyle(document.documentElement).getPropertyValue('--primary').trim() || '#1E29B6' },
+        theme: { color: getComputedStyle(document.documentElement).getPropertyValue('--primary').trim() || '#1A73E8' },
         modal: {
           ondismiss: () => setPayState("idle"),
         },

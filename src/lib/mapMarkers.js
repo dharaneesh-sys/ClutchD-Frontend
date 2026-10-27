@@ -7,7 +7,7 @@
 import L from "leaflet";
 
 // Brand accent hex for pins — usable by consumers (e.g. marketplace map)
-export const brandPinFill = "#1E29B6";
+export const brandPinFill = "#1A73E8";
 
 // ─── Color palette ──────────────────────────────────────────────────────────
 const COLORS = {
@@ -16,9 +16,9 @@ const COLORS = {
   green:  { fill: "#22c55e", stroke: "#16a34a", glow: "rgba(34, 197, 94, 0.35)" },
   violet: { fill: "#8b5cf6", stroke: "#7c3aed", glow: "rgba(139, 92, 246, 0.35)" },
   orange: { fill: "#0ea5e9", stroke: "#0284c7", glow: "rgba(14, 165, 233, 0.35)" },
-  emerald:{ fill: "#4aa5f5", stroke: "#2e8ce0", glow: "rgba(74, 165, 245, 0.35)" },
-  // Brand pin (indigo rebrand) — distinct from functional warning/orange above
-  brand:  { fill: brandPinFill, stroke: "#1a2490", glow: "rgba(30, 41, 182, 0.35)" },
+  emerald:{ fill: "#8AB4F8", stroke: "#A8C7FA", glow: "rgba(138, 180, 248, 0.35)" },
+  // Brand pin (flat blue) — distinct from functional warning/orange above
+  brand:  { fill: brandPinFill, stroke: "#1557B0", glow: "rgba(26, 115, 232, 0.35)" },
 };
 
 // ─── Teardrop pin SVG generator ─────────────────────────────────────────────

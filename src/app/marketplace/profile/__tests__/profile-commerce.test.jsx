@@ -54,7 +54,7 @@ describe("profile commerce cards (D4/D5)", () => {
       expect(code, `${name} needs headline-3`).toMatch(/type-headline-3|headline-3/);
       expect(code, `${name} needs body-2`).toMatch(/type-body-2|body-2/);
       expect(code, `${name} bans type-display`).not.toContain("type-display");
-      expect(code, `${name} bans Instrument Serif body`).not.toContain("Instrument Serif");
+      expect(code, `${name} bans hardcoded font-family`).not.toMatch(/font-family/);
     }
   });
 });

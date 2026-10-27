@@ -17,10 +17,10 @@ export default function GlobalError({ error, reset }) {
 var t = localStorage.getItem('clutchd_theme');
                 var mq = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)');
                 var isDark = t === 'dark' || (!t && !!(mq && mq.matches));
-                var d = isDark ? '#09090b' : '#f4f6fc';
-                var f = isDark ? '#fafafa' : '#171a2e';
-                var p = isDark ? '#4aa5f5' : '#1E29B6';
-                var oc = isDark ? '#0B1030' : '#FFFFFF';
+                var d = isDark ? '#0B1220' : '#F5F7FB';
+                var f = isDark ? '#E8EEF7' : '#111827';
+                var p = isDark ? '#8AB4F8' : '#1A73E8';
+                var oc = isDark ? '#0B1220' : '#FFFFFF';
                 document.body.style.background = d;
                 document.body.style.color = f;
                 document.documentElement.style.setProperty('--bg', d);

@@ -252,7 +252,7 @@ describe("customer dashboard contract (D1/D2/D5/D7)", () => {
     const code = src(appDashCustomer, "page.js");
     expect(code).not.toMatch(/stone-|zinc-/);
     expect(code).not.toMatch(/dark:/);
-    expect(code).not.toMatch(/\[#1E29B6\]/);
+    expect(code).not.toMatch(/\[#[0-9A-Fa-f]{6}\]/);
   });
 
   it("kills red one-off hues on the chat FAB (danger token only)", () => {
