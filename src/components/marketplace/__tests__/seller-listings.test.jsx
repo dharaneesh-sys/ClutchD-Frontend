@@ -313,11 +313,11 @@ describe("ServiceStatusTracker contract (D1/D5/D7/D15)", () => {
     expect(code).not.toMatch(/red-400|red-300/);
   });
 
-  it("keeps status/progress/data flow identical", () => {
+  it("immediate capture: no escrow/release wiring, keeps cancel/pay/dispute", () => {
     const code = src(dashDir, "ServiceStatusTracker.js");
-    expect(code).toContain("EscrowStatus");
-    expect(code).toContain("WarrantyTerms");
-    expect(code).toContain("currentStepIdx");
-    expect(code).toContain("onReleasePayment");
+    expect(code).not.toMatch(/EscrowStatus|WarrantyTerms|onReleasePayment/);
+    expect(code).toContain("onComplete(request)");
+    expect(code).toContain("onCancel");
+    expect(code).toContain("onDisputePayment");
   });
 });

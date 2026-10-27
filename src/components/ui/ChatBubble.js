@@ -38,8 +38,8 @@ export function ChatBubble({ message, isOwn }) {
         className={cn(
           "px-3.5 py-2 rounded-2xl text-sm leading-relaxed break-words space-y-1.5",
           isOwn
-            ? "bg-primary/20 text-primary-light border border-primary/20 rounded-br-md"
-            : "bg-[var(--surface-soft)] text-on-surface border border-[var(--border)] rounded-bl-md"
+            ? "bg-[var(--primary)] text-[var(--on-primary)] rounded-br-md"
+            : "bg-[var(--surface-card)] text-[var(--foreground)] border border-[var(--border)] rounded-bl-md"
         )}
       >
         {/* Text content */}
@@ -62,7 +62,7 @@ export function ChatBubble({ message, isOwn }) {
 
         {/* Fallback for broken image */}
         {message.imageUrl && imgError && (
-          <div className="flex items-center gap-2 p-2 rounded-lg bg-red-500/10 border border-red-500/20 text-xs text-red-400">
+          <div className="flex items-center gap-2 p-2 rounded-lg bg-[var(--surface-soft)] border border-[var(--border)] text-xs text-[var(--danger-ink)]">
             <ImageIcon size={14} />
             <span>Image unavailable</span>
           </div>

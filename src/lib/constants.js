@@ -19,6 +19,7 @@ export const SERVICE_STATUS = {
   PAYMENT_RELEASED: "payment_released",
   PAYMENT_DISPUTE: "payment_dispute",
   COMPLETED: "completed",
+  CANCELLED: "cancelled",
 };
 
 /**

@@ -177,7 +177,7 @@ wsConnected ? "bg-primary-light" : "bg-[var(--pending)]",
 
             <button
               onClick={() => setIsOpen(false)}
-              className="surface-card-interactive w-7 h-7 flex items-center justify-center rounded-lg active-press"
+              className="w-11 h-11 -m-1.5 flex items-center justify-center rounded-lg hover:bg-[var(--surface-soft)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)]"
               aria-label="Close chat"
             >
               <svg
@@ -201,7 +201,7 @@ wsConnected ? "bg-primary-light" : "bg-[var(--pending)]",
             className="flex-1 overflow-y-auto custom-scrollbar px-4 py-3 space-y-2.5 min-h-[200px] max-h-[400px]"
           >
             {messages.length === 0 && (
-              <p className="text-dim text-sm text-center py-8">
+              <p className="text-[var(--text-muted)] text-sm text-center py-8">
                 No messages yet
               </p>
             )}
@@ -222,7 +222,7 @@ wsConnected ? "bg-primary-light" : "bg-[var(--pending)]",
                   )}
                 >
                   {isSystem ? (
-                    <span className="inline-block px-3 py-1.5 rounded-full text-xs text-dim bg-[var(--surface-soft)] border border-[var(--border)] leading-tight text-center max-w-[85%]">
+                    <span className="inline-block px-3 py-1.5 rounded-full text-xs text-[var(--text-muted)] bg-[var(--surface-soft)] border border-[var(--border)] leading-tight text-center max-w-[85%]">
                       {msg.text}
                     </span>
                   ) : (
@@ -252,7 +252,7 @@ wsConnected ? "bg-primary-light" : "bg-[var(--pending)]",
               onChange={(e) => setInputValue(e.target.value)}
               onKeyDown={handleKeyDown}
               placeholder="Type a message..."
-              className="input-glass flex-1 min-h-[44px] resize-none"
+              className="flex-1 min-h-[44px] rounded-xl border px-3 text-sm bg-[var(--surface-card)] border-[var(--border)] text-[var(--foreground)] placeholder:text-[var(--text-muted)] focus:border-[var(--primary)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)]"
               aria-label="Chat message"
             />
 
@@ -263,8 +263,8 @@ wsConnected ? "bg-primary-light" : "bg-[var(--pending)]",
                 "w-11 h-11 flex items-center justify-center rounded-xl transition-all flex-shrink-0",
                 "active-press",
                 inputValue.trim()
-                  ? "bg-primary text-white shadow-[0_0_16px_rgba(var(--color-primary-rgb),0.25)] hover:shadow-[0_0_20px_rgba(var(--color-primary-rgb),0.35)]"
-                  : "bg-[var(--surface-soft)] text-dim cursor-not-allowed"
+                  ? "bg-[var(--primary)] text-[var(--on-primary)] hover:bg-[var(--primary-dark)]"
+                  : "bg-[var(--surface-soft)] text-[var(--text-muted)] cursor-not-allowed"
               )}
               aria-label="Send message"
             >
@@ -291,10 +291,10 @@ wsConnected ? "bg-primary-light" : "bg-[var(--pending)]",
         onClick={() => setIsOpen((o) => !o)}
         className={cn(
           "w-14 h-14 rounded-full flex items-center justify-center transition-all active-press",
-          "shadow-[0_8px_32px_rgba(var(--color-primary-rgb),0.3)]",
+          "shadow-[var(--elevation-3)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)]",
           isOpen
-            ? "bg-red-500/20 border border-red-400/30 text-red-400 rotate-45"
-            : "bg-primary text-white hover:shadow-[0_12px_40px_rgba(var(--color-primary-rgb),0.4)] hover-lift"
+            ? "bg-[var(--surface-card)] border border-[var(--border)] text-[var(--foreground)]"
+            : "bg-[var(--primary)] text-[var(--on-primary)] hover:bg-[var(--primary-dark)]"
         )}
         aria-label={isOpen ? "Close chat" : "Open chat"}
       >

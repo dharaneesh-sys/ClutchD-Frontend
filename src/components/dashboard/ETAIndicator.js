@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo } from "react";
-import { Navigation, MapPin, Search, CheckCircle2 } from "lucide-react";
+import { Navigation, CheckCircle2 } from "lucide-react";
 import { SERVICE_STATUS } from "@/lib/constants";
 import { haversineDistance } from "@/store/trackingStore";
 
@@ -37,32 +37,8 @@ export function ETAIndicator({ mechanicLocation, userLocation, status }) {
     return { distanceKm, etaSeconds };
   }, [mechanicLocation, userLocation, status]);
 
-  if (status === SERVICE_STATUS.SEARCHING) {
-    return (
-      <div
-        role="status"
-        aria-live="polite"
-        className="flex items-center gap-2 px-4 py-3 rounded-xl bg-bg-card border border-border-subtle text-sm text-text-muted"
-      >
-        <Search size={16} className="shrink-0 text-icon-highlight animate-pulse" />
-        <span>Searching for a mechanic...</span>
-      </div>
-    );
-  }
-
-  if (status === SERVICE_STATUS.ASSIGNED) {
-    return (
-      <div
-        role="status"
-        aria-live="polite"
-        className="flex items-center gap-2 px-4 py-3 rounded-xl bg-bg-card border border-border-subtle text-sm text-text-muted"
-      >
-        <MapPin size={16} className="shrink-0 text-icon-highlight" />
-        <span>Mechanic assigned — preparing</span>
-      </div>
-    );
-  }
-
+  // Only en_route has a real, location-derived ETA; the tracker already
+  // names the other stages.
   if (status === SERVICE_STATUS.EN_ROUTE) {
     if (!info) return null;
 
@@ -71,10 +47,10 @@ export function ETAIndicator({ mechanicLocation, userLocation, status }) {
         <div
           role="status"
           aria-live="polite"
-          className="flex items-center gap-2 px-4 py-3 rounded-xl bg-bg-card border border-border-subtle text-sm"
+          className="flex items-center gap-2 px-4 py-3 rounded-xl bg-[var(--surface-card)] border border-[var(--border)] text-sm"
         >
-          <CheckCircle2 size={16} className="shrink-0 text-success" />
-          <span className="font-medium text-text-primary">
+          <CheckCircle2 size={16} aria-hidden="true" className="shrink-0 text-[var(--success)]" />
+          <span className="font-medium text-[var(--foreground)]">
             Mechanic has arrived
           </span>
         </div>
@@ -85,16 +61,17 @@ export function ETAIndicator({ mechanicLocation, userLocation, status }) {
       <div
         role="status"
         aria-live="polite"
-        className="flex items-center gap-2 px-4 py-3 rounded-xl bg-bg-card border border-border-subtle text-sm"
+        className="flex items-center gap-2 px-4 py-3 rounded-xl bg-[var(--surface-card)] border border-[var(--border)] text-sm"
       >
         <span className="relative shrink-0 flex items-center justify-center w-6 h-6">
           <Navigation
             size={16}
-            className="text-icon-highlight relative z-10"
+            aria-hidden="true"
+            className="text-[var(--primary-dark)] relative z-10"
           />
-          <span className="absolute inset-0 rounded-full bg-icon-highlight/15 animate-ping" />
+          <span aria-hidden="true" className="absolute inset-0 rounded-full bg-[var(--surface-soft)] animate-ping motion-reduce:animate-none" />
         </span>
-        <span className="text-text-primary">
+        <span className="text-[var(--foreground)]">
           Mechanic is{" "}
           <strong>{Number(info.distanceKm ?? 0).toFixed(1)} km</strong> away (
           {formatETA(info.etaSeconds)})

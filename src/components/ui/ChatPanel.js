@@ -97,10 +97,10 @@ export function ChatPanel({ jobId, otherUserName, otherUserRole, onClose }) {
 
   const badgeColor =
     otherUserRole === "mechanic"
-      ? "bg-blue-500/20 text-blue-400 border-blue-500/30"
+      ? "bg-[var(--surface-soft)] text-[var(--primary-dark)] border-[var(--border)]"
       : otherUserRole === "garage"
-        ? "bg-purple-500/20 text-purple-400 border-purple-500/30"
-        : "bg-icon-highlight/20 text-icon-highlight border-icon-highlight/30";
+        ? "bg-[var(--surface-soft)] text-[var(--primary-dark)] border-[var(--border)]"
+        : "bg-[var(--surface-soft)] text-[var(--primary-dark)] border-[var(--border)]";
 
   return (
     <>
@@ -119,7 +119,7 @@ export function ChatPanel({ jobId, otherUserName, otherUserRole, onClose }) {
           <div className="flex items-center gap-2.5 min-w-0">
             <button
               onClick={onClose}
-              className="surface-card-interactive w-7 h-7 flex items-center justify-center rounded-lg active-press shrink-0"
+              className="w-11 h-11 -m-1.5 flex items-center justify-center rounded-lg shrink-0 hover:bg-[var(--surface-soft)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)]"
               aria-label="Back"
             >
               <ChevronLeft size={16} className="text-on-surface-variant" />
@@ -138,14 +138,14 @@ export function ChatPanel({ jobId, otherUserName, otherUserRole, onClose }) {
                   {ROLE_BADGE[otherUserRole] || otherUserRole}
                 </span>
               </div>
-              <p className="text-[11px] text-text-dim truncate">
+              <p className="text-[11px] text-text-[var(--text-muted)] truncate">
                 {jobId ? `Job #${jobId.slice(0, 8)}` : ""}
               </p>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="surface-card-interactive w-7 h-7 flex items-center justify-center rounded-lg active-press shrink-0"
+            className="w-11 h-11 -m-1.5 flex items-center justify-center rounded-lg shrink-0 hover:bg-[var(--surface-soft)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)]"
             aria-label="Close chat"
           >
             <X size={14} className="text-on-surface-variant" />
@@ -158,10 +158,10 @@ export function ChatPanel({ jobId, otherUserName, otherUserRole, onClose }) {
         >
           {loading ? (
             <div className="flex items-center justify-center py-12">
-              <Loader2 size={20} className="animate-spin text-text-dim" />
+              <Loader2 size={20} className="animate-spin text-text-[var(--text-muted)]" />
             </div>
           ) : messages.length === 0 ? (
-            <p className="text-dim text-sm text-center py-8">
+            <p className="text-[var(--text-muted)] text-sm text-center py-8">
               No messages yet. Start the conversation!
             </p>
           ) : (
@@ -178,8 +178,8 @@ export function ChatPanel({ jobId, otherUserName, otherUserRole, onClose }) {
             className={cn(
               "w-11 h-11 flex items-center justify-center rounded-xl transition-all flex-shrink-0 active-press",
               uploading
-                ? "bg-[var(--surface-soft)] text-dim cursor-not-allowed"
-                : "bg-[var(--surface-soft)] text-on-surface-variant hover:bg-[var(--surface-soft)]"
+                ? "bg-[var(--surface-soft)] text-[var(--text-muted)] cursor-not-allowed"
+                : "bg-[var(--surface-soft)] text-[var(--foreground)] hover:bg-[var(--border)]"
             )}
             aria-label="Attach image"
           >
@@ -204,7 +204,7 @@ export function ChatPanel({ jobId, otherUserName, otherUserRole, onClose }) {
             onChange={(e) => setInputValue(e.target.value)}
             onKeyDown={handleKeyDown}
             placeholder="Type a message..."
-            className="input-glass flex-1 min-h-[44px] resize-none"
+            className="flex-1 min-h-[44px] rounded-xl border px-3 text-sm bg-[var(--surface-card)] border-[var(--border)] text-[var(--foreground)] placeholder:text-[var(--text-muted)] focus:border-[var(--primary)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)]"
             aria-label="Chat message"
           />
           <button
@@ -213,8 +213,8 @@ export function ChatPanel({ jobId, otherUserName, otherUserRole, onClose }) {
             className={cn(
               "w-11 h-11 flex items-center justify-center rounded-xl transition-all flex-shrink-0 active-press",
               inputValue.trim()
-                ? "bg-primary text-white shadow-[0_0_16px_rgba(var(--color-primary-rgb),0.25)] hover:shadow-[0_0_20px_rgba(var(--color-primary-rgb),0.35)]"
-                : "bg-[var(--surface-soft)] text-dim cursor-not-allowed"
+                ? "bg-[var(--primary)] text-[var(--on-primary)] hover:bg-[var(--primary-dark)]"
+                : "bg-[var(--surface-soft)] text-[var(--text-muted)] cursor-not-allowed"
             )}
             aria-label="Send message"
           >
