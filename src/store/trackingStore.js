@@ -183,6 +183,16 @@ export const useTrackingStore = create((set, get) => ({
     const watchId = navigator.geolocation.watchPosition(
       (position) => {
         const coords = [position.coords.latitude, position.coords.longitude];
+        // Reject coarse fixes (cell/IP positioning can be km off) once we have
+        // any usable position, and ignore sub-10m jitter — both make the
+        // navigation arrow and route jump around.
+        const acc = position.coords.accuracy;
+        const cur = get().userLocation;
+        const hasFix = cur && (cur[0] !== MAP_DEFAULT_CENTER[0] || cur[1] !== MAP_DEFAULT_CENTER[1]);
+        if (hasFix) {
+          if (acc != null && acc > 100) return;
+          if (haversineDistance(cur[0], cur[1], coords[0], coords[1]) < 0.01) return;
+        }
         set({ userLocation: coords, gpsStatus: "granted" });
         cacheLastLocation(coords[0], coords[1]);
         // Continuous check-in while the provider is on the road (watch mode):

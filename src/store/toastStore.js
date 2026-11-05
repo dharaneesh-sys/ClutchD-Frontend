@@ -14,6 +14,9 @@ export const useToastStore = create((set, get) => ({
   toasts: [],
 
   addToast: (type, message, options = {}) => {
+    // Identical message already on screen: don't stack another copy.
+    const dup = get().toasts.find((t) => t.type === type && t.message === message);
+    if (dup) return dup.id;
     const id = generateId();
     const toast = {
       id,
@@ -25,7 +28,7 @@ export const useToastStore = create((set, get) => ({
       createdAt: Date.now(),
     };
 
-    set((state) => ({ toasts: [...state.toasts, toast] }));
+    set((state) => ({ toasts: [...state.toasts, toast].slice(-3) }));
 
     if (!toast.persistent && toast.duration > 0) {
       setTimeout(() => {

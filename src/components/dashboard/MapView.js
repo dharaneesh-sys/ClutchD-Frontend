@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   MapContainer,
   TileLayer,
@@ -11,7 +11,7 @@ import {
   Tooltip,
 } from "react-leaflet";
 import MarkerClusterGroup from "react-leaflet-cluster";
-import { useTrackingStore } from "@/store/trackingStore";
+import { useTrackingStore, haversineDistance } from "@/store/trackingStore";
 import { useToastStore } from "@/store/toastStore";
 import {
   createUserLocationIcon,
@@ -202,40 +202,59 @@ export default function MapView({ role = "customer" }) {
   const [routePath, setRoutePath] = useState(null);
   const [routeDistance, setRouteDistance] = useState(null);
 
+  // Route only when the origin moved meaningfully (>40m) or the target changed,
+  // at most every 10s. Refetching on every GPS tick hammered the public OSRM
+  // server (rate-limited → missing/wrong routes) and raced stale responses.
+  const lastRouteRef = useRef({ at: 0, lat: null, lng: null, tLat: null, tLng: null });
+  const routeWarnedRef = useRef(false);
+  const navLat = navigationTarget?.lat;
+  const navLng = navigationTarget?.lng;
+  const originLat = userLocation?.[0];
+  const originLng = userLocation?.[1];
+
   useEffect(() => {
-    if (navigationTarget && userLocation) {
-      const getRoute = async () => {
-        try {
-          const res = await fetch(
-            `https://router.project-osrm.org/route/v1/driving/${userLocation[1]},${userLocation[0]};${navigationTarget.lng},${navigationTarget.lat}?overview=full&geometries=geojson`
-          );
-          if (!res.ok) {
-            throw new Error(`OSRM route request failed (${res.status})`);
-          }
-          const data = await res.json();
-          if (data.routes && data.routes.length > 0) {
-            const coords = data.routes[0].geometry.coordinates.map((coord) => [
-              coord[1],
-              coord[0],
-            ]);
-            setRoutePath(coords);
-            setRouteDistance(data.routes[0].distance / 1000);
-          }
-        } catch (err) {
-          console.error("Failed to fetch route:", err);
-          toast.warning(
-            "Couldn't calculate the route right now. Please try again."
-          );
-        }
-      };
-      getRoute();
-    } else {
-      /* eslint-disable-next-line react-hooks/set-state-in-effect */
+    if (navLat == null || navLng == null || originLat == null || originLng == null) {
       setRoutePath(null);
-      /* eslint-disable-next-line react-hooks/set-state-in-effect */
       setRouteDistance(null);
+      lastRouteRef.current = { at: 0, lat: null, lng: null, tLat: null, tLng: null };
+      return;
     }
-  }, [navigationTarget, userLocation]);
+    const last = lastRouteRef.current;
+    const targetChanged = last.tLat !== navLat || last.tLng !== navLng;
+    if (!targetChanged && last.lat != null) {
+      const movedKm = haversineDistance(last.lat, last.lng, originLat, originLng);
+      if (movedKm < 0.04 || Date.now() - last.at < 10000) return;
+    }
+    lastRouteRef.current = { at: Date.now(), lat: originLat, lng: originLng, tLat: navLat, tLng: navLng };
+
+    const controller = new AbortController();
+    (async () => {
+      try {
+        const res = await fetch(
+          `https://router.project-osrm.org/route/v1/driving/${originLng},${originLat};${navLng},${navLat}?overview=full&geometries=geojson`,
+          { signal: controller.signal }
+        );
+        if (!res.ok) throw new Error(`OSRM route request failed (${res.status})`);
+        const data = await res.json();
+        if (data.routes && data.routes.length > 0) {
+          setRoutePath(data.routes[0].geometry.coordinates.map((c) => [c[1], c[0]]));
+          setRouteDistance(data.routes[0].distance / 1000);
+          routeWarnedRef.current = false;
+        }
+      } catch (err) {
+        if (err?.name === "AbortError") return;
+        console.error("Failed to fetch route:", err);
+        // Keep the last good route on screen; warn once per outage, and let
+        // the next real movement retry.
+        lastRouteRef.current.at = 0;
+        if (!routeWarnedRef.current) {
+          routeWarnedRef.current = true;
+          toast.warning("Couldn't calculate the route right now. Please try again.");
+        }
+      }
+    })();
+    return () => controller.abort();
+  }, [navLat, navLng, originLat, originLng]); // eslint-disable-line react-hooks/exhaustive-deps
 
   if (!mounted) {
     return (

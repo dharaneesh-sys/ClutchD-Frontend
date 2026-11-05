@@ -15,6 +15,7 @@ export const ACCESS_TTL_MS =
 // Singleton in-flight refresh — every caller awaits the same request, so
 // concurrent 401s never stampede the backend with parallel refresh calls.
 let inflight = null;
+let lastAuthRedirect = 0;
 
 /**
  * Refresh the access token using the persisted refresh token.
@@ -120,5 +121,23 @@ export function handleRefreshFailure() {
   }
   clearAccessToken();
   clearRefreshToken();
-  navigateToAuth();
+  // Reset the auth store too. Otherwise it still says "authenticated", /auth
+  // bounces straight back to the dashboard, the dashboard 401s again and the
+  // app loops (each lap firing requests until the rate limiter answers 429).
+  // Dynamic import: authStore imports this module.
+  import("@/store/authStore")
+    .then(({ useAuthStore }) => {
+      const st = useAuthStore.getState();
+      if (st.isAuthenticated) {
+        useAuthStore.setState({ user: null, isAuthenticated: false, _hydrated: true, _isRestoring: false, error: null });
+      }
+    })
+    .catch(() => {})
+    .finally(() => {
+      const now = Date.now();
+      // One redirect per burst — parallel 401s must not queue several.
+      if (now - lastAuthRedirect < 3000) return;
+      lastAuthRedirect = now;
+      navigateToAuth();
+    });
 }

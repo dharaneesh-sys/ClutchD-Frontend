@@ -112,16 +112,23 @@ export default function CustomerDashboard() {
   );
 
   useEffect(() => {
+    // Only for a restored, signed-in session — never on the way to /auth.
+    if (!_hydrated || !isAuthenticated) return;
+    let cancelled = false;
     api
       .get("/vehicles")
-      .then((res) => setVehicles(res.data))
-      .catch(() => {
+      .then((res) => { if (!cancelled) setVehicles(res.data); })
+      .catch((err) => {
+        // 401 is handled by the auth interceptor (redirect); 429 has its own toast.
+        const status = err?.response?.status;
+        if (cancelled || status === 401 || status === 429) return;
         toast.error("Could not load your saved vehicles. Please try again later.");
       });
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+    return () => { cancelled = true; };
+  }, [_hydrated, isAuthenticated]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleDisputePayment = useCallback((reason) => {
-    disputePayment(reason);
+    return disputePayment(reason);
   }, [disputePayment]);
 
   /* ── Chat state ────────────────────────────────────────────────── */
