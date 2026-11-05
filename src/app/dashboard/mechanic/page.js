@@ -28,6 +28,7 @@ import {
 } from "@/components/dashboard/DashboardTabBar";
 import { PartnerTabStrip } from "@/components/partner/PartnerTabStrip";
 import { PartnerSupport } from "@/components/partner/PartnerSupport";
+import { PartnerBilling } from "@/components/partner/PartnerBilling";
 import { ChatPanel } from "@/components/ui/ChatPanel";
 import SplashScreen from "@/components/ui/SplashScreen";
 import { NAVIGATION_EVENT } from "@/lib/navigation";
@@ -187,7 +188,10 @@ export default function MechanicDashboard() {
         )}
 
         {activeTab === "earnings" && (
-          <EarningsChart earnings={overview.earnings} error={overview.errors.earnings} onRetry={overview.reload} />
+          <div className="space-y-4">
+            <EarningsChart earnings={overview.earnings} error={overview.errors.earnings} onRetry={overview.reload} />
+            <PartnerBilling role="mechanic" />
+          </div>
         )}
 
         {activeTab === "history" && (

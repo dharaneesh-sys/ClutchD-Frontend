@@ -18,6 +18,7 @@ import {
 } from "@/components/dashboard/DashboardTabBar";
 import { PartnerTabStrip } from "@/components/partner/PartnerTabStrip";
 import { PartnerSupport } from "@/components/partner/PartnerSupport";
+import { PartnerBilling } from "@/components/partner/PartnerBilling";
 import { ChatPanel } from "@/components/ui/ChatPanel";
 import { GarageProfile } from "@/components/garage/GarageProfile";
 import { KycDocumentsSection } from "@/components/ui/KycDocumentsSection";
@@ -132,6 +133,7 @@ export default function GarageDashboard() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-6">
             <GarageProfile />
             <KycDocumentsSection role="garage" />
+            <div className="lg:col-span-2"><PartnerBilling role="garage" /></div>
           </div>
         )}
 

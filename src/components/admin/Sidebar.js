@@ -8,6 +8,8 @@ import { useAuthStore } from "@/store/authStore";
 import api from "@/lib/api";
 import { Logo } from "@/components/ui/Logo";
 
+import { BILLING_ENABLED } from "@/lib/billing";
+
 const NAV_ITEMS = [
   { name: "Overview", icon: BarChart3, path: "/admin" },
   { name: "Users & Providers", icon: Users, path: "/admin/users" },
@@ -18,6 +20,7 @@ const NAV_ITEMS = [
   { name: "Active Jobs", icon: Briefcase, path: "/admin/jobs" },
   { name: "Payments", icon: CreditCard, path: "/admin/payments" },
   { name: "Payouts", icon: Wallet, path: "/admin/payouts" },
+  ...(BILLING_ENABLED ? [{ name: "Rent & Incentives", icon: Wallet, path: "/admin/billing" }] : []),
   { name: "KYC Verifications", icon: FileCheck, path: "/admin/kyc", badgeKey: "kyc" },
   { name: "Disputes", icon: AlertTriangle, path: "/admin/disputes", badgeKey: "disputes" },
   { name: "Warranty Claims", icon: ShieldCheck, path: "/admin/warranty" },

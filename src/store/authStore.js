@@ -9,7 +9,7 @@ import { setFleetPersona } from "@/lib/persona";
 import { useToastStore } from "@/store/toastStore";
 
 /** API `detail` as display text: FastAPI 422s send an array of objects. */
-function detailText(error) {
+export function detailText(error) {
   const d = error?.response?.data?.detail;
   if (typeof d === "string") return d;
   if (Array.isArray(d) && d.length) return d.map((x) => x?.msg || x?.message || "Invalid input").join("; ");
